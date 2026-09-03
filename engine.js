@@ -157,8 +157,8 @@ async function runAnalysis(){
     setStatus('Cross-checking with fundamentals feed…');
     const summary = await fetchYahooQuoteSummary(ySymbol);
     setStatus('Pulling news flow…');
-    const companyName = chart.meta?.longName || chart.meta?.shortName || rawSym;
-    const news = await fetchNews(companyName);
+    const companyNameForNews = chart.meta?.longName || chart.meta?.shortName || rawSym;
+    const news = await fetchNews(companyNameForNews);
 
     setStatus('Computing indicators, pivots, Fibonacci levels & trading calls…');
     const model = buildModel(chart, summary, news, rawSym, exch);
@@ -170,7 +170,7 @@ async function runAnalysis(){
     console.error(e);
     setStatus('Fetch failed', 'err');
     document.getElementById('errArea').innerHTML = `<div class="errbox">
-      Could not retrieve live data for <b>${rawSym}.${exch==='NS'?'NSE':'BSE'}</b>.
+      Could not retrieve live data for <b>${ySymbol}</b> (${exch==='NS'?'NSE':'BSE'}).
       This usually means the CORS proxy chain is rate-limited or the symbol is wrong.
       Try again in a few seconds, double-check the ticker (use the NSE/BSE trading symbol, not the company name),
       or open this page over GitHub Pages HTTPS rather than a local file if you haven't already.
@@ -182,6 +182,7 @@ async function runAnalysis(){
 }
 
 function buildModel(chart, summary, news, rawSym, exch){
+  const companyName = chart.meta?.longName || chart.meta?.shortName || rawSym;
   const ts = chart.timestamp || [];
   const q = chart.indicators.quote[0];
   const closes = q.close, highs=q.high, lows=q.low, opens=q.open, vols=q.volume;
