@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joshi's Corner | Stock Analyst Terminal</title>
+<style>
+  :root{
+    --navy-deep:#070c18;
+    --navy:#0d1730;
+    --navy-glass:rgba(18,28,54,0.72);
+    --navy-line:rgba(198,163,90,0.18);
+    --gold:#c6a35a;
+    --gold-bright:#f0d38a;
+    --gold-dim:#8a713a;
+    --green:#3ecf8e;
+    --green-dim:#1d5a41;
+    --red:#ef5b6f;
+    --red-dim:#5a1d2a;
+    --amber:#e0a93f;
+    --violet:#9d7ee0;
+    --text:#eef1f8;
+    --text-dim:#93a0bd;
+    --text-faint:#5c6884;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--navy-deep);color:var(--text);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;}
+  body{
+    background:
+      radial-gradient(ellipse 1200px 700px at 15% -10%, rgba(198,163,90,0.09), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 100% 0%, rgba(60,120,220,0.10), transparent 55%),
+      linear-gradient(180deg,#070c18 0%, #0a1224 40%, #070c18 100%);
+    min-height:100vh;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* ===== Header / brand ===== */
+  .brandbar{display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--navy-line);}
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .mark{font-size:26px;font-weight:700;letter-spacing:0.5px;
+    background:linear-gradient(120deg,var(--gold-bright),var(--gold) 60%,var(--gold-dim));
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand .sub{font-size:12.5px;color:var(--text-faint);letter-spacing:0.4px;}
+  .clock{font-size:12px;color:var(--text-dim);text-align:right;line-height:1.5;}
+  .clock b{color:var(--gold);}
+
+  /* ===== Search / submit card ===== */
+  .searchcard{
+    background:var(--navy-glass);
+    border:1px solid var(--navy-line);
+    border-radius:16px;
+    padding:22px 24px;
+    display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;
+    box-shadow:0 20px 50px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+    margin-bottom:26px;
+  }
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:11.5px;color:var(--text-dim);letter-spacing:0.3px;}
+  .field input, .field select{
+    background:#0a1226;border:1px solid rgba(198,163,90,0.25);color:var(--text);
+    border-radius:9px;padding:11px 13px;font-size:15px;min-width:170px;
+    outline:none;transition:border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field select:focus{border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(198,163,90,0.15);}
+  .goBtn{
+    background:linear-gradient(135deg,var(--gold-bright),var(--gold) 55%,var(--gold-dim));
+    color:#1a1408;font-weight:700;border:none;border-radius:9px;
+    padding:12px 26px;font-size:14.5px;cursor:pointer;letter-spacing:0.3px;
+    box-shadow:0 8px 22px -8px rgba(198,163,90,0.55);
+    transition:transform .12s, box-shadow .12s;
+  }
+  .goBtn:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(198,163,90,0.7);}
+  .goBtn:active{transform:translateY(0);}
+  .goBtn:disabled{opacity:0.5;cursor:wait;}
+  .srcnote{font-size:11px;color:var(--text-faint);margin-left:auto;max-width:280px;line-height:1.5;}
+
+  .statusline{font-size:12.5px;color:var(--text-dim);margin:-10px 0 22px 2px;display:none;}
+  .statusline.show{display:block;}
+  .statusline .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--amber);margin-right:7px;animation:pulse 1.1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .statusline.ok .dot{background:var(--green);animation:none;}
+  .statusline.err .dot{background:var(--red);animation:none;}
+
+  #results{display:none;}
+  #results.show{display:block;animation:fadein .4s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  section{margin-bottom:34px;}
+  .sectitle{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .sectitle h2{font-size:15px;margin:0;color:var(--gold-bright);font-weight:600;letter-spacing:0.3px;}
+  .sectitle .line{flex:1;height:1px;background:linear-gradient(90deg,var(--navy-line),transparent);}
+  .sectitle .tag{font-size:10.5px;color:var(--text-faint);border:1px solid var(--navy-line);
+    padding:2px 8px;border-radius:20px;}
+
+  /* ===== 3D gradient tiles ===== */
+  .tilegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;
+    perspective:1400px;}
+  .tile{
+    position:relative;border-radius:14px;padding:16px 18px;
+    background:linear-gradient(155deg,var(--g1,#1b2c52),var(--g2,#0c1530));
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:0 18px 34px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -18px 30px -22px rgba(0,0,0,0.5);
+    transform:rotateX(0deg);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .tile:hover{transform:rotateX(4deg) translateY(-3px);
+    box-shadow:0 26px 44px -18px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);}
+  .tile .tlabel{font-size:11px;color:rgba(255,255,255,0.65);letter-spacing:0.3px;margin-bottom:8px;}
+  .tile .tval{font-size:22px;font-weight:700;color:#fff;line-height:1.15;}
+  .tile .tsub{font-size:12px;margin-top:6px;color:rgba(255,255,255,0.75);}
+  .tile.up{--g1:#0f3d34;--g2:#0a2318;}
+  .tile.down{--g1:#4a1220;--g2:#230a12;}
+  .tile.gold{--g1:#3c2f10;--g2:#221a08;}
+  .tile.neutral{--g1:#1b2c52;--g2:#0c1530;}
+  .tile.violet{--g1:#2c1f52;--g2:#160c30;}
+
+  /* ===== data-quality legend ===== */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin:10px 2px 0;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .legend .lg-green{background:var(--green);}
+  .legend .lg-amber{background:var(--amber);}
+  .legend .lg-violet{background:var(--violet);}
+
+  /* ===== tables ===== */
+  table{width:100%;border-collapse:collapse;background:var(--navy-glass);
+    border-radius:14px;overflow:hidden;border:1px solid var(--navy-line);}
+  th,td{padding:11px 14px;font-size:13px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.04);}
+  th{background:rgba(198,163,90,0.08);color:var(--gold-bright);font-weight:600;font-size:12px;
+    letter-spacing:0.3px;text-transform:uppercase;}
+  tr:last-child td{border-bottom:none;}
+  td.lbl{text-align:left;color:var(--text-dim);font-weight:600;}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;}
+  .pill.res{background:rgba(239,91,111,0.15);color:#ff8a9a;}
+  .pill.sup{background:rgba(62,207,142,0.15);color:#6fe8ae;}
+  .pill.piv{background:rgba(198,163,90,0.18);color:var(--gold-bright);}
+  .pill.buy{background:rgba(62,207,142,0.18);color:#6fe8ae;}
+  .pill.sell{background:rgba(239,91,111,0.18);color:#ff8a9a;}
+  .pill.wait{background:rgba(224,169,63,0.18);color:var(--amber);}
+  .num-red{color:#ff8a9a;font-weight:600;}
+  .num-green{color:#6fe8ae;font-weight:600;}
+  .num-gold{color:var(--gold-bright);font-weight:600;}
+  .scrollx{overflow-x:auto;border-radius:14px;}
+
+  /* trend/bias badge */
+  .biasbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+    font-size:12px;font-weight:700;letter-spacing:0.3px;}
+  .biasbadge.bull{background:rgba(62,207,142,0.15);color:#6fe8ae;}
+  .biasbadge.bear{background:rgba(239,91,111,0.15);color:#ff8a9a;}
+  .biasbadge.range{background:rgba(224,169,63,0.15);color:var(--amber);}
+
+  /* summary section */
+  .summarygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  .summarycard{background:var(--navy-glass);border:1px solid var(--navy-line);border-radius:14px;
+    padding:16px 18px;}
+  .summarycard .slabel{font-size:11px;color:var(--text-faint);letter-spacing:0.3px;margin-bottom:6px;}
+  .summarycard .sval{font-size:20px;font-weight:700;}
+  .outlookbox{background:linear-gradient(155deg,rgba(198,163,90,0.09),rgba(198,163,90,0.02));
+    border:1px solid rgba(198,163,90,0.25);border-radius:16px;padding:22px 24px;line-height:1.7;
+    font-size:14px;color:var(--text);}
+  .outlookbox b{color:var(--gold-bright);}
+
+  .newsitem{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;}
+  .newsitem:last-child{border-bottom:none;}
+  .newsitem a{color:var(--text);text-decoration:none;}
+  .newsitem a:hover{color:var(--gold-bright);}
+  .newsitem .newsdate{font-size:11px;color:var(--text-faint);margin-top:2px;}
+
+  .footnote{font-size:11px;color:var(--text-faint);margin-top:10px;line-height:1.6;}
+  .errbox{background:rgba(239,91,111,0.08);border:1px solid rgba(239,91,111,0.3);border-radius:12px;
+    padding:16px 18px;font-size:13px;color:#ff9caa;}
+
+  @media (max-width:640px){
+    .searchcard{flex-direction:column;align-items:stretch;}
+    .srcnote{margin-left:0;max-width:100%;}
+    .field input,.field select{min-width:0;width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brandbar">
+    <div class="brand">
+      <span class="mark">Joshi's Corner</span>
+      <span class="sub">Stock Analyst Terminal</span>
+    </div>
+    <div class="clock">
+      <div><b id="clockTime">--:--:--</b></div>
+      <div id="clockDate">--</div>
+    </div>
+  </div>
+
+  <div class="searchcard">
+    <div class="field">
+      <label for="symbolInput">Symbol</label>
+      <input id="symbolInput" type="text" placeholder="e.g. RELIANCE" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="exchangeInput">Exchange</label>
+      <select id="exchangeInput">
+        <option value="NS">NSE</option>
+        <option value="BO">BSE</option>
+      </select>
+    </div>
+    <button class="goBtn" id="goBtn" onclick="runAnalysis()">Generate Terminal View</button>
+    <div class="srcnote">Pulls live quote, history, fundamentals &amp; news from multiple sources and cross-checks them before computing levels — nothing here is hardcoded.</div>
+  </div>
+
+  <div class="statusline" id="statusLine"><span class="dot"></span><span id="statusText">Idle</span></div>
+
+  <div id="errArea"></div>
+
+  <div id="results">
+
+    <section>
+      <div class="sectitle"><h2>Snapshot</h2><div class="line"></div><span class="tag" id="asOfTag">as of --</span></div>
+      <div class="tilegrid" id="snapshotTiles"></div>
+      <div class="legend">
+        <span><i class="lg-green"></i>Verified across ≥2 sources</span>
+        <span><i class="lg-amber"></i>Single source (cross-check unavailable)</span>
+        <span><i class="lg-violet"></i>Computed client-side from raw OHLCV</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Pivot Levels</h2><div class="line"></div><span class="tag">Classic pivots · prior session</span></div>
+      <div class="scrollx"><table id="pivotTable"></table></div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Fibonacci Map</h2><div class="line"></div><span class="tag" id="fibRangeTag">recent swing range</span></div>
+      <div class="scrollx"><table id="fibTable"></table></div>
+      <div class="footnote" id="fibNote"></div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Trading Call Matrix</h2><div class="line"></div><span class="tag">Volatility-scaled, 8 horizons</span></div>
+      <div class="scrollx"><table id="callTable"></table></div>
+      <div class="footnote">Entry/SL/Target derived from annualised historical volatility (σ√T) and current trend structure (price vs 50/200 DMA, RSI, MACD). This is a systematic, algorithmic view — not personalized investment advice.</div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Technical &amp; Fundamental Readout</h2><div class="line"></div></div>
+      <div class="tilegrid" id="techTiles"></div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Move Summary</h2><div class="line"></div></div>
+      <div class="summarygrid" id="summaryGrid"></div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>Outlook From Here</h2><div class="line"></div></div>
+      <div class="outlookbox" id="outlookBox"></div>
+    </section>
+
+    <section>
+      <div class="sectitle"><h2>News Flow</h2><div class="line"></div></div>
+      <div id="newsBox" style="background:var(--navy-glass);border:1px solid var(--navy-line);border-radius:14px;padding:6px 18px;"></div>
+    </section>
+
+    <div class="footnote">
+      Data sources: Yahoo Finance (quote, OHLCV history, fundamentals), Google News RSS (headlines). NSE-native fields (F&O OI, delivery %) require a dedicated backend (Apps Script) due to NSE's bot-protection layer and are marked unavailable rather than estimated. All indicators, pivots, Fibonacci levels and trading calls are computed client-side in your browser from the raw fetched OHLCV series — no numbers are pre-baked into this file. Generated by Joshi's Corner Stock Analyst Terminal.
+    </div>
+
+  </div>
+</div>
+
+<script src="engine.js"></script>
+</body>
+</html>
