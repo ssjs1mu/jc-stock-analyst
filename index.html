@@ -52,32 +52,33 @@
   .searchcard{
     background:var(--navy-glass);
     border:1px solid var(--navy-line);
-    border-radius:16px;
-    padding:22px 24px;
-    display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;
-    box-shadow:0 20px 50px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
-    margin-bottom:26px;
+    border-radius:14px;
+    padding:14px 18px;
+    box-shadow:0 16px 36px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+    margin-bottom:18px;
   }
-  .field{display:flex;flex-direction:column;gap:6px;}
-  .field label{font-size:11.5px;color:var(--text-dim);letter-spacing:0.3px;}
+  .srcnote-top{margin-bottom:10px;max-width:none;}
+  .searchrow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:11px;color:var(--text-dim);letter-spacing:0.3px;}
   .field input, .field select{
     background:#0a1226;border:1px solid rgba(198,163,90,0.25);color:var(--text);
-    border-radius:9px;padding:11px 13px;font-size:15px;min-width:170px;
+    border-radius:8px;padding:9px 12px;font-size:14px;min-width:150px;
     outline:none;transition:border-color .15s, box-shadow .15s;
   }
   .field input:focus, .field select:focus{border-color:var(--gold);
     box-shadow:0 0 0 3px rgba(198,163,90,0.15);}
   .goBtn{
     background:linear-gradient(135deg,var(--gold-bright),var(--gold) 55%,var(--gold-dim));
-    color:#1a1408;font-weight:700;border:none;border-radius:9px;
-    padding:12px 26px;font-size:14.5px;cursor:pointer;letter-spacing:0.3px;
+    color:#1a1408;font-weight:700;border:none;border-radius:8px;
+    padding:10px 22px;font-size:13.5px;cursor:pointer;letter-spacing:0.3px;
     box-shadow:0 8px 22px -8px rgba(198,163,90,0.55);
     transition:transform .12s, box-shadow .12s;
   }
   .goBtn:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(198,163,90,0.7);}
   .goBtn:active{transform:translateY(0);}
   .goBtn:disabled{opacity:0.5;cursor:wait;}
-  .srcnote{font-size:11px;color:var(--text-faint);margin-left:auto;max-width:280px;line-height:1.5;}
+  .srcnote{font-size:11px;color:var(--text-faint);line-height:1.5;}
 
   .statusline{font-size:12.5px;color:var(--text-dim);margin:-10px 0 22px 2px;display:none;}
   .statusline.show{display:block;}
@@ -174,11 +175,11 @@
   .biasbadge.range{background:rgba(224,169,63,0.15);color:var(--amber);}
 
   /* summary section */
-  .summarygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
-  .summarycard{background:var(--navy-glass);border:1px solid var(--navy-line);border-radius:14px;
-    padding:16px 18px;}
-  .summarycard .slabel{font-size:11px;color:var(--text-faint);letter-spacing:0.3px;margin-bottom:6px;}
-  .summarycard .sval{font-size:20px;font-weight:700;}
+  .summarygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}
+  .summarycard{background:var(--navy-glass);border:1px solid var(--navy-line);border-radius:10px;
+    padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .summarycard .slabel{font-size:10.5px;color:var(--text-faint);letter-spacing:0.3px;}
+  .summarycard .sval{font-size:15px;font-weight:700;}
   .outlookbox{background:linear-gradient(155deg,rgba(198,163,90,0.09),rgba(198,163,90,0.02));
     border:1px solid rgba(198,163,90,0.25);border-radius:16px;padding:22px 24px;line-height:1.7;
     font-size:14px;color:var(--text);}
@@ -195,8 +196,7 @@
     padding:16px 18px;font-size:13px;color:#ff9caa;}
 
   @media (max-width:640px){
-    .searchcard{flex-direction:column;align-items:stretch;}
-    .srcnote{margin-left:0;max-width:100%;}
+    .searchrow{flex-direction:column;align-items:stretch;}
     .field input,.field select{min-width:0;width:100%;}
   }
 </style>
@@ -215,20 +215,22 @@
     </div>
   </div>
 
-  <div class="searchcard">
-    <div class="field">
-      <label for="symbolInput">Symbol</label>
-      <input id="symbolInput" type="text" placeholder="e.g. RELIANCE" autocomplete="off">
+  <div class="searchcard searchcard-compact">
+    <div class="srcnote srcnote-top">Pulls live quote, history, fundamentals &amp; news from multiple sources and cross-checks them before computing levels — nothing here is hardcoded.</div>
+    <div class="searchrow">
+      <div class="field">
+        <label for="symbolInput">Symbol</label>
+        <input id="symbolInput" type="text" placeholder="e.g. RELIANCE" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="exchangeInput">Exchange</label>
+        <select id="exchangeInput">
+          <option value="NS">NSE</option>
+          <option value="BO">BSE</option>
+        </select>
+      </div>
+      <button class="goBtn" id="goBtn" onclick="runAnalysis()">Generate Terminal View</button>
     </div>
-    <div class="field">
-      <label for="exchangeInput">Exchange</label>
-      <select id="exchangeInput">
-        <option value="NS">NSE</option>
-        <option value="BO">BSE</option>
-      </select>
-    </div>
-    <button class="goBtn" id="goBtn" onclick="runAnalysis()">Generate Terminal View</button>
-    <div class="srcnote">Pulls live quote, history, fundamentals &amp; news from multiple sources and cross-checks them before computing levels — nothing here is hardcoded.</div>
   </div>
 
   <div class="statusline" id="statusLine"><span class="dot"></span><span id="statusText">Idle</span></div>
@@ -299,6 +301,6 @@
   </div>
 </div>
 
-<script src="engine.js"></script>
+<script src="engine.js?v=1788531786"></script>
 </body>
 </html>

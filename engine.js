@@ -324,7 +324,8 @@ function buildModel(chart, summary, news, rawSym, exch){
     } else {
       dir='Range';
       entryLow = cmp*(1-expMove*0.2); entryHigh = cmp*(1+expMove*0.2);
-      sl = cmp*(1-expMove*0.7);
+      // SL for range mode is a tight band around entry (not the same as the breakdown target)
+      sl = cmp*(1-expMove*0.35);
       t1 = cmp*(1+expMove*0.7); t2 = cmp*(1-expMove*0.7);
     }
     return {label:h.label, dir, entryLow, entryHigh, sl, t1, t2, expMovePct: expMove*100};
@@ -430,13 +431,14 @@ function renderAll(m){
   let callHTML = `<tr><th>Horizon</th><th>Bias</th><th>Entry Range</th><th>Stoploss</th><th>Target 1</th><th>Target 2</th><th>Expected Move</th></tr>`;
   m.calls.forEach(c=>{
     const pillCls = c.dir==='Long'?'buy':c.dir==='Short'?'sell':'wait';
+    const arrow = (v)=> v>=m.cmp ? '↑' : '↓';
     callHTML += `<tr>
       <td class="lbl">${c.label}</td>
       <td><span class="pill ${pillCls}">${c.dir}</span></td>
       <td>${fmt(Math.min(c.entryLow,c.entryHigh))} – ${fmt(Math.max(c.entryLow,c.entryHigh))}</td>
       <td class="num-red">${fmt(c.sl)}</td>
-      <td class="num-green">${fmt(c.t1)}</td>
-      <td class="num-green">${fmt(c.t2)}</td>
+      <td class="num-green">${arrow(c.t1)} ${fmt(c.t1)}</td>
+      <td class="num-green">${arrow(c.t2)} ${fmt(c.t2)}</td>
       <td>±${c.expMovePct.toFixed(1)}%</td>
     </tr>`;
   });
