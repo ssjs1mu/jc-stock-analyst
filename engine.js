@@ -151,27 +151,47 @@ async function runAnalysis(){
   setStatus('Fetching live quote & 2-year history from Yahoo Finance…');
 
   const ySymbol = `${rawSym}.${exch}`;
+  const altExch = exch === 'NS' ? 'BO' : 'NS';
+  const altYSymbol = `${rawSym}.${altExch}`;
+
+  let usedExch = exch;
+  let usedYSymbol = ySymbol;
 
   try{
-    const chart = await fetchYahooChart(ySymbol);
+    let chart;
+    try{
+      chart = await fetchYahooChart(ySymbol);
+    }catch(primaryErr){
+      // Self-correct: the symbol may only be listed on the other exchange — try it automatically
+      setStatus(`No data on ${exch==='NS'?'NSE':'BSE'} for ${rawSym} — trying ${altExch==='NS'?'NSE':'BSE'} instead…`);
+      try{
+        chart = await fetchYahooChart(altYSymbol);
+        usedExch = altExch;
+        usedYSymbol = altYSymbol;
+      }catch(altErr){
+        // Both exchanges failed — surface the original exchange's error as primary
+        throw primaryErr;
+      }
+    }
     setStatus('Cross-checking with fundamentals feed…');
-    const summary = await fetchYahooQuoteSummary(ySymbol);
+    const summary = await fetchYahooQuoteSummary(usedYSymbol);
     setStatus('Pulling news flow…');
     const companyNameForNews = chart.meta?.longName || chart.meta?.shortName || rawSym;
     const news = await fetchNews(companyNameForNews);
 
     setStatus('Computing indicators, pivots, Fibonacci levels & trading calls…');
-    const model = buildModel(chart, summary, news, rawSym, exch);
+    const model = buildModel(chart, summary, news, rawSym, usedExch);
     renderAll(model);
 
-    setStatus('Live · sourced from Yahoo Finance + Google News · '+new Date().toLocaleTimeString('en-IN'), 'ok');
+    const switchedNote = usedExch !== exch ? ` (auto-switched to ${usedExch==='NS'?'NSE':'BSE'} — no data found on ${exch==='NS'?'NSE':'BSE'})` : '';
+    setStatus('Live · sourced from Yahoo Finance + Google News · '+new Date().toLocaleTimeString('en-IN')+switchedNote, 'ok');
     document.getElementById('results').classList.add('show');
   }catch(e){
     console.error(e);
     setStatus('Fetch failed', 'err');
     document.getElementById('errArea').innerHTML = `<div class="errbox">
-      Could not retrieve live data for <b>${ySymbol}</b> (${exch==='NS'?'NSE':'BSE'}).
-      This usually means the CORS proxy chain is rate-limited or the symbol is wrong.
+      Could not retrieve live data for <b>${rawSym}</b> on either exchange — tried <b>${ySymbol}</b> (${exch==='NS'?'NSE':'BSE'}) and <b>${altYSymbol}</b> (${altExch==='NS'?'NSE':'BSE'}).
+      This usually means the CORS proxy chain is rate-limited, the symbol doesn't exist on Yahoo Finance under this name, or your network is blocking the proxy domains.
       Try again in a few seconds, double-check the ticker (use the NSE/BSE trading symbol, not the company name),
       or open this page over GitHub Pages HTTPS rather than a local file if you haven't already.
       <br><br><span style="color:var(--text-faint)">Technical detail: ${(e && e.message)||e}</span>
@@ -236,6 +256,15 @@ function buildModel(chart, summary, news, rawSym, exch){
     P,
     R1: 2*P-pL, R2: P+(pH-pL), R3: pH+2*(P-pL),
     S1: 2*P-pH, S2: P-(pH-pL), S3: pL-2*(pH-P)
+  };
+
+  // Live pivot — uses today's session H/L and current price instead of yesterday's close
+  const lH = H[n-1], lL = L[n-1], lC = cmp;
+  const lP = (lH+lL+lC)/3;
+  const livePivots = {
+    P: lP,
+    R1: 2*lP-lL, R2: lP+(lH-lL), R3: lH+2*(lP-lL),
+    S1: 2*lP-lH, S2: lP-(lH-lL), S3: lL-2*(lH-lP)
   };
 
   // Fibonacci — swing over last 60 trading days
@@ -332,7 +361,7 @@ function buildModel(chart, summary, news, rawSym, exch){
     dayHigh: H[n-1], dayLow: L[n-1], wk52High, wk52Low,
     sma20, sma50, sma100, sma200, macd, macdSignal, macdHist, rsi, atr,
     bbUpper, bbMid, bbLower, annualVol,
-    pivots, fibLevels, fibExt, swingHigh, swingLow, uptrend,
+    pivots, livePivots, fibLevels, fibExt, swingHigh, swingLow, uptrend,
     bias, score, calls, moves, fundamentals, news, currency: meta.currency || 'INR',
     lastDate: new Date(T[n-1]*1000)
   };
@@ -358,42 +387,44 @@ function renderAll(m){
   tiles += tileHTML('violet', 'Annualised Volatility', (m.annualVol*100).toFixed(1)+'%', 'from 1Y daily returns');
   document.getElementById('snapshotTiles').innerHTML = tiles;
 
-  /* --- pivot table --- */
-  const p = m.pivots;
-  const pivotRows = [
-    ['R3', p.R3, 'res'], ['R2', p.R2, 'res'], ['R1', p.R1, 'res'],
-    ['Pivot', p.P, 'piv'],
-    ['S1', p.S1, 'sup'], ['S2', p.S2, 'sup'], ['S3', p.S3, 'sup'],
-  ];
-  let pivotHTML = `<tr><th>Level</th><th>Price</th><th>Distance from CMP</th><th>Type</th></tr>`;
-  pivotRows.forEach(([label, val, type])=>{
-    const dist = ((val-m.cmp)/m.cmp)*100;
-    pivotHTML += `<tr><td class="lbl">${label}</td><td>${fmt(val)}</td>
-      <td class="${dist>=0?'num-red':'num-green'}">${fmtPct(dist)}</td>
-      <td><span class="pill ${type}">${type==='res'?'Resistance':type==='sup'?'Support':'Pivot'}</span></td></tr>`;
-  });
-  document.getElementById('pivotTable').innerHTML = pivotHTML;
+  /* --- pivot tables (live + classic), compact 3-column style --- */
+  function renderPivotTable(elId, p){
+    const rows = [
+      ['R3', p.R3, 'res'], ['R2', p.R2, 'res'], ['R1', p.R1, 'res'],
+      ['P', p.P, 'piv'],
+      ['S1', p.S1, 'sup'], ['S2', p.S2, 'sup'], ['S3', p.S3, 'sup'],
+    ];
+    let html = `<tr><th>Lvl</th><th>Price</th><th>Δ%</th></tr>`;
+    rows.forEach(([label, val, type])=>{
+      const dist = ((val-m.cmp)/m.cmp)*100;
+      html += `<tr><td class="lbl">${label}</td><td>${fmt(val)}</td>
+        <td class="${dist>=0?'num-red':'num-green'}">${fmtPct(dist,1)}</td></tr>`;
+    });
+    document.getElementById(elId).innerHTML = html;
+  }
+  renderPivotTable('livePivotTable', m.livePivots);
+  renderPivotTable('pivotTable', m.pivots);
 
-  /* --- fibonacci table --- */
+  /* --- fibonacci table (retracements + extensions, sorted by price so order is always correct) --- */
   document.getElementById('fibRangeTag').textContent =
     (m.uptrend?'Retracing down from ':'Retracing up from ') + '₹'+fmt(m.uptrend?m.swingHigh:m.swingLow) +
     ' · 60-session range ₹'+fmt(m.swingHigh-m.swingLow);
-  let fibHTML = `<tr><th>Retracement %</th><th>Price Level</th><th>Distance from CMP</th></tr>`;
-  m.fibLevels.forEach(f=>{
+  const fibRows = [
+    ...m.fibLevels.map(f=>({label: (f.pct*100).toFixed(1)+'%', level: f.level, ext:false})),
+    ...m.fibExt.map(f=>({label: (f.pct*100).toFixed(1)+'%', level: f.level, ext:true})),
+  ].sort((a,b)=> b.level - a.level);
+  let fibHTML = `<tr><th>Lvl</th><th>Price</th><th>Δ%</th></tr>`;
+  fibRows.forEach(f=>{
     const dist = ((f.level-m.cmp)/m.cmp)*100;
-    fibHTML += `<tr><td class="lbl">${(f.pct*100).toFixed(1)}%</td><td class="num-gold">${fmt(f.level)}</td>
-      <td class="${dist>=0?'num-red':'num-green'}">${fmtPct(dist)}</td></tr>`;
-  });
-  m.fibExt.forEach(f=>{
-    const dist = ((f.level-m.cmp)/m.cmp)*100;
-    fibHTML += `<tr><td class="lbl">${(f.pct*100).toFixed(1)}% ext.</td><td>${fmt(f.level)}
-      <span class="pill ${m.uptrend?'res':'sup'}">${m.uptrend?'New High Trigger':'New Low Trigger'}</span></td>
-      <td class="${dist>=0?'num-red':'num-green'}">${fmtPct(dist)}</td></tr>`;
+    const extPill = f.ext ? `<br><span class="pill ${m.uptrend?'res':'sup'}" style="margin-top:3px;">${m.uptrend?'Breakout↑':'Breakdown↓'}</span>` : '';
+    fibHTML += `<tr><td class="lbl">${f.label}${extPill}</td><td class="${f.ext?'num-gold':''}">${fmt(f.level)}</td>
+      <td class="${dist>=0?'num-red':'num-green'}">${fmtPct(dist,1)}</td></tr>`;
   });
   document.getElementById('fibTable').innerHTML = fibHTML;
   document.getElementById('fibNote').textContent =
     `A sustained close beyond the ${m.uptrend?'161.8% extension above the recent swing high':'161.8% extension below the recent swing low'} `+
-    `(₹${fmt(m.fibExt[1].level)}) confirms a fresh breakout rather than a retracement bounce.`;
+    `(₹${fmt(m.fibExt[1].level)}) confirms a fresh breakout rather than a retracement bounce. Live Pivot uses today's session H/L/close; Classic Pivot uses the prior session's — compare the two to see how much the day's range has shifted the levels.`;
+
 
   /* --- trading call matrix --- */
   let callHTML = `<tr><th>Horizon</th><th>Bias</th><th>Entry Range</th><th>Stoploss</th><th>Target 1</th><th>Target 2</th><th>Expected Move</th></tr>`;
@@ -435,6 +466,7 @@ function renderAll(m){
   ).join('');
 
   /* --- outlook --- */
+  const p = m.pivots;
   const nearestSup = [p.S1,p.S2,p.S3].filter(v=>v<m.cmp).sort((a,b)=>b-a)[0];
   const nearestRes = [p.R1,p.R2,p.R3].filter(v=>v>m.cmp).sort((a,b)=>a-b)[0];
   const distTo52wHigh = ((m.wk52High-m.cmp)/m.cmp*100).toFixed(1);

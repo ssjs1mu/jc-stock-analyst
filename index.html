@@ -28,9 +28,10 @@
     font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;}
   body{
     background:
-      radial-gradient(ellipse 1200px 700px at 15% -10%, rgba(198,163,90,0.09), transparent 60%),
-      radial-gradient(ellipse 900px 600px at 100% 0%, rgba(60,120,220,0.10), transparent 55%),
-      linear-gradient(180deg,#070c18 0%, #0a1224 40%, #070c18 100%);
+      radial-gradient(ellipse 1300px 750px at 12% -12%, rgba(198,163,90,0.11), transparent 62%),
+      radial-gradient(ellipse 950px 620px at 102% -5%, rgba(120,130,150,0.10), transparent 55%),
+      radial-gradient(ellipse 800px 500px at 50% 110%, rgba(80,90,110,0.08), transparent 60%),
+      linear-gradient(160deg,#15181f 0%, #0c0e13 35%, #17191f 65%, #0a0b0e 100%);
     min-height:100vh;
   }
   .wrap{max-width:1320px;margin:0 auto;padding:28px 20px 80px;}
@@ -39,9 +40,10 @@
   .brandbar{display:flex;align-items:center;justify-content:space-between;
     padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--navy-line);}
   .brand{display:flex;align-items:baseline;gap:10px;}
-  .brand .mark{font-size:26px;font-weight:700;letter-spacing:0.5px;
-    background:linear-gradient(120deg,var(--gold-bright),var(--gold) 60%,var(--gold-dim));
-    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand .mark{font-family:'Brush Script MT','Segoe Script',cursive;font-size:36px;font-weight:400;letter-spacing:0.5px;
+    background:linear-gradient(120deg,var(--gold-bright),var(--gold) 55%,var(--gold-dim));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4));}
   .brand .sub{font-size:12.5px;color:var(--text-faint);letter-spacing:0.4px;}
   .clock{font-size:12px;color:var(--text-dim);text-align:right;line-height:1.5;}
   .clock b{color:var(--gold);}
@@ -147,6 +149,23 @@
   .num-gold{color:var(--gold-bright);font-weight:600;}
   .scrollx{overflow-x:auto;border-radius:14px;}
 
+  /* ===== side-by-side pivot/fib columns ===== */
+  .pivotgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .pivotcol{border-radius:14px;overflow:hidden;border:1px solid var(--navy-line);
+    box-shadow:0 14px 28px -18px rgba(0,0,0,0.7);}
+  .pivotcol table{border-radius:0;box-shadow:none;}
+  .pivotcol th,.pivotcol td{padding:7px 9px;font-size:11.5px;}
+  .pivotcol-head{padding:9px 12px;font-size:12px;font-weight:700;letter-spacing:0.3px;
+    display:flex;align-items:baseline;gap:6px;}
+  .pivotcol-sub{font-size:10px;font-weight:400;color:rgba(255,255,255,0.6);}
+  .pivotcol-live .pivotcol-head{background:linear-gradient(120deg,rgba(224,169,63,0.22),rgba(224,169,63,0.06));color:var(--amber);}
+  .pivotcol-live table{background:linear-gradient(180deg,rgba(224,169,63,0.05),transparent 40%),var(--navy-glass);}
+  .pivotcol-classic .pivotcol-head{background:linear-gradient(120deg,rgba(157,126,224,0.22),rgba(157,126,224,0.06));color:var(--violet);}
+  .pivotcol-classic table{background:linear-gradient(180deg,rgba(157,126,224,0.05),transparent 40%),var(--navy-glass);}
+  .pivotcol-fib .pivotcol-head{background:linear-gradient(120deg,rgba(62,207,142,0.22),rgba(62,207,142,0.06));color:var(--green);}
+  .pivotcol-fib table{background:linear-gradient(180deg,rgba(62,207,142,0.05),transparent 40%),var(--navy-glass);}
+  @media (max-width:820px){ .pivotgrid{grid-template-columns:1fr;} }
+
   /* trend/bias badge */
   .biasbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
     font-size:12px;font-weight:700;letter-spacing:0.3px;}
@@ -229,13 +248,21 @@
     </section>
 
     <section>
-      <div class="sectitle"><h2>Pivot Levels</h2><div class="line"></div><span class="tag">Classic pivots · prior session</span></div>
-      <div class="scrollx"><table id="pivotTable"></table></div>
-    </section>
-
-    <section>
-      <div class="sectitle"><h2>Fibonacci Map</h2><div class="line"></div><span class="tag" id="fibRangeTag">recent swing range</span></div>
-      <div class="scrollx"><table id="fibTable"></table></div>
+      <div class="sectitle"><h2>Pivot &amp; Fibonacci Levels</h2><div class="line"></div><span class="tag" id="fibRangeTag">recent swing range</span></div>
+      <div class="pivotgrid">
+        <div class="pivotcol pivotcol-live">
+          <div class="pivotcol-head">Live Pivot <span class="pivotcol-sub">today's session</span></div>
+          <table id="livePivotTable"></table>
+        </div>
+        <div class="pivotcol pivotcol-classic">
+          <div class="pivotcol-head">Classic Pivot <span class="pivotcol-sub">prior session</span></div>
+          <table id="pivotTable"></table>
+        </div>
+        <div class="pivotcol pivotcol-fib">
+          <div class="pivotcol-head">Fibonacci <span class="pivotcol-sub">60-session swing</span></div>
+          <table id="fibTable"></table>
+        </div>
+      </div>
       <div class="footnote" id="fibNote"></div>
     </section>
 
