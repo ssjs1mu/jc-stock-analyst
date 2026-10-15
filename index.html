@@ -124,6 +124,23 @@
   .wlcloud{font-size:11px;color:var(--ink2);margin:-2px 0 6px}.uptable.wl td{vertical-align:middle}.uptable td.acc{min-width:150px}
   .kp{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 7px}.kpi{flex:1 1 120px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--navy);border-radius:8px;padding:4px 10px;min-width:0}.kpi .cap{display:block;font-size:8.5px;letter-spacing:.9px;text-transform:uppercase;font-weight:800;color:var(--ink2)}.kpi b{display:block;font-size:16px;font-weight:900;color:var(--navy);line-height:1.2}.kpi small{display:block;font-size:10px;color:var(--ink2)}
   .uptable .stance{white-space:nowrap}.split.up{grid-template-columns:.7fr 1.5fr}@media(max-width:900px){.split.up{grid-template-columns:1fr}}.kpi b.num-green{color:var(--green)}.kpi b.num-red{color:var(--red)}
+  /* scheduled-report tabs */
+  .scpanel .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 9px;box-shadow:0 5px 16px -14px rgba(20,40,100,.55);min-width:0;margin-bottom:8px;overflow-x:auto}
+  .schead{display:grid;grid-template-columns:1.1fr 1.4fr;gap:8px;margin-bottom:8px;align-items:stretch}@media(max-width:900px){.schead{grid-template-columns:1fr}}
+  .schtitle{display:flex;gap:10px;align-items:center;background:linear-gradient(120deg,#14306e,#1f4fb8 60%,#3a2a8a);color:#fff;border-radius:10px;padding:8px 12px;box-shadow:0 8px 20px -14px rgba(20,48,110,.9)}
+  .schtitle h3{margin:0;font-size:16px;letter-spacing:.2px}.schtitle small{display:block;color:#d9e2ff;font-size:11px;line-height:1.35;margin-top:2px}.scicon{font-size:24px}
+  .sckp{display:flex;gap:6px;flex-wrap:wrap}.sckp .kpi{margin:0}
+  .scst{display:inline-block;font-weight:800;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid transparent;white-space:normal}
+  .scst.ok{background:#e3f6ec;color:var(--green);border-color:#bfe6cf}.scst.bad{background:#fde7ec;color:var(--red);border-color:#f5c2cd}
+  .scst.wait{background:#eaf0ff;color:var(--navy);border-color:#c9d6f7}.scst.run{background:#fff4e0;color:var(--amber);border-color:#f3d9a6;animation:blink 1.4s infinite}
+  .scst.mute,.scst.info{background:#f0f2f7;color:var(--ink2);border-color:var(--line)}
+  .scbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;font-size:12px}.scbar .spacer{flex:1}.sccap{color:var(--ink2);font-style:italic}
+  .sclink{display:inline-block;font-weight:700;color:var(--navy);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;background:#fff;font-size:11px;margin:1px 0}
+  .sclinkbtn{text-decoration:none;display:inline-block;margin-left:6px}.scbig{display:block;text-align:center;margin:10px 0;padding:14px;font-size:14px}
+  .scpanel .uptable td,.scpanel .uptable th{text-align:left}
+  .scpdf{width:100%;height:78vh;min-height:520px;border:1px solid var(--line);border-radius:8px;background:#fff}.scpng{width:100%;max-width:1000px;display:block;margin:0 auto;border-radius:8px}
+  .scview h4,.scpanel .card h4{margin:0 0 6px;color:var(--navy);font-size:13px}.uptable td.r,.uptable th.r{text-align:right}
+  #scToast{position:fixed;right:14px;bottom:14px;z-index:50;background:#14306e;color:#fff;padding:9px 14px;border-radius:10px;box-shadow:0 10px 26px -10px rgba(0,0,0,.5);transform:translateY(140%);transition:transform .3s}#scToast.show{transform:none}#scToast a{color:#ffd77a;font-weight:800}
 </style>
 </head>
 <body>
@@ -136,12 +153,14 @@
       <button class="goBtn" id="goBtn" onclick="runAnalysis()">Generate</button>
       <label>View
         <select id="viewSel">
+          <optgroup label="Live analysis">
           <option value="pSummary">⚡ Quick summary</option>
           <option value="pIntraday">Intraday</option>
           <option value="pSwing">Short term</option>
           <option value="pLong">Long term</option>
           <option value="pUpcoming">Results week</option>
           <option value="pWatch">★ Watchlists</option>
+          </optgroup>
         </select></label>
       <span id="vchips"></span>
       <span class="spacer"></span>
@@ -175,5 +194,6 @@
   <div class="legal">Systematic, rule-based analysis computed from fetched market data — research input, not personalised investment advice or a guarantee of returns. Prices are delayed Yahoo Finance data; result dates and filed results come from NSE where shown; “est” delivery, expected result-moves and time-to-target are model estimates. Confirm live quotes and price-band status on your trading terminal before acting. Joshi's Corner · SSJ Finance.</div>
 </div>
 <script src="engine.js?v=8"></script>
+<script src="schedules.js?v=1"></script>
 </body>
 </html>
