@@ -6,7 +6,7 @@
    ============================================================ */
 'use strict';
 const IS_BROWSER = typeof document !== 'undefined';
-const DEFAULT_BACKEND_URL = '';           // paste your Apps Script /exec URL here, or set it from the page
+const DEFAULT_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzgFpSE1hu8ch1L9vTdtnWmiFrf4DM3QXTx-I7xrtUOPWqy8oYP8SDAOXampEjjk8EfWg/exec';           // paste your Apps Script /exec URL here, or set it from the page
 const LS_BACKEND = 'jc_backend_url';
 
 /* ---------- small utils ---------- */
