@@ -22,6 +22,7 @@ import os
 import re
 import subprocess
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -159,10 +160,14 @@ def expiry_text(d):
     return " ".join(out)
 
 
+LAST_ERR = ["no key in environment"]
+
+
 def gemini(prompt):
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         return None
+    LAST_ERR[0] = "unknown"
     model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
     url = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent" % model
     body = json.dumps({"contents": [{"parts": [{"text": prompt}]}],
@@ -172,8 +177,13 @@ def gemini(prompt):
         j = json.loads(urllib.request.urlopen(req, timeout=60).read())
         txt = j["candidates"][0]["content"]["parts"][0]["text"]
         return json.loads(txt)
+    except urllib.error.HTTPError as e:
+        LAST_ERR[0] = "HTTP %s %s" % (e.code, e.read()[:300].decode("utf8", "replace"))
+        print("Gemini unavailable:", LAST_ERR[0])
+        return None
     except Exception as e:
-        print("Gemini unavailable:", str(e)[:150])
+        LAST_ERR[0] = str(e)[:300]
+        print("Gemini unavailable:", LAST_ERR[0])
         return None
 
 
@@ -462,7 +472,8 @@ def main():
         return
     cfg = build(a.sid, qs, heads, now)
     if a.dry and os.environ.get("GEMINI_API_KEY") and "commentary: Gemini" not in json.dumps(cfg) and "drafted by Gemini" not in json.dumps(cfg):
-        sys.exit("DRY CHECK FAILED: GEMINI_API_KEY is set but Gemini commentary was not used")
+        print("::error::Gemini not used: " + LAST_ERR[0].replace("\n", " ")[:400])
+        sys.exit("DRY CHECK FAILED")
     os.makedirs(a.out, exist_ok=True)
     stem = {"premarket-news": "Market_News", "morning-brief": "JCGG_Morning_Updates_Brief",
             "morning-detailed": "JCGG_Morning_Updates_Detailed", "morning-pulse": "JCGG_Morning_Pulse_Infographic",
