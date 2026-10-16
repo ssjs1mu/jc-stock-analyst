@@ -2,6 +2,21 @@
  "schedule_id": "premarket-news",
  "runs": [
   {
+   "generated_at": "2026-10-16T15:54:15+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Late catch-up (Indian time corrected): Nifty 23,146 / Sensex 74,729, relief rally",
+   "note": "",
+   "files": [
+    {
+     "name": "Market_News_2026-10-16.pdf",
+     "path": "reports/premarket-news/Market_News_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 471080
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-16T15:47:56+05:30",
    "date": "2026-10-16",
    "status": "ok",
@@ -17,5 +32,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-16T15:47:56+05:30"
+ "updated_at": "2026-10-16T15:54:15+05:30"
 }
