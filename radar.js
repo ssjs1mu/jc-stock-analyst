@@ -75,7 +75,7 @@
     R.busy = true; R.err = ''; paint();
     try {
       const q = await quotes(syms); const now = Date.now();
-      if (q) { R.q = q; R.n = Object.keys(q).length; R.last = now; const firstSweep = !Object.keys(R.hist).length; Object.keys(q).forEach((s) => { const a = judge(s, q[s], now); if (a) { R.alerts.push(a); popup(a); } }); save(); }
+      if (q) { R.q = q; R.n = Object.keys(q).length; R.last = now; const firstSweep = !Object.keys(R.hist).length; Object.keys(q).forEach((s) => { const a = judge(s, q[s], now); if (a) { R.alerts.push(a); popup(a); } }); save(); if (window.jcMgr) window.jcMgr.run(); }
       else if (!R.last) R.err = 'No live quotes yet — check the Data backend connection.';
     } catch (e) { R.err = 'Sweep failed: ' + ((e && e.message) || e); }
     finally { R.busy = false; paint(); }

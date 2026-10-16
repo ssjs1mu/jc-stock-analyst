@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 14, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 15, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -285,20 +285,38 @@ function in10y_() {
     cache.put('in10y', out, 900); return out;
   } catch (e) { cache.put('in10y_fail', '1', 1800); throw new Error('India 10Y unavailable: ' + String(e).slice(0, 80)); }
 }
+function pcrUpstox_() {
+  var r = UrlFetchApp.fetch('https://upstox.com/option-chain/nifty/', { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36', 'Accept': 'text/html' }, muteHttpExceptions: true });
+  var h = r.getContentText();
+  if (r.getResponseCode() !== 200 || h.length < 20000) throw new Error('Upstox ' + r.getResponseCode());
+  var rows = h.match(/<tr[\s\S]*?<\/tr>/g) || [], ce = 0, pe = 0, n = 0;
+  rows.forEach(function (x) {
+    var t = [], m, re = /<td[^>]*>([\s\S]*?)<\/td>/g;
+    while ((m = re.exec(x))) t.push(m[1].replace(/<[^>]+>/g, '').replace(/,/g, '').trim());
+    if (t.length >= 19) { var a = parseFloat(t[6]), b = parseFloat(t[12]); if (!isNaN(a) && !isNaN(b)) { ce += a; pe += b; n++; } }
+  });
+  if (n < 20 || !ce) throw new Error('Upstox table not found');
+  var ts = (h.match(/Updated:\s*([^<]{5,40})/) || [])[1];
+  var ex = (h.match(/>\s*(\d{1,2} [A-Z][a-z]{2})\s*</) || [])[1];
+  return { pcr: pe / ce, ce: ce * 1e5, pe: pe * 1e5, expiry: ex, ts: ts && ts.trim(), src: 'Upstox (weekly expiry chain)', n: n };
+}
 function pcrNifty_() {
   var cache = CacheService.getScriptCache(), hit = cache.get('pcr'); if (hit) return hit;
-  if (cache.get('pcr_fail')) throw new Error('NSE option chain unavailable (recent failure)');
-  if (cache.get('pcr_busy')) throw new Error('NSE option chain request in progress');
-  cache.put('pcr_busy', '1', 120);
+  if (cache.get('pcr_busy')) throw new Error('PCR request in progress');
+  cache.put('pcr_busy', '1', 60);
   try {
-    var h = nseHeaders_('https://www.nseindia.com/option-chain');
-    var r = UrlFetchApp.fetch('https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY', { headers: h, muteHttpExceptions: true });
-    var j = parseJson_(r), f = j && j.filtered;
-    if (!f || !f.CE || !f.PE || !f.CE.totOI) throw new Error('NSE ' + r.getResponseCode());
-    var out = JSON.stringify({ pcr: f.PE.totOI / f.CE.totOI, ce: f.CE.totOI, pe: f.PE.totOI, expiry: j.records && j.records.expiryDates && j.records.expiryDates[0], ts: j.records && j.records.timestamp, u: j.records && j.records.underlyingValue });
+    var out;
+    try { out = JSON.stringify(pcrUpstox_()); }
+    catch (e1) {
+      if (cache.get('pcr_fail')) throw e1;
+      var h = nseHeaders_('https://www.nseindia.com/option-chain');
+      var r = UrlFetchApp.fetch('https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY', { headers: h, muteHttpExceptions: true });
+      var j = parseJson_(r), f = j && j.filtered;
+      if (!f || !f.CE || !f.PE || !f.CE.totOI) { cache.put('pcr_fail', '1', 900); throw new Error('Upstox: ' + String(e1).slice(0, 50) + '; NSE ' + r.getResponseCode()); }
+      out = JSON.stringify({ pcr: f.PE.totOI / f.CE.totOI, ce: f.CE.totOI, pe: f.PE.totOI, expiry: j.records && j.records.expiryDates && j.records.expiryDates[0], ts: j.records && j.records.timestamp, u: j.records && j.records.underlyingValue, src: 'NSE' });
+    }
     cache.put('pcr', out, 120); return out;
-  } catch (e) { cache.put('pcr_fail', '1', 1800); throw new Error('NSE option chain unavailable: ' + String(e).slice(0, 80)); }
-  finally { cache.remove('pcr_busy'); }
+  } finally { cache.remove('pcr_busy'); }
 }
 
 /* ---------- watchlists in Google Drive (needs Drive permission — approve once when redeploying) ---------- */
