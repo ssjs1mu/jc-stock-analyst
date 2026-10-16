@@ -1,0 +1,21 @@
+{
+ "schedule_id": "morning-brief",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T15:47:58+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Late catch-up: Nifty 23,146 / Sensex 74,729 - relief rally, support 22,800 resistance 23,200",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Brief_2026-10-16.pdf",
+     "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 482170
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T15:47:58+05:30"
+}
