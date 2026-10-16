@@ -53,7 +53,7 @@
   function universe() {
     const seen = new Set(), list = []; const add = (s) => { s = String(s || '').toUpperCase(); if (s && !seen.has(s)) { seen.add(s); list.push(s); } };
     try { if (typeof wlEnsure === 'function') wlEnsure(); (WL.store ? WL.store.lists : []).forEach((l) => l.syms.forEach(add)); } catch (e) {}
-    NIFTY50.forEach(add); return list;
+    NIFTY50.forEach(add); try { (window.jcUni ? window.jcUni() : []).forEach(add); } catch (e) {} return list;
   }
   async function buildClient(force) {
     if (C.busy) return; C.busy = true; const today = istToday();
@@ -61,7 +61,17 @@
       C.msg = 'Building today’s call book…'; paint();
       await loadBook(); if (C.book.days[today] && !force) return;
       const uni = universe(), yf = uni.map((s) => (/\.BO$/.test(s) ? s : s.replace(/\.NS$/, '') + '.NS')); let done = 0;
-      const res = await mapLimit(yf, 5, async (y) => { const r = await fetchChart(y, '2y', '1d'); done++; C.msg = `Scanning ${done}/${yf.length} stocks…`; if (done % 5 === 0) paint(); return r.bars; });
+      const res = new Array(yf.length).fill(null), be = getBackend && getBackend(), bt = []; for (let i = 0; i < yf.length; i += 25) bt.push(i);
+      await mapLimit(bt, 3, async (i0) => {
+        const part = yf.slice(i0, i0 + 25);
+        try {
+          if (!be) throw new Error('no backend');
+          const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=dailyb&range=2y&symbols=' + encodeURIComponent(part.join(','))), 60000));
+          part.forEach((y, k) => { const b = j.bars && j.bars[y]; if (b && b.t.length >= 150) res[i0 + k] = b.t.map((t, q) => ({ t, o: b.o[q], h: b.h[q], l: b.l[q], c: b.c[q], v: b.v[q] })); });
+        } catch (e) { await Promise.all(part.map(async (y, k) => { try { res[i0 + k] = (await fetchChart(y, '2y', '1d')).bars; } catch (e2) { } })); }
+        await Promise.all(part.map(async (y, k) => { if (!res[i0 + k]) { try { res[i0 + k] = (await fetchChart(y, '2y', '1d')).bars; } catch (e2) { } } }));
+        done += part.length; C.msg = `Scanning ${done}/${yf.length} stocks…`; paint();
+      });
       const nifty = (await fetchChart('^NSEI', '2y', '1d')).bars; let vix = []; try { vix = (await fetchChart('^INDIAVIX', '2y', '1d')).bars; } catch (e) {}
       const stocks = [], missing = []; uni.forEach((s, i) => { if (res[i] && res[i].length) stocks.push({ sym: s.replace(/\.BO$/, ''), ex: /\.BO$/.test(s) ? 'BO' : 'NS', daily: res[i] }); else missing.push(s); });
       const book = JCE.buildBook({ dateIso: today, stocks, nifty, vix, maxDay: 10, maxInv: 5 }), now = new Date().toISOString(), openInv = {};
@@ -197,7 +207,7 @@
   /* ---------- wiring ---------- */
   function paint() {
     const t = window.__curTab, st = window.scrollY;
-    if (t === 'pCalls' && $('pCalls')) { $('pCalls').innerHTML = renderToday(); window.scrollTo(0, st); }
+    if (t === 'pCalls' && $('pCalls')) { $('pCalls').innerHTML = renderToday() + '<div id="clBig"></div>'; if (window.jcBig) window.jcBig.paint(); window.scrollTo(0, st); }
     if (t === 'pRecs' && $('pRecs')) { $('pRecs').innerHTML = renderRecs(); window.scrollTo(0, st); }
   }
   async function onShow(first) {

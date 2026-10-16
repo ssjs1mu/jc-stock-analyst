@@ -161,7 +161,7 @@ function bfUniverse_() {
   return JSON.stringify({ src: list.length ? src : '', list: list, ts: new Date().toISOString() });
 }
 function dailyBatch_(symbols, range) {
-  var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo)$/.test(range) ? range : '3mo', out = {};
+  var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo|1y|2y)$/.test(range) ? range : '3mo', out = {};
   var reqs = syms.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
   var rs = UrlFetchApp.fetchAll(reqs);
   rs.forEach(function (r, i) {
