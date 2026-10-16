@@ -72,6 +72,18 @@ def from_moneycontrol():
 
 
 def from_nse():
+    last = None
+    for attempt in range(3):
+        try:
+            return _from_nse()
+        except Exception as e:  # NSE's bot filter sometimes refuses a first visit
+            last = e
+            import time
+            time.sleep(4 + attempt * 4)
+    raise last
+
+
+def _from_nse():
     get("https://www.nseindia.com/", accept="text/html")
     get("https://www.nseindia.com/reports/fii-dii", accept="text/html")
     rows = json.loads(get("https://www.nseindia.com/api/fiidiiTradeReact", accept="application/json", referer="https://www.nseindia.com/reports/fii-dii"))
@@ -97,7 +109,7 @@ def from_nsdl():
     upto = re.search(r"up to (\d{1,2} \w{3} \d{4})", flat)
     out = {}
     for i, name in enumerate(MONTHS):
-        m = re.search(r"\|\s*%s\s*\|\s*([-()\d.,]+)\s*\|" % name, flat)
+        m = re.search(r"\b%s[\s|]+([-()\d.,]+)\s*\|" % name, flat)
         if m and num(m.group(1)) is not None:
             out["%d-%02d" % (year, i + 1)] = num(m.group(1))
     if not out:
