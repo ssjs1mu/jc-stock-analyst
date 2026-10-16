@@ -161,6 +161,7 @@ def main():
     if not days:
         sys.exit("No FII/DII data from any source.")
     same = {k: v for k, v in data.items() if k not in ("updated_at", "sources")} == {k: v for k, v in new.items() if k not in ("updated_at", "sources")}
+    print("::notice title=fiidii summary::%s" % json.dumps({"status": status, "days": len(days), "fpi_months": len(new["fpi_equity_monthly"]), "unchanged": same}))
     if same and os.path.exists(OUT):
         print("No new figures; file left unchanged.")
         return
