@@ -295,8 +295,8 @@
   function colComm(ms) {
     const w = wantNow(ms);
     return card('Commodities', '🛢', `<table class="jd-tb">${head}<tbody>${COMM.map((it) => row(it[0], it[1], {}, ms)).join('')}</tbody></table>`, `<span class="jd-chip ${w.fut ? 'on' : ''}">${w.fut ? '● LIVE' : 'CLOSED'}</span>`)
-      + card('Bonds &amp; yields', '🏦', `<table class="jd-tb">${head}<tbody>${BONDS.map((it) => row(it[0], it[1], {}, ms, { yield: 1, flag: 'us' })).join('')}</tbody></table><div class="jd-fn">Yield change in basis points. India 10Y G-Sec sits in the Indian markets table.</div>`)
-      + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', `<table class="jd-tb">${head}<tbody>${['EURINR=X', 'GBPINR=X', 'JPYINR=X', 'DX-Y.NYB', 'EURUSD=X'].map((s) => row(s, { 'EURINR=X': 'EUR / INR', 'GBPINR=X': 'GBP / INR', 'JPYINR=X': 'JPY / INR', 'DX-Y.NYB': 'US DOLLAR INDEX', 'EURUSD=X': 'EUR / USD' }[s], { dp: s === 'JPYINR=X' || s === 'EURUSD=X' ? 4 : 3 }, ms)).join('')}</tbody></table>`);
+      + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', `<table class="jd-tb">${head}<tbody>${['EURINR=X', 'GBPINR=X', 'JPYINR=X', 'DX-Y.NYB', 'EURUSD=X'].map((s) => row(s, { 'EURINR=X': 'EUR / INR', 'GBPINR=X': 'GBP / INR', 'JPYINR=X': 'JPY / INR', 'DX-Y.NYB': 'US DOLLAR INDEX', 'EURUSD=X': 'EUR / USD' }[s], { dp: s === 'JPYINR=X' || s === 'EURUSD=X' ? 4 : 3 }, ms)).join('')}</tbody></table>`)
+      + card('Bonds &amp; yields', '🏦', `<table class="jd-tb">${head}<tbody>${BONDS.map((it) => row(it[0], it[1], {}, ms, { yield: 1, flag: 'us' })).join('')}</tbody></table><div class="jd-fn">Yield change in basis points. India 10Y G-Sec sits in the Indian markets table.</div>`);
   }
   const ago = (ts, ms) => { const m = Math.max(0, Math.round((ms - ts) / 60000)); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h' : Math.floor(m / 1440) + 'd'; };
   function colNews(ms) {
@@ -310,9 +310,9 @@
     const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], p: pct, px: q ? q.p : null, big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
     const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
     const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
-    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-ht${i.big ? ' big' : ''}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)}"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)}"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
     const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
-    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hgrid">${tiles}</div><div class="jd-hleg"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
+    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div><div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
   }
   function heroHTML(w, ms) {
     const ist = w.ist, ip = istParts(ms);
@@ -386,7 +386,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
-      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-heatw">${heatHTML(ms)}</div><div class="jd-col jd-c2">${colGlobal(ms)}</div><div class="jd-col jd-c3">${colComm(ms)}</div><div class="jd-col jd-c4">${colNews(ms)}</div></div>`
+      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}<div class="jd-newsw">${colNews(ms)}</div></div><div class="jd-col jd-c3">${colGlobal(ms)}${colComm(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
     Object.keys(S.q).forEach((k) => { S.q[k].flash = ''; });
@@ -456,17 +456,23 @@
   .jd-lg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 18px}.jd-lg p{margin:4px 0 0;font-size:11.5px;color:var(--ink2)}.jd-pillmini{display:inline-flex;align-items:center;gap:6px;background:#0f2352;color:#fff;border-radius:99px;padding:2px 10px;font-size:10.5px;font-weight:800}.jd-pillmini .jd-dot{width:9px;height:9px;background:#3ddc84;animation:jdpulse 1.1s infinite}
   .jd-mini-g{display:inline-block;background:linear-gradient(90deg,#b3162f,#e9bd2d,#0b7a3f);color:#fff;border-radius:99px;padding:2px 10px;font-size:10.5px;font-weight:800}
   #pDash .jd-board+.jd-card,#pDash .jd-card+.jd-card{margin-top:10px}#pDash>.jd-card{margin-top:10px}
-  .jd-board{grid-template-areas:"a h h h" "a g c n";align-items:stretch}.jd-c1{grid-area:a}.jd-heatw{grid-area:h;min-width:0}.jd-c2{grid-area:g}.jd-c3{grid-area:c}.jd-c4{grid-area:n}
-  .jd-heatw>.jd-card{display:flex;flex-direction:column}.jd-hgrid{flex:1;grid-auto-rows:1fr;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:4px}.jd-ht{border-radius:7px;padding:7px 8px;min-height:52px;display:flex;flex-direction:column;justify-content:space-between;line-height:1.15;transition:background .5s}.jd-ht b{font-size:10px;letter-spacing:.3px;font-weight:800}.jd-ht span{font:800 13px ui-monospace,Consolas,monospace}.jd-ht.big{min-height:64px}.jd-ht.big span{font-size:15px}
-  .jd-hleg{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:9.5px;color:#7b88a6;font-weight:700}.jd-hleg i{flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,#c1243e,#fde3e8)}.jd-hleg i.g{background:linear-gradient(90deg,#e2f4ea,#1e9a5a)}
   @media(max-width:1280px){.jd-board{grid-template-areas:"a h" "a g" "c n"}}@media(max-width:640px){.jd-board{grid-template-areas:"h" "a" "g" "c" "n"}}
-  .jd-board>.jd-col>.jd-card:last-child{flex:1}.jd-heatw>.jd-card{height:100%;box-sizing:border-box}
-  @media(min-width:1281px){.jd-c4{position:relative;min-height:380px}.jd-newsc{position:absolute;inset:0;display:flex;flex-direction:column}.jd-newsc .jd-nlist{flex:1;min-height:0}}
-  @media(max-width:1280px){.jd-nlist{max-height:520px}}
-  .jd-card h3{font-size:14.5px}.jd-tb{font-size:12.5px}.jd-tb td{padding:5px 4px}.jd-nm{font-size:11.6px}.jd-px{font-size:13px}.jd-ch{font-size:11.8px}.jd-pc span{font-size:11.5px;min-width:50px}.jd-tb th{font-size:9.5px}.jd-nb{font-size:12.4px}.jd-ht b{font-size:10.6px}.jd-ht span{font-size:14px}.jd-sub td{font-size:9.6px}
-  @media(max-width:1280px){.jd-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* v4 layout: India | heatmap + news | global/commodities/currencies/bonds */
+  .jd-board{grid-template-columns:minmax(0,1.04fr) minmax(0,1.12fr) minmax(0,1.04fr);grid-template-areas:"a m r";align-items:stretch}.jd-c1{grid-area:a}.jd-c2{grid-area:m}.jd-c3{grid-area:r}
+  .jd-board>.jd-col>.jd-card:last-child{flex:1}.jd-newsw{flex:1;position:relative;min-height:340px;display:flex}.jd-newsw>.jd-card{position:absolute;inset:0;display:flex;flex-direction:column}.jd-newsw .jd-nlist{flex:1;min-height:0;overflow:auto}
+  .jd-scroll{overflow:visible}.jd-heat{display:block}
+  .jd-hmg{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));grid-auto-rows:56px;gap:4px}.jd-hmt{border-radius:7px;padding:6px 8px;display:flex;flex-direction:column;justify-content:space-between;line-height:1.15;transition:background .5s}.jd-hmt b{font-size:10.6px;letter-spacing:.3px;font-weight:800}.jd-hmt span{font:800 14px ui-monospace,Consolas,monospace}.jd-hmt.big{grid-row:span 1}.jd-hmt.big span{font-size:15px}
+  .jd-hml{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:9.5px;color:#4a5878;font-weight:700}.jd-hml i{flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,#c1243e,#fde3e8)}.jd-hml i.g{background:linear-gradient(90deg,#e2f4ea,#1e9a5a)}
+  /* visibility: contrast, weight, page tone */
+  #pDash{--jg:#08783a;--jr:#c0102e;--ink:#0a1430;--ink2:#34456a;--line:#c9d3e8}
+  #pDash{background:linear-gradient(180deg,#e4ebf8 0%,#edf1fa 60%,#e4ebf8 100%);border-radius:16px;padding:10px}
+  .jd-card{border:1px solid #bccae6;box-shadow:0 2px 8px rgba(20,48,110,.12)}.jd-card h3{font-size:14.5px;color:#0b2260;padding-bottom:6px;border-bottom:2px solid #dfe7f6;margin-bottom:6px}.jd-card h3 small{color:#4a5878;font-weight:700}
+  .jd-tb{font-size:12.5px}.jd-tb th{color:#4a5878;font-size:9.5px;border-bottom:1.5px solid #c9d3e8}.jd-tb td{padding:5px 4px;border-bottom:1px solid #e3e9f5}.jd-nm{font-size:11.8px;color:#10204a;font-weight:800}.jd-px{font-size:13px;font-weight:800;color:#0a1430}.jd-ch{font-size:11.8px;font-weight:800;color:#34456a}.jd-pc span{font-size:11.5px;min-width:50px;font-weight:800}
+  tr.u .jd-pc span{background:#c9f0da;color:#06612f}tr.d .jd-pc span{background:#fbd0d8;color:#a10b27}tr.u .jd-ch{color:#06612f}tr.d .jd-ch{color:#a10b27}.jd-sub td{background:#dfe7f6;color:#2a3b66;font-size:9.6px}
+  .jd-nb{font-size:12.4px;color:#0a1430;font-weight:700}.jd-nb small{color:#4a5878}.jd-fn{color:#34456a}
+  @media(max-width:1280px){.jd-board{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"a m" "a r"}.jd-newsw{min-height:0}.jd-newsw>.jd-card{position:static}.jd-newsw .jd-nlist{max-height:520px}}
   @media(max-width:900px){.jd-hero{grid-template-columns:1fr;text-align:center;padding:14px}.jd-mood{margin:0 auto}.jd-time{font-size:34px}.jd-pill{flex-wrap:wrap;justify-content:center}.jd-lane,.jd-axis,.jd-hr{grid-template-columns:90px 1fr}.jd-hours{--hn:90px}.jd-seg span{font-size:8px}}
-  @media(max-width:640px){.jd-board{grid-template-columns:1fr}}
+  @media(max-width:640px){.jd-board{grid-template-columns:1fr;grid-template-areas:"m" "a" "r"}}
   @media print{.jd-btn,.jd-status{display:none}.jd-hero{background:#0f2352!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
 
   /* ---------- wiring ---------- */
