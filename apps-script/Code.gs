@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 10, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 11, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -35,6 +35,7 @@ function doGet(e) {
     else if (p.action === 'fetch') out = proxyFetch_(p.url);
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
     else if (p.action === 'universe') out = bfUniverse_();
+    else if (p.action === 'ytlive') out = ytLive_(p.channel);
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
@@ -171,6 +172,18 @@ function dailyBatch_(symbols, range) {
     } catch (e) {}
   });
   return JSON.stringify({ n: Object.keys(out).length, bars: out });
+}
+/* current live video id of a YouTube channel (the live_stream?channel= embed is refused for several Indian news channels, the watch-id embed is not) */
+function ytLive_(channel) {
+  if (!/^UC[\w-]{22}$/.test(String(channel || ''))) return JSON.stringify({ ok: false, err: 'bad channel' });
+  var cache = CacheService.getScriptCache(), key = 'ytl_' + channel, hit = cache.get(key);
+  if (hit) return hit;
+  var r = UrlFetchApp.fetch('https://www.youtube.com/channel/' + channel + '/live', { muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9', 'Cookie': 'CONSENT=YES+1; SOCS=CAI' } });
+  var t = r.getContentText(), live = /"isLive":true/.test(t);
+  var m = /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})"/.exec(t) || /"videoId":"([\w-]{11})"/.exec(t);
+  var out = JSON.stringify({ ok: !!(m && live), vid: m ? m[1] : '', live: live, ts: new Date().toISOString() });
+  if (m && live) cache.put(key, out, 240);
+  return out;
 }
 function preOpen_() {
   try {

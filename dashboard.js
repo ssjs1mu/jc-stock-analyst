@@ -345,7 +345,7 @@
     const cur = tvCur();
     return '<div class="jd-tvh">LIVE TV <small>tap to watch · keeps playing on every tab</small></div><div class="jd-tvg">' + TV.map((t) => `<button type="button" class="jd-tvb${cur === t.k ? ' on' : ''}" data-jdtv="${t.k}" style="--tc:${t.col}" title="Watch ${esc(t.n)} live"><i class="jd-tvd"></i><b>${esc(t.n)}</b><span>${cur === t.k ? 'NOW PLAYING' : '● LIVE'}</span></button>`).join('') + '</div>';
   }
-  const tvSrc = (t) => 'https://www.youtube.com/embed/live_stream?channel=' + t.c + '&autoplay=1&rel=0&playsinline=1';
+  const tvSrc = (t) => (t.vid ? 'https://www.youtube.com/embed/' + t.vid + '?' : 'https://www.youtube.com/embed/live_stream?channel=' + t.c + '&') + 'autoplay=1&rel=0&playsinline=1';
   function tvEnsure() {
     let el = document.getElementById('jdTvDock'); if (el) return el;
     const st = document.createElement('style'); st.textContent = `
@@ -353,7 +353,7 @@
     #jdTvDock.on{display:block}#jdTvDock .tvbar{display:flex;align-items:center;gap:6px;padding:6px 8px;background:linear-gradient(90deg,#17388a,#0d2358);font-size:12px;font-weight:800;flex-wrap:wrap}
     #jdTvDock .tvbar .tt{flex:1;min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#jdTvDock .tvbar .tt:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b30;margin-right:6px;animation:jdpulse 1.4s infinite}
     #jdTvDock button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:800;cursor:pointer}#jdTvDock button:hover{background:rgba(255,255,255,.28)}#jdTvDock button.on{background:#fff;color:#0a1736}
-    #jdTvDock .tvch{display:flex;gap:4px;padding:5px 8px;background:#0c1e4a;flex-wrap:wrap}#jdTvDock .tvbox{position:relative;width:100%;aspect-ratio:16/9;background:#000}#jdTvDock iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    #jdTvDock .tvch{display:flex;gap:4px;padding:5px 8px;background:#0c1e4a;flex-wrap:wrap}#jdTvDock .tvbox{position:relative;width:100%;aspect-ratio:16/9;background:#000}#jdTvDock .tvld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9fb3e6}#jdTvDock iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
     #jdTvDock.min .tvch{display:none}#jdTvDock.min .tvbox{position:absolute;left:-9999px;width:320px;height:180px;aspect-ratio:auto}
     @media(max-width:600px){#jdTvDock{right:8px;left:8px;bottom:8px;width:auto}}`;
     document.head.appendChild(st);
@@ -364,13 +364,20 @@
     return el;
   }
   function tvMark(k) { document.querySelectorAll('.jd-tvb').forEach((b) => { const on = b.getAttribute('data-jdtv') === k; b.classList.toggle('on', on); const sp = b.querySelector('span'); if (sp) sp.textContent = on ? 'NOW PLAYING' : '● LIVE'; }); }
-  function tvPlay(k) {
-    const t = TV.find((x) => x.k === k); if (!t) return; const el = tvEnsure(); window.__jdtv = window.__jdtv || {}; window.__jdtv.cur = k;
+  const tvVid = {};
+  async function tvResolve(t) {
+    const c = tvVid[t.k]; if (c && Date.now() - c.at < 180000) return c.vid;
+    try { const u = typeof getBackend === 'function' ? getBackend() : ''; if (u) { const j = JSON.parse(await fetchWithTimeout(beUrl(u, 'action=ytlive&channel=' + t.c), 20000)); if (j && j.ok && j.vid) { tvVid[t.k] = { vid: j.vid, at: Date.now() }; return j.vid; } } } catch (e) { }
+    return null;
+  }
+  async function tvPlay(k) {
+    const t = TV.find((x) => x.k === k); if (!t) return; const el = tvEnsure(); window.__jdtv = window.__jdtv || {}; window.__jdtv.cur = k; const tok = (window.__jdtv.tok = (window.__jdtv.tok || 0) + 1);
     el.classList.add('on'); el.classList.remove('min');
     document.getElementById('jdTvT').textContent = t.n + ' · LIVE';
     document.getElementById('jdTvCh').innerHTML = TV.map((x) => `<button type="button" data-tvch="${x.k}" class="${x.k === k ? 'on' : ''}">${esc(x.n)}</button>`).join('');
-    document.getElementById('jdTvBox').innerHTML = '<iframe title="' + esc(t.n) + ' live" src="' + tvSrc(t) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    tvMark(k);
+    const box = document.getElementById('jdTvBox'); box.innerHTML = '<div class="tvld">Connecting to ' + esc(t.n) + '…</div>'; tvMark(k);
+    const vid = await tvResolve(t); if (window.__jdtv.tok !== tok || window.__jdtv.cur !== k) return;
+    t.vid = vid; box.innerHTML = '<iframe title="' + esc(t.n) + ' live" src="' + tvSrc(t) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
   }
   function tvStop() { const el = document.getElementById('jdTvDock'); if (!el) return; document.getElementById('jdTvBox').innerHTML = ''; el.classList.remove('on'); window.__jdtv.cur = null; tvMark(null); }
   function tvPop() {
