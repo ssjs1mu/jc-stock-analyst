@@ -1,14 +1,19 @@
-name: Auto reports (fallback, no Claude needed)
+name: Auto reports (primary builder, no Claude needed)
 
-# Runs ~25 min after each scheduled report time (IST). If the report for today is already in
-# reports/<id>/index.json it does nothing; otherwise it builds the report from live data.
+# Builds each report shortly BEFORE its due time (IST), then retries twice. A run whose report
+# is already in reports/<id>/index.json for today does nothing, so retries are free.
+# Off-the-hour minutes are used because GitHub delays jobs queued at :00 / :30.
 on:
   schedule:
-    - cron: '55 2 * * 1-5'    # 08:25 IST  premarket-news
-    - cron: '25 3 * * 1-5'    # 08:55 IST  morning-brief, morning-detailed
-    - cron: '5 3 * * 1-5'     # 08:35 IST  morning-pulse (Actions is the primary builder for this one)
-    - cron: '55 12 * * 1-5'   # 18:25 IST  evening-market-wrap
-    - cron: '55 13 * * 1-5'   # 19:25 IST  evening-news-wrap
+    - cron: '13 2 * * 1-5'    # 07:43 IST  premarket-news            (due 08:00)
+    - cron: '28 2 * * 1-5'    # 07:58 IST  premarket-news retry
+    - cron: '43 2 * * 1-5'    # 08:13 IST  morning-brief, morning-detailed (due 08:30) + premarket retry
+    - cron: '58 2 * * 1-5'    # 08:28 IST  morning-pulse (due 08:45) + brief/detailed retry
+    - cron: '13 3 * * 1-5'    # 08:43 IST  final retry, all morning reports
+    - cron: '13 12 * * 1-5'   # 17:43 IST  evening-market-wrap        (due 18:00)
+    - cron: '43 12 * * 1-5'   # 18:13 IST  evening-market-wrap retry
+    - cron: '13 13 * * 1-5'   # 18:43 IST  evening-news-wrap (due 19:00) + market-wrap retry
+    - cron: '43 13 * * 1-5'   # 19:13 IST  evening-news-wrap retry
   workflow_dispatch:
     inputs:
       ids:
@@ -35,29 +40,53 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install renderer
-        run: |
-          pip install playwright pillow
-          python -m playwright install --with-deps chromium
       - name: Pick report ids
         id: pick
         run: |
           case "${{ github.event.schedule }}" in
-            "55 2 * * 1-5")  IDS="premarket-news" ;;
-            "25 3 * * 1-5")  IDS="morning-brief morning-detailed" ;;
-            "5 3 * * 1-5")   IDS="morning-pulse" ;;
-            "55 12 * * 1-5") IDS="evening-market-wrap" ;;
-            "55 13 * * 1-5") IDS="evening-news-wrap" ;;
+            "13 2 * * 1-5")  IDS="premarket-news" ;;
+            "28 2 * * 1-5")  IDS="premarket-news" ;;
+            "43 2 * * 1-5")  IDS="premarket-news morning-brief morning-detailed" ;;
+            "58 2 * * 1-5")  IDS="morning-pulse morning-brief morning-detailed" ;;
+            "13 3 * * 1-5")  IDS="premarket-news morning-brief morning-detailed morning-pulse" ;;
+            "13 12 * * 1-5") IDS="evening-market-wrap" ;;
+            "43 12 * * 1-5") IDS="evening-market-wrap" ;;
+            "13 13 * * 1-5") IDS="evening-news-wrap evening-market-wrap" ;;
+            "43 13 * * 1-5") IDS="evening-news-wrap" ;;
             *) IDS="${{ github.event.inputs.ids }}" ;;
           esac
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # drop reports already published (or marked holiday) today, so retries finish in seconds
+            IDS=$(python3 - $IDS <<'PY'
+          import json, sys, datetime as dt
+          today = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=5, minutes=30)).date().isoformat()
+          left = []
+          for i in sys.argv[1:]:
+              try:
+                  runs = json.load(open("reports/%s/index.json" % i)).get("runs", [])
+              except Exception:
+                  runs = []
+              if not any(r.get("date") == today and r.get("status") in ("ok", "holiday") for r in runs):
+                  left.append(i)
+          print(" ".join(left))
+          PY
+          )
+          fi
           echo "ids=$IDS" >> "$GITHUB_OUTPUT"
+          echo "To build: ${IDS:-nothing (all done)}"
+      - name: Install renderer
+        if: ${{ steps.pick.outputs.ids != '' }}
+        run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
       - name: Build and publish
+        if: ${{ steps.pick.outputs.ids != '' }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -76,7 +105,7 @@ jobs:
           done
       - name: Attach dry-run PDFs
         if: ${{ github.event.inputs.dry == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dry-run-reports
           path: /tmp/dry/*.pdf

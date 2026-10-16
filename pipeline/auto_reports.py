@@ -138,25 +138,39 @@ def pivots(q):
     return dict(p=p, s1=2 * p - q["hi"], r1=2 * p - q["lo"], s2=p - (q["hi"] - q["lo"]), r2=p + (q["hi"] - q["lo"]))
 
 
+def is_trading_day(d):
+    return d.weekday() < 5 and d.isoformat() not in NSE_HOLIDAYS
+
+
 def next_trading_day(d):
     d += dt.timedelta(days=1)
-    while d.weekday() >= 5:
+    while not is_trading_day(d):
         d += dt.timedelta(days=1)
     return d
 
 
+def _expiry_on_or_after(d, wd):
+    """Weekly expiry for the week holding the next `wd` weekday on/after d; a holiday moves it to the previous trading day."""
+    e = d + dt.timedelta(days=(wd - d.weekday()) % 7)
+    x = e
+    while not is_trading_day(x):
+        x -= dt.timedelta(days=1)
+    if x < d:  # this week's expiry already passed (moved earlier) -> next week's
+        return _expiry_on_or_after(e + dt.timedelta(days=1), wd)
+    return x
+
+
 def expiry_text(d):
-    """SEBI mapping: Nifty weekly = Tuesday, Sensex weekly = Thursday."""
+    """SEBI mapping: Nifty weekly = Tuesday, Sensex weekly = Thursday; an exchange holiday moves expiry to the previous trading day."""
+    nf, sx = _expiry_on_or_after(d, 1), _expiry_on_or_after(d, 3)
     out = []
-    if d.weekday() == 1:
-        out.append("Nifty weekly expiry today (Tuesday).")
-    if d.weekday() == 3:
-        out.append("Sensex weekly expiry today (Thursday).")
+    if nf == d:
+        out.append("Nifty weekly expiry today%s." % ("" if d.weekday() == 1 else " (moved from Tuesday's holiday)"))
+    if sx == d:
+        out.append("Sensex weekly expiry today%s." % ("" if d.weekday() == 3 else " (moved from Thursday's holiday)"))
     if not out:
-        nxt_tue = d + dt.timedelta(days=(1 - d.weekday()) % 7)
-        nxt_thu = d + dt.timedelta(days=(3 - d.weekday()) % 7)
-        out.append("Next Nifty weekly expiry: Tuesday %s; next Sensex weekly expiry: Thursday %s."
-                   % (nxt_tue.strftime("%d %b"), nxt_thu.strftime("%d %b")))
+        out.append("Next Nifty weekly expiry: %s %s; next Sensex weekly expiry: %s %s."
+                   % (nf.strftime("%A"), nf.strftime("%d %b"), sx.strftime("%A"), sx.strftime("%d %b")))
     return " ".join(out)
 
 
@@ -497,6 +511,17 @@ def build(sid, qs, heads, now):
     raise SystemExit("unsupported id " + sid)
 
 
+# NSE equity trading holidays (exchange circular). Add the next year's list each December.
+NSE_HOLIDAYS = {
+    "2026-01-15": "Municipal elections (Maharashtra)", "2026-01-26": "Republic Day", "2026-03-03": "Holi",
+    "2026-03-26": "Shri Ram Navami", "2026-03-31": "Shri Mahavir Jayanti", "2026-04-03": "Good Friday",
+    "2026-04-14": "Dr. Baba Saheb Ambedkar Jayanti", "2026-05-01": "Maharashtra Day", "2026-05-28": "Bakri Id",
+    "2026-06-26": "Muharram", "2026-09-14": "Ganesh Chaturthi", "2026-10-02": "Mahatma Gandhi Jayanti",
+    "2026-10-20": "Dussehra", "2026-11-10": "Diwali Balipratipada", "2026-11-24": "Guru Nanak Jayanti",
+    "2026-12-25": "Christmas",
+}
+
+
 # ---------------------------------------------------------------- main
 def already_done(sid, today):
     try:
@@ -521,9 +546,14 @@ def main():
     if not a.force and not mock and not a.dry and already_done(a.sid, now.date()):
         print("%s already published today; skipping (fallback not needed)." % a.sid)
         return
+    pub = [sys.executable, os.path.join(HERE, "publish.py"), a.sid]
+    hol = NSE_HOLIDAYS.get(now.date().isoformat())
+    if hol and not a.force and not mock and not a.dry:
+        subprocess.run(pub + ["--status", "holiday", "--note", "NSE closed today: %s." % hol])
+        print("NSE holiday (%s); recorded, no report." % hol)
+        return
     qs, heads = gather(mock)
     n = qs.get("^NSEI")
-    pub = [sys.executable, os.path.join(HERE, "publish.py"), a.sid]
     if not n and not mock and not a.dry:
         subprocess.run(pub + ["--status", "failed", "--note", "Auto pipeline could not fetch index data (Yahoo unavailable)."])
         sys.exit("No Nifty data; marked failed.")
