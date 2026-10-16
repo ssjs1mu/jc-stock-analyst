@@ -9,6 +9,7 @@ r = pathlib.Path(__file__).resolve().parent.parent
 base = (r / 'apps-script/Code.base.gs').read_text()
 eng = (r / 'calls_engine.js').read_text()
 srv = (r / 'apps-script/Calls.server.gs').read_text()
-out = base.rstrip() + '\n\n/* ===================== calls_engine.js (JCE) — generated, do not edit here ===================== */\n' + eng.rstrip() + '\n\n' + srv.lstrip()
+tg = (r / 'apps-script/Telegram.server.gs').read_text()
+out = base.rstrip() + '\n\n/* ===================== calls_engine.js (JCE) — generated, do not edit here ===================== */\n' + eng.rstrip() + '\n\n' + srv.lstrip() + '\n\n' + tg.lstrip()
 (r / 'apps-script/Code.gs').write_text(out)
 print('Code.gs', len(out.encode()), 'bytes')
