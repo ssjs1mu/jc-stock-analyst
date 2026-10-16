@@ -1582,8 +1582,9 @@ async function loadUpcoming() {
     }
     await runUpcomingList(P);
   } catch (e) {
-    const m = (e && e.message) || String(e);
-    fail(m === 'OLD_BACKEND' ? '<b>Your Apps Script backend is the old version.</b> Paste the new <code>Code.gs</code>, then Deploy ▸ Manage deployments ▸ Edit ▸ Version: <b>New version</b> ▸ Deploy (the /exec URL stays the same). Meanwhile you can load an NSE Event-Calendar CSV or paste symbols above.' : 'Could not load the calendar: ' + esc(m) + '. If this says “Unexpected token <”, the backend URL is not a public web app — redeploy with “Who has access: Anyone”. You can still load an NSE Event-Calendar CSV or paste symbols above.');
+    const m = (e && e.message) || String(e); let ver = 'unknown';
+    if (m === 'OLD_BACKEND') { try { const pj = JSON.parse(await fetchWithTimeout(beUrl(getBackend(), 'action=ping'), 12000)); ver = pj && pj.v ? String(pj.v) : 'old (no version number)'; } catch (x) { ver = 'not reachable'; } }
+    fail(m === 'OLD_BACKEND' ? `<b>Your Apps Script backend is the old version</b> (the URL you saved answers as: <b>${esc(ver)}</b>; needs 6 or higher). Saving the script is not enough — paste the new <code>Code.gs</code>, press Save, then Deploy ▸ Manage deployments ▸ pencil (Edit) ▸ Version: <b>New version</b> ▸ Deploy, and approve the permissions. Check: open your /exec URL followed by <code>?action=ping</code> — it must show <code>"v":6</code>. Meanwhile you can load an NSE Event-Calendar CSV or paste symbols above.` : 'Could not load the calendar: ' + esc(m) + '. If this says “Unexpected token <”, the backend URL is not a public web app — redeploy with “Who has access: Anyone”. You can still load an NSE Event-Calendar CSV or paste symbols above.');
   } finally { btn.disabled = false; }
 }
 async function loadUpcomingManual() {
