@@ -1,3 +1,7 @@
+> **Now built automatically** by `.github/workflows/auto-reports.yml` (`pipeline/auto_reports.py morning-pulse`,
+> design in `pipeline/render_pulse_board.py`, landscape PNG + PDF), independent of any Claude run.
+> The Claude task for this id is retired; the notes below describe the older layout only.
+
 # JCGG Morning Pulse Infographic — 08:45 IST, Mon–Fri  (id: `morning-pulse`)
 
 Follow `schedules/RUNBOOK.md`. Vibrant companion to the gold-letterhead brief —

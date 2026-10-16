@@ -188,14 +188,20 @@ def commentary(kind, facts, headlines):
         'Return JSON: {"bias": "3-4 sentence summary of the session/market setup", '
         '"outlook": ["3-5 short bullets on what to watch, levels and risks drawn only from the facts"], '
         '"news": ["up to 6 bullets rewriting the most market-relevant headlines in one sentence each, '
-        'keeping the source name in brackets"]}' % (kind, facts, heads or "(none)"))
+        'keeping the source name in brackets"], '
+        '"headline": "max 7 words, the single main takeaway", '
+        '"vol_text": "2 sentences on India VIX and the rupee from the facts", '
+        '"asia_head": "max 5 words on Asian markets", '
+        '"asia_text": "2-3 sentences on Asian and global cues from the facts"}' % (kind, facts, heads or "(none)"))
     out = gemini(prompt)
     if out and isinstance(out.get("bias"), str):
         out["outlook"] = [str(x) for x in out.get("outlook", [])][:6]
         out["news"] = [str(x) for x in out.get("news", [])][:8]
+        for k in ("headline", "vol_text", "asia_head", "asia_text"):
+            out[k] = str(out.get(k, "")).strip()
         out["by"] = "gemini"
         return out
-    return dict(bias=facts.split("\n")[0], outlook=[], by="template",
+    return dict(bias=facts.split("\n")[0], outlook=[], by="template", headline="", vol_text="", asia_head="", asia_text="",
                 news=["%s (%s)" % (t, s or "news") for _, t, s in headlines[:8]])
 
 
@@ -350,31 +356,62 @@ def build(sid, qs, heads, now):
             sec("Headlines", [B(headl)]),
             sec("Alerts for the Day", [B([exp])])])
     if sid == "morning-pulse":
-        def it(n, sub, q, d=2):
-            return {"name": n, "sub": sub, "level": f2(q["last"], d) if q else "n/a", "chg": round(q["pct"], 2) if q else 0.0}
-        n, s = qs.get("^NSEI"), qs.get("^BSESN")
-        mood = "RELIEF / RISK-ON" if n and n["pct"] > 0.3 else ("RISK-OFF" if n and n["pct"] < -0.3 else "RANGE-BOUND")
-        lev = []
-        if n and pv:
-            lev.append({"name": "Nifty 50", "cur_label": "Close " + f2(n["last"], 0), "cur_value": n["last"],
-                        "low": pv["s1"], "high": pv["r1"], "low_label": "S1 " + f2(pv["s1"], 0), "high_label": "R1 " + f2(pv["r1"], 0)})
-        return {"title": "JCGG Morning Pulse", "eyebrow": "Joshi's Corner · Pre-Market", "headline": "Morning Pulse",
-                "subline": "%s · <b>Generated %s IST</b> · auto pipeline" % (now.strftime("%A, %d %b %Y"), TM),
-                "mood": {"tag": mood, "text": bias},
-                "hero": {"label": "Nifty 50 previous close", "value": f2(n["last"]) if n else "n/a",
-                         "chip": ("%s · Sensex %s" % (pct(n["pct"]), f2(s["last"]) if s else "n/a")) if n else "n/a",
-                         "dir": "up" if n and n["pct"] >= 0 else "down"},
-                "tile_groups": [
-                    {"heading": "Global & Asian Markets", "cols": 3, "scale_max": 1.5, "note": "Latest closes from Yahoo Finance.",
-                     "items": [it(k, "close", qs.get(v)) for k, v in {**GLOBAL, **ASIA}.items()]},
-                    {"heading": "Commodities", "cols": 3, "scale_max": 2.5, "note": "GIFT Nifty and MCX not available here.",
-                     "items": [it(k, "latest", qs.get(v)) for k, v in list(CMDTY.items())[:3]]},
-                    {"heading": "India VIX & USD/INR", "cols": 2, "scale_max": 5, "note": "VIX near 14 is moderate; check the live terminal for updates.",
-                     "items": [it("India VIX", "close", qs.get("^INDIAVIX")), it("USD/INR", "latest", qs.get("USDINR=X"), 3)]}],
-                "levels": lev,
-                "alerts": [{"tag": "Expiry", "tag_class": "deriv", "text": exp}] +
-                          [{"tag": "News", "tag_class": "data", "text": h} for h in headl[:2]],
-                "disclaimer": DISC}
+        n, s_, bn = qs.get("^NSEI"), qs.get("^BSESN"), qs.get("^NSEBANK")
+        vix = qs.get("^INDIAVIX")
+        def lv(q):
+            p = pivots(q)
+            return p
+        def zone(a, b_):
+            lo, hi = sorted([a, b_])
+            return "%s - %s" % (f2(lo, 0), f2(hi, 0))
+        levels = []
+        for nm, q in (("Nifty 50", n), ("Bank Nifty", bn)):
+            p = lv(q)
+            if p:
+                levels.append({"name": nm.replace(" ", "\n", 1) if False else nm, "s": zone(p["s2"], p["s1"]), "r": zone(p["r1"], p["r2"]),
+                               "note": "A sustained move above %s opens up %s; a slide below %s would expose %s."
+                                       % (f2(p["r1"], 0), f2(p["r2"], 0), f2(p["s1"], 0), f2(p["s2"], 0))})
+            else:
+                levels.append({"name": nm, "s": "n/a", "r": "n/a", "note": "Levels not available."})
+        vv = vix["last"] if vix else None
+        gfrac = 0.5 if vv is None else min(1, max(0, 1 - (vv - 10) / 20))  # low VIX = calm = right side
+        spark_vals = []
+        try:
+            j = json.loads(http("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?range=1mo&interval=1d"))
+            spark_vals = [c for c in j["chart"]["result"][0]["indicators"]["quote"][0]["close"] if c][-18:]
+        except Exception:
+            pass
+        def tile(nm, sub, q, d=2):
+            return {"name": nm, "sub": sub, "value": f2(q["last"], d) if q else "n/a", "pct": pct(q["pct"]) if q else "n/a"}
+        codes = {"Dow Jones": "US", "S&P 500": "US", "Nasdaq Composite": "US", "FTSE 100": "UK", "DAX": "DE",
+                 "Nikkei 225": "JP", "Hang Seng": "HK", "Shanghai Composite": "CN", "Kospi": "KR"}
+        bench = [{"name": k, "code": codes.get(k, ""), "level": f2(qs.get(v)["last"]) if qs.get(v) else "n/a",
+                  "pct": pct(qs[v]["pct"]) if qs.get(v) else "n/a"} for k, v in {**GLOBAL, **ASIA}.items()]
+        npct = n["pct"] if n else 0
+        head = cm.get("headline") or ("Nifty %s at %s" % (pct(npct), f2(n["last"], 0)) if n else "Market snapshot")
+        vtxt = cm.get("vol_text") or ("India VIX closed at %s (%s); USD/INR at %s."
+                                      % (f2(vv), pct(vix["pct"]) if vix else "n/a", f2(qs.get("USDINR=X")["last"], 3) if qs.get("USDINR=X") else "n/a"))
+        movers_txt = "Top Nifty 50 gainers: %s. Top losers: %s." % (
+            ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in gain[:3]) or "n/a",
+            ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in lose[:3]) or "n/a")
+        bottom = [
+            {"title": "Latest Headlines", "icon": "list", "text": " | ".join(x[:150] for x in headl[:2])},
+            {"title": "Biggest Movers (Nifty 50)", "icon": "chart", "text": movers_txt},
+            {"title": "F&O Expiry Schedule Note", "icon": "cal", "text": exp + " Bank Nifty has monthly expiry only (last Tuesday)."}]
+        return {"title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
+                "headline": head, "bias_text": bias,
+                "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
+                "vix": {"gauge": gfrac, "headline": "India VIX %s (%s)" % (f2(vv), pct(vix["pct"]) if vix else "n/a"), "text": vtxt},
+                "tiles": [tile("Nifty 50", "prev close", n), tile("Brent Crude", "US$/bbl", qs.get("BZ=F")),
+                          tile("Gold Spot", "US$/oz", qs.get("GC=F")), tile("India VIX", "close", vix),
+                          tile("USD/INR", "latest", qs.get("USDINR=X"), 3), tile("US 10-yr", "yield %", qs.get("^TNX"))],
+                "bench": bench,
+                "asia": {"head": cm.get("asia_head") or "Asia & Global Cues",
+                         "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
+                "levels": levels, "bottom": bottom,
+                "footnote": "Auto-generated %s IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: %s | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session."
+                            % (TM, "Gemini" if cm["by"] == "gemini" else "template"),
+                "disclaimer": "Not investment advice. Markets carry risk."}
     raise SystemExit("unsupported id " + sid)
 
 
@@ -419,14 +456,18 @@ def main():
     pdf = os.path.join(a.out, "%s_%s.pdf" % (stem, now.strftime("%Y-%m-%d")))
     cj = os.path.join(a.out, a.sid + ".json")
     json.dump(cfg, open(cj, "w"), indent=1)
-    rend = "render_infographic_pdf.py" if a.sid == "morning-pulse" else "render_pdf.py"
-    subprocess.check_call([sys.executable, os.path.join(HERE, rend), "--config", cj, "--output", pdf])
+    png = pdf[:-4] + ".png"
+    if a.sid == "morning-pulse":
+        subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--png", png, "--pdf", pdf])
+    else:
+        subprocess.check_call([sys.executable, os.path.join(HERE, "render_pdf.py"), "--config", cj, "--output", pdf])
     if a.dry and not n:
         sys.exit("DRY: no Nifty data fetched from Yahoo")
     if mock or a.dry:
         print("DRY/MOCK run: rendered", pdf, "(not published)")
         return
-    subprocess.check_call(pub + ["--file", pdf, "--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
+    files = ["--file", pdf] + (["--file", png] if a.sid == "morning-pulse" else [])
+    subprocess.check_call(pub + files + ["--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
 
 
 if __name__ == "__main__":

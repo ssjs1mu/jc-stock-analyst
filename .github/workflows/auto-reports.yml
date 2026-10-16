@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '55 2 * * 1-5'    # 08:25 IST  premarket-news
     - cron: '25 3 * * 1-5'    # 08:55 IST  morning-brief, morning-detailed
-    - cron: '40 3 * * 1-5'    # 09:10 IST  morning-pulse
+    - cron: '5 3 * * 1-5'     # 08:35 IST  morning-pulse (Actions is the primary builder for this one)
     - cron: '55 12 * * 1-5'   # 18:25 IST  evening-market-wrap
     - cron: '55 13 * * 1-5'   # 19:25 IST  evening-news-wrap
   workflow_dispatch:
@@ -51,7 +51,7 @@ jobs:
           case "${{ github.event.schedule }}" in
             "55 2 * * 1-5")  IDS="premarket-news" ;;
             "25 3 * * 1-5")  IDS="morning-brief morning-detailed" ;;
-            "40 3 * * 1-5")  IDS="morning-pulse" ;;
+            "5 3 * * 1-5")   IDS="morning-pulse" ;;
             "55 12 * * 1-5") IDS="evening-market-wrap" ;;
             "55 13 * * 1-5") IDS="evening-news-wrap" ;;
             *) IDS="${{ github.event.inputs.ids }}" ;;
