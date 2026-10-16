@@ -461,6 +461,8 @@ def main():
         subprocess.run(pub + ["--status", "holiday", "--note", "No NSE session today (last bar %s)." % n["date"]])
         return
     cfg = build(a.sid, qs, heads, now)
+    if a.dry and os.environ.get("GEMINI_API_KEY") and "commentary: Gemini" not in json.dumps(cfg) and "drafted by Gemini" not in json.dumps(cfg):
+        sys.exit("DRY CHECK FAILED: GEMINI_API_KEY is set but Gemini commentary was not used")
     os.makedirs(a.out, exist_ok=True)
     stem = {"premarket-news": "Market_News", "morning-brief": "JCGG_Morning_Updates_Brief",
             "morning-detailed": "JCGG_Morning_Updates_Detailed", "morning-pulse": "JCGG_Morning_Pulse_Infographic",

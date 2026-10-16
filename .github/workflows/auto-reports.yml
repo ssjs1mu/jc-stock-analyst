@@ -67,7 +67,11 @@ jobs:
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             if [ "$FORCE" = "true" ]; then F="--force"; else F=""; fi
             if [ "$DRY" = "true" ]; then F="$F --dry --out /tmp/dry"; fi
-            python pipeline/auto_reports.py "$id" $F || echo "::warning::$id failed"
+            if [ "$DRY" = "true" ]; then
+              python pipeline/auto_reports.py "$id" $F
+            else
+              python pipeline/auto_reports.py "$id" $F || echo "::warning::$id failed"
+            fi
           done
       - name: Attach dry-run PDFs
         if: ${{ github.event.inputs.dry == 'true' }}
