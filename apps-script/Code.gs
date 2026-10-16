@@ -34,7 +34,7 @@ function doGet(e) {
     else if (p.action === 'calls_reconcile') out = callsReconcile_();
     else if (p.action === 'fetch') out = proxyFetch_(p.url);
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
-    else if (p.action === 'universe') out = universe_(p.idx);
+    else if (p.action === 'universe') out = bfUniverse_();
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
@@ -150,7 +150,7 @@ function idxCsv_(file, key) {
   if (out.length) cache.put(key, JSON.stringify(out), 21600);
   return out;
 }
-function universe_(idx) {
+function bfUniverse_() {
   var src = 'Nifty MidSmallCap 400', list = idxCsv_('ind_niftymidsmallcap400list.csv', 'msc400');
   if (!list.length) {
     var n5 = idxCsv_('ind_nifty500list.csv', 'n500b'), n1 = idxCsv_('ind_nifty100list.csv', 'n100b'), big = {};
