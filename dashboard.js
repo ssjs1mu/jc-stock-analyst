@@ -450,7 +450,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
-      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}<div class="jd-newsw">${colNews(ms)}</div></div><div class="jd-col jd-c3">${colGlobal(ms)}${colComm(ms)}</div></div>`
+      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}${window.jcFD ? window.jcFD.html(ms) : ''}<div class="jd-newsw">${colNews(ms)}</div></div><div class="jd-col jd-c3">${colGlobal(ms)}${colComm(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
     Object.keys(S.q).forEach((k) => { S.q[k].flash = ''; });
