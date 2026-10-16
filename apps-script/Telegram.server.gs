@@ -33,5 +33,76 @@ function tgPostReports() {
       if (res.getResponseCode() === 200) { sent[id] = run.generated_at; n++; } else Logger.log(id + ' ' + res.getContentText());
     } catch (e) { Logger.log(id + ' ' + e); }
   });
-  s.p.setProperty('TG_SENT', JSON.stringify(sent)); return n;
+  s.p.setProperty('TG_SENT', JSON.stringify(sent));
+  try { tgLive_(s); } catch (e) { Logger.log('live ' + e); }
+  return n;
+}
+
+/* ---------- live news + live stock signals (same 5-minute trigger) ---------- */
+function tgSend_(s, html) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: html, parse_mode: 'HTML', disable_web_page_preview: 'true' }, muteHttpExceptions: true }); if (r.getResponseCode() !== 200) Logger.log('send ' + r.getContentText()); return r.getResponseCode() === 200; }
+function tgEsc_(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function tgNum_(v, d) { return Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
+function tgLive_(s) {
+  var ist = new Date(Date.now() + 19800000), dow = ist.getUTCDay(), m = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+  var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16);
+  if (m >= 480 && m <= 1260) tgNews_(s);
+  if (dow >= 1 && dow <= 5 && m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm);
+}
+function tgNews_(s) {
+  var qs = ['Sensex OR Nifty OR "Bank Nifty" when:1d', 'RBI OR rupee OR "FII" OR "crude oil" India when:1d', '"Wall Street" OR Nasdaq OR "Fed" stocks when:1d'], tags = ['INDIA', 'MACRO', 'GLOBAL'], items = [];
+  qs.forEach(function (q, i) {
+    try {
+      var x = UrlFetchApp.fetch('https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=en-IN&gl=IN&ceid=IN:en', { muteHttpExceptions: true }).getContentText();
+      var doc = XmlService.parse(x), its = doc.getRootElement().getChild('channel').getChildren('item');
+      its.slice(0, 12).forEach(function (it) {
+        var t = it.getChildText('title') || '', src = it.getChildText('source') || ''; if (src && t.slice(-(src.length + 3)) === ' - ' + src) t = t.slice(0, -(src.length + 3));
+        items.push({ t: t, src: src, link: it.getChildText('link') || '', ts: Date.parse(it.getChildText('pubDate') || '') || 0, tag: tags[i] });
+      });
+    } catch (e) { }
+  });
+  var seen = {}, first = false; try { seen = JSON.parse(s.p.getProperty('TG_NEWS') || 'null'); } catch (e) { } if (!seen) { seen = {}; first = true; }
+  items.sort(function (a, b) { return b.ts - a.ts; });
+  var fresh = [], cut = Date.now() - 3 * 3600000;
+  items.forEach(function (n) { var k = n.t.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 50); if (!n.t || seen[k]) return; seen[k] = Date.now(); if (!first && n.ts > cut) fresh.push(n); });
+  Object.keys(seen).forEach(function (k) { if (Date.now() - seen[k] > 2 * 86400000) delete seen[k]; });
+  s.p.setProperty('TG_NEWS', JSON.stringify(seen));
+  if (!fresh.length) return;
+  fresh = fresh.slice(0, 6);
+  tgSend_(s, '📰 <b>Live news</b>\n\n' + fresh.map(function (n) { return '• <b>' + tgEsc_(n.tag) + '</b> — <a href="' + tgEsc_(n.link) + '">' + tgEsc_(n.t) + '</a>' + (n.src ? ' <i>(' + tgEsc_(n.src) + ')</i>' : ''); }).join('\n'));
+}
+function tgSignals_(s, m, today, hhmm) {
+  var uni = universe_(); if (!uni.length) return;
+  var r = JSON.parse(liveQ_(uni.map(function (x) { return x + '.NS'; }).join(',')));
+  if (!r.ok) return; var q = r.q;
+  var seen = {}; try { seen = JSON.parse(s.p.getProperty('TG_SIG') || '{}'); } catch (e) { } if (seen.d !== today) seen = { d: today, k: {} };
+  var prev = {}; try { prev = JSON.parse(CacheService.getScriptCache().get('tgq') || '{}'); } catch (e) { }
+  var el = Math.max(1, m - 555), frac = Math.min(1, Math.max(el / 375, 0.06)), now = Date.now(), snap = {};
+  var G = { BRK: [], BURST: [], VOL: [], RATE: [], H52: [], L52: [] };
+  Object.keys(q).forEach(function (k) {
+    var a = q[k], px = a[0], pc = a[1], o = a[2], h = a[3], l = a[4], v = a[5], av = a[6], h52 = a[8], l52 = a[9], sym = k.replace(/\.NS$/, '');
+    if (!(px > 50 && pc > 0 && av > 2e5 && v > 0)) return;
+    snap[sym] = [px, v, now];
+    var chg = (px / pc - 1) * 100, pace = v / (av * frac), P = prev[sym], key;
+    if (chg >= 2.5 && pace >= 3 && px >= h * 0.985) { G.BRK.push({ sym: sym, px: px, chg: chg, pace: pace }); return; }
+    if (P && now - P[2] >= 150000 && now - P[2] <= 720000) { var dpx = (px / P[0] - 1) * 100, dv = v - P[1]; if (dpx >= 1.5 && dv >= 0.1 * av && chg >= 1.5) { G.BURST.push({ sym: sym, px: px, chg: chg, pace: pace, d: dpx, mins: Math.round((now - P[2]) / 60000) }); return; } }
+    if (Math.abs(chg) >= 4) G.RATE.push({ sym: sym, px: px, chg: chg, pace: pace });
+    else if (pace >= 3) G.VOL.push({ sym: sym, px: px, chg: chg, pace: pace });
+    if (h52 && px >= h52 * 0.999) G.H52.push({ sym: sym, px: px, chg: chg, pace: pace }); else if (l52 && px <= l52 * 1.001) G.L52.push({ sym: sym, px: px, chg: chg, pace: pace });
+  });
+  try { CacheService.getScriptCache().put('tgq', JSON.stringify(snap), 1800); } catch (e) { }
+  var lines = [], cap = { BRK: 4, BURST: 4, RATE: 4, VOL: 4, H52: 3, L52: 3 }, title = { BRK: '🚀 BREAKOUT', BURST: '⚡ VOLUME BURST', RATE: '📊 RATE BLAST', VOL: '🔊 VOLUME BLAST', H52: '🏔 52-WEEK HIGH', L52: '🕳 52-WEEK LOW' };
+  Object.keys(G).forEach(function (t) {
+    var arr = G[t].filter(function (x) { return !seen.k[x.sym + ':' + t]; });
+    arr.sort(function (a, b) { return t === 'RATE' ? Math.abs(b.chg) - Math.abs(a.chg) : b.pace - a.pace; });
+    arr.slice(0, cap[t]).forEach(function (x) {
+      seen.k[x.sym + ':' + t] = 1;
+      var base = '<b>' + tgEsc_(x.sym) + '</b> ' + tgNum_(x.px) + ' (' + (x.chg >= 0 ? '+' : '') + x.chg.toFixed(1) + '%)';
+      if (t === 'BRK' || t === 'BURST') { var slp = x.chg >= 6 ? 2 : 1.5; base += (t === 'BURST' ? ' +' + x.d.toFixed(1) + '% in ' + x.mins + 'm' : '') + ' · vol ' + x.pace.toFixed(1) + '×\n   Entry ' + tgNum_(x.px) + ' · SL ' + tgNum_(x.px * (1 - slp / 100)) + ' · T1 ' + tgNum_(x.px * 1.015) + ' · T2 ' + tgNum_(x.px * 1.03) + ' · T3 ' + tgNum_(x.px * 1.05); }
+      else if (t === 'VOL' || t === 'RATE') base += ' · vol ' + x.pace.toFixed(1) + '×';
+      lines.push(title[t] + '  ' + base);
+    });
+  });
+  s.p.setProperty('TG_SIG', JSON.stringify(seen));
+  if (!lines.length) return;
+  tgSend_(s, '📡 <b>Live stock signals</b> · ' + hhmm + ' IST\n\n' + lines.join('\n') + '\n\n<i>Rule-based scan of ~500 NSE stocks, delayed quotes. Not advice — levels are mechanical; no outcome is guaranteed.</i>');
 }
