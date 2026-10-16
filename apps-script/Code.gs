@@ -10,6 +10,8 @@
  *                                 quarterly + annual filed results, promoter holding  — best effort, NSE may reject cookies
  *   ?action=earn&symbols=A,B,C     Yahoo calendarEvents (next earnings date) for up to 40 NSE symbols in parallel — fallback when NSE blocks Google
  *   ?action=dash&symbols=^NSEI,GC=F,...   Joshi's Dashboard: one call returns price, previous close, last-tick time and an intraday sparkline for up to 60 Yahoo symbols (cached 20 s)
+ *   ?action=in10y   India 10-year G-Sec yield (Stooq daily series: last, previous, sparkline)
+ *   ?action=pcr     Nifty put-call ratio (open interest, nearest expiry) from the NSE option chain — best effort, NSE may reject Google
  *   ?action=wl_load / POST {action:'wl_save',data}   watchlists saved as JC_Watchlists.json in YOUR Google Drive (symbols sorted A–Z)
  *   ?action=upcoming&days=7       NSE event calendar + board meetings for the next N days, the Nifty 500 list, and a per-call
  *                                 'diag' report (HTTP status / rows) so a blocked or empty NSE response is visible in the app
@@ -20,9 +22,11 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 7, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 8, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
+    else if (p.action === 'in10y') out = in10y_();
+    else if (p.action === 'pcr') out = pcrNifty_();
     else if (p.action === 'wl_load') out = wlLoad_();
     else if (p.action === 'fetch') out = proxyFetch_(p.url);
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
@@ -183,6 +187,27 @@ function dashQuotes_(symbols) {
   var out = JSON.stringify({ rows: rows, ts: new Date().toISOString() });
   if (out.length < 90000) cache.put(key, out, 20);
   return out;
+}
+
+/* ---------- India 10Y G-Sec yield + Nifty PCR (best effort; the app shows n/a when a source refuses) ---------- */
+function in10y_() {
+  var cache = CacheService.getScriptCache(), hit = cache.get('in10y'); if (hit) return hit;
+  var r = UrlFetchApp.fetch('https://stooq.com/q/d/l/?s=10yiny.b&i=d', { muteHttpExceptions: true, headers: { 'User-Agent': UA } });
+  var rows = r.getResponseCode() === 200 ? Utilities.parseCsv(r.getContentText()) : [];
+  var data = rows.slice(1).filter(function (c) { return c.length >= 5 && c[4] && !isNaN(parseFloat(c[4])); });
+  if (data.length < 2) throw new Error('India 10Y unavailable (' + r.getResponseCode() + ')');
+  var last = data[data.length - 1], prev = data[data.length - 2];
+  var out = JSON.stringify({ p: parseFloat(last[4]), pc: parseFloat(prev[4]), d: last[0], sp: data.slice(-30).map(function (c) { return parseFloat(c[4]); }) });
+  cache.put('in10y', out, 900); return out;
+}
+function pcrNifty_() {
+  var cache = CacheService.getScriptCache(), hit = cache.get('pcr'); if (hit) return hit;
+  var h = nseHeaders_('https://www.nseindia.com/option-chain');
+  var r = UrlFetchApp.fetch('https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY', { headers: h, muteHttpExceptions: true });
+  var j = parseJson_(r), f = j && j.filtered;
+  if (!f || !f.CE || !f.PE || !f.CE.totOI) throw new Error('NSE option chain unavailable (' + r.getResponseCode() + ')');
+  var out = JSON.stringify({ pcr: f.PE.totOI / f.CE.totOI, ce: f.CE.totOI, pe: f.PE.totOI, expiry: j.records && j.records.expiryDates && j.records.expiryDates[0], ts: j.records && j.records.timestamp, u: j.records && j.records.underlyingValue });
+  cache.put('pcr', out, 120); return out;
 }
 
 /* ---------- watchlists in Google Drive (needs Drive permission — approve once when redeploying) ---------- */
