@@ -137,7 +137,7 @@ body{width:%dpx;height:%dpx;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-se
 h2{font-size:25px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
 .abs{position:absolute}
 .big{font-size:38px;font-weight:800;line-height:1.1}
-p{font-size:21px;line-height:1.35;color:#1e3553}
+p{font-size:21px;line-height:1.35;color:#1e3553}.clamp6{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;font-size:19px}.bp p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .panel{background:#1d3a5e;border-radius:26px;padding:22px 26px;border:3px solid #2e547f}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 14px;margin-top:6px}
 .tile{text-align:center;color:#fff}.tn{font-weight:700;font-size:20px;margin-top:-2px}.ts{font-size:14px;color:#a9bfdc}.tv{font-weight:800;font-size:24px}.tc{font-weight:700;font-size:19px}
@@ -159,7 +159,7 @@ p{font-size:21px;line-height:1.35;color:#1e3553}
 <div class="abs" style="left:40px;top:215px">%s</div>
 <div class="abs" style="left:40px;top:455px;width:470px;font-size:15px;color:#4a6486">%s</div>
 
-<div class="abs" style="left:560px;top:118px;width:450px"><div class="big" style="font-size:34px">%s</div><p style="margin-top:12px">%s</p></div>
+<div class="abs" style="left:560px;top:118px;width:450px"><div class="big" style="font-size:34px">%s</div><p class="clamp6" style="margin-top:12px">%s</p></div>
 <div class="abs" style="left:1025px;top:118px;width:2px;height:200px;background:#c9d6e6"></div>
 <div class="abs" style="left:1045px;top:112px;display:flex;gap:12px;width:350px;align-items:center">%s<div><div class="big" style="font-size:26px">%s</div></div></div>
 <div class="abs" style="left:1045px;top:215px;width:350px"><p style="font-size:19px">%s</p></div>
