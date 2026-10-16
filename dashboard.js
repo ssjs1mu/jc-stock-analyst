@@ -326,10 +326,60 @@
     const md = moodScore(), ml = md ? moodLabel(md.score) : ['LOADING', '#8a94ad'];
     const drv = md ? md.top.map((p) => `<span>${esc(p.name)} <b style="color:${p.v >= 0 ? '#6ee7a0' : '#ff9aa9'}">${esc(p.txt)}</b></span>`).join('') : '';
     return `<div class="jd-hero">
-      <div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div><div class="jd-livebox"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span><span class="jd-pn">${esc(note)}</span></a><div class="jd-sub">${sub}</div></div></div>
+      <div class="jd-left"><div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div><div class="jd-livebox"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span><span class="jd-pn">${esc(note)}</span></a><div class="jd-sub">${sub}</div></div></div>
+      <div class="jd-mood" title="${md ? esc(md.top.map((p) => p.name + ' ' + p.txt).join(' · ')) + ' — ' : ''}Composite of Nifty move, index breadth, VIX, global markets, rupee, crude, US yields${pcrVal() != null ? ' and PCR' : ''}. A reading of today’s tone, not a forecast."><div class="jd-mh">MARKET MOOD</div>${gaugeSVG(md ? md.score : null)}<div class="jd-mv" style="color:${ml[1]}"><b>${md ? md.score : '—'}</b><span>${ml[0]}</span></div></div></div>
       <div class="jd-mid"><img class="jd-ban" src="assets/jc-banner.png" alt="Joshi’s Corner — Shares ◆ Insurance ◆ Restaurant · Connecting People Thru Services…S.I.R" draggable="false"></div>
-      <div class="jd-mood" title="Composite of Nifty move, index breadth, VIX, global markets, rupee, crude, US yields${pcrVal() != null ? ' and PCR' : ''}. A reading of today’s tone, not a forecast."><div class="jd-mh">MARKET MOOD</div>${gaugeSVG(md ? md.score : null)}<div class="jd-mv" style="color:${ml[1]}"><b>${md ? md.score : '—'}</b><span>${ml[0]}</span></div><div class="jd-md">${drv}</div></div></div>`;
+      <div class="jd-tv" aria-label="Live business TV">${tvTiles()}</div></div>`;
   }
+
+
+  /* ---------- live business TV: tiles in the header + one persistent docked player (lives on <body>, so it keeps playing when the tab/view changes) ---------- */
+  const TV = [
+    { k: 'zee', n: 'Zee Business', c: 'UCkXopQ3ubd-rnXnStZqCl2w', col: '#e53935' },
+    { k: 'cnbc', n: 'CNBC Awaaz', c: 'UCQIycDaLsBpMKjOCeaKUYVg', col: '#f9a825' },
+    { k: 'ndtv', n: 'NDTV Profit', c: 'UC3uJIdRFTGgLWrUziaHbzrg', col: '#1e88e5' },
+    { k: 'etnow', n: 'ET Now', c: 'UCI_mwTKUhicNzFrhm33MzBQ', col: '#d81b60' },
+  ];
+  const tvCur = () => { try { return window.__jdtv && window.__jdtv.cur; } catch (e) { return null; } };
+  function tvTiles() {
+    const cur = tvCur();
+    return '<div class="jd-tvh">LIVE TV <small>tap to watch · keeps playing on every tab</small></div><div class="jd-tvg">' + TV.map((t) => `<button type="button" class="jd-tvb${cur === t.k ? ' on' : ''}" data-jdtv="${t.k}" style="--tc:${t.col}" title="Watch ${esc(t.n)} live"><i class="jd-tvd"></i><b>${esc(t.n)}</b><span>${cur === t.k ? 'NOW PLAYING' : '● LIVE'}</span></button>`).join('') + '</div>';
+  }
+  const tvSrc = (t) => 'https://www.youtube.com/embed/live_stream?channel=' + t.c + '&autoplay=1&rel=0&playsinline=1';
+  function tvEnsure() {
+    let el = document.getElementById('jdTvDock'); if (el) return el;
+    const st = document.createElement('style'); st.textContent = `
+    #jdTvDock{position:fixed;right:14px;bottom:14px;width:min(400px,calc(100vw - 28px));z-index:99990;background:#0a1736;border:1px solid #2b4a9a;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.45);overflow:hidden;display:none;color:#fff;font-family:inherit}
+    #jdTvDock.on{display:block}#jdTvDock .tvbar{display:flex;align-items:center;gap:6px;padding:6px 8px;background:linear-gradient(90deg,#17388a,#0d2358);font-size:12px;font-weight:800;flex-wrap:wrap}
+    #jdTvDock .tvbar .tt{flex:1;min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#jdTvDock .tvbar .tt:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b30;margin-right:6px;animation:jdpulse 1.4s infinite}
+    #jdTvDock button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:7px;padding:3px 8px;font-size:11px;font-weight:800;cursor:pointer}#jdTvDock button:hover{background:rgba(255,255,255,.28)}#jdTvDock button.on{background:#fff;color:#0a1736}
+    #jdTvDock .tvch{display:flex;gap:4px;padding:5px 8px;background:#0c1e4a;flex-wrap:wrap}#jdTvDock .tvbox{position:relative;width:100%;aspect-ratio:16/9;background:#000}#jdTvDock iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    #jdTvDock.min .tvch{display:none}#jdTvDock.min .tvbox{position:absolute;left:-9999px;width:320px;height:180px;aspect-ratio:auto}
+    @media(max-width:600px){#jdTvDock{right:8px;left:8px;bottom:8px;width:auto}}`;
+    document.head.appendChild(st);
+    el = document.createElement('div'); el.id = 'jdTvDock';
+    el.innerHTML = '<div class="tvbar"><span class="tt" id="jdTvT">Live TV</span><button type="button" data-tvact="min" title="Minimise (audio keeps playing)">▁</button><button type="button" data-tvact="pop" title="Open in a separate small window — keeps playing even if you minimise or leave this page">⧉ Pop out</button><button type="button" data-tvact="yt" title="Open on YouTube">YouTube ↗</button><button type="button" data-tvact="x" title="Stop and close">✕</button></div><div class="tvch" id="jdTvCh"></div><div class="tvbox" id="jdTvBox"></div>';
+    document.body.appendChild(el);
+    el.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const a = b.getAttribute('data-tvact'), k = b.getAttribute('data-tvch'); if (k) tvPlay(k); else if (a === 'x') tvStop(); else if (a === 'min') { el.classList.toggle('min'); b.textContent = el.classList.contains('min') ? '▢' : '▁'; } else if (a === 'pop') tvPop(); else if (a === 'yt') { const t = TV.find((x) => x.k === tvCur()); if (t) window.open('https://www.youtube.com/channel/' + t.c + '/live', '_blank', 'noopener'); } });
+    return el;
+  }
+  function tvMark(k) { document.querySelectorAll('.jd-tvb').forEach((b) => { const on = b.getAttribute('data-jdtv') === k; b.classList.toggle('on', on); const sp = b.querySelector('span'); if (sp) sp.textContent = on ? 'NOW PLAYING' : '● LIVE'; }); }
+  function tvPlay(k) {
+    const t = TV.find((x) => x.k === k); if (!t) return; const el = tvEnsure(); window.__jdtv = window.__jdtv || {}; window.__jdtv.cur = k;
+    el.classList.add('on'); el.classList.remove('min');
+    document.getElementById('jdTvT').textContent = t.n + ' · LIVE';
+    document.getElementById('jdTvCh').innerHTML = TV.map((x) => `<button type="button" data-tvch="${x.k}" class="${x.k === k ? 'on' : ''}">${esc(x.n)}</button>`).join('');
+    document.getElementById('jdTvBox').innerHTML = '<iframe title="' + esc(t.n) + ' live" src="' + tvSrc(t) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    tvMark(k);
+  }
+  function tvStop() { const el = document.getElementById('jdTvDock'); if (!el) return; document.getElementById('jdTvBox').innerHTML = ''; el.classList.remove('on'); window.__jdtv.cur = null; tvMark(null); }
+  function tvPop() {
+    const t = TV.find((x) => x.k === tvCur()); if (!t) return;
+    const w = window.open('', 'jcTvPop', 'width=520,height=340,menubar=no,toolbar=no,location=no,status=no'); if (!w) { alert('Your browser blocked the pop-up window. Allow pop-ups for this site and press Pop out again.'); return; }
+    w.document.title = t.n + ' — Joshi’s Corner Live TV'; w.document.body.setAttribute('style', 'margin:0;background:#000'); w.document.body.innerHTML = '<iframe style="position:fixed;inset:0;width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen src="' + tvSrc(t) + '"></iframe>';
+    tvStop(); // the pop-out takes over so the sound is not doubled
+  }
+  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-jdtv]'); if (b) { e.preventDefault(); tvPlay(b.getAttribute('data-jdtv')); } });
 
   /* timetable: India day with CAS */
   function timetableHTML(ms) {
@@ -473,6 +523,15 @@
   .jd-ban{display:block;width:100%;max-width:720px;max-height:230px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}.jd-hero{align-items:center}.jd-clk{align-self:center}
   @media(max-width:900px){.jd-ban{max-width:100%}}
   .jd-hero{grid-template-columns:minmax(300px,auto) minmax(0,1fr) auto}.jd-livebox{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:12px;max-width:400px}.jd-livebox .jd-pill{width:100%;box-sizing:border-box}.jd-livebox .jd-sub{font-size:11.5px;text-align:left}.jd-livebox .jd-pl small{white-space:nowrap}.jd-livebox .jd-pn{font-size:11px}
+  .jd-left{display:flex;align-items:center;gap:18px;min-width:0}.jd-left .jd-mood{width:150px;flex:none}.jd-left .jd-mv{margin-top:-4px}.jd-left .jd-mv b{font-size:21px}.jd-left .jd-mv span{font-size:11px}.jd-left .jd-mh{font-size:9px}
+  .jd-hero{grid-template-columns:auto minmax(0,1fr) 270px}
+  .jd-tv{position:relative;z-index:1;min-width:0}.jd-tvh{font-size:9.5px;letter-spacing:1.6px;color:#9fb3e6;font-weight:800;margin-bottom:5px}.jd-tvh small{letter-spacing:.2px;font-weight:600;color:#7f95c9;margin-left:4px}
+  .jd-tvg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .jd-tvb{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;cursor:pointer;color:#fff;border:1px solid rgba(255,255,255,.22);border-left:4px solid var(--tc);background:rgba(255,255,255,.08);border-radius:10px;padding:7px 9px 6px 10px;font-family:inherit;transition:background .15s,transform .15s}
+  .jd-tvb:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}.jd-tvb b{font-size:12.5px;letter-spacing:.2px;line-height:1.15}.jd-tvb span{font-size:9.5px;font-weight:800;letter-spacing:.8px;color:#ff8a80}.jd-tvb.on{background:rgba(255,255,255,.95);color:#0a1736}.jd-tvb.on span{color:#0b7a3f}
+  .jd-tvd{position:absolute;right:8px;top:8px;width:7px;height:7px;border-radius:50%;background:#ff3b30;animation:jdpulse 1.4s infinite}
+  @media(max-width:1180px){.jd-hero{grid-template-columns:auto minmax(0,1fr)}.jd-tv{grid-column:1 / -1}.jd-tvg{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:900px){.jd-left{flex-direction:column;gap:8px}.jd-left .jd-mood{margin:0 auto}.jd-tvg{grid-template-columns:1fr 1fr}.jd-hero{grid-template-columns:1fr}}
   @media(max-width:900px){.jd-livebox{align-items:center;margin-left:auto;margin-right:auto}.jd-livebox .jd-sub{text-align:center}}
   @media(max-width:1280px){.jd-board{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"a m" "a r"}.jd-newsw{min-height:0}.jd-newsw>.jd-card{position:static}.jd-newsw .jd-nlist{max-height:520px}}
   @media(max-width:900px){.jd-hero{grid-template-columns:1fr;text-align:center;padding:14px}.jd-mood{margin:0 auto}.jd-time{font-size:34px}.jd-pill{flex-wrap:wrap;justify-content:center}.jd-lane,.jd-axis,.jd-hr{grid-template-columns:90px 1fr}.jd-hours{--hn:90px}.jd-seg span{font-size:8px}}
