@@ -38,7 +38,7 @@ common to all of them. Read both before doing anything.
   (schema in the script's docstring; `"trend": true` on level/%-change tables;
   `"style": "framed"` on a "Today's Bias in Brief" section).
 - `generated_line` = `"Generated: <date>, <time> IST"` from the real clock.
-- Infographics use `render_infographic_pdf.py` / `render_cas_infographic.py` as
+- Infographics use `render_infographic_pdf.py` as
   the report file says.
 
 ## 5. Check before delivering (mandatory)

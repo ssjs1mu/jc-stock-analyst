@@ -11,8 +11,8 @@ Fallback behaviour: if reports/<id>/index.json already holds an ok/holiday run f
 (IST) -- e.g. the Claude scheduled task published -- this script exits without doing anything,
 unless --force. Never invents numbers: anything not fetched is printed as "n/a".
 Supported ids: premarket-news, morning-brief, morning-detailed, morning-pulse,
-evening-market-wrap, evening-news-wrap. (closing-auction and circuit-watch need NSE
-exchange files that block cloud servers, so they are not generated here.)
+evening-market-wrap, evening-news-wrap. (circuit-watch needs NSE exchange files that block cloud servers,
+so it is not generated here.)
 """
 import argparse
 import concurrent.futures as cf
