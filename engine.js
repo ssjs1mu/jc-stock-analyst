@@ -958,70 +958,21 @@ function parseYahooEarn(E, nowMs, days, meta) {
    then replayed on real 5-minute candles to show the live state and the track record of the rules.
    ============================================================ */
 const LS_WL = 'jc_watchlists_v1';
-function dayPlan(ref, atr, ctx) {
-  const rp = pivotSet(ref.h, ref.l, ref.c), lv = [], add = (v, label) => { if (isNum(v)) lv.push({ v, label }); };
-  ['R3', 'R2', 'R1', 'P', 'S1', 'S2', 'S3'].forEach((k) => add(rp[k], 'Pivot ' + k)); add(rp.cprTop, 'CPR top'); add(rp.cprBot, 'CPR bottom'); add(rp.H3, 'Camarilla H3'); add(rp.H4, 'Camarilla H4'); add(rp.L3, 'Camarilla L3'); add(rp.L4, 'Camarilla L4'); add(ref.h, 'Prev high'); add(ref.l, 'Prev low');
-  let sc = 0, n = 0; const vote = (v) => { if (v !== null && v !== undefined) { sc += v; n++; } };
-  vote(isNum(ctx.ema20) ? (ref.c > ctx.ema20 ? 1 : -1) : null);
-  vote(isNum(ctx.ema20) && isNum(ctx.ema50) ? (ctx.ema20 > ctx.ema50 ? 1 : -1) : null);
-  vote(isNum(ctx.rsi) ? (ctx.rsi > 55 ? 1 : ctx.rsi < 45 ? -1 : 0) : null);
-  vote(ref.c > rp.cprTop ? 1 : ref.c < rp.cprBot ? -1 : 0);
-  const pos = (ref.c - ref.l) / Math.max(1e-9, ref.h - ref.l); vote(pos > 0.7 ? 1 : pos < 0.3 ? -1 : 0);
-  const bias = n < 3 ? 'Neutral' : sc >= 2 ? 'Bullish' : sc <= -2 ? 'Bearish' : 'Neutral';
-  const mk = (dir) => {
-    const entry = dir > 0 ? ref.h + 0.03 * atr : ref.l - 0.03 * atr;
-    const near = (dir > 0 ? levelsBelow(lv, entry, 0.2 * atr, 1) : levelsAbove(lv, entry, 0.2 * atr, 1))[0];
-    let risk = near ? Math.abs(entry - near.v) + 0.1 * atr : 0.45 * atr; risk = Math.min(0.6 * atr, Math.max(0.3 * atr, risk));
-    const ups = dir > 0 ? levelsAbove(lv, entry, Math.max(0.35 * atr, risk), 2) : levelsBelow(lv, entry, Math.max(0.35 * atr, risk), 2);
-    const t1 = ups[0] ? ups[0].v : entry + dir * Math.max(0.6 * atr, 1.2 * risk);
-    let t2 = ups[1] ? ups[1].v : t1 + dir * Math.max(0.5 * atr, risk); if (dir * (t2 - t1) < 0.2 * atr) t2 = t1 + dir * 0.5 * atr;
-    return { dir, side: dir > 0 ? 'BUY' : 'SELL', entry, sl: entry - dir * risk, t1, t2, risk, rr1: Math.abs(t1 - entry) / risk, rr2: Math.abs(t2 - entry) / risk, t1Why: ups[0] ? ups[0].label : 'ATR projection', t2Why: ups[1] ? ups[1].label : 'ATR projection' };
-  };
-  const sides = bias === 'Bullish' ? [mk(1)] : bias === 'Bearish' ? [mk(-1)] : [mk(1), mk(-1)];
-  return { bias, score: sc, votes: n, sides, atr, ref: { h: ref.h, l: ref.l, c: ref.c } };
-}
-/* One side of a plan on a list of 5-min bars. Stop-buy/stop-sell entry at the trigger (gap beyond 0.3×ATR = skipped), stop moves to cost after T1,
-   half booked at T1 and half at T2; if stop and target share a bar the stop is assumed first (conservative). */
-function evalSide(sd, bars, atr, final) {
-  const d = sd.dir; let fill = null, fi = -1;
-  for (let i = 0; i < bars.length; i++) {
-    const b = bars[i];
-    if (d > 0 ? b.h >= sd.entry : b.l <= sd.entry) {
-      const gapBy = d > 0 ? b.o - sd.entry : sd.entry - b.o;
-      if (i === 0 && gapBy > 0.3 * atr) return { state: 'SKIP', fill: null, R: 0, fi: 0 };
-      fill = gapBy > 0 ? b.o : sd.entry; fi = i; break;
-    }
-  }
-  if (fi < 0) return { state: final ? 'NT' : 'WAIT', fill: null, R: 0, fi: -1 };
-  const risk = Math.abs(fill - sd.sl) || atr * 0.3, pr = (px) => (d * (px - fill)) / risk; let t1hit = false, outcome = null, stop = sd.sl;
-  for (let i = fi; i < bars.length; i++) {
-    const b = bars[i], trig = i === fi;
-    let slH = d > 0 ? b.l <= stop : b.h >= stop; if (trig) slH = slH && (d > 0 ? b.c < b.o : b.c > b.o);
-    const t1H = d > 0 ? b.h >= sd.t1 : b.l <= sd.t1, t2H = d > 0 ? b.h >= sd.t2 : b.l <= sd.t2;
-    if (!t1hit) { if (slH) { outcome = 'SL'; break; } if (t1H) { t1hit = true; stop = fill; if (t2H) { outcome = 'T2'; break; } } }
-    else { if (t2H) { outcome = 'T2'; break; } if (slH) { outcome = 'T1'; break; } }
-  }
-  const lastB = last(bars); let R, state;
-  if (outcome === 'SL') { R = -1; state = 'SL'; }
-  else if (outcome === 'T2') { R = (pr(sd.t1) + pr(sd.t2)) / 2; state = 'T2'; }
-  else if (outcome === 'T1') { R = pr(sd.t1) / 2; state = 'T1'; }
-  else { R = t1hit ? (pr(sd.t1) + pr(lastB.c)) / 2 : pr(lastB.c); state = final ? (t1hit ? 'T1' : R >= 0 ? 'EOD+' : 'EOD−') : 'LIVE'; }
-  return { state, fill, fi, R, t1hit, live: !final && !outcome, pnlPct: (d * (lastB.c - fill)) / fill * 100, cmp: lastB.c };
-}
-/* both sides of a neutral plan are one-cancels-other: the first to trigger wins */
+const JC = (typeof JCE !== 'undefined') ? JCE : require('./calls_engine.js');
+/* Day-trading calls now come from calls_engine.js (JCE): a call is issued only when trend, ADX, RSI, MACD, volume, CPR, 20-day range and the Nifty/VIX regime agree;
+   entries need a 5-minute CLOSE beyond the trigger; costs are charged. Same file runs in the 8:30 AM Apps Script call book. */
+function dayPlan(dd, k, mkt) { return JC.dayPlanFor(dd, k, mkt); }
+function evalSide(sd, bars, atr, final) { return JC.evalDay(sd, bars, atr, final); }
 function evalPlan(plan, bars, atr, final) {
-  const evs = plan.sides.map((sd) => ({ sd, ev: evalSide(sd, bars, atr, final) })), trig = evs.filter((x) => x.ev.fill != null);
-  let chosen = null;
-  if (trig.length) { trig.sort((a, b) => a.ev.fi - b.ev.fi || Math.abs(bars[a.ev.fi].o - a.sd.entry) - Math.abs(bars[b.ev.fi].o - b.sd.entry)); chosen = trig[0]; }
-  evs.forEach((x) => { if (chosen && x !== chosen && x.ev.fill != null) x.ev = { state: 'CANCEL', fill: null, R: 0, fi: -1 }; });
-  const skip = !chosen && evs.some((x) => x.ev.state === 'SKIP');
-  return { sides: evs, chosen, state: chosen ? chosen.ev.state : skip ? 'SKIP' : final ? 'NT' : 'WAIT', R: chosen ? chosen.ev.R : 0, live: !!(chosen && chosen.ev.live) };
+  if (!plan.sides.length) return { sides: [], chosen: null, state: 'NOCALL', R: 0, live: false };
+  const evs = plan.sides.map((sd) => ({ sd, ev: evalSide(sd, bars, atr, final) })), c = evs[0], st = c.ev.state;
+  return { sides: evs, chosen: c.ev.fill != null ? c : null, state: st, R: c.ev.R || 0, live: !!c.ev.live };
 }
 function marketClock(nowMs) {
   const ist = new Date(nowMs + 19800000), dow = ist.getUTCDay(), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
   return { today: istDate(nowMs / 1000), open: dow >= 1 && dow <= 5 && mins >= 555 && mins <= 930, afterClose: mins > 930, preOpen: mins < 555 };
 }
-function analyseWatch(daily, m5, meta, nowMs) {
+function analyseWatch(daily, m5, meta, nowMs, mkt) {
   const mc = marketClock(nowMs), sess = {};
   m5.forEach((x) => { const d = istDate(x.t); (sess[d] = sess[d] || []).push(x); });
   const sdates = Object.keys(sess).sort(); if (!sdates.length) return { ok: false, reason: 'No 5-minute candles returned.' };
@@ -1031,22 +982,22 @@ function analyseWatch(daily, m5, meta, nowMs) {
   sdates.forEach((d) => { if (!dmap.has(d) && completeSess(d) && sess[d].length >= 40) { const s = sess[d]; dmap.set(d, { t: s[0].t, o: s[0].o, h: Math.max(...s.map((x) => x.h)), l: Math.min(...s.map((x) => x.l)), c: last(s).c, v: s.reduce((a, x) => a + x.v, 0), derived: true }); } });
   const dd = [...dmap.entries()].filter(([d]) => d < mc.today || completeSess(d)).sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([d, b]) => Object.assign({ date: d }, b));
   if (dd.length < 60) return { ok: false, reason: 'Not enough daily history (' + dd.length + ' sessions) for pivots/ATR.' };
-  const cl = dd.map((b) => b.c), e20 = EMA(cl, 20), e50 = EMA(cl, 50), rs = RSI(cl), at14 = ATR(dd);
-  const ctxAt = (k) => ({ ema20: e20[k], ema50: e50[k], rsi: rs[k] });
+  const at14 = ATR(dd);
   const idxBefore = (d) => { let k = -1; for (let i = 0; i < dd.length; i++) { if (dd[i].date < d) k = i; else break; } return k; };
   const hist = [];
   sdates.forEach((d) => {
     if (sess[d].length < 25) return; const k = idxBefore(d); if (k < 30 || !isNum(at14[k])) return;
-    const final = completeSess(d), plan = dayPlan(dd[k], at14[k], ctxAt(k)), res = evalPlan(plan, sess[d], at14[k], final);
+    const final = completeSess(d), plan = dayPlan(dd, k, mkt), res = evalPlan(plan, sess[d], plan.atr, final);
     hist.push({ date: d, final, plan, res, bars: sess[d].length });
   });
-  const kL = dd.length - 1, nextPlan = isNum(at14[kL]) ? dayPlan(dd[kL], at14[kL], ctxAt(kL)) : null, today = hist.length && last(hist).date === mc.today ? last(hist) : null;
+  const kL = dd.length - 1, nextPlan = isNum(at14[kL]) ? dayPlan(dd, kL, mkt) : null, today = hist.length && last(hist).date === mc.today ? last(hist) : null;
   const active = liveNow && today ? today.plan : nextPlan, lastBar = last(sess[lastSess]);
   const cmp = isNum(meta && meta.regularMarketPrice) && liveNow ? meta.regularMarketPrice : lastBar.c, kPrev = idxBefore(lastSess), prevClose = kPrev >= 0 ? dd[kPrev].c : null;
   return { ok: true, liveNow, lastSess, cmp, prevClose, chg: isNum(prevClose) ? (cmp / prevClose - 1) * 100 : null, active, activeFor: liveNow ? mc.today : null, today, hist, nextPlan, atr: at14[kL], lastT: lastBar.t, acc: accuracy(hist.filter((h) => h.final)) };
 }
 function accuracy(hs) {
-  const a = { sessions: hs.length, trig: 0, T2: 0, T1: 0, SL: 0, eodP: 0, eodN: 0, skip: 0, nt: 0, wins: 0, netR: 0, dots: [] };
+  const nocall = hs.filter((h) => h.res.state === 'NOCALL').length; hs = hs.filter((h) => h.res.state !== 'NOCALL');
+  const a = { nocall, sessions: hs.length, trig: 0, T2: 0, T1: 0, SL: 0, eodP: 0, eodN: 0, skip: 0, nt: 0, wins: 0, netR: 0, dots: [] };
   hs.forEach((h) => {
     const s = h.res.state; a.netR += h.res.R || 0;
     if (s === 'NT' || s === 'WAIT') { a.nt++; a.dots.push(['nt', h.date, 'no trigger']); return; }
@@ -1060,7 +1011,10 @@ function accuracy(hs) {
 }
 function mergeAcc(list) { const a = { sessions: 0, trig: 0, T2: 0, T1: 0, SL: 0, eodP: 0, eodN: 0, skip: 0, nt: 0, wins: 0, netR: 0 }; list.forEach((x) => { Object.keys(a).forEach((k) => { a[k] += x[k] || 0; }); }); a.hit = a.trig ? (a.T1 + a.T2) / a.trig : null; a.slRate = a.trig ? a.SL / a.trig : null; a.win = a.trig ? a.wins / a.trig : null; a.avgR = a.trig ? a.netR / a.trig : null; return a; }
 /* ---------- watchlist storage + feeds ---------- */
-const sortSyms = (a) => [...new Set(a)].sort((x, y) => x.localeCompare(y));
+const symBase = (s) => String(s).replace(/\.(NS|BO)$/, '');
+const symEx = (s) => (/\.BO$/.test(s) ? 'BO' : 'NS');
+const symYf = (s) => symBase(s) + '.' + symEx(s);
+const sortSyms = (a) => [...new Set(a)].sort((x, y) => symBase(x).localeCompare(symBase(y)) || x.localeCompare(y));
 function wlLoad() { try { const j = JSON.parse(localStorage.getItem(LS_WL) || 'null'); if (j && Array.isArray(j.lists) && j.lists.length) { j.lists.forEach((l) => { l.syms = sortSyms(l.syms || []); }); return j; } } catch (e) {} return { updated: 0, lists: [{ id: 'l' + Date.now().toString(36), name: 'My watchlist', syms: [] }], active: null }; }
 function wlSave(localOnly) {
   WL.store.lists.forEach((l) => { l.syms = sortSyms(l.syms); }); if (!localOnly) WL.store.updated = Date.now();
@@ -1087,20 +1041,25 @@ async function wlDriveSync() {
     else if ((WL.store.updated || 0) > (j.updated || 0)) await wlDrivePush(); else wlCloudSet('saved');
   } catch (e) { wlCloudSet('error', /unknown action/.test(e.message || '') ? 'backend is the old version — redeploy Code.gs' : (e && e.message) || 'failed'); }
 }
-const WL = { cloud: null, pushT: null, synced: false, store: null, data: {}, cache: {}, timer: null, auto: true, busy: false, stamp: 0 };
+const WL = { ex: 'NS', view: (() => { try { return JSON.parse(localStorage.getItem('jc_wl_view') || 'null') || { f: 'all', s: 'az' }; } catch (e) { return { f: 'all', s: 'az' }; } })(), mkt: null, mktAt: 0, cloud: null, pushT: null, synced: false, store: null, data: {}, cache: {}, timer: null, auto: true, busy: false, stamp: 0 };
 const wlList = () => WL.store.lists.find((l) => l.id === WL.store.active) || WL.store.lists[0];
-const cleanSym = (s) => String(s || '').toUpperCase().replace(/\.(NS|BO)$/, '').replace(/[^A-Z0-9&\-]/g, '');
+const cleanSym = (s, ex) => { let u = String(s || '').toUpperCase().trim(), bse = ex === 'BO' || /\.BO$/.test(u) || /^BSE:/.test(u); u = u.replace(/^(NSE|BSE):/, '').replace(/\.(NS|BO)$/, '').replace(/[^A-Z0-9&\-]/g, ''); return u ? (bse ? u + '.BO' : u) : ''; };
 function mergeBars(old, fresh) { if (!fresh.length) return old; const t0 = fresh[0].t; return old.filter((b) => b.t < t0).concat(fresh); }
+async function wlMkt(force) {
+  if (WL.mkt && !force && Date.now() - WL.mktAt < 3600e3) return WL.mkt;
+  try { const [n, v] = await Promise.all([fetchChart('^NSEI', '1y', '1d'), fetchChart('^INDIAVIX', '1y', '1d').catch(() => ({ bars: [] }))]); WL.mkt = JC.mktSeries(n.bars, v.bars); WL.mktAt = Date.now(); } catch (e) { WL.mkt = WL.mkt || {}; }
+  return WL.mkt;
+}
 async function wlLoadSym(sym, force) {
-  const now = Date.now(), c = WL.cache[sym];
+  const now = Date.now(), c = WL.cache[sym], yf = symYf(sym), mkt = await wlMkt(false);
   try {
     if (!c || force || now - c.dt > 3600e3 || !c.m5) {
-      const [d, m] = await Promise.all([fetchChart(sym + '.NS', '1y', '1d'), fetchChart(sym + '.NS', '1mo', '5m')]);
+      const [d, m] = await Promise.all([fetchChart(yf, '1y', '1d'), fetchChart(yf, '60d', '5m')]);
       WL.cache[sym] = { daily: d.bars, m5: m.bars, meta: m.meta, dt: now };
     } else {
-      const f = await fetchChart(sym + '.NS', '1d', '5m'); c.m5 = mergeBars(c.m5, f.bars); c.meta = f.meta;
+      const f = await fetchChart(yf, '1d', '5m'); c.m5 = mergeBars(c.m5, f.bars); c.meta = f.meta;
     }
-    const cc = WL.cache[sym]; WL.data[sym] = Object.assign({ sym, at: now }, analyseWatch(cc.daily, cc.m5, cc.meta, now));
+    const cc = WL.cache[sym]; WL.data[sym] = Object.assign({ sym, at: now }, analyseWatch(cc.daily, cc.m5, cc.meta, now, mkt));
   } catch (e) { WL.data[sym] = { sym, ok: false, reason: (e && e.message) || 'fetch failed', at: now }; }
 }
 async function wlRefreshAll(force) {
@@ -1134,32 +1093,40 @@ function wlStatus(sd, ev, a) {
 const dotCls = { hit: '#0d8a4b', sl: '#c0233f', eod: '#e0a61a', nt: '#c6cde0' };
 function dotsHtml(a, n = 20) { return `<span class="dots">${a.dots.slice(-n).map((d) => `<i style="background:${dotCls[d[0]]}" title="${esc(d[1] + ' · ' + d[2])}"></i>`).join('')}</span>`; }
 function accKpi(label, v, sub, cls) { return `<div class="kpi"><span class="cap">${label}</span><b class="${cls || ''}">${v}</b><small>${sub || ''}</small></div>`; }
-function htmlWatchBody(list, data, stamp, busy, isLive) {
-  if (!list.syms.length) return '<div class="note">This watchlist is empty. Add NSE symbols above (comma or space separated) — each gets today’s day-trading levels, a live tracker and a track record.</div>';
-  const rows = list.syms.map((s) => data[s] || { sym: s, loading: true });
-  const okRows = rows.filter((r) => r.ok), A = mergeAcc(okRows.map((r) => r.acc));
+const callSide = (r) => (r && r.active && r.active.sides && r.active.sides[0] ? r.active.sides[0].side : null);
+function htmlWatchBody(list, data, stamp, busy, isLive, ui) {
+  if (!list.syms.length) return '<div class="note">This watchlist is empty. Add NSE or BSE symbols above (comma or space separated) — each gets today’s day-trading call (only when several parameters agree), a live tracker and a track record.</div>';
+  const all = list.syms.map((s) => data[s] || { sym: s, loading: true }), V = WL.view || { f: 'all', s: 'az' };
+  const cnt = { all: all.length, buy: all.filter((r) => callSide(r) === 'BUY').length, sell: all.filter((r) => callSide(r) === 'SELL').length, none: all.filter((r) => r.ok && !callSide(r)).length };
+  let rows = all.filter((r) => V.f === 'all' || r.loading || (V.f === 'buy' && callSide(r) === 'BUY') || (V.f === 'sell' && callSide(r) === 'SELL') || (V.f === 'none' && r.ok && !callSide(r)) || (!r.ok && V.f === 'none'));
+  const sc = (r) => (r.active ? Math.abs(r.active.score || 0) : -1), hv = (r) => (r.acc && isNum(r.acc.hit) ? r.acc.hit : -1);
+  rows = rows.slice().sort((a, b) => (V.s === 'score' ? sc(b) - sc(a) : V.s === 'acc' ? hv(b) - hv(a) : 0) || symBase(a.sym).localeCompare(symBase(b.sym)));
+  const tb = ui ? `<div class="wlfilter"><span class="cap">Show</span>${[['all', 'All'], ['buy', '▲ Buy'], ['sell', '▼ Sell'], ['none', 'No trade']].map((x) => `<button class="wlchip${V.f === x[0] ? ' on' : ''}" onclick="wlSetView('f','${x[0]}')">${x[1]} <small>${cnt[x[0]]}</small></button>`).join('')}<span class="cap" style="margin-left:14px">Sort</span><select onchange="wlSetView('s',this.value)"><option value="az"${V.s === 'az' ? ' selected' : ''}>A → Z (default)</option><option value="score"${V.s === 'score' ? ' selected' : ''}>Strongest call first</option><option value="acc"${V.s === 'acc' ? ' selected' : ''}>Best track record first</option></select></div>` : '';
+  const okRows = all.filter((r) => r.ok), A = mergeAcc(okRows.map((r) => r.acc));
   const live = okRows.filter((r) => r.today && r.active && r.liveNow).map((r) => r.today.res), nLive = live.filter((x) => x.live).length, nT = live.filter((x) => x.state === 'T1' || x.state === 'T2' || (x.live && x.chosen && x.chosen.ev.t1hit)).length, nS = live.filter((x) => x.state === 'SL').length, nW = live.filter((x) => x.state === 'WAIT').length;
-  const kpi = `<div class="kp">${accKpi('Calls replayed', A.sessions, `${okRows.length} stocks · ~20 sessions`)}${accKpi('Triggered', A.trig, (A.sessions ? Math.round((A.trig / A.sessions) * 100) + '% of days' : ''))}${accKpi('Target hit', pct0(A.hit), `T1 or T2 · ${A.T1 + A.T2} of ${A.trig}`, A.hit >= 0.5 ? 'num-green' : 'num-red')}${accKpi('Stop-loss', pct0(A.slRate), `${A.SL} of ${A.trig}`, 'num-red')}${accKpi('Profitable', pct0(A.win), 'net R > 0 per trade')}${accKpi('Net result', (A.netR >= 0 ? '+' : '') + A.netR.toFixed(1) + 'R', isNum(A.avgR) ? 'avg ' + (A.avgR >= 0 ? '+' : '') + A.avgR.toFixed(2) + 'R / trade' : '', A.netR >= 0 ? 'num-green' : 'num-red')}${isLive ? accKpi('Right now', `${nLive} live`, `${nW} waiting · ${nT} at T1/T2 · ${nS} stopped`) : ''}</div>`;
+  const kpi = `<div class="kp">${accKpi('Calls replayed', A.sessions, `${okRows.length} stocks · last ~40 sessions · only sessions where a call was issued`)}${accKpi('Triggered', A.trig, (A.sessions ? Math.round((A.trig / A.sessions) * 100) + '% of days' : ''))}${accKpi('Target hit', pct0(A.hit), `T1 or T2 · ${A.T1 + A.T2} of ${A.trig}`, A.hit >= 0.5 ? 'num-green' : 'num-red')}${accKpi('Stop-loss', pct0(A.slRate), `${A.SL} of ${A.trig}`, 'num-red')}${accKpi('Profitable', pct0(A.win), 'net R > 0 per trade')}${accKpi('Net result', (A.netR >= 0 ? '+' : '') + A.netR.toFixed(1) + 'R', isNum(A.avgR) ? 'avg ' + (A.avgR >= 0 ? '+' : '') + A.avgR.toFixed(2) + 'R / trade' : '', A.netR >= 0 ? 'num-green' : 'num-red')}${isLive ? accKpi('Right now', `${nLive} live`, `${nW} waiting · ${nT} at T1/T2 · ${nS} stopped`) : ''}</div>`;
   let trs = '';
   rows.forEach((r) => {
-    if (r.loading) { trs += `<tr><td class="lbl"><b>${esc(r.sym)}</b></td><td colspan="9" class="rd">loading…</td></tr>`; return; }
-    const rm = `<button class="xbtn" title="Remove" onclick="wlRemove('${esc(r.sym)}')">✕</button>`;
-    if (!r.ok) { trs += `<tr><td class="lbl"><b>${esc(r.sym)}</b>${rm}</td><td colspan="9" class="rd num-red">${esc(r.reason)}</td></tr>`; return; }
-    const plan = r.active; if (!plan) { trs += `<tr><td class="lbl"><b>${esc(r.sym)}</b>${rm}</td><td colspan="9" class="rd">No plan (ATR unavailable)</td></tr>`; return; }
+    const nm = symBase(r.sym) + (symEx(r.sym) === 'BO' ? ' <em class="bsetag">BSE</em>' : '');
+    if (r.loading) { trs += `<tr><td class="lbl"><b>${nm}</b></td><td colspan="10" class="rd">loading…</td></tr>`; return; }
+    const rm = `<button class="xbtn" title="Remove" onclick="wlRemove('${esc(r.sym)}')">✕</button>`, xr = `<button class="xrbtn" title="Live X-ray of ${esc(symBase(r.sym))}" onclick="jcXray('${esc(r.sym)}')">X-ray</button>`;
+    if (!r.ok) { trs += `<tr><td class="lbl"><b>${nm}</b>${rm}</td><td colspan="10" class="rd num-red">${esc(r.reason)}</td></tr>`; return; }
+    const plan = r.active; if (!plan) { trs += `<tr><td class="lbl"><b>${nm}</b>${rm}</td><td colspan="10" class="rd">No plan (ATR unavailable)</td></tr>`; return; }
+    if (!plan.sides.length) { const tailN = `<td class="acc">${isNum(r.acc.hit) ? `<b>${pct0(r.acc.hit)}</b> hit<small>${r.acc.trig} trades / ${r.acc.sessions} calls</small>` : '<small>no triggered calls yet</small>'}${dotsHtml(r.acc)}</td>`; trs += `<tr class="nocall"><td class="lbl"><a href="#" class="symlink" onclick="loadSymbol('${esc(r.sym)}');return false">${nm}</a>${xr}${rm}<small>No trade</small></td><td>₹${fmt(r.cmp)}<small class="${r.chg >= 0 ? 'num-green' : 'num-red'}">${fmtPct(r.chg, 2)}</small></td><td colspan="8" class="rd" title="${esc(plan.pts.map((p) => p.label + ' ' + (p.v > 0 ? '+' : '') + p.v + ': ' + p.txt).join('\n'))}"><b>No trade</b> — ${esc((plan.reasons || []).join('; ') || 'no edge')} <small>(score ${plan.score >= 0 ? '+' : ''}${plan.score.toFixed(1)}; calls need ≥ ${JC.CFG.minScore})</small></td>${tailN}</tr>`; return; }
     const todayEv = r.liveNow && r.today ? r.today.res.sides : null;
     plan.sides.forEach((sd, i) => {
       const ev = todayEv ? (todayEv.find((x) => x.sd.dir === sd.dir) || {}).ev : null;
       const st = ev ? wlStatus(sd, ev) : ['range', r.liveNow ? 'Waiting' : `Plan for next session`];
-      const head = i === 0 ? `<td class="lbl" rowspan="${plan.sides.length}"><a href="#" class="symlink" onclick="loadSymbol('${esc(r.sym)}');return false">${esc(r.sym)}</a>${rm}<small>${esc(plan.bias)} bias</small></td><td rowspan="${plan.sides.length}">₹${fmt(r.cmp)}<small class="${r.chg >= 0 ? 'num-green' : 'num-red'}">${fmtPct(r.chg, 2)}</small></td>` : '';
+      const head = i === 0 ? `<td class="lbl" rowspan="${plan.sides.length}"><a href="#" class="symlink" onclick="loadSymbol('${esc(r.sym)}');return false">${nm}</a>${xr}${rm}<small>${esc(plan.bias)} · grade ${esc(plan.grade)}</small></td><td rowspan="${plan.sides.length}">₹${fmt(r.cmp)}<small class="${r.chg >= 0 ? 'num-green' : 'num-red'}">${fmtPct(r.chg, 2)}</small></td>` : '';
       const tail = i === 0 ? `<td rowspan="${plan.sides.length}" class="acc">${isNum(r.acc.hit) ? `<b>${pct0(r.acc.hit)}</b> hit<small>${r.acc.trig} trades / ${r.acc.sessions} sessions</small>` : '<small>no triggered trades yet</small>'}${dotsHtml(r.acc)}</td>` : '';
-      trs += `<tr class="${sd.dir > 0 ? 'bull' : 'bear'}">${head}<td><span class="stance ${sd.dir > 0 ? 'bull' : 'bear'}">${sd.dir > 0 ? '▲ BUY' : '▼ SELL'}</span></td><td><b>${fmt(sd.entry)}</b><small>${sd.dir > 0 ? 'above prev high' : 'below prev low'}</small></td><td class="num-red">${fmt(sd.sl)}<small>${fmtPct(((sd.sl - sd.entry) / sd.entry) * 100, 2)}</small></td><td class="num-green">${fmt(sd.t1)}<small>${fmtPct(((sd.t1 - sd.entry) / sd.entry) * 100, 2)} · ${esc(sd.t1Why)}</small></td><td class="num-green">${fmt(sd.t2)}<small>${fmtPct(((sd.t2 - sd.entry) / sd.entry) * 100, 2)} · ${esc(sd.t2Why)}</small></td><td>${sd.rr1.toFixed(1)} / ${sd.rr2.toFixed(1)}</td><td><span class="stance ${st[0]}">${esc(st[1])}</span></td><td>${svgTrack(sd, ev, r.cmp)}</td>${tail}</tr>`;
+      trs += `<tr class="${sd.dir > 0 ? 'bull' : 'bear'}">${head}<td title="${esc(plan.pts.map((p) => p.label + ' ' + (p.v > 0 ? '+' : '') + p.v + ': ' + p.txt).join('\n'))}"><span class="stance ${sd.dir > 0 ? 'bull' : 'bear'}">${sd.dir > 0 ? '▲ BUY' : '▼ SELL'}</span><small>score ${Math.abs(plan.score).toFixed(1)} · hover for why</small></td><td><b>${fmt(sd.entry)}</b><small>${sd.dir > 0 ? 'above prev high' : 'below prev low'}</small></td><td class="num-red">${fmt(sd.sl)}<small>${fmtPct(((sd.sl - sd.entry) / sd.entry) * 100, 2)}</small></td><td class="num-green">${fmt(sd.t1)}<small>${fmtPct(((sd.t1 - sd.entry) / sd.entry) * 100, 2)} · ${esc(sd.t1Why)}</small></td><td class="num-green">${fmt(sd.t2)}<small>${fmtPct(((sd.t2 - sd.entry) / sd.entry) * 100, 2)} · ${esc(sd.t2Why)}</small></td><td>${sd.rr1.toFixed(1)} / ${sd.rr2.toFixed(1)}</td><td><span class="stance ${st[0]}">${esc(st[1])}</span></td><td>${svgTrack(sd, ev, r.cmp)}</td>${tail}</tr>`;
     });
   });
   const main = `<div class="halfcard"><div class="rh">${isLive ? 'LIVE TRACKER' : 'PLAN FOR THE NEXT SESSION'} · DAY-TRADING LEVELS</div><div class="scrollx"><table class="uptable wl"><tr><th style="text-align:left">Stock</th><th>LTP</th><th style="text-align:left">Side</th><th>Entry</th><th>Stop-loss</th><th>Target 1</th><th>Target 2</th><th>R:R 1/2</th><th style="text-align:left">Status</th><th>Tracker (SL · E · T1 · T2 ▼ LTP)</th><th style="text-align:left">Accuracy · last 20</th></tr>${trs}</table></div></div>`;
-  const accRows = okRows.slice().sort((a, b) => (b.acc.hit ?? -1) - (a.acc.hit ?? -1)).map((r) => { const a = r.acc; return `<tr><td class="lbl"><b>${esc(r.sym)}</b></td><td>${a.sessions}</td><td>${a.trig}</td><td>${a.T2}</td><td>${a.T1}</td><td>${a.SL}</td><td>${a.eodP + a.eodN}</td><td>${a.nt + a.skip}</td><td>${isNum(a.hit) ? `<div class="hb"><i style="width:${Math.round(a.hit * 100)}%"></i></div><b>${pct0(a.hit)}</b>` : '—'}</td><td>${pct0(a.win)}</td><td class="${a.netR >= 0 ? 'num-green' : 'num-red'}">${a.netR >= 0 ? '+' : ''}${a.netR.toFixed(1)}R</td><td>${dotsHtml(a, 25)}</td></tr>`; }).join('');
+  const accRows = okRows.slice().sort((a, b) => (b.acc.hit ?? -1) - (a.acc.hit ?? -1)).map((r) => { const a = r.acc; return `<tr><td class="lbl"><b>${esc(symBase(r.sym))}</b></td><td>${a.sessions}</td><td>${a.trig}</td><td>${a.T2}</td><td>${a.T1}</td><td>${a.SL}</td><td>${a.eodP + a.eodN}</td><td>${a.nt + a.skip}</td><td>${isNum(a.hit) ? `<div class="hb"><i style="width:${Math.round(a.hit * 100)}%"></i></div><b>${pct0(a.hit)}</b>` : '—'}</td><td>${pct0(a.win)}</td><td class="${a.netR >= 0 ? 'num-green' : 'num-red'}">${a.netR >= 0 ? '+' : ''}${a.netR.toFixed(1)}R</td><td>${dotsHtml(a, 25)}</td></tr>`; }).join('');
   const accTbl = okRows.length ? `<div class="halfcard"><div class="rh">ACCURACY OF THE CALLS · SAME RULES REPLAYED ON REAL 5-MIN CANDLES (last ~20 sessions)</div><div class="scrollx"><table class="uptable"><tr><th style="text-align:left">Stock</th><th>Sessions</th><th>Triggered</th><th>T2</th><th>T1</th><th>Stop</th><th>EOD exit</th><th>No trade</th><th style="text-align:left">Target-hit %</th><th>Profitable</th><th>Net R</th><th style="text-align:left">Each dot = a session</th></tr>${accRows}</table></div><div class="legendline"><i style="background:#0d8a4b"></i>target hit <i style="background:#c0233f"></i>stop-loss <i style="background:#e0a61a"></i>closed without target/stop <i style="background:#c6cde0"></i>no trade</div></div>` : '';
   const upd = stamp ? `Updated ${new Date(stamp).toLocaleTimeString('en-IN')}` : '';
-  return `${kpi}${main}${accTbl}<div class="footnote">${busy ? 'Refreshing… ' : ''}${upd}. <b>How the levels are built:</b> from the previous session only — pivots, CPR, Camarilla and prev high/low snap the stop and targets; daily ATR(14) bounds the risk (0.3–0.6×ATR). A bullish/bearish bias (EMA20/50, RSI, CPR, prior-day close position) allows one side; a neutral bias arms both a breakout buy (above prev high) and breakdown sell (below prev low) — the first to trigger cancels the other. Half is booked at T1 (stop moves to cost), half at T2. <b>Accuracy</b> replays exactly these rules on each of the last ~20 sessions using only data available before that open; if stop and target share a 5-min candle the stop counts first. It is the rules’ track record, not a forecast. Intraday positions: square off before 3:15 PM.</div>`;
+  return `${tb}${kpi}${main}${accTbl}<div class="footnote">${busy ? 'Refreshing… ' : ''}${upd}. <b>How a call is made:</b> only when independent parameters agree — trend (20/50/200 DMA), ADX strength, RSI, MACD, prior-day close &amp; volume, CPR, the 20-day range and the Nifty / India-VIX regime. Below the confluence threshold (or in a chop, a thin or a too-wild stock) the answer is <b>No trade</b> — there are no two-sided “try both” plans any more. Stop &amp; targets snap to pivots / CPR / Camarilla / prior high-low (ATR-bounded). <b>Entry needs a 5-minute candle to close beyond the trigger</b> (a wick does not count), not before 9:20, not after 2:30 PM, and not on a gap-chase. Half is booked at T1 (stop to cost), half at T2; square-off 3:15 PM; ≈0.05 % costs are charged to every trade. <b>Accuracy</b> replays these exact rules on the last ~40 sessions using only data known before each open; if stop and target share a candle the stop counts first. It is the rules’ track record, not a forecast — sizing should assume any single call can fail.</div>`;
 }
 
 /* ============================================================
@@ -1559,7 +1526,7 @@ function printPDF() {
   const d = f.contentWindow.document; d.open(); d.write(html); d.close();
   setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { alert('Print failed: ' + e.message); } }, 600);
 }
-function loadSymbol(sym) { $('symbolInput').value = sym; $('exchangeInput').value = 'NS'; showTab('pSummary'); window.scrollTo({ top: 0, behavior: 'smooth' }); runAnalysis(); }
+function loadSymbol(sym) { $('symbolInput').value = symBase(sym); $('exchangeInput').value = symEx(sym); showTab('pSummary'); window.scrollTo({ top: 0, behavior: 'smooth' }); runAnalysis(); }
 async function feed(name, fn) { const tr = {}; try { const d = await fn(tr); return { name, ok: d != null, data: d, via: tr.via }; } catch (e) { return { name, ok: false, data: null, err: (e && e.message) || String(e) }; } }
 async function runUpcomingList(P) {
   const msg = $('upMsg'), body = $('upBody'), base = { from: P.from, to: P.to, stats: P.stats, diag: P.diag, n500Missing: P.n500Missing, manual: P.manual, source: P.source, checked: P.checked, withDate: P.withDate, batchErrors: P.batchErrors }; let U;
@@ -1597,10 +1564,12 @@ function wlRenderBar() {
   const L = WL.store.lists, act = wlList().id;
   const chips = L.map((l) => { const ok = l.syms.map((s) => WL.data[s]).filter((x) => x && x.ok), A = mergeAcc(ok.map((x) => x.acc)); return `<button class="wlchip${l.id === act ? ' on' : ''}" onclick="wlSwitch('${l.id}')">${esc(l.name)} <small>${l.syms.length}${isNum(A.hit) ? ' · hit ' + pct0(A.hit) : ''}</small></button>`; }).join('');
   const prev = $('wlInput') ? $('wlInput').value : '';
-  $('wlBar').innerHTML = `<div class="upbar">${chips}<button class="ghostBtn" onclick="wlNew()">＋ New list</button><button class="ghostBtn" onclick="wlRename()">Rename</button><button class="ghostBtn" onclick="wlDelete()">Delete list</button></div><div class="upbar"><input id="wlInput" type="text" placeholder="Add NSE symbols — e.g. RELIANCE, TCS INFY" autocomplete="off" value="${esc(prev)}"><button class="goBtn" onclick="wlAdd()">Add</button><button class="ghostBtn" onclick="wlRefreshAll(true)">⟳ Refresh now</button><label class="wlauto"><input type="checkbox" id="wlAuto" ${WL.auto ? 'checked' : ''} onchange="wlToggleAuto()"> auto-refresh every 60 s during market hours</label></div><div class="wlcloud" id="wlCloud">${wlCloudHtml()}</div>`;
+  $('wlBar').innerHTML = `<div class="upbar">${chips}<button class="ghostBtn" onclick="wlNew()">＋ New list</button><button class="ghostBtn" onclick="wlRename()">Rename</button><button class="ghostBtn" onclick="wlDelete()">Delete list</button></div><div class="upbar"><select id="wlEx" title="Exchange for the symbols you type"><option value="NS"${WL.ex === 'NS' ? ' selected' : ''}>NSE</option><option value="BO"${WL.ex === 'BO' ? ' selected' : ''}>BSE</option></select><input id="wlInput" type="text" placeholder="Add symbols — NSE: RELIANCE, TCS · BSE: 500325 or RELIANCE (pick BSE)" autocomplete="off" value="${esc(prev)}"><button class="goBtn" onclick="wlAdd()">Add</button><button class="ghostBtn" onclick="wlRefreshAll(true)">⟳ Refresh now</button><label class="wlauto"><input type="checkbox" id="wlAuto" ${WL.auto ? 'checked' : ''} onchange="wlToggleAuto()"> auto-refresh every 60 s during market hours</label></div><div class="wlcloud" id="wlCloud">${wlCloudHtml()}</div>`;
   const inp = $('wlInput'); if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') wlAdd(); });
 }
-function wlRenderBody() { const mc = marketClock(Date.now()); $('wlBody').innerHTML = htmlWatchBody(wlList(), WL.data, WL.stamp, WL.busy, mc.open); }
+function wlRenderBody() { const mc = marketClock(Date.now()); $('wlBody').innerHTML = htmlWatchBody(wlList(), WL.data, WL.stamp, WL.busy, mc.open, true); }
+function wlSetView(k, v) { WL.view[k] = v; try { localStorage.setItem('jc_wl_view', JSON.stringify(WL.view)); } catch (e) {} wlRenderBody(); }
+function jcXray(sym) { loadSymbol(sym); }
 function wlEnsure() { if (!WL.store) { WL.store = wlLoad(); if (!WL.store.active || !WL.store.lists.find((l) => l.id === WL.store.active)) WL.store.active = WL.store.lists[0].id; } }
 function wlOnShow() { wlEnsure(); wlRenderBar(); wlRenderBody(); if (!WL.synced) { WL.synced = true; wlDriveSync(); } const l = wlList(); if (l.syms.some((s) => !WL.data[s]) || Date.now() - WL.stamp > 60e3) wlRefreshAll(false); }
 function wlSwitch(id) { WL.store.active = id; wlSave(true); wlRenderBar(); wlRenderBody(); wlRefreshAll(false); }
@@ -1608,7 +1577,7 @@ function wlNew() { const n = (prompt('Name for the new watchlist?', 'Watchlist '
 function wlRename() { const l = wlList(), n = (prompt('Rename watchlist', l.name) || '').trim(); if (!n) return; l.name = n.slice(0, 30); wlSave(); wlRenderBar(); }
 function wlDelete() { if (WL.store.lists.length < 2) { alert('Keep at least one watchlist.'); return; } const l = wlList(); if (!confirm('Delete watchlist “' + l.name + '”?')) return; WL.store.lists = WL.store.lists.filter((x) => x.id !== l.id); WL.store.active = WL.store.lists[0].id; wlSave(); wlRenderBar(); wlRenderBody(); }
 async function wlAdd() {
-  const inp = $('wlInput'), l = wlList(), add = String(inp.value || '').split(/[\s,;]+/).map(cleanSym).filter(Boolean).filter((s, i, a) => a.indexOf(s) === i && !l.syms.includes(s));
+  const exSel = $('wlEx'), ex = exSel ? exSel.value : 'NS'; WL.ex = ex; const inp = $('wlInput'), l = wlList(), add = String(inp.value || '').split(/[\s,;]+/).map((t) => cleanSym(t, ex)).filter(Boolean).filter((s, i, a) => a.indexOf(s) === i && !l.syms.includes(s));
   if (!add.length) { inp.value = ''; return; } l.syms.push(...add); inp.value = ''; wlSave(); wlRenderBar(); wlRenderBody(); wlRefreshAll(false);
 }
 function wlRemove(sym) { const l = wlList(); l.syms = l.syms.filter((s) => s !== sym); wlSave(); wlRenderBar(); wlRenderBody(); }

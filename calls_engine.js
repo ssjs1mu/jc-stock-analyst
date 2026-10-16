@@ -47,6 +47,7 @@ var JCE = (function () {
     chaseMax: 0.25,       // skip if the confirming candle closes > 25 % ATR beyond the trigger
     gapSkip: 0.30,        // skip if the day opens > 30 % ATR beyond the trigger
     noEntryAfter: 14 * 60 + 30, firstEntryBar: 1, squareOff: 15 * 60 + 15,
+    minRR1: 1.5,          // first target must pay at least 1.5× the risk (back-test: calls with R:R<1.5 had no edge after costs)
     costPct: 0.05         // brokerage + STT + slippage, % of price (round trip) charged against every triggered trade
   };
 
@@ -126,7 +127,7 @@ var JCE = (function () {
     var t1 = ups[0] ? ups[0].v : entry + dir * Math.max(0.75 * a, 1.3 * risk);
     var t2 = ups[1] ? ups[1].v : t1 + dir * Math.max(0.6 * a, 1.0 * risk); if (dir * (t2 - t1) < CFG.t2MinGap * a) t2 = t1 + dir * 0.6 * a;
     var sd = { dir: dir, side: dir > 0 ? 'BUY' : 'SELL', entry: entry, sl: entry - dir * risk, t1: t1, t2: t2, risk: risk, rr1: Math.abs(t1 - entry) / risk, rr2: Math.abs(t2 - entry) / risk, t1Why: ups[0] ? ups[0].label : 'ATR projection', t2Why: ups[1] ? ups[1].label : 'ATR projection' };
-    if (sd.rr1 < 0.9) { why.push('target too close to entry (R:R ' + sd.rr1.toFixed(2) + ')'); return out; }
+    if (sd.rr1 < CFG.minRR1) { why.push('first target too close for the risk (R:R ' + sd.rr1.toFixed(2) + ' < ' + CFG.minRR1 + ')'); return out; }
     out.sides = [sd]; out.bias = dir > 0 ? 'Bullish' : 'Bearish'; out.grade = abs >= CFG.gradeAA ? 'A+' : abs >= CFG.gradeA ? 'A' : 'B';
     return out;
   }

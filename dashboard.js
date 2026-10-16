@@ -251,14 +251,14 @@
   function row(sym, name, o, ms, opts) {
     o = o || {}; opts = opts || {}; const q = S.q[sym];
     const lead = opts.flag ? flag(opts.flag) : '';
-    if (!q) return `<tr class="jd-na"><td class="jd-nm">${lead}${esc(name)}</td><td class="jd-px">…</td><td class="jd-ch"></td><td class="jd-pc"></td></tr>`;
+    if (!q) return `<tr class="jd-na"><td class="jd-nm">${lead}${esc(name)}<button class="jd-xr" type="button" data-xr="${esc(sym)}" title="Live X-ray of ${esc(name)}">X-ray</button></td><td class="jd-px">…</td><td class="jd-ch"></td><td class="jd-pc"></td></tr>`;
     const dp = o.dp != null ? o.dp : (opts.yield ? 3 : dpOf(q.p)); const chg = q.pc != null ? q.p - q.pc : null, pct = q.pc ? chg / q.pc * 100 : null;
     const dir = chg == null || Math.abs(pct) < 0.005 ? 0 : chg > 0 ? 1 : -1, good = (o.inv || opts.yield) ? -dir : dir;
     const age = (ms / 1000 - (q.t || 0)) / 60, live = age >= 0 && age < 20; const when = q.t ? new Date(q.t * 1000).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) : '';
     const cls = good > 0 ? 'u' : good < 0 ? 'd' : '';
     const chTxt = chg == null ? '—' : opts.yield ? `${chg >= 0 ? '+' : ''}${(chg * 100).toFixed(1)} bp` : `${chg > 0 ? '+' : ''}${fmtN(chg, dp)}`;
     return `<tr class="${cls} ${q.flash ? 'fl-' + q.flash : ''}" title="${esc(sym)} · last tick ${when} IST${live ? '' : ' · market closed, last session'}">
-      <td class="jd-nm">${lead}<span class="jd-live ${live ? 'on' : 'off'}"></span>${esc(name)}</td>
+      <td class="jd-nm">${lead}<span class="jd-live ${live ? 'on' : 'off'}"></span>${esc(name)}<button class="jd-xr" type="button" data-xr="${esc(sym)}" title="Live X-ray of ${esc(name)}">X-ray</button></td>
       <td class="jd-px">${fmtN(q.p, dp)}${opts.yield ? '<i>%</i>' : ''}</td>
       <td class="jd-ch"><b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chTxt}</td>
       <td class="jd-pc"><span>${pct == null ? '—' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</span></td></tr>`;
@@ -307,10 +307,10 @@
 
   function heatHTML(ms) {
     const all = [['^NSEI', 'NIFTY 50'], ['^NSEBANK', 'BANK NIFTY'], ['^BSESN', 'SENSEX']].concat(NIFTY_OTHERS.map((x) => [x[0], x[1].replace(/^NIFTY /, '')]));
-    const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], p: pct, px: q ? q.p : null, big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
+    const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], sym: it[0], p: pct, px: q ? q.p : null, big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
     const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
     const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
-    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)}"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" data-xr="${esc(i.sym)}" style="cursor:pointer;background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for live X-ray"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
     const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
     return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div><div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
   }
