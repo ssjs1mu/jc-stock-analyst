@@ -113,6 +113,8 @@ def from_nsdl():
         if m and num(m.group(1)) is not None:
             out["%d-%02d" % (year, i + 1)] = num(m.group(1))
     if not out:
+        i = flat.find("January")
+        print("::warning title=nsdl layout::" + flat[max(0, i - 200):i + 600].replace("%", "%25"))
         raise ValueError("NSDL monthly rows not found")
     return year, out, (upto.group(1) if upto else "")
 
@@ -153,6 +155,9 @@ def main():
         "sources": status,
     }
     print(json.dumps(status))
+    for k, v in status.items():
+        if not v.startswith("ok"):
+            print("::warning title=%s::%s" % (k, v))
     if not days:
         sys.exit("No FII/DII data from any source.")
     same = {k: v for k, v in data.items() if k not in ("updated_at", "sources")} == {k: v for k, v in new.items() if k not in ("updated_at", "sources")}
