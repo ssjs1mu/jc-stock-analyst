@@ -109,7 +109,7 @@ def from_nsdl():
     upto = re.search(r"up to (\d{1,2} \w{3} \d{4})", flat)
     out = {}
     for i, name in enumerate(MONTHS):
-        m = re.search(r"\b%s[\s|]+([-()\d.,]+)\s*\|" % name, flat)
+        m = re.search(r"\b%s[\s|*#]+([-()\d.,]+)\s*\|" % name, flat)
         if m and num(m.group(1)) is not None:
             out["%d-%02d" % (year, i + 1)] = num(m.group(1))
     if not out:
@@ -124,9 +124,11 @@ def main():
         data = json.load(open(OUT))
     except Exception:
         data = {}
-    daily = data.get("daily", {})
-    fpi = data.get("fpi_equity_monthly", {})
+    before = json.dumps({k: v for k, v in data.items() if k not in ("updated_at", "sources")}, sort_keys=True)
+    daily = dict(data.get("daily", {}))
+    fpi = dict(data.get("fpi_equity_monthly", {}))
     status = {}
+    upto_new = data.get("fpi_equity_upto", "")
     for name, fn in [("moneycontrol", from_moneycontrol), ("nse", from_nse)]:  # NSE last so it wins for its day
         try:
             got = fn()
@@ -139,7 +141,7 @@ def main():
     try:
         year, months, upto = from_nsdl()
         fpi.update(months)
-        data["fpi_equity_upto"] = upto
+        upto_new = upto
         status["nsdl"] = "ok (%d months of %d)" % (len(months), year)
     except Exception as e:
         status["nsdl"] = "failed: %s" % str(e)[:160]
@@ -151,7 +153,7 @@ def main():
                  "FPI monthly = NSDL net investment in equity (all routes, includes primary market).",
         "daily": {d: daily[d] for d in days},
         "fpi_equity_monthly": dict(sorted(fpi.items())),
-        "fpi_equity_upto": data.get("fpi_equity_upto", ""),
+        "fpi_equity_upto": upto_new,
         "sources": status,
     }
     print(json.dumps(status))
@@ -160,7 +162,7 @@ def main():
             print("::warning title=%s::%s" % (k, v))
     if not days:
         sys.exit("No FII/DII data from any source.")
-    same = {k: v for k, v in data.items() if k not in ("updated_at", "sources")} == {k: v for k, v in new.items() if k not in ("updated_at", "sources")}
+    same = before == json.dumps({k: v for k, v in new.items() if k not in ("updated_at", "sources")}, sort_keys=True)
     print("::notice title=fiidii summary::%s" % json.dumps({"status": status, "days": len(days), "fpi_months": len(new["fpi_equity_monthly"]), "unchanged": same}))
     if same and os.path.exists(OUT):
         print("No new figures; file left unchanged.")
