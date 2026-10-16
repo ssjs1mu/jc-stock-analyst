@@ -22,35 +22,92 @@ const istDate = (t) => new Date((t + 19800) * 1000).toISOString().slice(0, 10);
 function weekKey(t) { const d = new Date((t + 19800) * 1000); const diff = (d.getUTCDay() + 6) % 7; return new Date(d.getTime() - diff * 864e5).toISOString().slice(0, 10); }
 
 /* ---------- fetch layer ---------- */
+/* Public CORS proxies are last-resort only (corsproxy.io now needs a paid key, so it is gone).
+   The Apps Script backend is the main route. */
 const PROXIES = [
-  (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
   (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
 ];
 function getBackend() { try { return (IS_BROWSER && localStorage.getItem(LS_BACKEND)) || DEFAULT_BACKEND_URL || ''; } catch (e) { return DEFAULT_BACKEND_URL || ''; } }
 const beUrl = (be, qs) => be + (be.includes('?') ? '&' : '?') + qs;
+
+/* Apps Script allows only ~30 simultaneous runs per script; a screen that fires 50+ chart
+   requests at once overloads it and everything times out. Cap in-flight backend calls. */
+const BE_MAX_INFLIGHT = 8;
+let beInflight = 0; const beQueue = [];
+const isBackendUrl = (u) => /^https:\/\/script\.google(usercontent)?\.com\//.test(u);
+function beAcquire() { if (beInflight < BE_MAX_INFLIGHT) { beInflight++; return Promise.resolve(); } return new Promise((res) => beQueue.push(res)); }
+function beRelease() { const n = beQueue.shift(); if (n) n(); else beInflight = Math.max(0, beInflight - 1); }
+
 async function fetchWithTimeout(url, ms = 9000) {
+  const gated = isBackendUrl(url);
+  if (gated) await beAcquire(); // the timeout starts only once this request actually goes out
   const ctl = new AbortController(); const id = setTimeout(() => ctl.abort(), ms);
   try { const r = await fetch(url, { cache: 'no-store', signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); }
-  finally { clearTimeout(id); }
+  finally { clearTimeout(id); if (gated) beRelease(); }
 }
-/* tries: Apps Script backend → direct → public proxies. `validate` rejects bad payloads so the next route is tried. */
+
+/* ---- response cache: in-memory (fresh, de-duplicated) + last-good copy in localStorage ---- */
+const FC_MEM = new Map(); const FC_INFLIGHT = new Map();
+const FC_LS_PREFIX = 'jcfc:', FC_LS_INDEX = 'jcfc_idx', FC_LS_MAX_ITEM = 400000, FC_LS_MAX_TOTAL = 3500000;
+function fcTTL(url) {
+  if (/interval=(1m|2m|5m|15m|30m|60m|1h)/.test(url)) return 60e3;   // intraday bars
+  if (/\/chart\//.test(url)) return 5 * 60e3;                          // daily / weekly bars
+  if (/news\.google\.com/.test(url)) return 10 * 60e3;
+  return 30 * 60e3;                                                    // fundamentals, timeseries
+}
+function fcKey(url) { let h = 0; for (let i = 0; i < url.length; i++) h = (h * 31 + url.charCodeAt(i)) | 0; return FC_LS_PREFIX + (h >>> 0).toString(36) + url.length.toString(36); }
+function fcSaveLS(url, txt) {
+  if (!IS_BROWSER || txt.length > FC_LS_MAX_ITEM) return;
+  try {
+    const k = fcKey(url); let idx = []; try { idx = JSON.parse(localStorage.getItem(FC_LS_INDEX) || '[]'); } catch (e) { idx = []; }
+    idx = idx.filter((x) => x.k !== k); idx.push({ k, n: txt.length });
+    let total = idx.reduce((s, x) => s + x.n, 0);
+    while (total > FC_LS_MAX_TOTAL && idx.length > 1) { const o = idx.shift(); total -= o.n; try { localStorage.removeItem(o.k); } catch (e) {} }
+    const put = () => { localStorage.setItem(k, JSON.stringify({ u: url, t: Date.now(), d: txt })); localStorage.setItem(FC_LS_INDEX, JSON.stringify(idx)); };
+    try { put(); } catch (e) { // storage full: drop the oldest half and try once more
+      idx.splice(0, Math.ceil(idx.length / 2)).forEach((o) => { try { localStorage.removeItem(o.k); } catch (x) {} }); try { put(); } catch (x) {}
+    }
+  } catch (e) {}
+}
+function fcLoadLS(url) {
+  if (!IS_BROWSER) return null;
+  try { const v = JSON.parse(localStorage.getItem(fcKey(url)) || 'null'); return v && v.u === url ? v : null; } catch (e) { return null; }
+}
+const fcAge = (ms) => { const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : m < 2880 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d'; };
+
+/* Route order: Apps Script backend (with one retry) → direct + public proxies raced in parallel
+   → last good copy saved on this device. `validate` rejects bad payloads so the next route is tried. */
 async function fetchData(url, { kind = 'json', validate = null, trace = null } = {}) {
-  const be = getBackend(); const attempts = [];
-  if (be) attempts.push({ name: 'backend', url: beUrl(be, 'action=fetch&url=' + encodeURIComponent(url)) });
-  attempts.push({ name: 'direct', url });
-  PROXIES.forEach((p, i) => attempts.push({ name: 'proxy' + (i + 1), url: p(url) }));
-  const errs = [];
-  for (const a of attempts) {
-    try {
-      const txt = await fetchWithTimeout(a.url);
-      const out = kind === 'json' ? JSON.parse(txt) : txt;
-      if (validate && !validate(out)) throw new Error('no usable data returned');
-      if (trace) trace.via = a.name;
-      return out;
-    } catch (e) { errs.push(a.name + ': ' + (e && e.name === 'AbortError' ? 'timed out' : (e && e.message) || 'failed')); }
-  }
-  throw new Error('All routes failed → ' + errs.join(' · '));
+  const parse = (txt) => { const out = kind === 'json' ? JSON.parse(txt) : txt; if (validate && !validate(out)) throw new Error('no usable data returned'); return out; };
+  const hit = FC_MEM.get(url);
+  if (hit && Date.now() - hit.t < fcTTL(url)) { try { const out = parse(hit.d); if (trace) trace.via = hit.via + ' (cached)'; return out; } catch (e) { FC_MEM.delete(url); } }
+  if (FC_INFLIGHT.has(url)) { const r = await FC_INFLIGHT.get(url); if (trace) trace.via = r.via; return parse(r.d); }
+
+  const job = (async () => {
+    const errs = []; const be = getBackend();
+    const tryRoute = async (name, u, ms) => { const txt = await fetchWithTimeout(u, ms); parse(txt); return { via: name, d: txt }; };
+    const note = (name, e) => errs.push(name + ': ' + (e && e.name === 'AbortError' ? 'timed out' : (e && e.message) || 'failed'));
+    if (be) {
+      const bu = beUrl(be, 'action=fetch&url=' + encodeURIComponent(url));
+      try { return await tryRoute('backend', bu, 20000); } catch (e) { note('backend', e); }
+      await new Promise((r) => setTimeout(r, 700));
+      try { return await tryRoute('backend', bu, 25000); } catch (e) { note('backend retry', e); }
+    }
+    const alts = [{ name: 'direct', u: url }].concat(PROXIES.map((p, i) => ({ name: 'proxy' + (i + 1), u: p(url) })));
+    try { return await Promise.any(alts.map((a) => tryRoute(a.name, a.u, 8000).catch((e) => { note(a.name, e); throw e; }))); } catch (e) {}
+    const st = fcLoadLS(url);
+    if (st) { try { parse(st.d); return { via: 'saved copy from ' + fcAge(Date.now() - st.t) + ' ago', d: st.d, stale: true }; } catch (e) {} }
+    const err = new Error('Live data is unavailable right now (the data backend is busy or offline) — please try again in a minute. [' + errs.join(' · ') + ']');
+    err.routes = errs; throw err;
+  })();
+  FC_INFLIGHT.set(url, job);
+  try {
+    const r = await job;
+    if (!r.stale) { FC_MEM.set(url, { t: Date.now(), d: r.d, via: r.via }); if (FC_MEM.size > 400) FC_MEM.delete(FC_MEM.keys().next().value); fcSaveLS(url, r.d); }
+    if (trace) trace.via = r.via;
+    return parse(r.d);
+  } finally { FC_INFLIGHT.delete(url); }
 }
 function parseChart(r) {
   const ts = r.timestamp || [], q = r.indicators?.quote?.[0] || {}; const bars = [];
@@ -1497,7 +1554,7 @@ function htmlLongTab(R, o) {
   return `${gold}${top}${gate}${mid}<div class="sect">TRADING CALLS</div>${htmlMatrixRows(R, [3, 4])}${low}${restRow(pool)}<div class="footnote">Thresholds (ROE ≥15%, D/E &lt;0.5×, growth ≥10%, P/E &lt;25 …) are fixed rule-of-thumb bands, not sector-relative. “computed” fields are derived from filed results / annual statements when Yahoo's ratio was empty. Time-to-target uses the stock's own growth rates (price CAGR, earnings CAGR, latest YoY) — a guide, not a forecast. Analyst targets are Street estimates.</div>`;
 }
 function htmlData(R) {
-  const feeds = R.feeds.map((f) => `<tr><td class="lbl">${esc(f.name)}</td><td>${f.ok ? '<span class="pill buy">Live</span>' : '<span class="pill sell">Unavailable</span>'}</td><td class="rd">${esc(f.ok ? f.via || '' : f.err || '')}</td></tr>`).join('');
+  const feeds = R.feeds.map((f) => `<tr><td class="lbl">${esc(f.name)}</td><td>${f.ok ? (/saved copy/.test(f.via || '') ? '<span class="pill wait">Saved copy</span>' : '<span class="pill buy">Live</span>') : '<span class="pill sell">Unavailable</span>'}</td><td class="rd">${esc(f.ok ? f.via || '' : f.err || '')}</td></tr>`).join('');
   const news = R.news.length ? R.news.map((n) => `<div class="newsitem"><a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a><div class="newsdate">${n.date ? new Date(n.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : ''}</div></div>`).join('') : '<div class="newsitem" style="color:#6b7596">No headlines retrieved.</div>';
   const au = R.audit.slice().reverse().map((a) => `<tr><td class="lbl">${dShort(a.date)}</td><td>${fmt(a.o)}</td><td>${fmt(a.h)}</td><td>${fmt(a.l)}</td><td>${fmt(a.c)}</td><td>${fmtVol(a.v)}</td><td class="rd">${esc(a.src)}${a.approx ? ' · OHLC partly missing' : ''}</td></tr>`).join('');
   return `<div class="split"><div class="col"><div class="halfcard"><div class="rh">CANDLE AUDIT — last 6 sessions &amp; source of each<span class="legend">check dates against your terminal</span></div><div class="scrollx"><table class="lvl"><tr><th style="text-align:left">Date</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th><th style="text-align:left">Source</th></tr>${au}</table></div></div><div class="halfcard"><div class="rh">DATA FEEDS USED</div><div class="scrollx"><table class="lvl"><tr><th style="text-align:left">Feed</th><th>Status</th><th style="text-align:left">Route / error</th></tr>${feeds}</table></div><div class="footnote">A feed marked Unavailable leaves dependent fields as “—/n/a” and removes those signals from the score — nothing is estimated except where labelled “est” or “computed”. Prices are Yahoo Finance data (typically ≤15-min delayed); verify live prices on ODIN before placing orders.</div></div></div><div class="col"><div class="halfcard"><div class="rh">NEWS FLOW</div><div class="newsbox">${news}</div></div></div></div>`;

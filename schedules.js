@@ -135,7 +135,14 @@
   function renderPanel(id) {
     const el = $(id); if (!el) return;
     if (id === 'pSchedBoard') el.innerHTML = boardHTML();
-    else { const s = S.list.find((x) => 'pS_' + x.id === id); if (s) el.innerHTML = panelHTML(s); }
+    else {
+      const s = S.list.find((x) => 'pS_' + x.id === id); if (!s) return;
+      // Keep the already-rendered PDF/picture when it is the same file, so refreshes don't re-download it.
+      const old = el.querySelector('.scpdf, .scpng');
+      el.innerHTML = panelHTML(s);
+      const nu = el.querySelector('.scpdf, .scpng');
+      if (old && nu && old.tagName === nu.tagName && old.getAttribute('src') === nu.getAttribute('src')) nu.replaceWith(old);
+    }
   }
   function refreshOptionLabels() {
     const sel = $('viewSel'); if (!sel) return;
