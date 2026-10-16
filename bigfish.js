@@ -30,7 +30,23 @@
   const rsi14 = (c) => { const n = 14; if (c.length < n + 2) return null; let ag = 0, al = 0; for (let i = 1; i <= n; i++) { const d = c[i] - c[i - 1]; if (d > 0) ag += d; else al -= d; } ag /= n; al /= n; for (let i = n + 1; i < c.length; i++) { const d = c[i] - c[i - 1]; ag = (ag * (n - 1) + (d > 0 ? d : 0)) / n; al = (al * (n - 1) + (d < 0 ? -d : 0)) / n; } return al === 0 ? 100 : 100 - 100 / (1 + ag / al); };
 
   /* one stock → metrics as of the last COMPLETED session; today's partial bar (if any) gives the live gap */
-  function metrics(sym, b) {
+  /* event study on the stock's own last ~3 months: every past day that passed the screen → what the NEXT 5 sessions did from the next open */
+  function events(b, kmax) {
+    const out = [];
+    for (let d = 25; d + 5 <= kmax; d++) {
+      const px = b.c[d]; if (!(px > CRIT.minPrice)) continue;
+      let hh = -Infinity; for (let i = d - CRIT.hiN; i < d; i++) hh = Math.max(hh, b.h[i]); if (b.h[d] < hh) continue;
+      let vol = 0; for (let i = d - 9; i <= d; i++) vol += b.v[i]; vol /= 10; if (vol <= CRIT.minVol) continue;
+      let rg = 0; for (let i = d - 13; i <= d; i++) rg += (b.h[i] - b.l[i]) / b.c[i] * 100; rg /= 14; if (rg <= CRIT.minVolat) continue;
+      const r = rsi14(b.c.slice(0, d + 1)); if (!(r > CRIT.minRsi)) continue;
+      const O = b.o[d + 1]; let mx = -1e9, mn = 1e9; for (let j = d + 1; j <= d + 5; j++) { mx = Math.max(mx, b.h[j]); mn = Math.min(mn, b.l[j]); }
+      out.push({ gap: (O / px - 1) * 100, up: (mx / O - 1) * 100, dn: (mn / O - 1) * 100, c5: (b.c[d + 5] / O - 1) * 100 });
+    }
+    return out;
+  }
+  function addHist(ev) { const H = B.hist || (B.hist = { all: [], gap: [] }); ev.forEach((e) => { H.all.push(e); if (e.gap > CRIT.gap) H.gap.push(e); }); }
+  const hstat = (a) => { const n = a.length; if (!n) return null; const p = (f) => a.filter(f).length / n * 100; return { n, p5: p((e) => e.up >= 5), p8: p((e) => e.up >= 8), p10: p((e) => e.up >= 10), sl: p((e) => e.dn <= -4), c5: a.reduce((x, e) => x + e.c5, 0) / n, med: a.map((e) => e.c5).sort((x, y) => x - y)[Math.floor(n / 2)] }; };
+  function metrics(sym, b, wantEv) {
     const today = istToday(), n = b.t.length; let k = n - 1, live = null;
     if (dateOf(b.t[k]) === today && istMin() < 15 * 60 + 40) { live = { o: b.o[k], h: b.h[k], l: b.l[k], c: b.c[k], v: b.v[k] }; k--; }
     if (k < 25) return null;
@@ -43,6 +59,7 @@
     m.setup = px > CRIT.minPrice && newHigh && r > CRIT.minRsi && rg > CRIT.minVolat && vol > CRIT.minVol;
     m.near = !m.setup && px > CRIT.minPrice && r > CRIT.minRsi && rg > CRIT.minVolat && vol > CRIT.minVol && px >= hh * 0.97;
     if (live) { m.gap = (live.o / px - 1) * 100; m.now = live.c; m.nowChg = (live.c / px - 1) * 100; m.dayVol = live.v; }
+    if (wantEv) m.ev = events(b, k);
     return m;
   }
   function applyPre(m) {
@@ -63,14 +80,14 @@
     try {
       await loadUniverse(); await fetchPre();
       const syms = B.universe, batches = []; for (let i = 0; i < syms.length; i += 30) batches.push(syms.slice(i, i + 30));
-      B.total = syms.length; B.scanned = 0; const rows = [];
+      B.total = syms.length; B.scanned = 0; B.hist = { all: [], gap: [] }; const rows = [];
       await mapLimit(batches, 3, async (bt) => {
         const j = await be('action=dailyb&range=3mo&symbols=' + encodeURIComponent(bt.map((s) => s + '.NS').join(',')), 60000);
-        bt.forEach((s) => { const b = j.bars && j.bars[s + '.NS']; if (b) { const m = metrics(s, b); if (m) rows.push(applyPre(m)); } });
+        bt.forEach((s) => { const b = j.bars && j.bars[s + '.NS']; if (b) { const m = metrics(s, b, true); if (m) { if (m.ev) { addHist(m.ev); delete m.ev; } rows.push(applyPre(m)); } } });
         B.scanned += bt.length; B.msg = `Scanning ${B.scanned}/${B.total} stocks…`; paint();
       });
-      B.rows = rows.filter((r) => r.status); B.at = Date.now(); B.msg = ''; B.live = rows.some((r) => num(r.gap));
-      try { localStorage.setItem(LS, JSON.stringify({ d: istToday(), at: B.at, rows: B.rows, src: B.src, n: B.total })); } catch (e) { }
+      B.rows = rows.filter((r) => r.status); B.histS = { all: hstat((B.hist || { all: [] }).all), gap: hstat((B.hist || { gap: [] }).gap) }; B.at = Date.now(); B.msg = ''; B.live = rows.some((r) => num(r.gap));
+      try { localStorage.setItem(LS, JSON.stringify({ d: istToday(), at: B.at, rows: B.rows, src: B.src, n: B.total, hs: B.histS })); } catch (e) { }
     } catch (e) { B.err = 'Scan failed: ' + ((e && e.message) || e); B.msg = ''; }
     finally { B.busy = false; paint(); }
   }
@@ -85,7 +102,7 @@
         const j = await be('action=dailyb&range=3mo&symbols=' + encodeURIComponent(bt.map((s) => s + '.NS').join(',')), 45000);
         bt.forEach((s) => { const b = j.bars && j.bars[s + '.NS']; if (!b) return; const m = metrics(s, b); if (!m) return; applyPre(m); const i = B.rows.findIndex((r) => r.s === s); if (i >= 0 && m.status) B.rows[i] = m; });
       });
-      B.at = Date.now(); B.live = true; try { localStorage.setItem(LS, JSON.stringify({ d: istToday(), at: B.at, rows: B.rows, src: B.src, n: B.total })); } catch (e) { }
+      B.at = Date.now(); B.live = true; try { localStorage.setItem(LS, JSON.stringify({ d: istToday(), at: B.at, rows: B.rows, src: B.src, n: B.total, hs: B.histS })); } catch (e) { }
     } catch (e) { }
     finally { B.busy = false; paint(); }
   }
@@ -96,6 +113,21 @@
     r.sort((a, b) => B.sort === 'az' ? a.s.localeCompare(b.s) : B.sort === 'rsi' ? b.rsi - a.rsi : B.sort === 'gap' ? (b.gapUse || -99) - (a.gapUse || -99) : B.sort === 'volat' ? b.volat - a.volat : (ord[a.status] - ord[b.status]) || ((b.gapUse || -99) - (a.gapUse || -99)) || b.volat - a.volat);
     return r;
   }
+  /* ---- Top Picks: the best-ranked READY / SETUP names with entry, stop, targets and the measured hit-rate ---- */
+  function pick(r) {
+    const g = num(r.gapUse) ? r.gapUse : 0, e = num(r.now) && num(r.gap) ? r.now : r.px * (1 + g / 100);
+    let sc = 0; sc += r.status === 'READY' ? 3 : 1; sc += Math.min(3, Math.max(0, g) / 1.5); sc += r.volat >= 4 ? 3 : r.volat >= 3 ? 2 : 1; sc += r.rsi >= 60 && r.rsi <= 75 ? 1.5 : r.rsi > 80 ? -1 : 0.5; sc += r.avgVol > 2e6 ? 1 : 0; if (g > 7) sc -= 2;
+    const slp = Math.min(4.5, Math.max(2.5, r.volat * 0.7)), op = num(r.gap) ? r.px * (1 + r.gap / 100) : e;
+    return Object.assign({}, r, { sc, entry: op, slp, sl: op * (1 - slp / 100), t1: op * 1.05, t2: op * 1.08, t3: op * 1.10 });
+  }
+  function picksHtml(rows) {
+    const P = rows.filter((r) => (r.status === 'READY' || r.status === 'SETUP') && r.volat >= 2.5).map(pick).sort((a, b) => b.sc - a.sc).slice(0, 10);
+    const hs = B.histS, H = hs && hs.all, G = hs && hs.gap, pc = (v) => (num(v) ? v.toFixed(0) + '%' : '—');
+    const stat = H ? `<div class="bf-hs"><b>Measured hit-rate (last ~3 months, this exact screen, from the next open, within 5 sessions)</b><div class="bf-hg"><div><i>All screen passers · ${H.n} cases</i><span>touched +5 %: <b>${pc(H.p5)}</b> · +8 %: <b>${pc(H.p8)}</b> · +10 %: <b>${pc(H.p10)}</b></span><span>touched −4 % at some point: <b>${pc(H.sl)}</b> · 5-day close vs open: <b>${sg(H.c5, 1)} %</b> avg / <b>${sg(H.med, 1)} %</b> median</span></div>${G ? `<div><i>Only with gap &gt; 1.5 % · ${G.n} cases</i><span>touched +5 %: <b>${pc(G.p5)}</b> · +8 %: <b>${pc(G.p8)}</b> · +10 %: <b>${pc(G.p10)}</b></span><span>touched −4 %: <b>${pc(G.sl)}</b> · 5-day close vs open: <b>${sg(G.c5, 1)} %</b> avg / <b>${sg(G.med, 1)} %</b> median</span></div>` : ''}</div></div>` : '<div class="bf-hs">Hit-rate appears after the next full scan.</div>';
+    return `<div class="bf-top"><h3>⭐ Top Picks <small>highest-ranked READY / SETUP names with room to run — ranked by gap, volatility, RSI and liquidity</small></h3>`
+      + (P.length ? `<div class="bf-sc"><table class="bf-t"><thead><tr><th>#</th><th>Stock</th><th>Status</th><th>Entry (open)</th><th>Stop-loss</th><th>+5 %</th><th>+8 %</th><th>+10 %</th><th>Risk</th><th>Gap</th><th>Volat.</th><th>RSI</th><th>Score</th></tr></thead><tbody>${P.map((r, i) => `<tr class="${r.status === 'READY' ? 'rdy' : ''}"><td>${i + 1}</td><td class="bf-s"><a class="symlink" href="javascript:void(0)" data-sym="${E(r.s)}" onclick="loadSymbol('${E(r.s)}')">${E(r.s)}</a></td><td><span class="bf-b ${r.status}">${r.status}</span></td><td>${f2(r.entry)}${num(r.gap) ? '' : '<small>est. at open</small>'}</td><td class="r">${f2(r.sl)}<small>−${r.slp.toFixed(1)}%</small></td><td class="g">${f2(r.t1)}</td><td class="g">${f2(r.t2)}</td><td class="g">${f2(r.t3)}</td><td>${(5 / r.slp).toFixed(1)}:1</td><td>${num(r.gapUse) ? sg(r.gapUse) + '%' : '—'}</td><td>${r.volat.toFixed(1)}%</td><td>${r.rsi.toFixed(0)}</td><td><b>${r.sc.toFixed(1)}</b></td></tr>`).join('')}</tbody></table></div>` : '<div class="bf-card">No stock clears the Top Picks filter right now (needs READY/SETUP and avg daily range ≥ 2.5 %).</div>')
+      + stat + `<div class="bf-note"><b>Be realistic.</b> A 5–10 % move is a stretch target, not an easy one: it needs a strong day or a few good sessions, and the table above shows how often it really happened. Plan: buy only after the open holds (not on the gap spike), keep the stop, sell in parts at +5 % / +8 % / +10 %, and exit by session 5 if neither target nor stop was hit. Size so that one stop-out is a small fraction of capital. Past frequencies are not a promise; any single pick can gap down and hit the stop.</div></div>`;
+  }
   function paint() {
     const el = $('pBig'); if (!el) return; const rows = sorted(), nR = rows.filter((r) => r.status === 'READY').length, nS = rows.filter((r) => r.status === 'SETUP').length, nN = rows.filter((r) => r.status === 'NEAR').length;
     const mn = istMin(), phase = mn < 9 * 60 ? 'Pre-market — gap & pre-open data appear from 09:00' : mn < 9 * 60 + 15 ? 'NSE pre-open session — indicative opening prices' : mn <= 15 * 60 + 30 ? 'Market live — gap is today’s open vs yesterday’s close' : 'Market closed — showing tomorrow’s setups from today’s close';
@@ -104,12 +136,12 @@
       + (B.err ? `<div class="bf-err">${E(B.err)}</div>` : '') + (B.msg ? `<div class="bf-msg">${E(B.msg)}</div>` : '')
       + `<div class="bf-crit"><b>Screen:</b> MidSmallCap 400 · price &gt; ₹50 · new 1-month high · RSI(14) &gt; 55 · volatility &gt; 2 % · 10-day avg volume &gt; 500 K · <b>READY</b> = all of these <i>and</i> gap &gt; 1.5 % ${B.preOk === false ? '· <span class="r">NSE pre-open feed unavailable — gap uses the live open once the market starts</span>' : B.preOk ? '· pre-open feed on (qty &gt; 50 K flagged)' : ''}</div>`
       + `<div class="bf-kp"><div class="bf-k"><i>READY now</i><b class="g">${nR}</b><small>setup + gap &gt; 1.5 %</small></div><div class="bf-k"><i>SETUP (waiting for gap)</i><b>${nS}</b><small>all criteria except gap</small></div><div class="bf-k"><i>NEAR (within 3 % of high)</i><b>${nN}</b><small>on the radar</small></div></div>`
-      + (rows.length ? `<div class="bf-sc"><table class="bf-t"><thead><tr><th>#</th>${th('az', 'Stock')}${th('status', 'Status')}<th>Prev close</th>${th('gap', 'Gap %')}<th>Now</th><th>Pre-open qty</th><th>10-D avg vol</th><th>1-M high</th>${th('volat', 'Volatility')}${th('rsi', 'RSI')}</tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.status === 'READY' ? 'rdy' : ''}"><td>${i + 1}</td><td class="bf-s"><a class="symlink" href="javascript:void(0)" data-sym="${E(r.s)}" onclick="loadSymbol('${E(r.s)}')">${E(r.s)}</a></td><td><span class="bf-b ${r.status}">${r.status}</span></td><td>${f2(r.px)}</td><td class="${r.gapUse > 0 ? 'g' : 'r'}">${num(r.gapUse) ? sg(r.gapUse) + '%' : '—'}${num(r.preGap) && !num(r.gap) ? '<small>pre-open</small>' : ''}</td><td>${num(r.now) ? f2(r.now) + '<small class="' + (r.nowChg >= 0 ? 'g' : 'r') + '">' + sg(r.nowChg) + '%</small>' : '—'}</td><td>${num(r.preQty) ? K(r.preQty) + (r.preOk ? ' ✓' : '') : '—'}</td><td>${K(r.avgVol)}</td><td>${r.newHigh ? '<b class="g">NEW HIGH</b>' : sg(r.hiDist) + '%'}<small>${f2(r.hi20)}</small></td><td>${r.volat.toFixed(1)}%</td><td>${r.rsi.toFixed(0)}</td></tr>`).join('')}</tbody></table></div>` : (B.busy ? '' : '<div class="bf-card">No stocks pass the screen yet. Press <b>Scan now</b> (the full MidSmallCap 400 scan takes about a minute).</div>'))
+      + (rows.length ? picksHtml(rows) + '<h3 class="bf-h3">All candidates</h3>' : '') + (rows.length ? `<div class="bf-sc"><table class="bf-t"><thead><tr><th>#</th>${th('az', 'Stock')}${th('status', 'Status')}<th>Prev close</th>${th('gap', 'Gap %')}<th>Now</th><th>Pre-open qty</th><th>10-D avg vol</th><th>1-M high</th>${th('volat', 'Volatility')}${th('rsi', 'RSI')}</tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.status === 'READY' ? 'rdy' : ''}"><td>${i + 1}</td><td class="bf-s"><a class="symlink" href="javascript:void(0)" data-sym="${E(r.s)}" onclick="loadSymbol('${E(r.s)}')">${E(r.s)}</a></td><td><span class="bf-b ${r.status}">${r.status}</span></td><td>${f2(r.px)}</td><td class="${r.gapUse > 0 ? 'g' : 'r'}">${num(r.gapUse) ? sg(r.gapUse) + '%' : '—'}${num(r.preGap) && !num(r.gap) ? '<small>pre-open</small>' : ''}</td><td>${num(r.now) ? f2(r.now) + '<small class="' + (r.nowChg >= 0 ? 'g' : 'r') + '">' + sg(r.nowChg) + '%</small>' : '—'}</td><td>${num(r.preQty) ? K(r.preQty) + (r.preOk ? ' ✓' : '') : '—'}</td><td>${K(r.avgVol)}</td><td>${r.newHigh ? '<b class="g">NEW HIGH</b>' : sg(r.hiDist) + '%'}<small>${f2(r.hi20)}</small></td><td>${r.volat.toFixed(1)}%</td><td>${r.rsi.toFixed(0)}</td></tr>`).join('')}</tbody></table></div>` : (B.busy ? '' : '<div class="bf-card">No stocks pass the screen yet. Press <b>Scan now</b> (the full MidSmallCap 400 scan takes about a minute).</div>'))
       + `<div class="bf-note"><b>How to read this honestly.</b> It is a candidate list, not a call. Over 2 years of data on a 46-stock sample, stocks passing this screen (before the gap filter) rose about +0.26 % the next day versus +0.03 % for all stocks, but almost all of that was the opening gap — measured from the open to the close they were flat (−0.03 %). With a gap above 1.5 % the open-to-close drift was about +0.45 % (only 92 cases, 43 % ended higher). The gap is the part you mostly cannot buy. Use the list to decide where to watch for an orderly pullback or a clean 5-minute close above the first 15-minute high, keep position size small, and let the stock-level X-ray and Today’s Calls confirm.</div>`;
   }
   function open(s) { if (window.jcXray) window.jcXray(s); }
 
-  const CSS = `#pBig{--g:#08783a;--r:#c0102e;background:linear-gradient(180deg,#e4ebf8,#edf1fa 60%,#e4ebf8);border-radius:16px;padding:10px;color:#0a1430}
+  const CSS = `.bf-top{margin:6px 0 12px}.bf-top h3,.bf-h3{margin:10px 2px 6px;font-size:15px;color:#0b2260}.bf-top h3 small{font-size:11px;color:#34456a;font-weight:600;margin-left:6px}.bf-hs{background:#fff;border:1px solid #bccae6;border-left:4px solid #08783a;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:12px;color:#24365e}.bf-hg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:6px}.bf-hg i{display:block;font-style:normal;font-weight:800;color:#0b2260;margin-bottom:2px}.bf-hg span{display:block;line-height:1.6}#pBig{--g:#08783a;--r:#c0102e;background:linear-gradient(180deg,#e4ebf8,#edf1fa 60%,#e4ebf8);border-radius:16px;padding:10px;color:#0a1430}
   .bf-head{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:linear-gradient(120deg,#17388a,#0b1d4d);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:10px}.bf-head>div:first-child{flex:1;min-width:260px}.bf-head h2{margin:0 0 4px;font-size:22px}.bf-head h2 small{font-size:12px;color:#c9d6f7;font-weight:700;margin-left:8px}.bf-st{font-size:12.5px;color:#e5ecff}
   .bf-btn{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:6px 12px;font-weight:800;font-size:12px;cursor:pointer}.bf-btn[disabled]{opacity:.45}
   .bf-err{background:#fde6ea;color:#a10b27;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:700;font-size:12.5px}.bf-msg{background:#fff;border:1px solid #bccae6;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:700;font-size:12.5px;color:#14306e}
@@ -128,7 +160,7 @@
     if ((location.hash || '').slice(1) === 'bigfish') window.showTab('pBig');
   }
   function onShow() {
-    if (!B.rows.length) { try { const c = JSON.parse(localStorage.getItem(LS) || 'null'); if (c && c.rows) { B.rows = c.rows; B.at = c.at; B.src = c.src; B.total = c.n; } } catch (e) { } }
+    if (!B.rows.length) { try { const c = JSON.parse(localStorage.getItem(LS) || 'null'); if (c && c.rows) { B.rows = c.rows; B.histS = c.hs; B.at = c.at; B.src = c.src; B.total = c.n; } } catch (e) { } }
     paint(); const stale = !B.at || new Date(B.at + 19800000).toISOString().slice(0, 10) !== istToday();
     if (stale && !B.busy) scan(); else refreshLive();
   }
