@@ -213,6 +213,37 @@ def gemini(prompt):
     return None
 
 
+def claude_json(prompt):
+    """Backup writer: Anthropic API (ANTHROPIC_API_KEY secret). Small model, tiny cost."""
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    if not key:
+        return None
+    import time
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")
+    body = json.dumps({"model": model, "max_tokens": 1500, "temperature": 0.3,
+                       "messages": [{"role": "user", "content": prompt + "\nReturn ONLY the JSON object, no other text."}]}).encode()
+    for attempt in range(3):
+        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
+                                     headers={"Content-Type": "application/json", "x-api-key": key,
+                                              "anthropic-version": "2023-06-01"})
+        try:
+            j = json.loads(urllib.request.urlopen(req, timeout=90).read())
+            txt = "".join(b.get("text", "") for b in j["content"] if b.get("type") == "text")
+            m = re.search(r"\{.*\}", txt, re.S)
+            return json.loads(m.group(0))
+        except urllib.error.HTTPError as e:
+            LAST_ERR[0] += " | Claude HTTP %s %s" % (e.code, e.read()[:200].decode("utf8", "replace"))
+            if e.code not in (429, 500, 502, 503, 504, 529):
+                break
+        except Exception as e:
+            LAST_ERR[0] += " | Claude " + str(e)[:200]
+        time.sleep(5 * (attempt + 1))
+    return None
+
+
+LAST_BY = ["template"]
+
+
 def commentary(kind, facts, headlines):
     """-> dict(bias:str, outlook:[str], news:[str]); Gemini if possible, else template."""
     heads = "\n".join("- %s (%s)" % (t, s) for _, t, s in headlines[:25])
@@ -229,13 +260,16 @@ def commentary(kind, facts, headlines):
         '"vol_text": "2 sentences on India VIX and the rupee from the facts", '
         '"asia_head": "max 5 words on Asian markets", '
         '"asia_text": "2-3 sentences on Asian and global cues from the facts"}' % (kind, facts, heads or "(none)"))
-    out = gemini(prompt)
+    out, by = gemini(prompt), "gemini"
+    if not (out and isinstance(out.get("bias"), str)):
+        out, by = claude_json(prompt), "claude"
     if out and isinstance(out.get("bias"), str):
         out["outlook"] = [str(x) for x in out.get("outlook", [])][:6]
         out["news"] = [str(x) for x in out.get("news", [])][:8]
         for k in ("headline", "vol_text", "asia_head", "asia_text"):
             out[k] = str(out.get(k, "")).strip()
-        out["by"] = "gemini"
+        out["by"] = by
+        LAST_BY[0] = by
         return out
     return dict(bias=facts.split("\n")[0], outlook=[], by="template", headline="", vol_text="", asia_head="", asia_text="",
                 news=["%s (%s)" % (t, s or "news") for _, t, s in headlines[:8]])
@@ -342,8 +376,8 @@ def build(sid, qs, heads, now):
     pv = pivots(qs.get("^NSEI"))
     note = ("Auto-generated at %s IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News "
             "headlines; commentary %s). GIFT Nifty, MCX, FII/DII and option-chain data are not available to "
-            "this pipeline and show as n/a." % (TM, "drafted by Gemini from those inputs only" if cm["by"] == "gemini"
-                                                else "templated from the numbers only"))
+            "this pipeline and show as n/a." % (TM, "drafted by %s from those inputs only" % cm["by"].title()
+                                                if cm["by"] != "template" else "templated from the numbers only"))
     base = dict(report_subtitle="Joshi's Corner", report_date=D, report_time=TM + " IST",
                 generated_line="Generated: %s, %s IST" % (D, TM), as_of_note=note, disclaimer=DISC)
     ind = [row(n, qs.get(s)) for n, s in IDX.items()]
@@ -458,7 +492,7 @@ def build(sid, qs, heads, now):
                          "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
                 "levels": levels, "bottom": bottom,
                 "footnote": "Auto-generated %s IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: %s | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session."
-                            % (TM, "Gemini" if cm["by"] == "gemini" else "template"),
+                            % (TM, cm["by"].title()),
                 "disclaimer": "Not investment advice. Markets carry risk."}
     raise SystemExit("unsupported id " + sid)
 
@@ -497,8 +531,8 @@ def main():
         subprocess.run(pub + ["--status", "holiday", "--note", "No NSE session today (last bar %s)." % n["date"]])
         return
     cfg = build(a.sid, qs, heads, now)
-    if a.dry and os.environ.get("GEMINI_API_KEY") and "commentary: Gemini" not in json.dumps(cfg) and "drafted by Gemini" not in json.dumps(cfg):
-        print("::error::Gemini not used: " + LAST_ERR[0].replace("\n", " ")[:400])
+    if a.dry and (os.environ.get("GEMINI_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")) and LAST_BY[0] == "template":
+        print("::error::No AI writer used: " + LAST_ERR[0].replace("\n", " ")[:400])
         sys.exit("DRY CHECK FAILED")
     os.makedirs(a.out, exist_ok=True)
     stem = {"premarket-news": "Market_News", "morning-brief": "JCGG_Morning_Updates_Brief",
