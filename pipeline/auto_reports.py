@@ -163,12 +163,33 @@ def expiry_text(d):
 LAST_ERR = ["no key in environment"]
 
 
+def pick_model(key):
+    """Newest text 'flash' model that supports generateContent (model names change; don't hardcode)."""
+    try:
+        req = urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200",
+                                     headers={"x-goog-api-key": key})
+        ms = json.loads(urllib.request.urlopen(req, timeout=30).read()).get("models", [])
+        names = [m["name"].split("/")[-1] for m in ms if "generateContent" in m.get("supportedGenerationMethods", [])]
+        bad = ("lite", "image", "tts", "audio", "live", "thinking", "embedding", "preview", "exp", "robotics", "computer")
+        cand = [n for n in names if "flash" in n and not any(b in n for b in bad)]
+        def ver(n):
+            m = re.search(r"gemini-(\d+(?:\.\d+)?)", n)
+            return float(m.group(1)) if m else 0
+        cand.sort(key=lambda n: (-ver(n), len(n)))
+        if cand:
+            print("Gemini model:", cand[0])
+            return cand[0]
+    except Exception as e:
+        print("model list failed:", str(e)[:120])
+    return "gemini-flash-latest"
+
+
 def gemini(prompt):
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         return None
     LAST_ERR[0] = "unknown"
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    model = os.environ.get("GEMINI_MODEL") or pick_model(key)
     url = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent" % model
     body = json.dumps({"contents": [{"parts": [{"text": prompt}]}],
                        "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"}}).encode()
