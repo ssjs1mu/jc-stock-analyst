@@ -1,0 +1,65 @@
+name: Auto reports (fallback, no Claude needed)
+
+# Runs ~25 min after each scheduled report time (IST). If the report for today is already in
+# reports/<id>/index.json it does nothing; otherwise it builds the report from live data.
+on:
+  schedule:
+    - cron: '55 2 * * 1-5'    # 08:25 IST  premarket-news
+    - cron: '25 3 * * 1-5'    # 08:55 IST  morning-brief, morning-detailed
+    - cron: '40 3 * * 1-5'    # 09:10 IST  morning-pulse
+    - cron: '55 12 * * 1-5'   # 18:25 IST  evening-market-wrap
+    - cron: '55 13 * * 1-5'   # 19:25 IST  evening-news-wrap
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: 'Space-separated schedule ids (e.g. "evening-market-wrap")'
+        required: true
+      force:
+        description: 'Rebuild even if already published today'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-reports
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install renderer
+        run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Pick report ids
+        id: pick
+        run: |
+          case "${{ github.event.schedule }}" in
+            "55 2 * * 1-5")  IDS="premarket-news" ;;
+            "25 3 * * 1-5")  IDS="morning-brief morning-detailed" ;;
+            "40 3 * * 1-5")  IDS="morning-pulse" ;;
+            "55 12 * * 1-5") IDS="evening-market-wrap" ;;
+            "55 13 * * 1-5") IDS="evening-news-wrap" ;;
+            *) IDS="${{ github.event.inputs.ids }}" ;;
+          esac
+          echo "ids=$IDS" >> "$GITHUB_OUTPUT"
+      - name: Build and publish
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          for id in ${{ steps.pick.outputs.ids }}; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            if [ "$FORCE" = "true" ]; then F="--force"; else F=""; fi
+            python pipeline/auto_reports.py "$id" $F || echo "::warning::$id failed"
+          done
