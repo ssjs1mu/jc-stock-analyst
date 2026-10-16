@@ -392,22 +392,23 @@ def main():
     ap.add_argument("sid")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--out", default="/tmp/auto_reports")
+    ap.add_argument("--dry", action="store_true", help="fetch real data and render, but do not publish")
     a = ap.parse_args()
     mock = os.environ.get("AUTO_MOCK") == "1"
     now = dt.datetime.now(IST)
     if now.weekday() >= 5 and not a.force:
         print("Weekend; nothing to do.")
         return
-    if not a.force and not mock and already_done(a.sid, now.date()):
+    if not a.force and not mock and not a.dry and already_done(a.sid, now.date()):
         print("%s already published today; skipping (fallback not needed)." % a.sid)
         return
     qs, heads = gather(mock)
     n = qs.get("^NSEI")
     pub = [sys.executable, os.path.join(HERE, "publish.py"), a.sid]
-    if not n and not mock:
+    if not n and not mock and not a.dry:
         subprocess.run(pub + ["--status", "failed", "--note", "Auto pipeline could not fetch index data (Yahoo unavailable)."])
         sys.exit("No Nifty data; marked failed.")
-    if a.sid.startswith("evening") and n and n["date"] != now.date().isoformat() and not a.force and not mock:
+    if a.sid.startswith("evening") and n and n["date"] != now.date().isoformat() and not a.force and not mock and not a.dry:
         subprocess.run(pub + ["--status", "holiday", "--note", "No NSE session today (last bar %s)." % n["date"]])
         return
     cfg = build(a.sid, qs, heads, now)
@@ -420,8 +421,10 @@ def main():
     json.dump(cfg, open(cj, "w"), indent=1)
     rend = "render_infographic_pdf.py" if a.sid == "morning-pulse" else "render_pdf.py"
     subprocess.check_call([sys.executable, os.path.join(HERE, rend), "--config", cj, "--output", pdf])
-    if mock:
-        print("MOCK run: rendered", pdf, "(not published)")
+    if a.dry and not n:
+        sys.exit("DRY: no Nifty data fetched from Yahoo")
+    if mock or a.dry:
+        print("DRY/MOCK run: rendered", pdf, "(not published)")
         return
     subprocess.check_call(pub + ["--file", pdf, "--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
 

@@ -18,6 +18,10 @@ on:
         description: 'Rebuild even if already published today'
         type: boolean
         default: false
+      dry:
+        description: 'Dry run: real data, no publish, PDFs attached to the run'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -57,9 +61,17 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FORCE: ${{ github.event.inputs.force }}
+          DRY: ${{ github.event.inputs.dry }}
         run: |
           for id in ${{ steps.pick.outputs.ids }}; do
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             if [ "$FORCE" = "true" ]; then F="--force"; else F=""; fi
+            if [ "$DRY" = "true" ]; then F="$F --dry --out /tmp/dry"; fi
             python pipeline/auto_reports.py "$id" $F || echo "::warning::$id failed"
           done
+      - name: Attach dry-run PDFs
+        if: ${{ github.event.inputs.dry == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-reports
+          path: /tmp/dry/*.pdf
