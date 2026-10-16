@@ -251,7 +251,7 @@
   function row(sym, name, o, ms, opts) {
     o = o || {}; opts = opts || {}; const q = S.q[sym];
     const lead = opts.flag ? flag(opts.flag) : '';
-    if (!q) return `<tr class="jd-na"><td class="jd-nm">${lead}${esc(name)}</td><td class="jd-px">…</td><td class="jd-ch"></td><td class="jd-pc"></td><td class="jd-spc"></td></tr>`;
+    if (!q) return `<tr class="jd-na"><td class="jd-nm">${lead}${esc(name)}</td><td class="jd-px">…</td><td class="jd-ch"></td><td class="jd-pc"></td></tr>`;
     const dp = o.dp != null ? o.dp : (opts.yield ? 3 : dpOf(q.p)); const chg = q.pc != null ? q.p - q.pc : null, pct = q.pc ? chg / q.pc * 100 : null;
     const dir = chg == null || Math.abs(pct) < 0.005 ? 0 : chg > 0 ? 1 : -1, good = (o.inv || opts.yield) ? -dir : dir;
     const age = (ms / 1000 - (q.t || 0)) / 60, live = age >= 0 && age < 20; const when = q.t ? new Date(q.t * 1000).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) : '';
@@ -261,23 +261,22 @@
       <td class="jd-nm">${lead}<span class="jd-live ${live ? 'on' : 'off'}"></span>${esc(name)}</td>
       <td class="jd-px">${fmtN(q.p, dp)}${opts.yield ? '<i>%</i>' : ''}</td>
       <td class="jd-ch"><b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chTxt}</td>
-      <td class="jd-pc"><span>${pct == null ? '—' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</span></td>
-      <td class="jd-spc">${spark(q.sp, dir === 0 ? null : dir > 0, 56, 18)}</td></tr>`;
+      <td class="jd-pc"><span>${pct == null ? '—' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</span></td></tr>`;
   }
-  const head = '<thead><tr><th>Market</th><th>Last</th><th>Change</th><th>%</th><th class="jd-spc"></th></tr></thead>';
+  const head = '<thead><tr><th>Market</th><th>Last</th><th>Change</th><th>%</th></tr></thead>';
   const manIn = (k, ph) => `<input class="jd-man" inputmode="decimal" placeholder="${ph}" title="Feed unavailable — type today's value" onchange="window.jdMan('${k}',this.value)">`;
 
   function in10yRow() {
     const x = S.x.in10y, m = manual().in10y;
     if (x && x.p != null) { const chg = x.pc != null ? (x.p - x.pc) * 100 : null; const cls = chg == null || Math.abs(chg) < .05 ? '' : chg > 0 ? 'd' : 'u'; // yields up = bond prices down (red for equities)
-      return `<tr class="${cls}" title="India 10-year G-Sec · ${esc(x.d || '')}"><td class="jd-nm">${flag('in')}<span class="jd-live on"></span>INDIA 10Y G-SEC</td><td class="jd-px">${fmtN(x.p, 3)}<i>%</i></td><td class="jd-ch"><b>${chg == null ? '■' : chg > 0 ? '▲' : '▼'}</b> ${chg == null ? '—' : (chg >= 0 ? '+' : '') + chg.toFixed(1) + ' bp'}</td><td class="jd-pc"><span>${x.pc ? (((x.p - x.pc) / x.pc) * 100 >= 0 ? '+' : '') + (((x.p - x.pc) / x.pc) * 100).toFixed(2) + '%' : ''}</span></td><td class="jd-spc">${spark(x.sp, null, 56, 18)}</td></tr>`; }
-    if (m) return `<tr title="Entered by you"><td class="jd-nm">${flag('in')}<span class="jd-live off"></span>INDIA 10Y G-SEC <small class="jd-tagm">manual</small></td><td class="jd-px">${fmtN(m.v, 3)}<i>%</i></td><td class="jd-ch" colspan="3"><a href="#" class="jd-clr" onclick="window.jdMan('in10y','');return false">clear</a></td></tr>`;
-    return `<tr class="jd-na"><td class="jd-nm">${flag('in')}<span class="jd-live off"></span>INDIA 10Y G-SEC</td><td class="jd-px">${manIn('in10y', 'yield %')}</td><td class="jd-ch" colspan="3"><small>feed blocked — enter</small></td></tr>`;
+      return `<tr class="${cls}" title="India 10-year G-Sec · ${esc(x.d || '')}"><td class="jd-nm">${flag('in')}<span class="jd-live on"></span>INDIA 10Y G-SEC</td><td class="jd-px">${fmtN(x.p, 3)}<i>%</i></td><td class="jd-ch"><b>${chg == null ? '■' : chg > 0 ? '▲' : '▼'}</b> ${chg == null ? '—' : (chg >= 0 ? '+' : '') + chg.toFixed(1) + ' bp'}</td><td class="jd-pc"><span>${x.pc ? (((x.p - x.pc) / x.pc) * 100 >= 0 ? '+' : '') + (((x.p - x.pc) / x.pc) * 100).toFixed(2) + '%' : ''}</span></td></tr>`; }
+    if (m) return `<tr title="Entered by you"><td class="jd-nm">${flag('in')}<span class="jd-live off"></span>INDIA 10Y G-SEC <small class="jd-tagm">manual</small></td><td class="jd-px">${fmtN(m.v, 3)}<i>%</i></td><td class="jd-ch" colspan="2"><a href="#" class="jd-clr" onclick="window.jdMan('in10y','');return false">clear</a></td></tr>`;
+    return `<tr class="jd-na"><td class="jd-nm">${flag('in')}<span class="jd-live off"></span>INDIA 10Y G-SEC</td><td class="jd-px">${manIn('in10y', 'yield %')}</td><td class="jd-ch" colspan="2"><small>feed blocked — enter</small></td></tr>`;
   }
   function pcrRow() {
     const x = S.x.pcr, m = manual().pcr, v = x && x.pcr != null ? x.pcr : m ? m.v : null;
-    if (v != null) { const t = pcrTag(v); return `<tr class="${t[1] === 'g' ? 'u' : t[1] === 'r' ? 'd' : ''}" title="${x ? 'NSE option chain · expiry ' + esc(x.expiry || '') + ' · ' + esc(x.ts || '') : 'Entered by you'}"><td class="jd-nm"><span class="jd-live ${x ? 'on' : 'off'}"></span>NIFTY PCR (OI) ${x ? '' : '<small class="jd-tagm">manual</small>'}</td><td class="jd-px">${v.toFixed(2)}</td><td class="jd-ch" colspan="2"><span class="jd-tr ${t[1]}">${t[0]}</span></td><td class="jd-spc">${x ? '' : '<a href="#" class="jd-clr" onclick="window.jdMan(\'pcr\',\'\');return false">clear</a>'}</td></tr>`; }
-    return `<tr class="jd-na"><td class="jd-nm"><span class="jd-live off"></span>NIFTY PCR (OI)</td><td class="jd-px">${manIn('pcr', 'PCR')}</td><td class="jd-ch" colspan="3"><small>NSE blocks cloud feeds — enter</small></td></tr>`;
+    if (v != null) { const t = pcrTag(v); return `<tr class="${t[1] === 'g' ? 'u' : t[1] === 'r' ? 'd' : ''}" title="${x ? 'NSE option chain · expiry ' + esc(x.expiry || '') + ' · ' + esc(x.ts || '') : 'Entered by you'}"><td class="jd-nm"><span class="jd-live ${x ? 'on' : 'off'}"></span>NIFTY PCR (OI) ${x ? '' : '<small class="jd-tagm">manual</small>'}</td><td class="jd-px">${v.toFixed(2)}</td><td class="jd-ch" colspan="2"><span class="jd-tr ${t[1]}">${t[0]}</span>${x ? '' : ' <a href="#" class="jd-clr" onclick="window.jdMan(\'pcr\',\'\');return false">clear</a>'}</td></tr>`; }
+    return `<tr class="jd-na"><td class="jd-nm"><span class="jd-live off"></span>NIFTY PCR (OI)</td><td class="jd-px">${manIn('pcr', 'PCR')}</td><td class="jd-ch" colspan="2"><small>NSE blocks cloud feeds — enter</small></td></tr>`;
   }
   const flagFor = { '^NSEI': 'in', '^NSEBANK': 'in', '^BSESN': 'in', '^INDIAVIX': 'in', 'USDINR=X': 'us' };
   function card(title, icon, body, extra) { return `<section class="jd-card jd-tc"><h3><span class="jd-ic">${icon}</span>${title}${extra || ''}</h3>${body}</section>`; }
@@ -290,7 +289,7 @@
   }
   function colGlobal(ms) {
     const w = wantNow(ms); const anyOpen = ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]);
-    const body = GLOBAL.map((g) => `<tbody><tr class="jd-sub"><td colspan="5">${g[0]}</td></tr>${g[1].map((it) => row(it[0], it[1], {}, ms, { flag: it[2] })).join('')}</tbody>`).join('');
+    const body = GLOBAL.map((g) => `<tbody><tr class="jd-sub"><td colspan="4">${g[0]}</td></tr>${g[1].map((it) => row(it[0], it[1], {}, ms, { flag: it[2] })).join('')}</tbody>`).join('');
     return card('Global markets', '🌍', `<table class="jd-tb">${head}${body}</table>`, `<span class="jd-chip ${anyOpen ? 'on' : ''}">${anyOpen ? '● LIVE' : 'CLOSED'}</span>`)
       + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', `<table class="jd-tb">${head}<tbody>${['EURINR=X', 'GBPINR=X', 'JPYINR=X', 'DX-Y.NYB', 'EURUSD=X'].map((s) => row(s, { 'EURINR=X': 'EUR / INR', 'GBPINR=X': 'GBP / INR', 'JPYINR=X': 'JPY / INR', 'DX-Y.NYB': 'US DOLLAR INDEX', 'EURUSD=X': 'EUR / USD' }[s], { dp: s === 'JPYINR=X' || s === 'EURUSD=X' ? 4 : 3 }, ms)).join('')}</tbody></table>`);
   }
@@ -306,6 +305,15 @@
       <div class="jd-nlist">${items || `<div class="jd-fn">${S.newsErr ? esc(S.newsErr) : 'Loading headlines…'}</div>`}</div><div class="jd-fn">Headlines via Google News · tap to open the source.${S.newsAt ? ' Updated ' + new Date(S.newsAt).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST.' : ''}</div></section>`;
   }
 
+  function heatHTML(ms) {
+    const all = [['^NSEI', 'NIFTY 50'], ['^NSEBANK', 'BANK NIFTY'], ['^BSESN', 'SENSEX']].concat(NIFTY_OTHERS.map((x) => [x[0], x[1].replace(/^NIFTY /, '')]));
+    const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], p: pct, px: q ? q.p : null, big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
+    const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
+    const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-ht${i.big ? ' big' : ''}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)}"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
+    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hgrid">${tiles}</div><div class="jd-hleg"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
+  }
   function heroHTML(w, ms) {
     const ist = w.ist, ip = istParts(ms);
     const dateStr = new Date(ms).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
@@ -367,7 +375,7 @@
       <div><span class="jd-pillmini"><span class="jd-dot"></span>LIVE</span><p>The blinking pill at the top is the <b>Indian market session</b>: green = trading, amber = pre-open, violet = closing auction, grey = closed — then it shows the countdown to the next open and which global markets are trading instead.</p></div>
       <div><span class="jd-mini-g">MARKET MOOD</span><p>0–100 gauge built from today’s Nifty move, breadth of the Indian indices, India VIX, global markets, rupee, crude, US yields and PCR. <b>0–20</b> very bearish · <b>20–40</b> bearish · <b>40–60</b> neutral · <b>60–80</b> bullish · <b>80–100</b> very bullish. Hover it for the weights. It describes tone, not a forecast.</p></div>
       <div><span class="jd-live on"></span> <span class="jd-live off"></span><p>Dot beside a name: <b>green</b> = a tick in the last 20 minutes; <b>grey</b> = market closed, showing the last session. Hover a row for its last-tick time.</p></div>
-      <div><b style="color:#12894b">▲</b> <b style="color:#c11d3d">▼</b><p>Change vs previous close. <b>India VIX</b> and <b>USD/INR</b> are inverted (a rise is red). India 10Y yield up = red. Sparkline = today’s path (15-min bars).</p></div>
+      <div><b style="color:#12894b">▲</b> <b style="color:#c11d3d">▼</b><p>Change vs previous close. <b>India VIX</b> and <b>USD/INR</b> are inverted (a rise is red). India 10Y yield up = red.</p></div>
       <div><b>PCR &amp; India 10Y</b><p>Nifty put-call ratio (open interest, nearest expiry): above 1 leans bullish, below 0.8 bearish. NSE and some bond sites refuse cloud servers — when a feed is blocked you can type today’s value in the box (saved on this device).</p></div>
       <div><b>Refresh</b><p>India indices every minute in session, other Nifty indices every 2 min, global every 3 min, closed markets every 15–20 min; news every 5 min. Quotes are delayed Yahoo Finance data.</p></div></div></div>`;
   }
@@ -378,7 +386,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
-      + `<div class="jd-board"><div class="jd-col">${colIndia(ms)}</div><div class="jd-col">${colGlobal(ms)}</div><div class="jd-col">${colComm(ms)}</div><div class="jd-col">${colNews(ms)}</div></div>`
+      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-heatw">${heatHTML(ms)}</div><div class="jd-col jd-c2">${colGlobal(ms)}</div><div class="jd-col jd-c3">${colComm(ms)}</div><div class="jd-col jd-c4">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
     Object.keys(S.q).forEach((k) => { S.q[k].flash = ''; });
@@ -421,7 +429,7 @@
   .jd-px{text-align:right;font:800 12px ui-monospace,'SF Mono',Consolas,monospace;color:var(--ink)}.jd-px i{font-style:normal;font-size:9px;color:var(--ink2);margin-left:1px}
   .jd-ch{text-align:right;font-weight:700;font-size:11px;color:#6a7691}.jd-ch b{font-size:9px;margin-right:1px}.jd-pc{text-align:right}.jd-pc span{display:inline-block;min-width:50px;text-align:right;font-weight:800;font-size:11px;padding:1px 5px;border-radius:6px;background:#eef1f7;color:#6a7691}
   tr.u .jd-ch{color:var(--jg)}tr.u .jd-pc span{background:#dff5e8;color:var(--jg)}tr.d .jd-ch{color:var(--jr)}tr.d .jd-pc span{background:#fde3e8;color:var(--jr)}
-  .jd-spc{display:none;width:60px;text-align:right}@media(min-width:1780px){.jd-spc{display:table-cell}}.jd-sp{display:block;margin-left:auto}.jd-na{opacity:.75}.jd-sub td{background:#f3f5fa;font-size:9px;letter-spacing:1.2px;font-weight:800;color:#6a7691;padding:3px 6px}
+  .jd-na{opacity:.75}.jd-sub td{background:#f3f5fa;font-size:9px;letter-spacing:1.2px;font-weight:800;color:#6a7691;padding:3px 6px}
   tr.fl-up{animation:jdfu 1.4s}tr.fl-dn{animation:jdfd 1.4s}@keyframes jdfu{0%{background:#b8f0cf}100%{}}@keyframes jdfd{0%{background:#ffc9d2}100%{}}
   .jd-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#aab3c5;flex:none}.jd-live.on{background:#12a05a;animation:jdpulse2 1.4s infinite}@keyframes jdpulse2{0%{box-shadow:0 0 0 0 rgba(18,160,90,.6)}100%{box-shadow:0 0 0 6px rgba(18,160,90,0)}}
   .jd-flag{border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.18);flex:none;display:block}
@@ -448,9 +456,13 @@
   .jd-lg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 18px}.jd-lg p{margin:4px 0 0;font-size:11.5px;color:var(--ink2)}.jd-pillmini{display:inline-flex;align-items:center;gap:6px;background:#0f2352;color:#fff;border-radius:99px;padding:2px 10px;font-size:10.5px;font-weight:800}.jd-pillmini .jd-dot{width:9px;height:9px;background:#3ddc84;animation:jdpulse 1.1s infinite}
   .jd-mini-g{display:inline-block;background:linear-gradient(90deg,#b3162f,#e9bd2d,#0b7a3f);color:#fff;border-radius:99px;padding:2px 10px;font-size:10.5px;font-weight:800}
   #pDash .jd-board+.jd-card,#pDash .jd-card+.jd-card{margin-top:10px}#pDash>.jd-card{margin-top:10px}
+  .jd-board{grid-template-areas:"a h h n" "a g c n"}.jd-c1{grid-area:a}.jd-heatw{grid-area:h;min-width:0}.jd-c2{grid-area:g}.jd-c3{grid-area:c}.jd-c4{grid-area:n}
+  .jd-hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:4px}.jd-ht{border-radius:7px;padding:7px 8px;min-height:52px;display:flex;flex-direction:column;justify-content:space-between;line-height:1.15;transition:background .5s}.jd-ht b{font-size:10px;letter-spacing:.3px;font-weight:800}.jd-ht span{font:800 13px ui-monospace,Consolas,monospace}.jd-ht.big{min-height:64px}.jd-ht.big span{font-size:15px}
+  .jd-hleg{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:9.5px;color:#7b88a6;font-weight:700}.jd-hleg i{flex:1;height:7px;border-radius:4px;background:linear-gradient(90deg,#c1243e,#fde3e8)}.jd-hleg i.g{background:linear-gradient(90deg,#e2f4ea,#1e9a5a)}
+  @media(max-width:1280px){.jd-board{grid-template-areas:"a h" "a g" "c n"}}@media(max-width:640px){.jd-board{grid-template-areas:"h" "a" "g" "c" "n"}}
   @media(max-width:1280px){.jd-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:900px){.jd-hero{grid-template-columns:1fr;text-align:center;padding:14px}.jd-mood{margin:0 auto}.jd-time{font-size:34px}.jd-pill{flex-wrap:wrap;justify-content:center}.jd-lane,.jd-axis,.jd-hr{grid-template-columns:90px 1fr}.jd-hours{--hn:90px}.jd-seg span{font-size:8px}}
-  @media(max-width:640px){.jd-board{grid-template-columns:1fr}.jd-spc{display:none}.jd-tb th:last-child{display:none}}
+  @media(max-width:640px){.jd-board{grid-template-columns:1fr}}
   @media print{.jd-btn,.jd-status{display:none}.jd-hero{background:#0f2352!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
 
   /* ---------- wiring ---------- */
