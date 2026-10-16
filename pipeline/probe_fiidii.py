@@ -1,33 +1,39 @@
 #!/usr/bin/env python3
-"""Temporary probe: dig into Moneycontrol's FII/DII page for history."""
+"""Temporary probe: structure of Moneycontrol FII/DII JSON."""
+import json
 import re
 import urllib.request
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 
 
-def get(url):
-    try:
-        r = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"}), timeout=25)
-        return r.status, r.read().decode("utf-8", "replace")
-    except Exception as e:
-        return getattr(e, "code", "ERR"), str(e)
+def nd(url):
+    h = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=25).read().decode("utf-8", "replace")
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', h, re.S)
+    return json.loads(m.group(1))["props"]["pageProps"] if m else {}
+
+
+def shape(o, path="", out=None, depth=0):
+    out = [] if out is None else out
+    if isinstance(o, dict):
+        for k, v in o.items():
+            shape(v, path + "." + k, out, depth + 1)
+    elif isinstance(o, list):
+        out.append("%s[list %d] first=%s last=%s" % (path, len(o), json.dumps(o[0])[:300] if o else "", json.dumps(o[-1])[:200] if o else ""))
+    elif depth < 4:
+        out.append("%s=%s" % (path, str(o)[:60]))
+    return out
 
 
 def warn(t, s):
-    print("::warning title=%s::%s" % (t, s.replace("%", "%25").replace("\r", " ").replace("\n", " ")[:3800]))
+    print("::warning title=%s::%s" % (t, s.replace("%", "%25").replace("\r", " ").replace("\n", " ## ")[:3900]))
 
 
-for name, url in [("mc_new", "https://www.moneycontrol.com/markets/fii-dii-data/"),
-                  ("mc_old", "https://www.moneycontrol.com/stocks/marketstats/fii_dii_activity/index.php")]:
-    st, h = get(url)
-    apis = sorted(set(re.findall(r"https?://[a-z0-9.-]*moneycontrol\.com/[^\"'\s<>]*(?:fii|dii|FII)[^\"'\s<>]*", h)))
-    warn(name + "_status", "%s %d bytes; api-like urls: %s" % (st, len(h), " , ".join(apis)[:2500]))
-    nd = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', h, re.S)
-    if nd:
-        j = nd.group(1)
-        warn(name + "_next", "NEXT_DATA %d chars: %s" % (len(j), j[:3500]))
-    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", h, re.S)
-    txt = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " | ", r)).strip() for r in rows]
-    txt = [t for t in txt if re.search(r"\d", t)]
-    warn(name + "_rows", "%d rows: %s" % (len(txt), " ## ".join(txt[:40])))
+for name, url in [("main", "https://www.moneycontrol.com/markets/fii-dii-data/"),
+                  ("cash", "https://www.moneycontrol.com/markets/fii-dii-data/cash/")]:
+    try:
+        pp = nd(url)
+        lines = [l for l in shape(pp) if "[list" in l]
+        warn(name, "\n".join(lines))
+    except Exception as e:
+        warn(name, "ERR " + str(e))
