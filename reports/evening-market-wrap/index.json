@@ -1,0 +1,21 @@
+{
+ "schedule_id": "evening-market-wrap",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T19:02:32+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Evening Market Wrap 16 Oct (late catch-up)",
+   "note": "",
+   "files": [
+    {
+     "name": "Evening_Market_Wrap_2026-10-16.pdf",
+     "path": "reports/evening-market-wrap/Evening_Market_Wrap_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 572566
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T19:02:32+05:30"
+}
