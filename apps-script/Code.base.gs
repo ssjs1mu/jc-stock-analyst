@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 11, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 12, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -179,10 +179,10 @@ function ytLive_(channel) {
   var cache = CacheService.getScriptCache(), key = 'ytl_' + channel, hit = cache.get(key);
   if (hit) return hit;
   var r = UrlFetchApp.fetch('https://www.youtube.com/channel/' + channel + '/live', { muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.9', 'Cookie': 'CONSENT=YES+1; SOCS=CAI' } });
-  var t = r.getContentText(), live = /"isLive":true/.test(t);
+  var t = r.getContentText(), live = /"isLive":true|"isLiveNow":true|BADGE_STYLE_TYPE_LIVE_NOW|"liveBroadcastDetails":\{[^}]*"isLiveNow":true/.test(t);
   var m = /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})"/.exec(t) || /"videoId":"([\w-]{11})"/.exec(t);
-  var out = JSON.stringify({ ok: !!(m && live), vid: m ? m[1] : '', live: live, ts: new Date().toISOString() });
-  if (m && live) cache.put(key, out, 240);
+  var out = JSON.stringify({ ok: !!m, vid: m ? m[1] : '', live: live, lc: /"isLiveContent":true/.test(t), ts: new Date().toISOString() });
+  if (m) cache.put(key, out, live ? 240 : 60);
   return out;
 }
 function preOpen_() {
