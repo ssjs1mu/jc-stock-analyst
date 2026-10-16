@@ -1,0 +1,21 @@
+{
+ "schedule_id": "circuit-watch",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T21:10:24+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Circuit Watch - session 16 Oct 2026: Sensex 74,729.27 (+0.56%), Nifty 23,146.15 (+0.65%)",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-16.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 9048
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T21:10:24+05:30"
+}
