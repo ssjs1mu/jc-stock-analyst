@@ -170,15 +170,17 @@ def pick_model(key):
                                      headers={"x-goog-api-key": key})
         ms = json.loads(urllib.request.urlopen(req, timeout=30).read()).get("models", [])
         names = [m["name"].split("/")[-1] for m in ms if "generateContent" in m.get("supportedGenerationMethods", [])]
-        bad = ("lite", "image", "tts", "audio", "live", "thinking", "embedding", "preview", "exp", "robotics", "computer")
-        cand = [n for n in names if "flash" in n and not any(b in n for b in bad)]
+        bad = ("image", "tts", "audio", "live", "thinking", "embedding", "preview", "exp", "robotics", "computer")
+        cand = [n for n in names if ("flash" in n or "pro" in n) and not any(b in n for b in bad)]
         def ver(n):
             m = re.search(r"gemini-(\d+(?:\.\d+)?)", n)
             return float(m.group(1)) if m else 0
-        cand.sort(key=lambda n: (-ver(n), len(n)))
+        # plain flash first, then flash-lite, then pro; newest version first within each group
+        grp = lambda n: 0 if "lite" not in n and "pro" not in n else (1 if "lite" in n else 2)
+        cand.sort(key=lambda n: (grp(n), -ver(n), len(n)))
         if cand:
-            print("Gemini models:", cand[:3])
-            return cand[:3]
+            print("Gemini models:", cand[:4])
+            return cand[:4]
     except Exception as e:
         print("model list failed:", str(e)[:120])
     return ["gemini-flash-latest"]
