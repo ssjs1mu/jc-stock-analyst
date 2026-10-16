@@ -1,0 +1,21 @@
+{
+ "schedule_id": "morning-detailed",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T15:48:00+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Late catch-up: detailed 16 Oct view - IT-led rally, FIIs still net sellers",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Detailed_2026-10-16.pdf",
+     "path": "reports/morning-detailed/JCGG_Morning_Updates_Detailed_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 690284
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T15:48:00+05:30"
+}
