@@ -1,0 +1,21 @@
+{
+ "schedule_id": "premarket-news",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T15:47:56+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Late catch-up: stock-level news and results from 16 Oct",
+   "note": "",
+   "files": [
+    {
+     "name": "Market_News_2026-10-16.pdf",
+     "path": "reports/premarket-news/Market_News_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 470837
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T15:47:56+05:30"
+}
