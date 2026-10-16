@@ -740,6 +740,7 @@ function installTelegramTrigger() {
   ScriptApp.newTrigger('tgPostReports').timeBased().everyMinutes(5).create();
 }
 function tgPostReports() {
+  var pp = PropertiesService.getScriptProperties(); if (!pp.getProperty('TG_TOKEN') || !pp.getProperty('TG_CHAT')) return 0; // not configured yet - stay quiet
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
   TG_IDS.forEach(function (id) {
