@@ -24,6 +24,7 @@ common to all of them. Read both before doing anything.
   means the actual last trading session.
 
 ## 3. Research rules (all reports)
+- Read `schedules/SOURCES.md` first: it lists the genuine sources to use and the no-waiting rules for unattended runs.
 - Fresh session, no memory: research every figure live (WebSearch/WebFetch).
 - Never fabricate a number, company, call, IPO or corporate action. An honest
   "none scheduled" / "n/a — not verifiable" row is correct.
