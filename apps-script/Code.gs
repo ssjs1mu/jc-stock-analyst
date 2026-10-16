@@ -10,7 +10,7 @@
  *                                 quarterly + annual filed results, promoter holding  — best effort, NSE may reject cookies
  *   ?action=earn&symbols=A,B,C     Yahoo calendarEvents (next earnings date) for up to 40 NSE symbols in parallel — fallback when NSE blocks Google
  *   ?action=dash&symbols=^NSEI,GC=F,...   Joshi's Dashboard: one call returns price, previous close, last-tick time and an intraday sparkline for up to 60 Yahoo symbols (cached 20 s)
- *   ?action=in10y   India 10-year G-Sec yield (Stooq daily series: last, previous, sparkline)
+ *   ?action=in10y   India 10-year G-Sec yield (CNBC quote feed: last + previous close)
  *   ?action=pcr     Nifty put-call ratio (open interest, nearest expiry) from the NSE option chain — best effort, NSE may reject Google
  *   ?action=wl_load / POST {action:'wl_save',data}   watchlists saved as JC_Watchlists.json in YOUR Google Drive (symbols sorted A–Z)
  *   ?action=upcoming&days=7       NSE event calendar + board meetings for the next N days, the Nifty 500 list, and a per-call
@@ -192,22 +192,31 @@ function dashQuotes_(symbols) {
 /* ---------- India 10Y G-Sec yield + Nifty PCR (best effort; the app shows n/a when a source refuses) ---------- */
 function in10y_() {
   var cache = CacheService.getScriptCache(), hit = cache.get('in10y'); if (hit) return hit;
-  var r = UrlFetchApp.fetch('https://stooq.com/q/d/l/?s=10yiny.b&i=d', { muteHttpExceptions: true, headers: { 'User-Agent': UA } });
-  var rows = r.getResponseCode() === 200 ? Utilities.parseCsv(r.getContentText()) : [];
-  var data = rows.slice(1).filter(function (c) { return c.length >= 5 && c[4] && !isNaN(parseFloat(c[4])); });
-  if (data.length < 2) throw new Error('India 10Y unavailable (' + r.getResponseCode() + ')');
-  var last = data[data.length - 1], prev = data[data.length - 2];
-  var out = JSON.stringify({ p: parseFloat(last[4]), pc: parseFloat(prev[4]), d: last[0], sp: data.slice(-30).map(function (c) { return parseFloat(c[4]); }) });
-  cache.put('in10y', out, 900); return out;
+  if (cache.get('in10y_fail')) throw new Error('India 10Y feed unavailable (recent failure)');
+  try {
+    var r = UrlFetchApp.fetch('https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=IN10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1', { muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': 'application/json' } });
+    var j = parseJson_(r), q = j && j.FormattedQuoteResult && j.FormattedQuoteResult.FormattedQuote && j.FormattedQuoteResult.FormattedQuote[0];
+    var num = function (v) { return v == null ? NaN : parseFloat(String(v).replace(/[%,]/g, '')); };
+    var p = q ? num(q.last) : NaN, pc = q ? num(q.previous_day_closing) : NaN;
+    if (isNaN(p)) throw new Error('bad response ' + r.getResponseCode());
+    var out = JSON.stringify({ p: p, pc: isNaN(pc) ? null : pc, d: q.last_time || '', sp: [] });
+    cache.put('in10y', out, 900); return out;
+  } catch (e) { cache.put('in10y_fail', '1', 1800); throw new Error('India 10Y unavailable: ' + String(e).slice(0, 80)); }
 }
 function pcrNifty_() {
   var cache = CacheService.getScriptCache(), hit = cache.get('pcr'); if (hit) return hit;
-  var h = nseHeaders_('https://www.nseindia.com/option-chain');
-  var r = UrlFetchApp.fetch('https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY', { headers: h, muteHttpExceptions: true });
-  var j = parseJson_(r), f = j && j.filtered;
-  if (!f || !f.CE || !f.PE || !f.CE.totOI) throw new Error('NSE option chain unavailable (' + r.getResponseCode() + ')');
-  var out = JSON.stringify({ pcr: f.PE.totOI / f.CE.totOI, ce: f.CE.totOI, pe: f.PE.totOI, expiry: j.records && j.records.expiryDates && j.records.expiryDates[0], ts: j.records && j.records.timestamp, u: j.records && j.records.underlyingValue });
-  cache.put('pcr', out, 120); return out;
+  if (cache.get('pcr_fail')) throw new Error('NSE option chain unavailable (recent failure)');
+  if (cache.get('pcr_busy')) throw new Error('NSE option chain request in progress');
+  cache.put('pcr_busy', '1', 120);
+  try {
+    var h = nseHeaders_('https://www.nseindia.com/option-chain');
+    var r = UrlFetchApp.fetch('https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY', { headers: h, muteHttpExceptions: true });
+    var j = parseJson_(r), f = j && j.filtered;
+    if (!f || !f.CE || !f.PE || !f.CE.totOI) throw new Error('NSE ' + r.getResponseCode());
+    var out = JSON.stringify({ pcr: f.PE.totOI / f.CE.totOI, ce: f.CE.totOI, pe: f.PE.totOI, expiry: j.records && j.records.expiryDates && j.records.expiryDates[0], ts: j.records && j.records.timestamp, u: j.records && j.records.underlyingValue });
+    cache.put('pcr', out, 120); return out;
+  } catch (e) { cache.put('pcr_fail', '1', 1800); throw new Error('NSE option chain unavailable: ' + String(e).slice(0, 80)); }
+  finally { cache.remove('pcr_busy'); }
 }
 
 /* ---------- watchlists in Google Drive (needs Drive permission — approve once when redeploying) ---------- */
