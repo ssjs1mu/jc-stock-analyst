@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 12, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 13, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -36,6 +36,7 @@ function doGet(e) {
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
     else if (p.action === 'universe') out = bfUniverse_();
     else if (p.action === 'ytlive') out = ytLive_(p.channel);
+    else if (p.action === 'liveq') out = liveQ_(p.symbols);
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
@@ -159,6 +160,20 @@ function bfUniverse_() {
     if (n5.length && n1.length) { list = n5.filter(function (x) { return !big[x.s]; }); src = 'Nifty 500 minus Nifty 100 (= MidSmallCap 400)'; }
   }
   return JSON.stringify({ src: list.length ? src : '', list: list, ts: new Date().toISOString() });
+}
+/* live quotes for up to ~500 symbols in a handful of Yahoo v7/quote calls (crumb auth): [price, prevClose, open, dayHigh, dayLow, dayVolume, avgVol10d, marketTime] */
+function liveQ_(symbols) {
+  var syms = String(symbols || '').split(',').filter(String).slice(0, 520), out = {}, codes = [];
+  for (var attempt = 0; attempt < 2 && !Object.keys(out).length; attempt++) {
+    var a = yahooAuth_(attempt > 0), reqs = [];
+    for (var i = 0; i < syms.length; i += 100) reqs.push({ url: 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(syms.slice(i, i + 100).join(',')) + '&crumb=' + encodeURIComponent(a.crumb), muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*', 'Cookie': a.cookies } });
+    var rs = UrlFetchApp.fetchAll(reqs); codes = [];
+    rs.forEach(function (r) {
+      codes.push(r.getResponseCode());
+      try { (JSON.parse(r.getContentText()).quoteResponse.result || []).forEach(function (q) { if (q.regularMarketPrice != null) out[q.symbol] = [q.regularMarketPrice, q.regularMarketPreviousClose, q.regularMarketOpen, q.regularMarketDayHigh, q.regularMarketDayLow, q.regularMarketVolume, q.averageDailyVolume10Day, q.regularMarketTime]; }); } catch (e) {}
+    });
+  }
+  return JSON.stringify({ ok: Object.keys(out).length > 0, n: Object.keys(out).length, codes: codes, q: out, ts: Date.now() });
 }
 function dailyBatch_(symbols, range) {
   var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo|1y|2y)$/.test(range) ? range : '3mo', out = {};

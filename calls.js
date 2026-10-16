@@ -207,7 +207,7 @@
   /* ---------- wiring ---------- */
   function paint() {
     const t = window.__curTab, st = window.scrollY;
-    if (t === 'pCalls' && $('pCalls')) { $('pCalls').innerHTML = renderToday() + '<div id="clBig"></div>'; if (window.jcBig) window.jcBig.paint(); window.scrollTo(0, st); }
+    if (t === 'pCalls' && $('pCalls')) { $('pCalls').innerHTML = renderToday() + '<div id="clRadar"></div><div id="clBig"></div>'; if (window.jcRadar) window.jcRadar.paint(); if (window.jcBig) window.jcBig.paint(); window.scrollTo(0, st); }
     if (t === 'pRecs' && $('pRecs')) { $('pRecs').innerHTML = renderRecs(); window.scrollTo(0, st); }
   }
   async function onShow(first) {
