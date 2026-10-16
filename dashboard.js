@@ -327,7 +327,7 @@
     const drv = md ? md.top.map((p) => `<span>${esc(p.name)} <b style="color:${p.v >= 0 ? '#6ee7a0' : '#ff9aa9'}">${esc(p.txt)}</b></span>`).join('') : '';
     return `<div class="jd-hero">
       <div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div></div>
-      <div class="jd-mid"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span><span class="jd-pn">${esc(note)}</span></a><div class="jd-sub">${sub}</div></div>
+      <div class="jd-mid"><img class="jd-ban" src="assets/jc-banner.png" alt="Joshi’s Corner — Shares ◆ Insurance ◆ Restaurant · Connecting People Thru Services…S.I.R" draggable="false"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span><span class="jd-pn">${esc(note)}</span></a><div class="jd-sub">${sub}</div></div>
       <div class="jd-mood" title="Composite of Nifty move, index breadth, VIX, global markets, rupee, crude, US yields${pcrVal() != null ? ' and PCR' : ''}. A reading of today’s tone, not a forecast."><div class="jd-mh">MARKET MOOD</div>${gaugeSVG(md ? md.score : null)}<div class="jd-mv" style="color:${ml[1]}"><b>${md ? md.score : '—'}</b><span>${ml[0]}</span></div><div class="jd-md">${drv}</div></div></div>`;
   }
 
@@ -470,6 +470,8 @@
   .jd-tb{font-size:12.5px}.jd-tb th{color:#4a5878;font-size:9.5px;border-bottom:1.5px solid #c9d3e8}.jd-tb td{padding:5px 4px;border-bottom:1px solid #e3e9f5}.jd-nm{font-size:11.8px;color:#10204a;font-weight:800}.jd-px{font-size:13px;font-weight:800;color:#0a1430}.jd-ch{font-size:11.8px;font-weight:800;color:#34456a}.jd-pc span{font-size:11.5px;min-width:50px;font-weight:800}
   tr.u .jd-pc span{background:#c9f0da;color:#06612f}tr.d .jd-pc span{background:#fbd0d8;color:#a10b27}tr.u .jd-ch{color:#06612f}tr.d .jd-ch{color:#a10b27}.jd-sub td{background:#dfe7f6;color:#2a3b66;font-size:9.6px}
   .jd-nb{font-size:12.4px;color:#0a1430;font-weight:700}.jd-nb small{color:#4a5878}.jd-fn{color:#34456a}
+  .jd-ban{display:block;width:100%;max-width:700px;max-height:215px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}.jd-hero{align-items:center}.jd-clk{align-self:center}
+  @media(max-width:900px){.jd-ban{max-width:100%}}
   @media(max-width:1280px){.jd-board{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"a m" "a r"}.jd-newsw{min-height:0}.jd-newsw>.jd-card{position:static}.jd-newsw .jd-nlist{max-height:520px}}
   @media(max-width:900px){.jd-hero{grid-template-columns:1fr;text-align:center;padding:14px}.jd-mood{margin:0 auto}.jd-time{font-size:34px}.jd-pill{flex-wrap:wrap;justify-content:center}.jd-lane,.jd-axis,.jd-hr{grid-template-columns:90px 1fr}.jd-hours{--hn:90px}.jd-seg span{font-size:8px}}
   @media(max-width:640px){.jd-board{grid-template-columns:1fr;grid-template-areas:"m" "a" "r"}}
