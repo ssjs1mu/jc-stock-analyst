@@ -1094,6 +1094,14 @@ const dotCls = { hit: '#0d8a4b', sl: '#c0233f', eod: '#e0a61a', nt: '#c6cde0' };
 function dotsHtml(a, n = 20) { return `<span class="dots">${a.dots.slice(-n).map((d) => `<i style="background:${dotCls[d[0]]}" title="${esc(d[1] + ' · ' + d[2])}"></i>`).join('')}</span>`; }
 function accKpi(label, v, sub, cls) { return `<div class="kpi"><span class="cap">${label}</span><b class="${cls || ''}">${v}</b><small>${sub || ''}</small></div>`; }
 const callSide = (r) => (r && r.active && r.active.sides && r.active.sides[0] ? r.active.sides[0].side : null);
+/* what to watch when there is no pre-planned call: today's move, and the levels that would turn it into a setup */
+function noTradeWatch(r, plan) {
+  try {
+    const x = plan.ctx, pv = x && x.piv; if (!pv || !isNum(r.cmp)) return '';
+    const mv = isNum(r.chg) && Math.abs(r.chg) >= 2 ? `<span class="nt-mv ${r.chg >= 0 ? 'up' : 'dn'}">${r.chg >= 0 ? '▲' : '▼'} moving ${fmtPct(r.chg, 1)} today with no planned setup — chasing now is a late entry (no edge in back-tests); wait for a pullback or a fresh 5-min close beyond a level below</span>` : '';
+    return `<small class="nt-w">${mv}Watch: above ₹${fmt(x.h)} (prev high) → long idea · below ₹${fmt(x.l)} (prev low) → short idea · pivot R1 ₹${fmt(pv.R1)} / S1 ₹${fmt(pv.S1)} · CPR ₹${fmt(pv.cprBot)}–${fmt(pv.cprTop)}</small>`;
+  } catch (e) { return ''; }
+}
 function htmlWatchBody(list, data, stamp, busy, isLive, ui) {
   if (!list.syms.length) return '<div class="note">This watchlist is empty. Add NSE or BSE symbols above (comma or space separated) — each gets today’s day-trading call (only when several parameters agree), a live tracker and a track record.</div>';
   const all = list.syms.map((s) => data[s] || { sym: s, loading: true }), V = WL.view || { f: 'all', s: 'az' };
@@ -1112,7 +1120,7 @@ function htmlWatchBody(list, data, stamp, busy, isLive, ui) {
     const rm = `<button class="xbtn" title="Remove" onclick="wlRemove('${esc(r.sym)}')">✕</button>`, xr = `<button class="xrbtn" title="Live X-ray of ${esc(symBase(r.sym))}" onclick="jcXray('${esc(r.sym)}')">X-ray</button>`;
     if (!r.ok) { trs += `<tr><td class="lbl"><b>${nm}</b>${rm}</td><td colspan="10" class="rd num-red">${esc(r.reason)}</td></tr>`; return; }
     const plan = r.active; if (!plan) { trs += `<tr><td class="lbl"><b>${nm}</b>${rm}</td><td colspan="10" class="rd">No plan (ATR unavailable)</td></tr>`; return; }
-    if (!plan.sides.length) { const tailN = `<td class="acc">${isNum(r.acc.hit) ? `<b>${pct0(r.acc.hit)}</b> hit<small>${r.acc.trig} trades / ${r.acc.sessions} calls</small>` : '<small>no triggered calls yet</small>'}${dotsHtml(r.acc)}</td>`; trs += `<tr class="nocall"><td class="lbl"><a href="#" class="symlink" onclick="loadSymbol('${esc(r.sym)}');return false">${nm}</a>${xr}${rm}<small>No trade</small></td><td>₹${fmt(r.cmp)}<small class="${r.chg >= 0 ? 'num-green' : 'num-red'}">${fmtPct(r.chg, 2)}</small></td><td colspan="8" class="rd" title="${esc(plan.pts.map((p) => p.label + ' ' + (p.v > 0 ? '+' : '') + p.v + ': ' + p.txt).join('\n'))}"><b>No trade</b> — ${esc((plan.reasons || []).join('; ') || 'no edge')} <small>(score ${plan.score >= 0 ? '+' : ''}${plan.score.toFixed(1)}; calls need ≥ ${JC.CFG.minScore})</small></td>${tailN}</tr>`; return; }
+    if (!plan.sides.length) { const tailN = `<td class="acc">${isNum(r.acc.hit) ? `<b>${pct0(r.acc.hit)}</b> hit<small>${r.acc.trig} trades / ${r.acc.sessions} calls</small>` : '<small>no triggered calls yet</small>'}${dotsHtml(r.acc)}</td>`; trs += `<tr class="nocall"><td class="lbl"><a href="#" class="symlink" onclick="loadSymbol('${esc(r.sym)}');return false">${nm}</a>${xr}${rm}<small>No trade</small></td><td>₹${fmt(r.cmp)}<small class="${r.chg >= 0 ? 'num-green' : 'num-red'}">${fmtPct(r.chg, 2)}</small></td><td colspan="8" class="rd" title="${esc(plan.pts.map((p) => p.label + ' ' + (p.v > 0 ? '+' : '') + p.v + ': ' + p.txt).join('\n'))}"><b>No trade</b> — ${esc((plan.reasons || []).join('; ') || 'no edge')} <small>(score ${plan.score >= 0 ? '+' : ''}${plan.score.toFixed(1)}; calls need ≥ ${JC.CFG.minScore})</small>${noTradeWatch(r, plan)}</td>${tailN}</tr>`; return; }
     const todayEv = r.liveNow && r.today ? r.today.res.sides : null;
     plan.sides.forEach((sd, i) => {
       const ev = todayEv ? (todayEv.find((x) => x.sd.dir === sd.dir) || {}).ev : null;

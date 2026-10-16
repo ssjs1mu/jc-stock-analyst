@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 9, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 10, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -34,6 +34,9 @@ function doGet(e) {
     else if (p.action === 'calls_reconcile') out = callsReconcile_();
     else if (p.action === 'fetch') out = proxyFetch_(p.url);
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
+    else if (p.action === 'universe') out = universe_(p.idx);
+    else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
+    else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
     else out = JSON.stringify({ error: 'unknown action' });
   } catch (err) { out = JSON.stringify({ error: String(err) }); }
@@ -130,6 +133,53 @@ function nifty500_(diag) {
   }
   if (out.length) cache.put('n500', JSON.stringify(out), 21600);
   return out;
+}
+
+/* ---- Pre-Market Big Fish support: index constituents, compact daily bars in batches, NSE pre-open ---- */
+function idxCsv_(file, key) {
+  var cache = CacheService.getScriptCache(), hit = cache.get(key);
+  if (hit) return JSON.parse(hit);
+  var out = [], hosts = ['https://nsearchives.nseindia.com/content/indices/', 'https://archives.nseindia.com/content/indices/', 'https://www.niftyindices.com/IndexConstituent/'];
+  for (var u = 0; u < hosts.length && !out.length; u++) {
+    try {
+      var r = UrlFetchApp.fetch(hosts[u] + file, { muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': 'text/csv,*/*' } });
+      var rows = r.getResponseCode() === 200 ? Utilities.parseCsv(r.getContentText()) : [];
+      for (var i = 1; i < rows.length; i++) { var c = rows[i]; if (c.length >= 3 && c[2]) out.push({ s: String(c[2]).trim(), n: c[0], i: c[1] }); }
+    } catch (e) {}
+  }
+  if (out.length) cache.put(key, JSON.stringify(out), 21600);
+  return out;
+}
+function universe_(idx) {
+  var src = 'Nifty MidSmallCap 400', list = idxCsv_('ind_niftymidsmallcap400list.csv', 'msc400');
+  if (!list.length) {
+    var n5 = idxCsv_('ind_nifty500list.csv', 'n500b'), n1 = idxCsv_('ind_nifty100list.csv', 'n100b'), big = {};
+    n1.forEach(function (x) { big[x.s] = 1; });
+    if (n5.length && n1.length) { list = n5.filter(function (x) { return !big[x.s]; }); src = 'Nifty 500 minus Nifty 100 (= MidSmallCap 400)'; }
+  }
+  return JSON.stringify({ src: list.length ? src : '', list: list, ts: new Date().toISOString() });
+}
+function dailyBatch_(symbols, range) {
+  var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo)$/.test(range) ? range : '3mo', out = {};
+  var reqs = syms.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
+  var rs = UrlFetchApp.fetchAll(reqs);
+  rs.forEach(function (r, i) {
+    try {
+      var j = JSON.parse(r.getContentText()), res = j.chart.result[0], q = res.indicators.quote[0], t = res.timestamp, o = { t: [], o: [], h: [], l: [], c: [], v: [] };
+      for (var k = 0; k < t.length; k++) { if (q.close[k] == null || q.high[k] == null || q.low[k] == null || q.open[k] == null) continue; o.t.push(t[k]); o.o.push(q.open[k]); o.h.push(q.high[k]); o.l.push(q.low[k]); o.c.push(q.close[k]); o.v.push(q.volume[k] || 0); }
+      if (o.t.length) out[syms[i]] = o;
+    } catch (e) {}
+  });
+  return JSON.stringify({ n: Object.keys(out).length, bars: out });
+}
+function preOpen_() {
+  try {
+    var h = nseHeaders_('https://www.nseindia.com/market-data/pre-open-market-cm-and-emerge-market');
+    var r = UrlFetchApp.fetch('https://www.nseindia.com/api/market-data-pre-open?key=ALL', { muteHttpExceptions: true, headers: h });
+    var j = JSON.parse(r.getContentText()), rows = {};
+    (j.data || []).forEach(function (d) { var m = d.metadata || d; if (m && m.symbol) rows[m.symbol] = { p: m.previousClose, i: m.iep || m.lastPrice, c: m.pChange, q: m.finalQuantity || m.totalTradedVolume || 0, b: m.totalBuyQuantity || 0, a: m.totalSellQuantity || 0 }; });
+    return JSON.stringify({ ok: Object.keys(rows).length > 0, n: Object.keys(rows).length, ts: new Date().toISOString(), rows: rows });
+  } catch (e) { return JSON.stringify({ ok: false, err: String(e).slice(0, 100) }); }
 }
 
 function upcomingResults_(days) {
