@@ -177,11 +177,11 @@ def pick_model(key):
             return float(m.group(1)) if m else 0
         cand.sort(key=lambda n: (-ver(n), len(n)))
         if cand:
-            print("Gemini model:", cand[0])
-            return cand[0]
+            print("Gemini models:", cand[:3])
+            return cand[:3]
     except Exception as e:
         print("model list failed:", str(e)[:120])
-    return "gemini-flash-latest"
+    return ["gemini-flash-latest"]
 
 
 def gemini(prompt):
@@ -189,23 +189,26 @@ def gemini(prompt):
     if not key:
         return None
     LAST_ERR[0] = "unknown"
-    model = os.environ.get("GEMINI_MODEL") or pick_model(key)
-    url = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent" % model
+    models = [os.environ["GEMINI_MODEL"]] if os.environ.get("GEMINI_MODEL") else pick_model(key)
     body = json.dumps({"contents": [{"parts": [{"text": prompt}]}],
                        "generationConfig": {"temperature": 0.3, "responseMimeType": "application/json"}}).encode()
-    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json", "x-goog-api-key": key})
-    try:
-        j = json.loads(urllib.request.urlopen(req, timeout=60).read())
-        txt = j["candidates"][0]["content"]["parts"][0]["text"]
-        return json.loads(txt)
-    except urllib.error.HTTPError as e:
-        LAST_ERR[0] = "HTTP %s %s" % (e.code, e.read()[:300].decode("utf8", "replace"))
-        print("Gemini unavailable:", LAST_ERR[0])
-        return None
-    except Exception as e:
-        LAST_ERR[0] = str(e)[:300]
-        print("Gemini unavailable:", LAST_ERR[0])
-        return None
+    import time
+    for attempt in range(6):
+        model = models[attempt % len(models)]
+        url = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent" % model
+        req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json", "x-goog-api-key": key})
+        try:
+            j = json.loads(urllib.request.urlopen(req, timeout=90).read())
+            return json.loads(j["candidates"][0]["content"]["parts"][0]["text"])
+        except urllib.error.HTTPError as e:
+            LAST_ERR[0] = "HTTP %s %s" % (e.code, e.read()[:200].decode("utf8", "replace"))
+            if e.code not in (429, 500, 502, 503, 504):
+                break
+        except Exception as e:
+            LAST_ERR[0] = str(e)[:300]
+        print("Gemini retry %d: %s" % (attempt + 1, LAST_ERR[0][:120]))
+        time.sleep(6 * (attempt + 1))
+    return None
 
 
 def commentary(kind, facts, headlines):
