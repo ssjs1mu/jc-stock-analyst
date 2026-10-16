@@ -5,7 +5,7 @@ Follow `schedules/RUNBOOK.md`. Must be posted by 21:00 IST.
 Holiday: short one-page notice (same template) stating markets are closed and naming the next session.
 
 ## Research (each with close/latest level, abs change, % change)
-- Indian snapshot: Nifty 50, Sensex, Bank Nifty, Nifty 500, India VIX (3:30 PM close).
+- Indian snapshot: Nifty 50, Sensex, Bank Nifty, Nifty 500, India VIX (3:30 PM close; F&O stocks settle via the 3:35 PM closing auction).
 - Global wrap: Dow, S&P 500, Nasdaq, FTSE 100, Nikkei 225, Hang Seng — use what's genuinely available, note timing.
 - Currencies, commodities & bonds: USD/INR, DXY, Brent (US$/bbl), Gold (Rs./10g 24K — state unit), 10Y G-Sec, 10Y UST.
 - Stocks in Focus: single biggest Nifty 500 gainer and loser (name, close, % change) — Trendlyne/Moneycontrol/NSE.

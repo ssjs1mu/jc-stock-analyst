@@ -22,7 +22,7 @@ Never fabricate data to fill the gap.
 
 ## Config for `pipeline/render_cas_infographic.py`
 `title` "Closing Auction Divergence"; `subline` raw HTML, e.g.
-"Wednesday, 02 September 2026 &middot; F&amp;O universe, &plusmn;1% or more: 3:15 PM reference &rarr; 3:40 PM auction close";
+"Wednesday, 02 September 2026 &middot; F&amp;O universe, &plusmn;1% or more: 3:15 PM reference (VWAP of 3:00&ndash;3:15) &rarr; CAS close (~3:35 PM)";
 `threshold` "1"; then either `not_published`, or `stocks` [{symbol, ref_price, final_price, pct_chg float, catalyst}],
 or neither (empty state).
 

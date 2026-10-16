@@ -9,6 +9,7 @@
  *   ?action=nse&symbol=RELIANCE   NSE: circuit band (DPR), delivery history, board-meeting (result) dates,
  *                                 quarterly + annual filed results, promoter holding  — best effort, NSE may reject cookies
  *   ?action=earn&symbols=A,B,C     Yahoo calendarEvents (next earnings date) for up to 40 NSE symbols in parallel — fallback when NSE blocks Google
+ *   ?action=dash&symbols=^NSEI,GC=F,...   Joshi's Dashboard: one call returns price, previous close, last-tick time and an intraday sparkline for up to 60 Yahoo symbols (cached 20 s)
  *   ?action=wl_load / POST {action:'wl_save',data}   watchlists saved as JC_Watchlists.json in YOUR Google Drive (symbols sorted A–Z)
  *   ?action=upcoming&days=7       NSE event calendar + board meetings for the next N days, the Nifty 500 list, and a per-call
  *                                 'diag' report (HTTP status / rows) so a blocked or empty NSE response is visible in the app
@@ -19,8 +20,9 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 6, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 7, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
+    else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'wl_load') out = wlLoad_();
     else if (p.action === 'fetch') out = proxyFetch_(p.url);
     else if (p.action === 'nse') out = nseBundle_(p.symbol);
@@ -161,6 +163,26 @@ function earnDates_(symbols) {
   }
   pending.forEach(function (s) { out.push({ s: s, d: [], err: 401 }); });
   return JSON.stringify({ rows: out });
+}
+
+/* ---------- Joshi's Dashboard: batched live quotes (Yahoo chart feed, 15-min bars) ---------- */
+function dashQuotes_(symbols) {
+  var list = String(symbols || '').split(',').map(function (x) { return x.trim(); }).filter(function (x) { return /^[A-Za-z0-9\^=.\-&]+$/.test(x); }).slice(0, 60);
+  if (!list.length) throw new Error('symbols required');
+  var cache = CacheService.getScriptCache(), key = 'dash:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, list.join(','))).slice(0, 40), hit = cache.get(key);
+  if (hit) return hit;
+  var rs = UrlFetchApp.fetchAll(list.map(function (s) {
+    return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=1d&interval=15m&includePrePost=false', headers: { 'User-Agent': UA, 'Accept': '*/*' }, muteHttpExceptions: true };
+  }));
+  var rows = rs.map(function (r, i) {
+    var j = parseJson_(r), x = j && j.chart && j.chart.result && j.chart.result[0];
+    if (!x) return { s: list[i], err: r.getResponseCode() };
+    var m = x.meta || {}, q = (x.indicators && x.indicators.quote && x.indicators.quote[0]) || {}, c = (q.close || []).filter(function (v) { return v != null; }).slice(-40).map(function (v) { return Math.round(v * 10000) / 10000; });
+    return { s: list[i], p: m.regularMarketPrice, pc: m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose, t: m.regularMarketTime, sp: c };
+  });
+  var out = JSON.stringify({ rows: rows, ts: new Date().toISOString() });
+  if (out.length < 90000) cache.put(key, out, 20);
+  return out;
 }
 
 /* ---------- watchlists in Google Drive (needs Drive permission — approve once when redeploying) ---------- */

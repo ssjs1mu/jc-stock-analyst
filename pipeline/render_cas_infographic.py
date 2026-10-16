@@ -46,7 +46,7 @@ def stock_card(s):
       <div class="chg-badge {d}"><span class="arrow">{arrow}</span>{sign}{chg:.2f}%</div></div>
       <div class="price-row"><div class="price-block"><span class="price-label">3:15 PM Ref</span><span class="price-val num">{esc(s["ref_price"])}</span></div>
       <div class="price-arrow">&#8594;</div>
-      <div class="price-block"><span class="price-label">3:40 PM Close</span><span class="price-val num hl-{d}">{esc(s["final_price"])}</span></div></div>
+      <div class="price-block"><span class="price-label">CAS Close</span><span class="price-val num hl-{d}">{esc(s["final_price"])}</span></div></div>
       <p class="catalyst">{esc(s.get("catalyst", "No clear catalyst identified for this session"))}</p></div>'''
 
 
