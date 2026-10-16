@@ -23,7 +23,7 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 13, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 14, ts: new Date().toISOString() });
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
@@ -161,7 +161,7 @@ function bfUniverse_() {
   }
   return JSON.stringify({ src: list.length ? src : '', list: list, ts: new Date().toISOString() });
 }
-/* live quotes for up to ~500 symbols in a handful of Yahoo v7/quote calls (crumb auth): [price, prevClose, open, dayHigh, dayLow, dayVolume, avgVol10d, marketTime] */
+/* live quotes for up to ~500 symbols in a handful of Yahoo v7/quote calls (crumb auth): [price, prevClose, open, dayHigh, dayLow, dayVolume, avgVol10d, marketTime, 52wHigh, 52wLow] */
 function liveQ_(symbols) {
   var syms = String(symbols || '').split(',').filter(String).slice(0, 520), out = {}, codes = [];
   for (var attempt = 0; attempt < 2 && !Object.keys(out).length; attempt++) {
@@ -170,7 +170,7 @@ function liveQ_(symbols) {
     var rs = UrlFetchApp.fetchAll(reqs); codes = [];
     rs.forEach(function (r) {
       codes.push(r.getResponseCode());
-      try { (JSON.parse(r.getContentText()).quoteResponse.result || []).forEach(function (q) { if (q.regularMarketPrice != null) out[q.symbol] = [q.regularMarketPrice, q.regularMarketPreviousClose, q.regularMarketOpen, q.regularMarketDayHigh, q.regularMarketDayLow, q.regularMarketVolume, q.averageDailyVolume10Day, q.regularMarketTime]; }); } catch (e) {}
+      try { (JSON.parse(r.getContentText()).quoteResponse.result || []).forEach(function (q) { if (q.regularMarketPrice != null) out[q.symbol] = [q.regularMarketPrice, q.regularMarketPreviousClose, q.regularMarketOpen, q.regularMarketDayHigh, q.regularMarketDayLow, q.regularMarketVolume, q.averageDailyVolume10Day, q.regularMarketTime, q.fiftyTwoWeekHigh, q.fiftyTwoWeekLow]; }); } catch (e) {}
     });
   }
   return JSON.stringify({ ok: Object.keys(out).length > 0, n: Object.keys(out).length, codes: codes, q: out, ts: Date.now() });

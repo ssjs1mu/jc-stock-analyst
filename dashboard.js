@@ -158,6 +158,17 @@
     return (w.fut || w.open.us) ? 120 : 1200;
   }
   const wantNow = (ms) => { const defs = mktDef(ms), open = {}; defs.forEach((m) => { open[m.k] = isOpen(m, ms); }); return { open, ist: indiaState(ms), fx: FX_OPEN(ms), fut: FUT_OPEN(ms) }; };
+  /* Yahoo has no feed for some NSE sector indices: estimate their % change as the equal-weight average of the constituents' live change (marked "est.") */
+  const IDXC = { 'NIFTY_CONSR_DURBL.NS': 'AMBER BATAINDIA BLUESTARCO CROMPTON DIXON HAVELLS KAJARIACER KALYANKJIL LGEINDIA PGEL THANGAMAYL TITAN VOLTAS WHIRLPOOL', 'NIFTY_HEALTHCARE.NS': 'ABBOTINDIA ALKEM APOLLOHOSP AUROPHARMA BIOCON CIPLA DIVISLAB DRREDDY FORTIS GLAND GLENMARK IPCALAB KIMS LAURUSLABS LUPIN MANKIND MAXHEALTH SUNPHARMA TORNTPHARM ZYDUSLIFE', 'NIFTY_IND_DEFENCE.NS': 'AXISCADES AEQUS APOLLO ASTRAMICRO BEML BDL BEL BHARATFORG CENTUM COCHINSHIP DATAPATTNS DYNAMATECH GRSE HAL MTARTECH MAZDOCK MIDHANI PARAS SIGMAADV SOLARINDS UNIMECH ZENTEC', 'NIFTY_IND_DIGITAL.NS': 'AFFLE BLS BHARTIARTL BHARTIHEXA BSOFT BBOX FIRSTCRY CARTRADE COFORGE CYIENT ETERNAL NYKAA FRACTAL HCLTECH HEXT ITI INDIAMART IRCTC NAUKRI INFY INTELLECT IKS KPITTECH LTTS LTM MEESHO MPHASIS NETWEB PAYTM OFSS POLICYBZR PERSISTENT PWL PINELABS RAILTEL SAGILITY STLTECH SWIGGY TBOTEK TATACOMM TCS TATAELXSI TATATECH TTML TECHM TEJASNET URBANCO IDEA WIPRO ZENSARTECH', 'NIFTY_MIDCAP_100.NS': '360ONE APLAPOLLO AUBANK ATGL ABCAPITAL APARINDS ASHOKLEY ASTRAL AUROPHARMA BANKINDIA MAHABANK BDL BHARATFORG BHEL GROWW BIOCON BLUESTARCO COCHINSHIP COFORGE COLPAL CONCOR DABUR DIXON EXIDEIND NYKAA FEDERALBNK FORTIS GVT&D GMRAIRPORT GLENMARK GODFRYPHLP GODREJPROP HAVELLS HEROMOTOCO HINDCOPPER HINDPETRO ICICIGI ICICIAMC IDFCFIRSTB INDIANB INDHOTEL IRCTC IREDA INDUSTOWER INDUSINDBK NAUKRI JSWENERGY JUBLFOOD KEI KALYANKJIL LTF LGEINDIA LICHSGFIN LAURUSLABS LENSKART LICI LODHA LUPIN MRF M&MFIN MANKIND MARICO MFSL MEESHO MOTILALOFS MPHASIS MCX NHPC NLCINDIA NMDC NATIONALUM OBEROIRLTY OIL PAYTM OFSS POLICYBZR PIIND PAGEIND PATANJALI PERSISTENT PHOENIXLTD PREMIERENE PRESTIGE RECLTD RADICO RVNL SBICARD SRF SAIL SUPREMEIND SUZLON SWIGGY TATACOMM TIINDIA UPL UNITDSPR VMM VOLTAS WAAREEENER YESBANK', 'NIFTY_OIL_AND_GAS.NS': 'ATGL AEGISLOG AEGISVOPAK BPCL CASTROLIND CHENNPETRO GAIL HINDPETRO IOC IGL MGL ONGC OIL PETRONET RELIANCE', 'NIFTY_PVT_BANK.NS': 'AXISBANK BANDHANBNK FEDERALBNK HDFCBANK ICICIBANK IDFCFIRSTB INDUSINDBK KOTAKBANK RBLBANK YESBANK' };
+  async function deriveIdx(ms, w) {
+    const be = getBackend(); if (!be || S.estBusy || (S.estDue && ms < S.estDue)) return; S.estBusy = true;
+    try {
+      const miss = Object.keys(IDXC).filter((k) => !(S.q[k] && !S.q[k].est)); if (!miss.length) return;
+      const syms = [...new Set(miss.flatMap((k) => IDXC[k].split(' ')))].map((x) => x + '.NS');
+      const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=liveq&symbols=' + encodeURIComponent(syms.join(','))), 30000)); if (!j || !j.ok) return;
+      miss.forEach((k) => { const L = IDXC[k].split(' '), ps = L.map((x) => j.q[x + '.NS']).filter((q) => q && q[1]).map((q) => (q[0] / q[1] - 1) * 100); if (ps.length >= Math.max(3, L.length * 0.6)) { const a = ps.reduce((x, y) => x + y, 0) / ps.length; S.q[k] = { s: k, p: 100 * (1 + a / 100), pc: 100, t: Math.floor(Date.now() / 1000), sp: [], est: true, n: ps.length }; } });
+    } catch (e) { } finally { S.estBusy = false; S.estDue = ms + (w.ist.cls !== 'off' ? 90000 : 900000); paint(); }
+  }
   async function refresh(force) {
     if (S.busy) return; const ms = Date.now(), w = wantNow(ms); S.busy = true; setBusy(true);
     try {
@@ -171,7 +182,7 @@
       }
     } catch (e) { S.err = (e && e.message) || 'Refresh failed'; }
     finally { S.busy = false; setBusy(false); paint(); }
-    extras(false); news(false);
+    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now()));
   }
 
   /* India 10Y + Nifty PCR: best-effort extras. NSE and some bond sites refuse Google's servers, so each is retried
@@ -226,12 +237,9 @@
     return { score, top, parts };
   }
   const moodLabel = (s) => s >= 80 ? ['VERY BULLISH', '#0b7a3f'] : s >= 60 ? ['BULLISH', '#2ea05f'] : s >= 40 ? ['NEUTRAL', '#c79a1b'] : s >= 20 ? ['BEARISH', '#e0643a'] : ['VERY BEARISH', '#b3162f'];
-  function gaugeSVG(score) {
-    const cx = 100, cy = 92, R = 78, r = 54, cols = ['#b3162f', '#e0643a', '#e9bd2d', '#7bc47a', '#0b7a3f'];
-    const arc = (a0, a1, col) => { const p = (a, rad) => [cx + rad * Math.cos(Math.PI - a * Math.PI), cy - rad * Math.sin(Math.PI - a * Math.PI)]; const [x0, y0] = p(a0, R), [x1, y1] = p(a1, R), [x2, y2] = p(a1, r), [x3, y3] = p(a0, r); return `<path d="M${x0.toFixed(1)} ${y0.toFixed(1)}A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}A${r} ${r} 0 0 0 ${x3.toFixed(1)} ${y3.toFixed(1)}Z" fill="${col}"/>`; };
-    const arcs = cols.map((c, i) => arc(i / 5 + .006, (i + 1) / 5 - .006, c)).join('');
-    const ang = -90 + (score == null ? 50 : score) * 1.8;
-    return `<svg viewBox="0 0 200 108" class="jd-gauge" aria-hidden="true">${arcs}<g class="jd-needle" style="transform:rotate(${ang}deg);transform-origin:${cx}px ${cy}px"><path d="M${cx - 3} ${cy}L${cx} ${cy - 70}L${cx + 3} ${cy}Z" fill="#fff"/></g><circle cx="${cx}" cy="${cy}" r="7" fill="#fff"/><circle cx="${cx}" cy="${cy}" r="3" fill="#0f2352"/></svg>`;
+  function gaugeSVG(score) { // horizontal heartbeat bar with a needle at the level
+    const sc = score == null ? 50 : Math.max(0, Math.min(100, score));
+    return `<div class="jd-mbar" aria-hidden="true" style="--pos:${sc}%"><div class="jd-mtrack"><i></i><i></i><i></i><i></i><i></i></div><div class="jd-mneedle"><b></b></div></div><div class="jd-mscale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>`;
   }
 
   /* ---------- PCR / 10Y values ---------- */
@@ -283,9 +291,8 @@
 
   function colIndia(ms) {
     const top = IN_TOP.map((it) => row(it[0], it[1], it[2], ms, { flag: it[0] === 'USDINR=X' ? null : 'in' })).join('') + in10yRow() + pcrRow();
-    const rest = NIFTY_OTHERS.map((it) => row(it[0], it[1], {}, ms)).join('');
     return card('Indian markets', '🇮🇳', `<table class="jd-tb" id="jd-in">${head}<tbody>${top}</tbody></table>`, `<span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${indiaState(ms).cls !== 'off' ? '● LIVE' : 'CLOSED'}</span>`)
-      + card('Nifty indices <small>A → Z</small>', '📈', `<div class="jd-scroll"><table class="jd-tb">${head}<tbody>${rest}</tbody></table></div>`);
+      + (window.jcSig ? window.jcSig.html(ms) : '');
   }
   function colGlobal(ms) {
     const w = wantNow(ms); const anyOpen = ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]);
@@ -307,10 +314,10 @@
 
   function heatHTML(ms) {
     const all = [['^NSEI', 'NIFTY 50'], ['^NSEBANK', 'BANK NIFTY'], ['^BSESN', 'SENSEX']].concat(NIFTY_OTHERS.map((x) => [x[0], x[1].replace(/^NIFTY /, '')]));
-    const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], sym: it[0], p: pct, px: q ? q.p : null, big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
+    const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], sym: it[0], p: pct, px: q ? q.p : null, est: !!(q && q.est), big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
     const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
     const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
-    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" data-xr="${esc(i.sym)}" style="cursor:pointer;background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for live X-ray"><b>${esc(i.n)}</b><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" data-xr="${esc(i.sym)}" style="cursor:pointer;background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for live X-ray"><b>${esc(i.n)}</b><em class="jd-hmv">${i.px == null ? '' : i.est ? '≈ est.' : fmtN(i.px, i.px >= 1000 ? 0 : 2)}</em><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
     const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
     return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div><div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
   }
@@ -326,10 +333,10 @@
     const md = moodScore(), ml = md ? moodLabel(md.score) : ['LOADING', '#8a94ad'];
     const drv = md ? md.top.map((p) => `<span>${esc(p.name)} <b style="color:${p.v >= 0 ? '#6ee7a0' : '#ff9aa9'}">${esc(p.txt)}</b></span>`).join('') : '';
     return `<div class="jd-hero">
-      <div class="jd-left"><div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div><div class="jd-livebox"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span></a><div class="jd-sub">${sub}</div><div class="jd-sub jd-sn">${esc(note)}</div></div></div>
+      <div class="jd-left"><div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div><div class="jd-livebox"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span></a></div></div>
       <div class="jd-mood" title="${md ? esc(md.top.map((p) => p.name + ' ' + p.txt).join(' · ')) + ' — ' : ''}Composite of Nifty move, index breadth, VIX, global markets, rupee, crude, US yields${pcrVal() != null ? ' and PCR' : ''}. A reading of today’s tone, not a forecast."><div class="jd-mh">MARKET MOOD</div>${gaugeSVG(md ? md.score : null)}<div class="jd-mv" style="color:${ml[1]}"><b>${md ? md.score : '—'}</b><span>${ml[0]}</span></div></div></div>
       <div class="jd-mid"><img class="jd-ban" src="assets/jc-banner.png" alt="Joshi’s Corner — Shares ◆ Insurance ◆ Restaurant · Connecting People Thru Services…S.I.R" draggable="false"></div>
-      <div class="jd-tv" aria-label="Live business TV">${tvTiles()}</div></div>`;
+      <div class="jd-tv" aria-label="Live business TV">${tvTiles()}<div class="jd-sess"><div class="jd-sub">${sub}</div><div class="jd-sub jd-sn">${esc(note)}</div></div></div></div>`;
   }
 
 
@@ -531,6 +538,12 @@
   @media(max-width:900px){.jd-ban{max-width:100%}}
   .jd-hero{grid-template-columns:minmax(300px,auto) minmax(0,1fr) auto}.jd-livebox{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:12px;max-width:400px}.jd-livebox .jd-pill{width:100%;box-sizing:border-box}.jd-livebox .jd-sub{font-size:11.5px;text-align:left}.jd-livebox .jd-pl small{white-space:nowrap}.jd-livebox .jd-pn{font-size:11px}
   .jd-left{display:flex;align-items:center;gap:18px;min-width:0}.jd-left .jd-mood{width:150px;flex:none}.jd-left .jd-mv{margin-top:-4px}.jd-left .jd-mv b{font-size:21px}.jd-left .jd-mv span{font-size:11px}.jd-left .jd-mh{font-size:9px}
+  .jd-mood{width:190px!important}.jd-mbar{position:relative;margin:7px 4px 0;animation:jdbeat 1.15s ease-in-out infinite;transform-origin:center}.jd-mtrack{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;height:13px;border-radius:7px;overflow:hidden;box-shadow:0 0 14px rgba(255,255,255,.22)}.jd-mtrack i:nth-child(1){background:#b3162f}.jd-mtrack i:nth-child(2){background:#e0643a}.jd-mtrack i:nth-child(3){background:#e9bd2d}.jd-mtrack i:nth-child(4){background:#7bc47a}.jd-mtrack i:nth-child(5){background:#0b7a3f}
+  .jd-mneedle{position:absolute;top:-6px;bottom:-4px;left:var(--pos);width:0;transition:left 1.2s cubic-bezier(.3,1.4,.5,1)}.jd-mneedle:before{content:'';position:absolute;left:-1.5px;top:5px;bottom:0;width:3px;border-radius:2px;background:#fff;box-shadow:0 0 8px #fff}.jd-mneedle b{position:absolute;left:-6px;top:-1px;border:6px solid transparent;border-top:8px solid #fff;border-bottom:0;filter:drop-shadow(0 0 4px #fff)}
+  .jd-mscale{display:flex;justify-content:space-between;margin:5px 2px 0;font-size:8.5px;color:#8fa3d6;font-weight:700}@keyframes jdbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.045)}24%{transform:scale(1)}38%{transform:scale(1.03)}55%{transform:scale(1)}}
+  .jd-livebox{margin-top:8px!important;max-width:210px!important}.jd-livebox .jd-pill{padding:4px 10px!important;gap:7px!important;border-radius:10px!important}.jd-livebox .jd-pl b{font-size:14px!important;letter-spacing:.8px!important}.jd-livebox .jd-pl small{font-size:8px!important;letter-spacing:1px!important}.jd-livebox .jd-dot{width:8px!important;height:8px!important}
+  .jd-sess{margin-top:7px;text-align:left}.jd-sess .jd-sub{font-size:10.5px;text-align:left;line-height:1.4}.jd-sess .jd-sn{opacity:.8;font-size:10px;margin-top:1px}
+  .jd-hmt .jd-hmv{font:700 10px ui-monospace,Consolas,monospace;font-style:normal;opacity:.85}.jd-hmg{grid-auto-rows:66px!important}
   .jd-hero{grid-template-columns:auto minmax(0,1fr) 270px}.jd-left .jd-mood{order:-1}.jd-left{gap:12px}.jd-livebox .jd-sn{font-size:10.5px;opacity:.85;margin-top:-2px}.jd-mid{justify-content:center;align-items:center;text-align:center}.jd-mid .jd-ban{margin:0 auto}
   .jd-tv{position:relative;z-index:1;min-width:0}.jd-tvh{font-size:9.5px;letter-spacing:1.6px;color:#9fb3e6;font-weight:800;margin-bottom:5px}.jd-tvh small{letter-spacing:.2px;font-weight:600;color:#7f95c9;margin-left:4px}
   .jd-tvg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -573,5 +586,6 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
   function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard') window.showTab('pDash'); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  window.__jdS = S; window.jdRepaint = () => { try { paint(); } catch (e) { } };
   window.__jd = { indiaState, mktDef, isOpen, moodScore };
 })();
