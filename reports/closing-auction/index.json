@@ -1,0 +1,27 @@
+{
+ "schedule_id": "closing-auction",
+ "runs": [
+  {
+   "generated_at": "2026-10-16T20:08:55+05:30",
+   "date": "2026-10-16",
+   "status": "ok",
+   "caption": "Closing Auction Divergence, 16 Oct 2026: NSE's CAS report not yet published; no divergence data available.",
+   "note": "",
+   "files": [
+    {
+     "name": "Closing_Auction_Divergence_2026-10-16.pdf",
+     "path": "reports/closing-auction/Closing_Auction_Divergence_2026-10-16.pdf",
+     "type": "pdf",
+     "bytes": 286854
+    },
+    {
+     "name": "Closing_Auction_Divergence_2026-10-16.png",
+     "path": "reports/closing-auction/Closing_Auction_Divergence_2026-10-16.png",
+     "type": "png",
+     "bytes": 230528
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-10-16T20:08:55+05:30"
+}
