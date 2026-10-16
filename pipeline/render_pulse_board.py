@@ -77,7 +77,7 @@ def spark(vals):
         return ""
     lo, hi = min(vals), max(vals)
     rng = (hi - lo) or 1
-    w, h, n = 560, 250, len(vals)
+    w, h, n = 470, 230, len(vals)
     pts = [(10 + i * (w - 20) / (n - 1), h - 20 - (v - lo) / rng * (h - 60)) for i, v in enumerate(vals)]
     bars = ""
     for i, (x, y) in enumerate(pts):
@@ -150,14 +150,14 @@ p{font-size:21px;line-height:1.35;color:#1e3553}
 .ln{font-size:26px;font-weight:800;line-height:1.05}.lz{display:flex;gap:18px}.zone{flex:1;text-align:center;border-top:4px solid #1b9a77;padding-top:6px}
 .zone:nth-child(2){border-top-color:#d6336c}.zone small{display:block;font-size:16px;color:#4a6486}.zone b{font-size:22px;white-space:nowrap}
 .lnote{font-size:17px;line-height:1.25}
-.bp{display:flex;gap:18px;align-items:flex-start}.bp h4{font-size:26px;font-weight:800;margin-bottom:6px}.bp p{font-size:19px;line-height:1.32}
+.bp{display:flex;gap:18px;align-items:flex-start}.bp svg{flex:none}.bp h4{font-size:26px;font-weight:800;margin-bottom:6px}.bp p{font-size:19px;line-height:1.32}
 .foot{position:absolute;left:0;right:0;bottom:0;height:30px;background:#0f2747;color:#c3d1e6;font-size:14px;display:flex;align-items:center;padding:0 40px;gap:30px;white-space:nowrap;overflow:hidden}
 </style></head><body>
 <div class="top"><img src="%s"><h1>%s</h1></div>
 
 <div class="abs" style="left:40px;top:116px;width:480px"><h2>Today's Market Bias<br>&amp; Macro Highlights</h2></div>
-<div class="abs" style="left:40px;top:200px">%s</div>
-<div class="abs" style="left:40px;top:455px;width:520px;font-size:15px;color:#4a6486">%s</div>
+<div class="abs" style="left:40px;top:215px">%s</div>
+<div class="abs" style="left:40px;top:455px;width:470px;font-size:15px;color:#4a6486">%s</div>
 
 <div class="abs" style="left:560px;top:118px;width:450px"><div class="big" style="font-size:34px">%s</div><p style="margin-top:12px">%s</p></div>
 <div class="abs" style="left:1025px;top:118px;width:2px;height:200px;background:#c9d6e6"></div>

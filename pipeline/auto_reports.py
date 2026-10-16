@@ -291,6 +291,18 @@ def build(sid, qs, heads, now):
     gain, lose, shock = movers(qs)
     facts = facts_text(qs, gain, lose)
     cm = commentary(sid, facts, heads)
+    if cm["by"] == "template":
+        def lv_(k): 
+            q = qs.get(k)
+            return "%s (%s)" % (f2(q["last"]), pct(q["pct"])) if q else "n/a"
+        cm["bias"] = ("Nifty 50 at %s and Sensex at %s in the latest session; Bank Nifty %s, India VIX %s. Brent crude %s, gold %s, "
+                      "USD/INR %s. Global cues: Dow %s, Nasdaq %s, Nikkei %s." % (
+                          lv_("^NSEI"), lv_("^BSESN"), lv_("^NSEBANK"), lv_("^INDIAVIX"), lv_("BZ=F"), lv_("GC=F"),
+                          lv_("USDINR=X"), lv_("^DJI"), lv_("^IXIC"), lv_("^N225")))
+        cm["asia_head"] = "Asia & Global Cues"
+        cm["asia_text"] = ("Latest closes: Nikkei %s, Hang Seng %s, Shanghai %s, Kospi %s. Wall Street: Dow %s, S&P 500 %s, "
+                           "Nasdaq %s." % tuple(lv_(k) for k in ("^N225", "^HSI", "000001.SS", "^KS11", "^DJI", "^GSPC", "^IXIC")))
+        cm["vol_text"] = "India VIX %s; USD/INR %s; US 10-yr yield %s." % (lv_("^INDIAVIX"), lv_("USDINR=X"), lv_("^TNX"))
     pv = pivots(qs.get("^NSEI"))
     note = ("Auto-generated at %s IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News "
             "headlines; commentary %s). GIFT Nifty, MCX, FII/DII and option-chain data are not available to "
@@ -395,7 +407,7 @@ def build(sid, qs, heads, now):
             ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in gain[:3]) or "n/a",
             ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in lose[:3]) or "n/a")
         bottom = [
-            {"title": "Latest Headlines", "icon": "list", "text": " | ".join(x[:150] for x in headl[:2])},
+            {"title": "Latest Headlines", "icon": "list", "text": " | ".join(re.sub(r"\s*[-|]\s*[^-|]{3,40}$", "", x)[:95] for x in headl[:2])},
             {"title": "Biggest Movers (Nifty 50)", "icon": "chart", "text": movers_txt},
             {"title": "F&O Expiry Schedule Note", "icon": "cal", "text": exp + " Bank Nifty has monthly expiry only (last Tuesday)."}]
         return {"title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
