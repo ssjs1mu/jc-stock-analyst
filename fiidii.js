@@ -50,14 +50,18 @@
       <text x="2" y="${top + 2}" class="fd-ax">+${Math.round(mx).toLocaleString('en-IN')}</text><text x="2" y="${H - bot - 1}" class="fd-ax">−${Math.round(mx).toLocaleString('en-IN')}</text></svg>`;
   }
 
+  const tone = (v) => v == null ? 'fl' : v > 0 ? 'up' : v < 0 ? 'dn' : 'fl';
+  const gtile = (lab, net, sub, wide, extra) => `<div class="fdg ${tone(net)}${wide ? ' wide' : ''}"><div class="fdg-in"><span class="fdg-l">${lab}</span><b class="fdg-v">${cr(net, 2)}</b><small>${sub}</small>${extra || ''}</div></div>`;
+  function miniBars(list) {
+    const L = list.slice(-20); if (!L.length) return '';
+    const W = 300, H = 40, mid = H / 2, mx = Math.max(1, ...L.map((r) => Math.max(Math.abs(r.fii_net || 0), Math.abs(r.dii_net || 0)))), sc = (mid - 2) / mx, slot = W / L.length, bw = Math.max(2, slot * 0.36);
+    let bars = ''; L.forEach((r, i) => { const x0 = i * slot + slot * 0.12;[[r.fii_net, '#6aa0ff'], [r.dii_net, '#ffb347']].forEach((b, j) => { const v = b[0] || 0, h = Math.max(1, Math.abs(v) * sc); bars += `<rect x="${(x0 + j * bw).toFixed(1)}" y="${(v >= 0 ? mid - h : mid).toFixed(1)}" width="${(bw - 0.6).toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${b[1]}"><title>${dShort(r.date)} · ${j ? 'DII' : 'FII/FPI'} ${cr(v, 2)} cr</title></rect>`; }); });
+    return `<svg class="fdg-sv" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${mid}" y2="${mid}" stroke="rgba(255,255,255,.35)"/>${bars}</svg><div class="fdg-lg"><i style="background:#6aa0ff"></i>FII/FPI <i style="background:#ffb347"></i>DII · last ${L.length} sessions</div>`;
+  }
   function dailyHTML(list) {
     const r = list[list.length - 1]; if (!r) return '<div class="jd-fn">No figures yet.</div>';
-    const tile = (lab, c, net, buy, sell) => `<div class="fd-t" style="--fc:${c}"><span>${lab}</span><b class="${cls(net)}">${cr(net, 2)}</b><small>Buy ${cr(buy, 0).replace('+', '')} · Sell ${cr(sell, 0).replace('+', '')}</small></div>`;
-    const comb = (r.fii_net || 0) + (r.dii_net || 0);
-    const old = r.date !== istToday();
-    return `<div class="fd-day">${dShort(r.date)}${old ? ' <em>(latest available)</em>' : ''} · combined <b class="${cls(comb)}">${cr(comb, 0)}</b></div>
-      <div class="fd-ts">${tile('FII / FPI net', FII_C, r.fii_net, r.fii_buy, r.fii_sell)}${tile('DII net', DII_C, r.dii_net, r.dii_buy, r.dii_sell)}</div>
-      <div class="fd-lg"><i style="background:${FII_C}"></i>FII/FPI <i style="background:${DII_C}"></i>DII <span>net ₹ cr · last ${Math.min(20, list.length)} sessions</span></div>${chart(list)}`;
+    const comb = (r.fii_net || 0) + (r.dii_net || 0), old = r.date !== istToday(), bs = (b, s2) => `Buy ${cr(b, 0).replace('+', '')} · Sell ${cr(s2, 0).replace('+', '')}`;
+    return `<div class="fd-day">${dShort(r.date)}${old ? ' <em>(latest available)</em>' : ''} · ₹ crore</div><div class="fdg-g">${gtile('FII / FPI NET', r.fii_net, bs(r.fii_buy, r.fii_sell))}${gtile('DII NET', r.dii_net, bs(r.dii_buy, r.dii_sell))}${gtile('COMBINED NET', comb, 'FII/FPI + DII', 1, miniBars(list))}</div>`;
   }
 
   // true when weekdays earlier in the same month are missing from the history (month only partly covered)
@@ -68,29 +72,22 @@
   }
   function monthlyHTML(list) {
     const by = months(list), fpi = (S.d && S.d.fpi_equity_monthly) || {};
-    const keys = [...new Set(Object.keys(by).concat(Object.keys(fpi)))].sort().reverse().slice(0, 6);
-    const cur = istToday().slice(0, 7), firstDay = list.length ? list[0].date : '';
-    const rows = keys.map((k) => {
-      const m = by[k], [y, mm] = k.split('-');
-      const partial = m && m.first === firstDay && missedStart(firstDay) ? `<small>from ${dShort(m.first)}</small>` : k === cur ? '<small>MTD</small>' : '';
-      return `<tr><td>${MON[+mm - 1]} ${y.slice(2)} ${partial}</td><td class="${cls(m && m.fii)}">${m ? cr(m.fii) : '—'}</td><td class="${cls(m && m.dii)}">${m ? cr(m.dii) : '—'}</td><td class="${cls(fpi[k])}">${fpi[k] != null ? cr(fpi[k]) : '—'}</td></tr>`;
-    }).join('');
-    return `<table class="fd-tb"><thead><tr><th>Month</th><th>FII/FPI<br><small>NSE prov.</small></th><th>DII<br><small>NSE prov.</small></th><th>FPI equity<br><small>NSDL</small></th></tr></thead><tbody>${rows}</tbody></table>`;
+    const keys = [...new Set(Object.keys(by).concat(Object.keys(fpi)))].sort().reverse().slice(0, 6), cur = istToday().slice(0, 7), firstDay = list.length ? list[0].date : '';
+    const mt = (k) => {
+      const m = by[k], [y, mm] = k.split('-'), partial = m && m.first === firstDay && missedStart(firstDay) ? 'from ' + dShort(m.first) : k === cur ? 'MTD' : '', t = tone(m ? m.fii + m.dii : fpi[k]);
+      const line = (n, v) => `<div class="fdg-r"><span>${n}</span><b class="${cls(v)}">${v == null ? '—' : cr(v)}</b></div>`;
+      return `<div class="fdg ${t}"><div class="fdg-in"><span class="fdg-l">${MON[+mm - 1].toUpperCase()} ${y.slice(2)} <em>${partial}</em></span>${line('FII/FPI', m ? m.fii : null)}${line('DII', m ? m.dii : null)}${line('FPI equity·NSDL', fpi[k] != null ? fpi[k] : null)}</div></div>`;
+    };
+    return `<div class="fdg-g g3">${keys.map(mt).join('')}</div>`;
   }
 
   function ytdHTML(list) {
-    const yr = istToday().slice(0, 4), fpi = (S.d && S.d.fpi_equity_monthly) || {};
-    const ks = Object.keys(fpi).filter((k) => k.startsWith(yr)).sort();
-    const ytd = ks.reduce((s, k) => s + fpi[k], 0);
-    const yl = list.filter((r) => r.date.startsWith(yr)), since = yl.length ? yl[0].date : '';
-    const fs = yl.reduce((s, r) => s + (r.fii_net || 0), 0), ds = yl.reduce((s, r) => s + (r.dii_net || 0), 0);
-    const mx = Math.max(1, ...ks.map((k) => Math.abs(fpi[k])));
-    const bars = ks.map((k) => { const v = fpi[k], h = Math.round(Math.abs(v) / mx * 42); return `<div class="fd-mb" title="${MON[+k.slice(5) - 1]} ${yr}: FPI equity ${cr(v)} cr"><i class="${v >= 0 ? 'p' : 'n'}" style="height:${h}px"></i><span>${MON[+k.slice(5) - 1][0]}</span></div>`; }).join('');
+    const yr = istToday().slice(0, 4), fpi = (S.d && S.d.fpi_equity_monthly) || {}, ks = Object.keys(fpi).filter((k) => k.startsWith(yr)).sort(), ytd = ks.reduce((s, k) => s + fpi[k], 0);
+    const yl = list.filter((r) => r.date.startsWith(yr)), since = yl.length ? yl[0].date : '', fs = yl.reduce((s, r) => s + (r.fii_net || 0), 0), ds = yl.reduce((s, r) => s + (r.dii_net || 0), 0), mx = Math.max(1, ...ks.map((k) => Math.abs(fpi[k])));
+    const bars = ks.map((k) => { const v = fpi[k], h = Math.round(Math.abs(v) / mx * 38); return `<div class="fdg-mb" title="${MON[+k.slice(5) - 1]} ${yr}: FPI equity ${cr(v)} cr"><i class="${v >= 0 ? 'p' : 'n'}" style="height:${h}px"></i><span>${MON[+k.slice(5) - 1].slice(0, 1)}</span></div>`; }).join('');
     const fullYear = since && since <= yr + '-01-05';
-    return `<div class="fd-ts"><div class="fd-t" style="--fc:${FII_C}"><span>FPI equity YTD <small>NSDL</small></span><b class="${cls(ytd)}">${cr(ytd)}</b><small>${ks.length} months${S.d && S.d.fpi_equity_upto ? ' · to ' + esc(S.d.fpi_equity_upto) : ''}</small></div>
-      <div class="fd-t" style="--fc:${DII_C}"><span>DII ${fullYear ? 'YTD' : 'since ' + (since ? dShort(since) : '—')} <small>NSE prov.</small></span><b class="${cls(ds)}">${yl.length ? cr(ds) : '—'}</b><small>FII/FPI same period ${yl.length ? cr(fs) : '—'}</small></div></div>
-      <div class="fd-mbs">${bars}</div>
-      ${fullYear ? '' : `<div class="jd-fn">DII history on this site starts ${since ? dShort(since) : 'soon'}; the DII total grows into a full YTD as each session is added.</div>`}`;
+    return `<div class="fdg-g">${gtile('FPI EQUITY YTD · NSDL', ytd, ks.length + ' months' + (S.d && S.d.fpi_equity_upto ? ' · to ' + esc(S.d.fpi_equity_upto) : ''))}${gtile('DII ' + (fullYear ? 'YTD' : 'SINCE ' + (since ? dShort(since).toUpperCase() : '—')), yl.length ? ds : null, 'FII/FPI same period ' + (yl.length ? cr(fs) : '—'))}`
+      + `<div class="fdg wide fl"><div class="fdg-in"><span class="fdg-l">FPI EQUITY BY MONTH</span><div class="fdg-mbs">${bars}</div></div></div></div>${fullYear ? '' : `<div class="jd-fn">DII history on this site starts ${since ? dShort(since) : 'soon'}; the DII total grows into a full YTD as each session is added.</div>`}`;
   }
 
   function html() {
@@ -101,7 +98,7 @@
     const body = !S.d ? `<div class="jd-fn">${S.err ? esc(S.err) : 'Loading FII / DII flows…'}</div>`
       : S.tab === 'monthly' ? monthlyHTML(list) : S.tab === 'ytd' ? ytdHTML(list) : dailyHTML(list);
     const upd = S.d && S.d.updated_at ? new Date(S.d.updated_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST' : '';
-    return `<section class="jd-card jd-tc fd-card"><h3><span class="jd-ic">🏦</span>FII / DII cash flows <small>₹ crore</small><span class="fd-tabs">${tabs}</span></h3>${body}
+    return `<section class="jd-card jd-tc fd-card fdg-card"><h3><span class="jd-ic">🏦</span>FII / DII cash flows <small>₹ crore</small><span class="fd-tabs">${tabs}</span></h3>${body}
       <div class="jd-fn">Provisional NSE cash-market figures; monthly FPI equity from NSDL (includes primary market).${upd ? ' Updated ' + upd + '.' : ''}</div></section>`;
   }
 
@@ -124,6 +121,22 @@
   .fd-tb th small{font-weight:700;color:#7b88a6;font-size:8.5px}.fd-tb td{padding:5px 4px;border-bottom:1px solid #e3e9f5;text-align:right;font:800 12px ui-monospace,Consolas,monospace}.fd-tb td:first-child{font-family:inherit;color:#10204a}.fd-tb td small{color:#8a5200;font-weight:700;font-size:9.5px;margin-left:3px}
   .fd-mbs{display:flex;align-items:flex-end;gap:4px;height:62px;margin:10px 0 2px;padding:0 2px;border-bottom:1px solid #c9d3e8}.fd-mb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;height:100%}
   .fd-mb i{width:100%;max-width:22px;border-radius:3px 3px 0 0;display:block}.fd-mb i.p{background:#1e9a5a}.fd-mb i.n{background:#c1243e}.fd-mb span{font-size:8.5px;font-weight:800;color:#4a5878}`;
+  css.textContent += `
+  .fdg-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;perspective:900px}.fdg-g.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.fdg.wide{grid-column:1 / -1}
+  .fdg-in{position:relative;overflow:hidden;isolation:isolate;border-radius:14px;padding:10px 12px;color:#eef3ff;display:flex;flex-direction:column;gap:2px;height:100%;
+    background:linear-gradient(150deg,#27345c 0%,#111a37 52%,#070b1a 100%);border:1px solid rgba(190,205,255,.3);
+    box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -8px 14px rgba(0,0,0,.45) inset,0 6px 0 -2px #0a1128,0 7px 0 -2px rgba(150,170,230,.25),0 16px 18px -10px rgba(5,12,40,.75);transition:transform .15s}
+  .fdg:hover .fdg-in{transform:translateY(-2px)}
+  .fdg-in::before{content:'';position:absolute;inset:-30%;z-index:-1;filter:blur(13px);animation:fdgs 11s ease-in-out infinite alternate;background:radial-gradient(38% 34% at 16% 85%,var(--g1),transparent 70%),radial-gradient(34% 30% at 88% 22%,rgba(150,175,255,.32),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.09),transparent 72%)}
+  .fdg-in::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;z-index:0;pointer-events:none;border-radius:14px 14px 55% 55%/14px 14px 22px 22px;background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.1) 48%,rgba(255,255,255,0))}
+  .fdg-in>*{position:relative;z-index:1}@keyframes fdgs{0%{transform:translate(-4%,2%) rotate(0)}100%{transform:translate(3%,-3%) rotate(8deg)}}
+  .fdg.up{--g1:rgba(30,214,120,.5);--ac:#42f0a0}.fdg.up .fdg-in{border-color:rgba(66,240,160,.55)}.fdg.dn{--g1:rgba(255,70,95,.48);--ac:#ff8a9b}.fdg.dn .fdg-in{border-color:rgba(255,122,142,.55)}.fdg.fl{--g1:rgba(120,150,255,.38);--ac:#c5d1f7}
+  .fdg-l{font-size:10px;font-weight:800;letter-spacing:.08em;color:#dfe8ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}.fdg-l em{font-style:normal;font-weight:600;opacity:.7;letter-spacing:0;margin-left:3px}
+  .fdg-v{font:900 22px ui-monospace,Consolas,monospace;color:var(--ac);text-shadow:0 2px 6px rgba(0,0,0,.55),0 0 14px var(--g1)}.fdg-in>small{font-size:10px;font-weight:700;color:#cfd9f7;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .fdg-sv{display:block;width:100%;height:42px;margin-top:6px}.fdg-lg{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;color:#cfd9f7;margin-top:2px}.fdg-lg i{width:8px;height:8px;border-radius:2px;display:inline-block}
+  .fdg-r{display:flex;justify-content:space-between;gap:6px;font-size:10.5px;margin-top:3px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.3)}.fdg-r span{color:#cfd9f7;font-weight:700}.fdg-r b{font:800 11px ui-monospace,Consolas,monospace}.fdg-r .fd-up{color:#54f5aa}.fdg-r .fd-dn{color:#ff8da0}
+  .fdg-mbs{display:flex;align-items:flex-end;gap:5px;height:50px;margin-top:6px}.fdg-mb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;height:100%}.fdg-mb i{width:100%;max-width:20px;border-radius:3px 3px 0 0;display:block}.fdg-mb i.p{background:#42f0a0}.fdg-mb i.n{background:#ff7a8e}.fdg-mb span{font-size:8.5px;font-weight:800;color:#cfd9f7}
+  @media(max-width:700px){.fdg-g.g3{grid-template-columns:1fr 1fr}}`;
   document.head.appendChild(css);
 
   window.jcFD = { html, load };

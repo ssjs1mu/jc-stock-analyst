@@ -293,16 +293,6 @@
     return window.jcSig ? window.jcSig.html(ms) : '';
   }
 
-  function colGlobal(ms) {
-    const w = wantNow(ms); const anyOpen = ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]);
-    return card('Global markets', '🌍', GLOBAL_T.map((g) => `<div class="j3m-sub">${g[0]}</div>${tgrid(g[1], ms)}`).join('') + TIP, `<span class="jd-chip ${anyOpen ? 'on' : ''}">${anyOpen ? '● LIVE' : 'CLOSED'}</span>`);
-  }
-  function colComm(ms) {
-    const w = wantNow(ms);
-    return card('Commodities', '🛢', tgrid(COMM_T, ms) + TIP, `<span class="jd-chip ${w.fut ? 'on' : ''}">${w.fut ? '● LIVE' : 'CLOSED'}</span>`)
-      + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', tgrid(FX_T, ms))
-      + card('Bonds &amp; yields', '🏦', tgrid(BOND_T, ms) + '<div class="jd-fn">Yield change in basis points. Japan, UK, Germany and India 10Y via the CNBC quote feed; US yields from Yahoo. Nifty PCR sits in the top row with the India 10Y.</div>');
-  }
   const ago = (ts, ms) => { const m = Math.max(0, Math.round((ms - ts) / 60000)); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h' : Math.floor(m / 1440) + 'd'; };
   function colNews(ms) {
     const items = S.news.map((n) => `<a class="jd-nw" href="${esc(n.link)}" target="_blank" rel="noopener"><span class="jd-nt t-${n.tag}">${n.tag}</span><span class="jd-nb">${esc(n.t)}<small>${esc(n.src)} · ${n.ts ? ago(n.ts, ms) : ''}</small></span></a>`).join('');
@@ -445,11 +435,11 @@
   function paint() {
     const el = $('pDash'); if (!el || !el.classList.contains('active')) return; const ms = Date.now(), w = wantNow(ms);
     const keep = window.scrollY, sc = [...el.querySelectorAll('.jd-scroll,.jd-nlist')].map((n) => n.scrollTop), act = document.activeElement;
-    if (act && act.classList && act.classList.contains('jd-man') && act.value) return; // don't wipe a value being typed
+    if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
       + tiles3d(ms)
-      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}${window.jcFD ? window.jcFD.html(ms) : ''}<div class="jd-newsw">${colNews(ms)}</div></div><div class="jd-col jd-c3">${colGlobal(ms)}${colComm(ms)}</div></div>`
+      + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}</div><div class="jd-col jd-c3">${window.jcFD ? window.jcFD.html(ms) : ''}${catButtons(ms)}</div><div class="jd-newsrow">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
     Object.keys(S.q).forEach((k) => { S.q[k].flash = ''; });
@@ -719,19 +709,6 @@
     if (it.cn) { const x = it.cn === 'IN10Y' ? (S.x.in10y || S.bd.IN10Y || (manual().in10y ? { p: manual().in10y.v, pc: null } : null)) : S.bd[it.cn]; return x ? { p: x.p, pc: x.pc, sp: null, live: false, d: x.d } : null; }
     const q = S.q[it.k]; return q ? { p: q.p, pc: q.pc, sp: q.sp, live: q.t ? (Date.now() / 1000 - q.t) / 60 < 20 : false, d: '' } : null;
   }
-  function mtile(it, ms) {
-    const x = quoteOf(it); let cls = 'fl', pxt = '…', cht = '';
-    if (x && x.p != null) {
-      const dp = it.dp != null ? it.dp : it.yld ? 3 : dpOf(x.p), chg = x.pc != null ? x.p - x.pc : null, pct = x.pc ? chg / x.pc * 100 : null, dir = chg == null || Math.abs(pct) < 0.005 ? 0 : chg > 0 ? 1 : -1, good = it.yld ? -dir : dir;
-      cls = good > 0 ? 'up' : good < 0 ? 'dn' : 'fl'; pxt = fmtN(x.p, dp) + (it.yld ? '<u>%</u>' : '');
-      cht = chg == null ? '' : it.yld ? `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chg >= 0 ? '+' : ''}${(chg * 100).toFixed(1)} bp` : `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
-    }
-    const q = S.q[it.k], fl = q && q.flash ? ' fl-' + q.flash : '';
-    return `<button type="button" class="j3m ${cls}${fl}" data-pop="${esc(it.k)}" title="${esc(it.n)} · click for details &amp; trend signals"><span class="j3m-n">${it.fc ? flag(it.fc) : ''}<em>${esc(it.n)}</em>${x && x.live ? '<i class="j3m-l"></i>' : ''}</span><span class="j3m-p">${pxt}</span><span class="j3m-c">${cht || '&nbsp;'}</span></button>`;
-  }
-  const tgrid = (arr, ms) => `<div class="j3m-g">${arr.map((it) => mtile(it, ms)).join('')}</div>`;
-  const TIP = '<div class="jd-fn">Tap a tile for details and trend signals.</div>';
-
   /* ---- history analytics + signals for the instrument popup ---- */
   async function histOne(sym, quiet) {
     const h = S.h[sym], ms = Date.now(); if (h && (h.busy || ms < h.due)) return; S.h[sym] = Object.assign(h || {}, { busy: 1 });
@@ -776,7 +753,7 @@
   const sgn = (v, d) => v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(d == null ? 2 : d) + '%';
   const tcol = (v) => v == null ? 'n' : v > 0 ? 'g' : v < 0 ? 'r' : 'a';
   function instPopHTML(P) {
-    const it = P.it, x = quoteOf(it), top = (inner) => `<div class="jd-pm-h"><div class="jd-pm-t">${it.fc ? flag(it.fc) : ''}<b>${esc(it.n)}</b><small>${it.cn ? 'CNBC quote feed' : esc(it.k)}</small></div><div class="jd-pm-bt">${it.cn ? '' : `<button type="button" class="jd-mvb" data-xr="${esc(it.k)}">X-ray</button>`}<button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div><div class="jd-pm-b">${inner}</div>`;
+    const it = P.it, x = quoteOf(it), top = (inner) => `<div class="jd-pm-h"><div class="jd-pm-t">${it.fc ? flag(it.fc) : ''}<b>${esc(it.n)}</b><small>${it.cn ? 'CNBC quote feed' : esc(it.k)}</small></div><div class="jd-pm-bt">${P.back ? '<button type="button" class="jd-mvb" data-popback="1">← Back</button>' : ''}${it.cn ? '' : `<button type="button" class="jd-mvb" data-xr="${esc(it.k)}">X-ray</button>`}<button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div><div class="jd-pm-b">${inner}</div>`;
     if (!x || x.p == null) return top('<div class="jd-fn">Waiting for the first quote…</div>');
     const dp = it.dp != null ? it.dp : it.yld ? 3 : dpOf(x.p), chg = x.pc != null ? x.p - x.pc : null, pct = x.pc ? chg / x.pc * 100 : null, dir = chg == null ? 0 : chg > 0 ? 1 : chg < 0 ? -1 : 0, good = it.yld ? -dir : dir;
     const head = `<div class="jd-pk ${good > 0 ? 'u' : good < 0 ? 'd' : ''}"><span class="jd-pkp">${fmtN(x.p, dp)}${it.yld ? '<u>%</u>' : ''}</span><span class="jd-pkc">${chg == null ? '' : (dir > 0 ? '▲ ' : dir < 0 ? '▼ ' : '■ ') + (it.yld ? (chg >= 0 ? '+' : '') + (chg * 100).toFixed(1) + ' bp' : (chg > 0 ? '+' : '') + fmtN(chg, dp) + ' (' + sgn(pct) + ')')}</span>${x.live ? '<span class="jd-pkl">● live</span>' : '<span class="jd-pkl off">last session</span>'}</div>`;
@@ -828,12 +805,12 @@
   function renderPop() {
     const el = $('jdPop'); if (!el) return; const P = S.pop;
     if (!P) { if (!el.hidden) { el.hidden = true; el.innerHTML = ''; el.__sig = ''; document.body.style.overflow = ''; } return; }
-    const html = P.t === 'idx' ? idxPopHTML(P) : instPopHTML(P); if (el.__sig === html && !el.hidden) return; el.__sig = html;
+    const html = P.t === 'idx' ? idxPopHTML(P) : P.t === 'cat' ? catPopHTML(P) : instPopHTML(P); if (el.__sig === html && !el.hidden) return; el.__sig = html;
     const sc = el.querySelector('.jd-pm-b'), st = sc ? sc.scrollTop : 0; el.innerHTML = `<div class="jd-pm" role="dialog" aria-modal="true">${html}</div>`; el.hidden = false; document.body.style.overflow = 'hidden';
     const sc2 = el.querySelector('.jd-pm-b'); if (sc2) sc2.scrollTop = st;
   }
   function openIdx(sym) { S.pop = { t: 'idx', k: sym, all: false }; renderPop(); loadCons().then(() => { loadMovers(sym); renderPop(); }); loadWeights(); }
-  function openInst(k) { const it = PM[k]; if (!it) return; S.pop = { t: 'inst', k, it }; if (!it.cn) histOne(it.k); renderPop(); }
+  function openInst(k) { const it = PM[k]; if (!it) return; S.pop = { t: 'inst', k, it, back: S.pop && S.pop.t === 'cat' ? S.pop : null }; if (!it.cn) histOne(it.k); renderPop(); }
 
   /* ---- top-row combined tile: India 10Y G-Sec + Nifty PCR ---- */
   function comboTile() {
@@ -876,10 +853,73 @@
   .jd-cr i{position:absolute;left:0;bottom:0;height:2px;opacity:.75}.jd-cr.u i{background:#16a05a}.jd-cr.d i{background:#d12a47}.jd-cr .n{font-weight:800;color:#14213d}.jd-cr .w,.jd-cr .c,.jd-cr .p{text-align:right;font:700 11px ui-monospace,Consolas,monospace}.jd-cr .w{color:#52607f}
   .jd-cr.u .c,.jd-cr.u .p{color:#0c7a42}.jd-cr.d .c,.jd-cr.d .p{color:#b3162f}.jd-cr .p{font-weight:800}.jd-crh{background:none;cursor:default;font-size:9.5px;color:#7b88a6;padding-bottom:0}.jd-crh span{font:700 9.5px "Segoe UI",sans-serif!important;color:#7b88a6!important}
   @media(max-width:700px){.jd-pgrid{grid-template-columns:1fr}.jd-pkp{font-size:24px}.jd-cr{grid-template-columns:1fr 46px 50px 50px}}`;
+  /* ---------- category buttons (Global / Commodities / Currencies / Bonds) -> popup with every instrument, trend signals and X-ray ---------- */
+  const CATS = {
+    global: { n: 'GLOBAL MARKETS', ic: '🌍', groups: GLOBAL_T },
+    comm: { n: 'COMMODITIES', ic: '🛢', groups: [['', COMM_T]] },
+    fx: { n: 'CURRENCIES', ic: '💱', sub: 'vs rupee & dollar', groups: [['', FX_T]] },
+    bond: { n: 'BONDS & YIELDS', ic: '🏦', groups: [['INDIA', BOND_T.slice(0, 1)], ['GLOBAL 10-YEAR', BOND_T.slice(1, 4)], ['UNITED STATES', BOND_T.slice(4)]] },
+  };
+  const catItems = (k) => CATS[k].groups.reduce((a, g) => a.concat(g[1]), []);
+  function catButtons(ms) {
+    const w = wantNow(ms), live = { global: ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]), comm: w.fut, fx: w.fut, bond: w.open.us };
+    return '<div class="jd-cats">' + Object.keys(CATS).map((k) => {
+      const C = CATS[k], arr = catItems(k).map((it) => { const x = quoteOf(it); if (!x || x.p == null || x.pc == null || !x.pc) return null; const pct = it.yld ? (x.p - x.pc) * 100 : (x.p / x.pc - 1) * 100; return { n: it.n, v: pct, yld: !!it.yld }; }).filter(Boolean);
+      const up = arr.filter((a) => a.v > 0.005).length, dn = arr.filter((a) => a.v < -0.005).length, good = k === 'bond' ? 0 : up - dn, tn = good > 0 ? 'up' : good < 0 ? 'dn' : 'fl';
+      const best = arr.length ? arr.reduce((a, b) => b.v > a.v ? b : a) : null, worst = arr.length ? arr.reduce((a, b) => b.v < a.v ? b : a) : null, fv = (a) => a.yld ? (a.v >= 0 ? '+' : '') + a.v.toFixed(1) + 'bp' : (a.v >= 0 ? '+' : '') + a.v.toFixed(2) + '%', sh = (n) => esc(n.replace(/ (YIELD|10Y.*)$/, '').slice(0, 15));
+      return `<button type="button" class="jd-cat ${tn}" data-cat="${k}"><span class="jd-cat-h"><span class="jd-cat-i">${C.ic}</span><span class="jd-cat-t">${C.n}</span>${k === 'bond' ? '' : `<span class="jd-cat-l ${live[k] ? 'on' : ''}">${live[k] ? '● LIVE' : 'CLOSED'}</span>`}</span>`
+        + `<span class="jd-cat-s">${arr.length ? `<b class="u">${up} ▲</b> <b class="d">${dn} ▼</b>` : '…'}</span><span class="jd-cat-b">${best ? `<span>Best <b>${sh(best.n)}</b> ${fv(best)}</span><span>Weakest <b>${sh(worst.n)}</b> ${fv(worst)}</span>` : ''}</span><span class="jd-cat-o">Tap for details ›</span></button>`;
+    }).join('') + '</div>';
+  }
+  async function histMany(keys) {
+    const q = keys.slice(); await Promise.all(Array.from({ length: 5 }, async () => { while (q.length) { await histOne(q.shift()); } }));
+  }
+  function openCat(k) { S.pop = { t: 'cat', k }; renderPop(); histMany(catItems(k).filter((it) => !it.cn).map((it) => it.k)); }
+  function catRow(it) {
+    const x = quoteOf(it), fl = it.fc ? flag(it.fc) : '', nm = it.cn ? `<span class="n">${fl}${esc(it.n)}</span>` : `<span class="n lnk" data-xr="${esc(it.k)}" title="Open the X-ray report">${fl}${esc(it.n)}</span>`;
+    if (!x || x.p == null) return `<div class="jd-ir">${nm}<span class="l">…</span></div>`;
+    const dp = it.dp != null ? it.dp : it.yld ? 3 : dpOf(x.p), chg = x.pc != null ? x.p - x.pc : null, pct = x.pc ? chg / x.pc * 100 : null, dir = chg == null || Math.abs(pct) < 0.005 ? 0 : chg > 0 ? 1 : -1, good = it.yld ? -dir : dir;
+    const A = it.cn ? null : ana(it.k, x.p), loading = !it.cn && !A && !(S.h[it.k] && S.h[it.k].err);
+    const ch = (v) => v == null ? '<span class="jd-tr n">–</span>' : `<span class="jd-tr ${tcol(v)}">${v > 0 ? '▲' : v < 0 ? '▼' : '■'}</span>`;
+    const trend = A ? `<span class="jd-trs" title="Short (20-day) · Medium (50-day) · Long (200-day)">${ch(A.T.s)}${ch(A.T.m)}${ch(A.T.l)}</span>` : `<span class="jd-trs na">${it.cn ? 'n/a' : loading ? '…' : '–'}</span>`;
+    const bias = A ? `<span class="jd-pbias sm ${A.bias[1]}" title="${esc(A.sig.map((s) => s[0]).join(' · '))}">${A.bias[0].replace(' BIAS', '').replace(' / MIXED', '')}</span>` : '<span class="jd-pbias sm"></span>';
+    return `<div class="jd-ir ${good > 0 ? 'u' : good < 0 ? 'd' : ''}">${nm}<span class="l">${fmtN(x.p, dp)}${it.yld ? '<u>%</u>' : ''}</span><span class="c">${chg == null ? '' : it.yld ? (chg >= 0 ? '+' : '') + (chg * 100).toFixed(1) + ' bp' : (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'}</span>${trend}${bias}<span class="a">${it.cn ? '' : `<button type="button" class="jd-mvb" data-xr="${esc(it.k)}">X-ray</button>`}<button type="button" class="jd-mvb" data-pop="${esc(it.k)}">Signals</button></span></div>`;
+  }
+  function catPopHTML(P) {
+    const C = CATS[P.k], hdr = '<div class="jd-ir jd-irh"><span class="n">Instrument</span><span class="l">Last</span><span class="c">Change</span><span class="jd-trs">Trend S·M·L</span><span>Bias</span><span class="a"></span></div>';
+    const body = C.groups.map((g) => (g[0] ? `<div class="jd-isub">${esc(g[0])}</div>` : '') + g[1].map(catRow).join('')).join('');
+    return `<div class="jd-pm-h"><div class="jd-pm-t"><b>${C.ic} ${C.n}</b><small>${C.sub || 'tap a name for its X-ray report'}</small></div><div class="jd-pm-bt"><button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div><div class="jd-pm-b">${hdr}${body}<div class="jd-fn">Trend arrows: Short = price vs 20-day average, Medium = 50-day, Long = 200-day (▲ rising above it, ▼ falling below, ■ flat). Bias combines trend, RSI, MACD, breakouts and 52-week position — mechanical, from delayed daily data, not advice. Tap a name or X-ray for the full report; “Signals” shows levels and a chart.${CATS[P.k] === CATS.bond ? ' Japan, UK, Germany and India 10Y come from the CNBC quote feed and have no free price history, so no trend is shown for them.' : ''}</div></div>`;
+  }
+  const CSS6 = `
+  .jd-board{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,.95fr)!important;grid-template-areas:"a m r" "n n n"!important;align-items:stretch!important}
+  .jd-c1{grid-area:a}.jd-c2{grid-area:m}.jd-c3{grid-area:r}.jd-newsrow{grid-area:n;min-width:0}.jd-c2>.jd-heat{flex:1}.jd-c3{display:flex;flex-direction:column;gap:10px}
+  .jd-newsrow .jd-nlist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 18px;max-height:300px;overflow:auto}.jd-newsrow .jd-newsc{display:block}
+  @media(max-width:1280px){.jd-board{grid-template-columns:1fr 1fr!important;grid-template-areas:"a m" "r r" "n n"!important}.jd-newsrow .jd-nlist{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.jd-board{grid-template-columns:1fr!important;grid-template-areas:"m" "a" "r" "n"!important}.jd-newsrow .jd-nlist{grid-template-columns:1fr}}
+  .jd-cats{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(104px,1fr);gap:10px;perspective:900px}
+  .jd-cat{position:relative;overflow:hidden;isolation:isolate;text-align:left;font:inherit;color:#eef3ff;cursor:pointer;border-radius:15px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;
+    background:linear-gradient(150deg,#27345c 0%,#111a37 52%,#070b1a 100%);border:1px solid rgba(190,205,255,.3);
+    box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -8px 14px rgba(0,0,0,.45) inset,0 6px 0 -2px #0a1128,0 7px 0 -2px rgba(150,170,230,.25),0 16px 18px -10px rgba(5,12,40,.75);transition:transform .15s,box-shadow .15s}
+  .jd-cat:hover{transform:translateY(-3px);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -8px 14px rgba(0,0,0,.45) inset,0 6px 0 -2px #0a1128,0 7px 0 -2px rgba(150,170,230,.3),0 24px 24px -10px rgba(5,12,40,.85)}
+  .jd-cat::before{content:'';position:absolute;inset:-30%;z-index:-1;filter:blur(13px);animation:j3smoke 11s ease-in-out infinite alternate;background:radial-gradient(38% 34% at 16% 85%,var(--g1),transparent 70%),radial-gradient(34% 30% at 88% 22%,rgba(150,175,255,.32),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.09),transparent 72%)}
+  .jd-cat::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;z-index:0;pointer-events:none;border-radius:15px 15px 55% 55%/15px 15px 24px 24px;background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.1) 48%,rgba(255,255,255,0))}
+  .jd-cat>*{position:relative;z-index:1}.jd-cat.up{--g1:rgba(30,214,120,.5);border-color:rgba(66,240,160,.55)}.jd-cat.dn{--g1:rgba(255,70,95,.48);border-color:rgba(255,122,142,.55)}.jd-cat.fl{--g1:rgba(120,150,255,.38)}
+  .jd-cat-h{display:flex;align-items:center;gap:6px}.jd-cat-i{font-size:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}.jd-cat-t{font-size:11px;font-weight:900;letter-spacing:.09em;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+  .jd-cat-l{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.06em;padding:1px 6px;border-radius:99px;background:rgba(0,0,0,.4);color:#aab6d8}.jd-cat-l.on{color:#42f0a0}
+  .jd-cat-s{font:900 19px ui-monospace,Consolas,monospace;display:flex;gap:10px;text-shadow:0 2px 5px rgba(0,0,0,.55)}.jd-cat-s b.u{color:#42f0a0}.jd-cat-s b.d{color:#ff8a9b}
+  .jd-cat-b{display:flex;flex-direction:column;gap:1px;font-size:9.5px;color:#cfd9f7;text-shadow:0 1px 2px rgba(0,0,0,.5)}.jd-cat-b b{color:#fff}.jd-cat-o{margin-top:auto;font-size:9px;font-weight:800;letter-spacing:.06em;color:#9fb0e0}
+  .jd-ir{display:grid;grid-template-columns:minmax(120px,1.5fr) 1fr 1fr 78px 82px auto;gap:8px;align-items:center;padding:5px 8px;margin-bottom:3px;border-radius:8px;background:#f5f7fc;font-size:12px}.jd-ir:hover{background:#e9effb}
+  .jd-ir .n{display:flex;align-items:center;gap:6px;font-weight:800;color:#14213d;min-width:0}.jd-ir .n .jd-flag{width:20px;height:13px;flex:none}.jd-ir .n.lnk{cursor:pointer;text-decoration:underline dotted #9fb0d8;text-underline-offset:3px}
+  .jd-ir .l{text-align:right;font:800 12.5px ui-monospace,Consolas,monospace;color:#0b2260}.jd-ir .l u{text-decoration:none;font-size:9px;opacity:.7}.jd-ir .c{text-align:right;font:800 12px ui-monospace,Consolas,monospace}.jd-ir.u .c{color:#0c7a42}.jd-ir.d .c{color:#b3162f}
+  .jd-ir.u{box-shadow:inset 4px 0 #12a05a}.jd-ir.d{box-shadow:inset 4px 0 #c0102e}.jd-ir .a{display:flex;gap:4px;justify-content:flex-end}
+  .jd-trs{display:flex;gap:4px;justify-content:center}.jd-trs.na{color:#9aa6c2;font-size:10px}.jd-tr{width:20px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:#e6ebf7;color:#52607f}.jd-tr.g{background:#d6f3e3;color:#0c7a42}.jd-tr.r{background:#fbdce2;color:#b3162f}.jd-tr.a{background:#fff0c7;color:#8a5a00}
+  .jd-pbias.sm{margin:0;padding:2px 8px;font-size:9px;text-align:center}.jd-irh{background:none!important;box-shadow:none!important;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#7b88a6;padding-bottom:0}.jd-irh span{font:800 9.5px "Segoe UI",sans-serif!important;color:#7b88a6!important;text-align:inherit}.jd-irh .l,.jd-irh .c{text-align:right}
+  .jd-isub{margin:10px 0 4px;font-size:9.5px;font-weight:800;letter-spacing:.14em;color:#52607f;border-bottom:1px solid #dfe7f6;padding-bottom:3px}
+  @media(max-width:700px){.jd-ir{grid-template-columns:1fr 1fr 1fr}.jd-ir .jd-trs,.jd-ir .jd-pbias{display:none}.jd-ir .a{grid-column:1 / -1}.jd-irh{display:none}.jd-cats{grid-template-columns:1fr 1fr}}`;
   /* ---------- wiring ---------- */
   function build() {
     if ($('pDash')) return;
-    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3); const st4 = document.createElement('style'); st4.id = 'jdcss4'; st4.textContent = CSS4; document.head.appendChild(st4); const st5 = document.createElement('style'); st5.id = 'jdcss5'; st5.textContent = CSS5; document.head.appendChild(st5); if (!$('jdPop')) { const pm = document.createElement('div'); pm.id = 'jdPop'; pm.className = 'jd-pop'; pm.hidden = true; document.body.appendChild(pm); }
+    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3); const st4 = document.createElement('style'); st4.id = 'jdcss4'; st4.textContent = CSS4; document.head.appendChild(st4); const st5 = document.createElement('style'); st5.id = 'jdcss5'; st5.textContent = CSS5; document.head.appendChild(st5); const st6 = document.createElement('style'); st6.id = 'jdcss6'; st6.textContent = CSS6; document.head.appendChild(st6); if (!$('jdPop')) { const pm = document.createElement('div'); pm.id = 'jdPop'; pm.className = 'jd-pop'; pm.hidden = true; document.body.appendChild(pm); }
     const anchor = document.querySelector('details.datasec'); const p = document.createElement('div'); p.className = 'panel'; p.id = 'pDash'; p.innerHTML = '<div class="note">Loading dashboard…</div>'; anchor.parentNode.insertBefore(p, anchor);
     const sel = $('viewSel'); const og = document.createElement('optgroup'); og.label = "Joshi's Dashboard";
     const o = document.createElement('option'); o.value = 'pDash'; o.textContent = "📊 Joshi's Dashboard — live markets"; og.appendChild(o); sel.insertBefore(og, sel.firstChild); sel.value = window.__curTab || 'pSummary';
@@ -902,6 +942,8 @@
   }
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q), hm = c('[data-hm]'); if (hm) { openIdx(hm.getAttribute('data-hm')); return; }
+    const ct = c('[data-cat]'); if (ct) { openCat(ct.getAttribute('data-cat')); return; }
+    if (c('[data-popback]') && S.pop && S.pop.back) { S.pop = S.pop.back; renderPop(); return; }
     const pp = c('[data-pop]'); if (pp) { openInst(pp.getAttribute('data-pop')); return; }
     if (c('[data-popx]') || e.target.id === 'jdPop') { S.pop = null; renderPop(); return; }
     if (c('[data-popall]') && S.pop) { S.pop.all = !S.pop.all; renderPop(); }
