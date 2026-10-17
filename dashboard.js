@@ -584,7 +584,7 @@
   }
   document.addEventListener('click', (e) => { const a = e.target.closest('[data-jdgo]'); if (!a) return; e.preventDefault(); const t = $(a.getAttribute('data-jdgo')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
-  function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard') window.showTab('pDash'); }
+  function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard' || !h) window.showTab('pDash'); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   window.__jdS = S; window.jdRepaint = () => { try { paint(); } catch (e) { } };
   window.__jd = { indiaState, mktDef, isOpen, moodScore };
