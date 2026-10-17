@@ -438,7 +438,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
-      + tiles3d(ms)
+      + tiles3d(ms) + callTiles()
       + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}</div><div class="jd-col jd-c3">${window.jcFD ? window.jcFD.html(ms) : ''}${catButtons(ms)}</div><div class="jd-newsrow">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
@@ -615,6 +615,7 @@
     return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.s === 'BZ=F' ? '🛢 ' : t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : ''}${esc(t.n)}</span>${xr}</div>`
       + `<div class="j3-px">${pxtxt}</div><div class="j3-ch">${chtxt}</div>${t.lv && q ? spark(q.sp, cls) : ''}${body}</div></div>`;
   }
+  function callTiles() { try { if (!window.jcCalls || !window.jcCalls.tiles) return ''; window.jcCalls.ensure(() => { if ((window.__curTab || '') === 'pDash') paint(); }); return window.jcCalls.tiles(); } catch (e) { return ''; } }
   function tiles3d(ms) { return `<div class="j3-row">${T3.map((t) => t.combo ? comboTile() : tile3(t, ms)).join('')}</div>`; }
   const CSS3 = `
   .j3-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}

@@ -219,8 +219,57 @@
     refresh: async () => { C.err = ''; await loadBook(); paint(); await tick(true); },
     build: async () => { const t = istToday(); if (C.book.days[t] && !confirm('Rebuild today’s call book? Calls already issued today will be kept; only new stocks are added. Use this only if the 8:10 AM build failed.')) return; await buildClient(true); },
     setF: (g, v) => { C.recF[g] = v; try { localStorage.setItem('jc_recf', JSON.stringify(C.recF)); } catch (e) {} paint(); },
-    csv, state: C,
+    csv, state: C, tiles: dashTiles,
+    ensure: async (cb) => { const c0 = readCache(); if (c0 && !C.loaded) { mergeBook(c0); } if (!C.loaded && !C.ensuring) { C.ensuring = true; try { await loadBook(); } catch (e) {} C.ensuring = false; if (cb) cb(); } },
   };
+
+  /* ---------- dashboard tiles (second row of Joshi's Dashboard) ---------- */
+  function dTbl(head, rows, empty) {
+    return rows.length ? `<table class="dc-t"><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>` : `<div class="dc-em">${empty}</div>`;
+  }
+  const dst = (c) => { const s = ST[c.status] || [c.status || '—', 'n']; return `<span class="dc-b dc-${s[1]}">${E(s[0] === 'Waiting for trigger' ? 'Waiting' : s[0] === 'Not triggered' ? 'No trigger' : s[0])}</span>`; };
+  function dashTiles() {
+    const today = istToday(), wd = isWeekday(), d = C.book.days[today], day = todayDay().sort((a, b) => (b.score || 0) - (a.score || 0));
+    const trig = day.filter(isTrig), live = day.filter((c) => c.status === 'LIVE').length, tgt = day.filter((c) => c.status === 'T1' || c.status === 'T2').length, slc = day.filter((c) => c.status === 'SL').length;
+    const avg = trig.length ? trig.reduce((a, c) => a + (c.retPct || 0), 0) / trig.length : null;
+    const state = !wd ? 'WEEKEND' : d ? 'LOCKED' : C.busy ? 'BUILDING' : istMin() < 490 ? 'AWAITING 8:10' : 'NOT BUILT';
+    const goBtn = (t) => `onclick="showTab('${t}')"`;
+    const dRows = day.slice(0, 7).map((c) => `<tr class="${c.side === 'BUY' ? 'b' : 's'}"><td class="dc-n">${E(c.sym)}</td><td class="dc-sd">${c.side === 'BUY' ? '▲ BUY' : '▼ SELL'}</td><td>${f2(c.entry)}</td><td class="r">${f2(c.sl)}</td><td class="g">${f2(c.t1)}</td><td>${dst(c)}</td></tr>`);
+    const inv = C.book.calls.filter((c) => c.type === 'INV' && !FINAL[c.status]).sort((a, b) => (a.date < b.date ? 1 : -1) || (b.score || 0) - (a.score || 0));
+    const iRows = inv.slice(0, 7).map((c) => { const left = c.expires ? Math.max(0, dayDiff(today, c.expires)) : null; return `<tr><td class="dc-n">${E(c.sym)}</td><td>${c.mode === 'stop' ? '>' + f2(c.entry) : f2(c.entryLo) + '–' + f2(c.entryHi)}</td><td class="r">${f2(c.sl)}</td><td class="g">${f2(c.t1)}</td><td>${left != null ? left + 'd' : '—'}</td><td>${num(c.fill) && num(c.retPct) ? `<b class="${c.retPct >= 0 ? 'g' : 'r'}">${sg(c.retPct)}%</b>` : '<span class="dc-b dc-w">Wait</span>'}</td></tr>`; });
+    const cut = new Date(Date.now() + 19800000 - 30 * 86400000).toISOString().slice(0, 10), fin = C.book.calls.filter((c) => FINAL[c.status] && isTrig(c) && c.date >= cut).sort((a, b) => (a.date < b.date ? 1 : -1));
+    const wins = fin.filter((c) => c.retPct > 0).length, net = fin.reduce((a, c) => a + (c.retPct || 0), 0), avg30 = fin.length ? net / fin.length : null;
+    const rRows = fin.slice(0, 6).map((c) => `<tr><td>${new Date(c.date + 'T00:00:00Z').toLocaleDateString('en-IN', { timeZone: 'UTC', day: '2-digit', month: 'short' })}</td><td class="dc-n">${E(c.sym)}</td><td>${c.type === 'INV' ? 'INV' : c.side === 'BUY' ? '▲' : '▼'}</td><td>${dst(c)}</td><td><b class="${c.retPct >= 0 ? 'g' : 'r'}">${sg(c.retPct)}%</b></td></tr>`);
+    const kp = (l, v, c) => `<span class="dc-kp"><i>${l}</i><b class="${c || ''}">${v}</b></span>`;
+    const tile = (cls, t, goto, title, sub, kps, body, foot) => `<div class="dc-tile ${cls}" role="button" tabindex="0" ${goto} title="${t}"><div class="dc-h"><b>${title}</b><small>${sub}</small></div><div class="dc-k">${kps}</div><div class="dc-b0">${body}</div><div class="dc-f">${foot} ›</div></div>`;
+    return `<div class="dc-row">`
+      + tile('t1', 'Open Today’s Calls', goTo('pCalls'), '🎯 DAY-TRADING CALLS', `${fmtD(today).slice(0, 10)} · ${state}`, kp('Calls', day.length) + kp('Triggered', trig.length) + kp('Live', live) + kp('T1/T2', tgt, tgt ? 'g' : '') + kp('SL', slc, slc ? 'r' : '') + kp('Day P&L', avg == null ? '—' : sg(avg) + '%', avg == null ? '' : avg >= 0 ? 'g' : 'r'), dTbl(['Stock', 'Side', 'Entry', 'SL', 'T1', 'Status'], dRows, d ? 'No stock met the rules today — no forced call.' : wd ? 'Call book not built yet (issued 8:10–8:30 AM IST).' : 'Market closed — next book on the next trading day.'), day.length > 7 ? `+${day.length - 7} more — full table, targets, reasons` : 'Open full table · targets · reasons')
+      + tile('t2', 'Open Today’s Calls', goTo('pCalls'), '📈 INVESTMENT CALLS', 'positional · delivery', kp('Open', inv.length) + kp('Running', inv.filter((c) => num(c.fill)).length), dTbl(['Stock', 'Buy', 'SL', 'T1', 'Left', 'Return'], iRows, 'No open investment call — stage-2 uptrend + pullback/breakout needed.'), inv.length > 7 ? `+${inv.length - 7} more — tenure, targets, reasons` : 'Open tenure · targets · reasons')
+      + tile('t3', 'Open Our Recommendations', goTo('pRecs'), '📒 TRACK RECORD', 'last 30 days · settled calls', kp('Settled', fin.length) + kp('Win rate', fin.length ? Math.round(wins / fin.length * 100) + '%' : '—') + kp('Avg/call', avg30 == null ? '—' : sg(avg30) + '%', avg30 == null ? '' : avg30 >= 0 ? 'g' : 'r') + kp('Net', fin.length ? sg(net) + '%' : '—', net >= 0 ? 'g' : 'r'), dTbl(['Date', 'Stock', '', 'Result', 'Return'], rRows, 'No settled call in the last 30 days yet.'), 'Open date-wise record &amp; reconciliation')
+      + `</div>`;
+    function goTo(t) { return `onclick="showTab('${t}')" onkeydown="if(event.key==='Enter')showTab('${t}')"`; }
+  }
+  const DCSS = `
+  .dc-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 10px;perspective:1300px}
+  .dc-tile{position:relative;overflow:hidden;isolation:isolate;cursor:pointer;color:#f6efff;border-radius:18px;padding:11px 13px 10px;display:flex;flex-direction:column;gap:6px;min-width:0;
+    background:linear-gradient(150deg,#4a2a86 0%,#241255 50%,#0d0724 100%);border:1px solid rgba(214,190,255,.38);
+    box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -10px 18px rgba(0,0,0,.5) inset,0 7px 0 -2px #150a33,0 8px 0 -2px rgba(190,160,255,.28),0 18px 22px -10px rgba(30,10,80,.8);transition:transform .15s,box-shadow .15s}
+  .dc-tile.t2{background:linear-gradient(150deg,#7a4a0e 0%,#3d2208 50%,#150b02 100%);border-color:rgba(255,215,150,.42);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -10px 18px rgba(0,0,0,.5) inset,0 7px 0 -2px #2a1604,0 8px 0 -2px rgba(255,200,120,.28),0 18px 22px -10px rgba(80,40,0,.8)}
+  .dc-tile.t3{background:linear-gradient(150deg,#0e5a66 0%,#08303b 50%,#031319 100%);border-color:rgba(150,235,245,.4);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -10px 18px rgba(0,0,0,.5) inset,0 7px 0 -2px #051c24,0 8px 0 -2px rgba(130,225,240,.28),0 18px 22px -10px rgba(0,50,70,.8)}
+  .dc-tile:hover{transform:translateY(-3px) rotateX(1.5deg)}
+  .dc-tile::before{content:'';position:absolute;inset:-30%;z-index:-1;filter:blur(15px);animation:j3smoke 12s ease-in-out infinite alternate;background:radial-gradient(36% 32% at 14% 88%,rgba(190,120,255,.5),transparent 70%),radial-gradient(34% 30% at 90% 20%,rgba(255,255,255,.22),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.08),transparent 72%)}
+  .dc-tile.t2::before{background:radial-gradient(36% 32% at 14% 88%,rgba(255,170,50,.5),transparent 70%),radial-gradient(34% 30% at 90% 20%,rgba(255,235,190,.26),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.08),transparent 72%)}
+  .dc-tile.t3::before{background:radial-gradient(36% 32% at 14% 88%,rgba(40,210,230,.48),transparent 70%),radial-gradient(34% 30% at 90% 20%,rgba(200,250,255,.26),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.08),transparent 72%)}
+  .dc-tile::after{content:'';position:absolute;left:0;right:0;top:0;height:30%;z-index:0;pointer-events:none;border-radius:18px 18px 60% 60%/18px 18px 22px 22px;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.06) 60%,rgba(255,255,255,0))}
+  .dc-tile>*{position:relative;z-index:1}
+  .dc-h{display:flex;align-items:baseline;gap:8px;justify-content:space-between;flex-wrap:wrap}.dc-h b{font-size:12px;font-weight:900;letter-spacing:.1em;text-shadow:0 1px 3px rgba(0,0,0,.6)}.dc-h small{font-size:9.5px;font-weight:800;letter-spacing:.06em;background:rgba(0,0,0,.38);border-radius:99px;padding:1px 8px;color:#e6dcff}
+  .dc-k{display:flex;flex-wrap:wrap;gap:5px}.dc-kp{background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:2px 8px;display:flex;flex-direction:column;min-width:52px}.dc-kp i{font-style:normal;font-size:8.5px;letter-spacing:.06em;color:#cdbfee;text-transform:uppercase}.dc-kp b{font:900 14px ui-monospace,Consolas,monospace;color:#fff}.dc-kp b.g,.dc-t .g{color:#5cf0a8}.dc-kp b.r,.dc-t .r{color:#ff8fa0}
+  .dc-b0{flex:1;background:rgba(0,0,0,.3);border-radius:10px;padding:4px 6px;overflow:auto;max-height:250px}
+  .dc-t{width:100%;border-collapse:collapse;font:700 11px ui-monospace,Consolas,monospace}.dc-t th{background:transparent!important;text-align:right;font:800 8.5px "Segoe UI",sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#bfb0e6;padding:2px 4px 3px;border-bottom:1px solid rgba(255,255,255,.15)}.dc-t th:first-child,.dc-t td:first-child{text-align:left}
+  .dc-t td{background:transparent!important;text-align:right;padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap;color:#f1ebff}.dc-t td.dc-n{font:900 11.5px "Segoe UI",sans-serif;color:#fff}.dc-t tr.b .dc-sd{color:#5cf0a8}.dc-t tr.s .dc-sd{color:#ff8fa0}.dc-t td.dc-sd{font-size:10px;font-weight:900}
+  .dc-b{display:inline-block;font:900 8.5px "Segoe UI",sans-serif;letter-spacing:.04em;padding:1px 6px;border-radius:99px;background:rgba(255,255,255,.16);color:#fff}.dc-b.dc-g,.dc-b.dc-g2{background:#16a864}.dc-b.dc-r,.dc-b.dc-r2{background:#d2234a}.dc-b.dc-l{background:#2b59c3}.dc-b.dc-w{background:#a8780c}.dc-b.dc-n{background:rgba(255,255,255,.12);color:#cdbfee}
+  .dc-em{font:700 11px "Segoe UI",sans-serif;color:#d8ccf5;padding:14px 6px;text-align:center;line-height:1.5}.dc-f{font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#d9ccf8;text-align:right}
+  @media(max-width:1100px){.dc-row{grid-template-columns:1fr}}`;
   const CSS = `
   #pCalls,#pRecs{--g:#08783a;--r:#c0102e;--ink:#0a1430;--ink2:#34456a;background:linear-gradient(180deg,#e4ebf8,#edf1fa 60%,#e4ebf8);border-radius:16px;padding:10px}
   .cl-head{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;background:linear-gradient(120deg,#17388a,#0b1d4d);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:10px}.cl-head>div:first-child{flex:1;min-width:260px}.cl-head h2{margin:0 0 4px;font-size:22px;letter-spacing:.3px}.cl-head h2 small{font-size:12px;color:#c9d6f7;font-weight:700;margin-left:8px}
@@ -239,7 +288,7 @@
   .cl-rec td,.cl-rec th{text-align:right}.cl-rec td:first-child,.cl-rec th:first-child{text-align:left}.cl-rec{min-width:760px}
   @media(max-width:700px){.cl-head h2{font-size:18px}.cl-k b{font-size:17px}}`;
   function build() {
-    if ($('pCalls')) return; const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
+    if ($('pCalls')) return; const st = document.createElement('style'); st.textContent = CSS + DCSS; document.head.appendChild(st);
     const anchor = document.querySelector('details.datasec'); if (!anchor) return;
     [['pCalls', 'Loading today’s calls…'], ['pRecs', 'Loading recommendations…']].forEach(([id, t]) => { const p = document.createElement('div'); p.className = 'panel'; p.id = id; p.innerHTML = '<div class="note">' + t + '</div>'; anchor.parentNode.insertBefore(p, anchor); });
     const sel = $('viewSel'); if (sel) { const og = document.createElement('optgroup'); og.label = 'Calls'; [['pCalls', '🎯 Today’s Calls — day & investment'], ['pRecs', '📒 Our Recommendations — record & returns']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; og.appendChild(o); }); sel.insertBefore(og, sel.children[1] || null); sel.value = window.__curTab || 'pSummary'; }
