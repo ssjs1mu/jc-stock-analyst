@@ -45,15 +45,23 @@ def main():
     for b in bad: print('::warning::' + b[:300])
     for sym in ('^NSEI', '^CNXIT'):
         if sym in out: print(f'::notice::{sym} {len(out[sym])} stocks e.g. {",".join(out[sym][:6])}')
-    # --- bond probe (stooq) ---
-    for s in ('10yjpy.b', '10yuky.b', '10ydey.b', '10yusy.b', '10yiny.b'):
+    # --- probes ---
+    import urllib.request as ur
+    u='https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=JP10Y,UK10Y,DE10Y,IN10Y,US10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1'
+    try:
+        rq=ur.Request(u,headers=dict(UA,Origin='https://ssjs1mu.github.io')); r=ur.urlopen(rq,timeout=20); hd=dict(r.headers); j=json.loads(r.read().decode())
+        print('::notice::cnbc http',r.status,'cors=',hd.get('Access-Control-Allow-Origin'))
+        for q in j['FormattedQuoteResult']['FormattedQuote']: print('::notice::cnbc',q.get('symbol'),q.get('last'),q.get('previous_day_closing'),q.get('change'),q.get('last_time'))
+    except Exception as e: print('::warning::cnbc',type(e).__name__,e)
+    for f in ['ind_niftyservicesectorlist.csv','ind_niftyservicelist.csv','ind_niftyindiadigitallist.csv','ind_niftyindiadigital_list.csv','ind_niftyindiadefencelist.csv','ind_niftyindiadefence_list.csv','ind_niftyindiadefenselist.csv','ind_niftyindiadefence.csv']:
+        for b in BASE[:2]:
+            try:
+                st,_,txt=get(b+f,15); print('::notice::file OK',b+f,len(txt)); break
+            except Exception as e: print('::notice::file miss',b+f,e)
+    for u in ['https://api.bseindia.com/BseIndiaAPI/api/GetSensexData/w','https://www.bseindia.com/sensex/code/16/','https://api.bseindia.com/BseIndiaAPI/api/IndexConstituents/w?index=16']:
         try:
-            st, hd, txt = get(f'https://stooq.com/q/d/l/?s={s}&i=d', 20)
-            lines = txt.strip().splitlines()
-            cors = hd.get('Access-Control-Allow-Origin') or hd.get('access-control-allow-origin')
-            print(f'::notice::stooq {s} http {st} rows {len(lines)} cors={cors} last: {lines[-2:] if len(lines) > 2 else lines}')
-        except Exception as e:
-            print(f'::warning::stooq {s}: {type(e).__name__} {e}')
+            rq=ur.Request(u,headers=dict(UA,Referer='https://www.bseindia.com/',Origin='https://www.bseindia.com')); r=ur.urlopen(rq,timeout=20); print('::notice::bse',u,r.status,r.read(300).decode('utf-8','replace').replace('\n',' '))
+        except Exception as e: print('::notice::bse miss',u,e)
     if out:
         json.dump({'updated': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z', 'source': 'niftyindices.com', 'idx': out}, open('data/constituents.json', 'w'), separators=(',', ':'))
     else:
