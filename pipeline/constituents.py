@@ -10,12 +10,12 @@ IDX = {
     '^NSEI': ['ind_nifty50list.csv'], '^NSEBANK': ['ind_niftybanklist.csv'], '^CNX100': ['ind_nifty100list.csv'], '^CNX200': ['ind_nifty200list.csv'],
     '^CNXAUTO': ['ind_niftyautolist.csv'], '^CNXCMDT': ['ind_niftycommoditieslist.csv'], 'NIFTY_CONSR_DURBL.NS': ['ind_niftyconsumerdurableslist.csv'],
     '^CNXCONSUM': ['ind_niftyconsumptionlist.csv'], '^CNXENERGY': ['ind_niftyenergylist.csv'], '^CNXFIN': ['ind_niftyfinancelist.csv'], '^CNXFMCG': ['ind_niftyfmcglist.csv'],
-    'NIFTY_HEALTHCARE.NS': ['ind_niftyhealthcarelist.csv'], 'NIFTY_IND_DEFENCE.NS': ['ind_niftyindiadefencelist.csv', 'ind_niftyindiadefenselist.csv'],
-    'NIFTY_IND_DIGITAL.NS': ['ind_niftyindiadigitallist.csv'], '^CNXINFRA': ['ind_niftyinfralist.csv'], '^CNXIT': ['ind_niftyitlist.csv'], '^CNXMEDIA': ['ind_niftymedialist.csv'],
+    'NIFTY_HEALTHCARE.NS': ['ind_niftyhealthcarelist.csv'], 'NIFTY_IND_DEFENCE.NS': ['ind_niftyindiadefence_list.csv', 'ind_niftyindiadefencelist.csv', 'ind_niftyindiadefense_list.csv', 'ind_niftyindiadefence.csv', 'ind_niftyindia_defence_list.csv', 'ind_niftyindiadefencelist .csv'],
+    'NIFTY_IND_DIGITAL.NS': ['ind_niftyindiadigital_list.csv', 'ind_niftyindiadigitallist.csv'], '^CNXINFRA': ['ind_niftyinfralist.csv'], '^CNXIT': ['ind_niftyitlist.csv'], '^CNXMEDIA': ['ind_niftymedialist.csv'],
     '^CNXMETAL': ['ind_niftymetallist.csv'], 'NIFTY_MIDCAP_100.NS': ['ind_niftymidcap100list.csv'], '^NSEMDCP50': ['ind_niftymidcap50list.csv'], '^CNXMNC': ['ind_niftymnclist.csv'],
     '^NSMIDCP': ['ind_niftynext50list.csv'], 'NIFTY_OIL_AND_GAS.NS': ['ind_niftyoilgaslist.csv'], '^CNXPHARMA': ['ind_niftypharmalist.csv'], '^CNXPSE': ['ind_niftypselist.csv'],
     '^CNXPSUBANK': ['ind_niftypsubanklist.csv'], 'NIFTY_PVT_BANK.NS': ['ind_nifty_privatebanklist.csv', 'ind_niftyprivatebanklist.csv'], '^CNXREALTY': ['ind_niftyrealtylist.csv'],
-    '^CNXSERVICE': ['ind_niftyservicesectorlist.csv'],
+    '^CNXSERVICE': ['ind_niftyservicelist.csv', 'ind_niftyservicesectorlist.csv'],
 }
 
 def get(url, t=25):
@@ -31,6 +31,7 @@ def main():
             for b in BASE:
                 try:
                     st, _, txt = get(b + f)
+                    if 'Symbol' not in txt[:400]: raise ValueError('not a constituent csv')
                     rows = list(csv.DictReader(io.StringIO(txt.lstrip('﻿'))))
                     syms = [(r.get('Symbol') or '').strip() for r in rows if (r.get('Symbol') or '').strip()]
                     syms = [s for s in syms if not s.upper().startswith('DUMMY')]
@@ -45,23 +46,21 @@ def main():
     for b in bad: print('::warning::' + b[:300])
     for sym in ('^NSEI', '^CNXIT'):
         if sym in out: print(f'::notice::{sym} {len(out[sym])} stocks e.g. {",".join(out[sym][:6])}')
-    # --- probes ---
+    # --- probes (one summary line each) ---
     import urllib.request as ur
-    u='https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=JP10Y,UK10Y,DE10Y,IN10Y,US10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1'
+    res=[]
+    u='https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=JP10Y|UK10Y|DE10Y|IN10Y|US10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1'
     try:
         rq=ur.Request(u,headers=dict(UA,Origin='https://ssjs1mu.github.io')); r=ur.urlopen(rq,timeout=20); hd=dict(r.headers); j=json.loads(r.read().decode())
-        print('::notice::cnbc http',r.status,'cors=',hd.get('Access-Control-Allow-Origin'))
-        for q in j['FormattedQuoteResult']['FormattedQuote']: print('::notice::cnbc',q.get('symbol'),q.get('last'),q.get('previous_day_closing'),q.get('change'),q.get('last_time'))
-    except Exception as e: print('::warning::cnbc',type(e).__name__,e)
-    for f in ['ind_niftyservicesectorlist.csv','ind_niftyservicelist.csv','ind_niftyindiadigitallist.csv','ind_niftyindiadigital_list.csv','ind_niftyindiadefencelist.csv','ind_niftyindiadefence_list.csv','ind_niftyindiadefenselist.csv','ind_niftyindiadefence.csv']:
-        for b in BASE[:2]:
-            try:
-                st,_,txt=get(b+f,15); print('::notice::file OK',b+f,len(txt)); break
-            except Exception as e: print('::notice::file miss',b+f,e)
-    for u in ['https://api.bseindia.com/BseIndiaAPI/api/GetSensexData/w','https://www.bseindia.com/sensex/code/16/','https://api.bseindia.com/BseIndiaAPI/api/IndexConstituents/w?index=16']:
+        fq=j['FormattedQuoteResult']['FormattedQuote']; fq=fq if isinstance(fq,list) else [fq]
+        res.append('cnbc cors=%s '%hd.get('Access-Control-Allow-Origin')+' | '.join('%s %s prev %s chg %s'%(q.get('symbol'),q.get('last'),q.get('previous_day_closing'),q.get('change')) for q in fq))
+    except Exception as e: res.append('cnbc ERR %s'%e)
+    print('::notice::'+' ## '.join(res)[:900]); res=[]
+    for u in ['https://api.bseindia.com/BseIndiaAPI/api/GetSensexData/w','https://api.bseindia.com/BseIndiaAPI/api/ComHeader/w?quotetype=EQ&scripcode=500325&seriesid=','https://www.bseindia.com/markets/equity/EQReports/MktWatchR.html','https://www.niftyindices.com/IndexConstituent/ind_niftyindiadefence_list.csv','https://www.niftyindices.com/IndexConstituent/ind_nifty_sensexlist.csv','https://www.asiaindex.co.in/']:
         try:
-            rq=ur.Request(u,headers=dict(UA,Referer='https://www.bseindia.com/',Origin='https://www.bseindia.com')); r=ur.urlopen(rq,timeout=20); print('::notice::bse',u,r.status,r.read(300).decode('utf-8','replace').replace('\n',' '))
-        except Exception as e: print('::notice::bse miss',u,e)
+            rq=ur.Request(u,headers=dict(UA,Referer='https://www.bseindia.com/',Origin='https://www.bseindia.com')); r=ur.urlopen(rq,timeout=20); res.append('%s %s %r'%(u[-45:],r.status,r.read(120).decode('utf-8','replace')))
+        except Exception as e: res.append('%s miss %s'%(u[-45:],e))
+    print('::notice::'+' ## '.join(res)[:1200])
     if out:
         json.dump({'updated': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z', 'source': 'niftyindices.com', 'idx': out}, open('data/constituents.json', 'w'), separators=(',', ':'))
     else:
