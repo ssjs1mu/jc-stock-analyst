@@ -635,7 +635,7 @@
   .j3-in>*{position:relative;z-index:1}
   .j3-top{display:flex;justify-content:space-between;align-items:center;gap:4px}.j3-nm{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.06em;color:#dfe8ff;text-shadow:0 1px 2px rgba(0,0,0,.6);white-space:nowrap}
   .j3-nm .jd-flag{width:19px;height:13px}
-  .j3 .jd-xr{font-size:8.5px;padding:1px 5px;border-radius:6px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
+  .j3 .jd-xr{font-size:10px;font-weight:800;padding:3px 8px;border-radius:7px;flex:none;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
   .j3-px{font-size:21px;font-weight:800;letter-spacing:.01em;margin-top:3px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.55),0 0 14px var(--g1);font-variant-numeric:tabular-nums}.j3-px i{font-size:12px;font-style:normal;opacity:.8}
   .j3-px .jd-man{width:90px;font-size:13px;padding:2px 4px;border-radius:5px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.35);color:#fff}
   .j3-ch{font-size:11.5px;font-weight:700;color:var(--ac);text-shadow:0 1px 2px rgba(0,0,0,.55)}.j3-ch span{color:#cfd9f7;font-weight:600}.j3-ch b{font-size:10px}
@@ -650,7 +650,10 @@
   @media(max-width:1480px){.j3-row{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
   @media(prefers-reduced-motion:reduce){.j3-in::before{animation:none}.j3-in{transition:none}}
   @media print{.j3-in{-webkit-print-color-adjust:exact;print-color-adjust:exact;transform:none!important}}`;
-  document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5, i = t.firstChild; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
+  document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), i = t.firstChild, hd = t.querySelector('.j3-top');
+    /* keep the tile flat while the pointer is on its header band (name + X-ray button) or any control, so the button never slides out from under the cursor */
+    if (e.target.closest('button,input,a,[data-xr]') || (hd && e.clientY - r.top < hd.offsetTop + hd.offsetHeight + 10)) { i.style.setProperty('--rx', '0deg'); i.style.setProperty('--ry', '0deg'); return; }
+    const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
   document.addEventListener('mouseout', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (t && !t.contains(e.relatedTarget)) { t.firstChild.style.setProperty('--rx', '0deg'); t.firstChild.style.setProperty('--ry', '0deg'); } }, { passive: true });
 
   /* ---------- 10-year yields of Japan / UK / Germany (CNBC quote feed, called straight from the browser) ---------- */

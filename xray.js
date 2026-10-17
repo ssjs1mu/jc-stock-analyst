@@ -163,7 +163,39 @@
   };
 
   /* ---------- buttons everywhere ---------- */
-  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-xr]'); if (b) { e.preventDefault(); e.stopPropagation(); window.jcXray(b.getAttribute('data-xr')); } }, true);
+  /* A press that starts on an X-ray control opens it on release, even if the control moved or was redrawn
+     in between (3D-tilt tiles, the dashboard's periodic repaint) — browsers drop the 'click' in those cases.
+     Touch/pen keep using the normal click so scrolling a list never opens anything by accident. */
+  let xrDown = null, xrOpenedAt = 0;
+  // Where a control sits when its tilting tile is flat (offsets ignore CSS transforms).
+  function restingHit(e) {
+    const tile = e.target.closest && e.target.closest('.j3'); if (!tile) return null;
+    const r = tile.getBoundingClientRect();
+    for (const b of tile.querySelectorAll('[data-xr]')) {
+      let x = 0, y = 0, n = b;
+      while (n && n !== tile) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+      if (n !== tile) continue;
+      const px = e.clientX - r.left, py = e.clientY - r.top, pad = 6;
+      if (px >= x - pad && px <= x + b.offsetWidth + pad && py >= y - pad && py <= y + b.offsetHeight + pad) return b;
+    }
+    return null;
+  }
+  document.addEventListener('pointerdown', (e) => {
+    const b = e.pointerType === 'mouse' && e.button === 0 && e.target.closest && (e.target.closest('[data-xr]') || restingHit(e));
+    xrDown = b ? { sym: b.getAttribute('data-xr'), x: e.clientX, y: e.clientY, t: Date.now() } : null;
+  }, true);
+  document.addEventListener('pointerup', (e) => {
+    const d = xrDown; xrDown = null;
+    if (!d || e.pointerType !== 'mouse' || e.button !== 0) return;
+    if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 12 || Date.now() - d.t > 1500) return;
+    xrOpenedAt = Date.now(); window.jcXray(d.sym);
+  }, true);
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('[data-xr]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    if (Date.now() - xrOpenedAt < 700) return; // already opened on pointerup
+    window.jcXray(b.getAttribute('data-xr'));
+  }, true);
   function decorate(root) {
     (root || document).querySelectorAll('a.symlink').forEach((a) => {
       if (a.dataset.xrd) return; a.dataset.xrd = '1';
