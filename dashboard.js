@@ -182,7 +182,7 @@
       }
     } catch (e) { S.err = (e && e.message) || 'Refresh failed'; }
     finally { S.busy = false; setBusy(false); paint(); }
-    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now())); loadHist(false); loadBonds(false); if (S.hm) loadMovers(S.hm);
+    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now())); loadHist(false); loadBonds(false); if (S.pop && S.pop.t === 'idx') loadMovers(S.pop.k);
   }
 
   /* India 10Y + Nifty PCR: best-effort extras. NSE and some bond sites refuse Google's servers, so each is retried
@@ -295,14 +295,13 @@
 
   function colGlobal(ms) {
     const w = wantNow(ms); const anyOpen = ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]);
-    const body = GLOBAL.map((g) => `<tbody><tr class="jd-sub"><td colspan="4">${g[0]}</td></tr>${g[1].map((it) => row(it[0], it[1], {}, ms, { flag: it[2] })).join('')}</tbody>`).join('');
-    return card('Global markets', '🌍', `<table class="jd-tb">${head}${body}</table>`, `<span class="jd-chip ${anyOpen ? 'on' : ''}">${anyOpen ? '● LIVE' : 'CLOSED'}</span>`);
+    return card('Global markets', '🌍', GLOBAL_T.map((g) => `<div class="j3m-sub">${g[0]}</div>${tgrid(g[1], ms)}`).join('') + TIP, `<span class="jd-chip ${anyOpen ? 'on' : ''}">${anyOpen ? '● LIVE' : 'CLOSED'}</span>`);
   }
   function colComm(ms) {
     const w = wantNow(ms);
-    return card('Commodities', '🛢', `<table class="jd-tb">${head}<tbody>${COMM.map((it) => row(it[0], it[1], {}, ms)).join('')}</tbody></table>`, `<span class="jd-chip ${w.fut ? 'on' : ''}">${w.fut ? '● LIVE' : 'CLOSED'}</span>`)
-      + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', `<table class="jd-tb">${head}<tbody>${['EURINR=X', 'GBPINR=X', 'JPYINR=X', 'DX-Y.NYB', 'EURUSD=X'].map((s) => row(s, { 'EURINR=X': 'EUR / INR', 'GBPINR=X': 'GBP / INR', 'JPYINR=X': 'JPY / INR', 'DX-Y.NYB': 'US DOLLAR INDEX', 'EURUSD=X': 'EUR / USD' }[s], { dp: s === 'JPYINR=X' || s === 'EURUSD=X' ? 4 : 3 }, ms)).join('')}</tbody></table>`)
-      + card('Bonds &amp; yields', '🏦', `<table class="jd-tb">${head}<tbody><tr class="jd-sub"><td colspan="4">INDIA</td></tr>${in10yRow()}${pcrRow()}<tr class="jd-sub"><td colspan="4">GLOBAL 10-YEAR</td></tr>${bondRow('JAPAN 10Y JGB', 'jp', S.bd.JP10Y)}${bondRow('UK 10Y GILT', 'gb', S.bd.UK10Y)}${bondRow('GERMANY 10Y BUND', 'de', S.bd.DE10Y)}<tr class="jd-sub"><td colspan="4">UNITED STATES</td></tr>${BONDS.map((it) => row(it[0], it[1], {}, ms, { yield: 1, flag: 'us' })).join('')}</tbody></table><div class="jd-fn">Yield change in basis points. Japan, UK, Germany and India 10Y via the CNBC quote feed; US yields from Yahoo.</div>`);
+    return card('Commodities', '🛢', tgrid(COMM_T, ms) + TIP, `<span class="jd-chip ${w.fut ? 'on' : ''}">${w.fut ? '● LIVE' : 'CLOSED'}</span>`)
+      + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', tgrid(FX_T, ms))
+      + card('Bonds &amp; yields', '🏦', tgrid(BOND_T, ms) + '<div class="jd-fn">Yield change in basis points. Japan, UK, Germany and India 10Y via the CNBC quote feed; US yields from Yahoo. Nifty PCR sits in the top row with the India 10Y.</div>');
   }
   const ago = (ts, ms) => { const m = Math.max(0, Math.round((ms - ts) / 60000)); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h' : Math.floor(m / 1440) + 'd'; };
   function colNews(ms) {
@@ -316,9 +315,9 @@
     const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], sym: it[0], p: pct, px: q ? q.p : null, est: !!(q && q.est), big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
     const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
     const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
-    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}${S.hm === i.sym ? ' sel' : ''}" data-hm="${esc(i.sym)}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for its strongest &amp; weakest stocks"><b>${esc(i.n)}</b><em class="jd-hmv">${i.px == null ? '' : i.est ? '≈ est.' : fmtN(i.px, i.px >= 1000 ? 0 : 2)}</em><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" data-hm="${esc(i.sym)}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for its strongest &amp; weakest stocks"><b>${esc(i.n)}</b><em class="jd-hmv">${i.px == null ? '' : i.est ? '≈ est.' : fmtN(i.px, i.px >= 1000 ? 0 : 2)}</em><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
     const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
-    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div>${moversHTML(items)}<div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
+    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div><div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
   }
   function heroHTML(w, ms) {
     const ist = w.ist, ip = istParts(ms);
@@ -455,7 +454,7 @@
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
     Object.keys(S.q).forEach((k) => { S.q[k].flash = ''; });
     [...el.querySelectorAll('.jd-scroll,.jd-nlist')].forEach((n, i) => { if (sc[i]) n.scrollTop = sc[i]; });
-    window.scrollTo(0, keep); tickClock();
+    window.scrollTo(0, keep); tickClock(); renderPop();
   }
   function setBusy(b) { const r = document.querySelector('#pDash .jd-ring'); if (r) r.classList.toggle('spin', b); }
   function tickClock() { const t = $('jdTime'); if (!t) return; t.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour12: false }); }
@@ -565,23 +564,10 @@
   const T3 = [
     { s: '^NSEI', n: 'NIFTY 50', lv: 1, rnd: 100 }, { s: '^NSEBANK', n: 'BANK NIFTY', lv: 1, rnd: 500 }, { s: '^BSESN', n: 'SENSEX', lv: 1, rnd: 500 },
     { s: '^INDIAVIX', n: 'INDIA VIX', lv: 1, rnd: 1, inv: 1 }, { s: 'USDINR=X', n: 'USD / INR', lv: 1, rnd: 0.5, inv: 1, dp: 3 },
-    { s: 'BZ=F', n: 'BRENT CRUDE', lv: 1, rnd: 1, dp: 2 },
+    { s: 'BZ=F', n: 'BRENT CRUDE', lv: 1, rnd: 1, dp: 2 }, { combo: 1 },
   ];
   S.h = {};
-  async function loadHist(force) {
-    const ms = Date.now();
-    await Promise.all(T3.filter((t) => t.lv).map(async (t) => {
-      const h = S.h[t.s]; if (h && (h.busy || (!force && ms < h.due))) return;
-      S.h[t.s] = Object.assign(h || {}, { busy: 1 });
-      try {
-        const j = await fetchData(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t.s)}?range=1y&interval=1d&includePrePost=false`, { kind: 'json', validate: (x) => !!(x && x.chart && x.chart.result && x.chart.result[0]) });
-        const r = j.chart.result[0], q = r.indicators.quote[0], ts = r.timestamp || [], bars = [];
-        ts.forEach((tt, i) => { if (q.close[i] != null && q.high[i] != null && q.low[i] != null) bars.push({ d: new Date((tt + 19800) * 1000).toISOString().slice(0, 10), h: q.high[i], l: q.low[i], c: q.close[i] }); });
-        S.h[t.s] = { bars, due: ms + 30 * 60000 };
-      } catch (e) { S.h[t.s] = { bars: (h && h.bars) || null, due: ms + 3 * 60000 }; }
-    }));
-    paint();
-  }
+  async function loadHist(force) { if (force) T3.forEach((t) => { if (t.lv && S.h[t.s]) S.h[t.s].due = 0; }); await Promise.all(T3.filter((t) => t.lv).map((t) => histOne(t.s, true))); paint(); }
   const avg = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
   function levels(t, px) {
     const h = S.h[t.s]; if (!h || !h.bars || h.bars.length < 30 || px == null) return null;
@@ -639,9 +625,9 @@
     return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.s === 'BZ=F' ? '🛢 ' : t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : ''}${esc(t.n)}</span>${xr}</div>`
       + `<div class="j3-px">${pxtxt}</div><div class="j3-ch">${chtxt}</div>${t.lv && q ? spark(q.sp, cls) : ''}${body}</div></div>`;
   }
-  function tiles3d(ms) { return `<div class="j3-row">${T3.map((t) => tile3(t, ms)).join('')}</div>`; }
+  function tiles3d(ms) { return `<div class="j3-row">${T3.map((t) => t.combo ? comboTile() : tile3(t, ms)).join('')}</div>`; }
   const CSS3 = `
-  .j3-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}
+  .j3-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}
   .j3{position:relative;transform-style:preserve-3d}
   .j3-in{position:relative;overflow:hidden;border-radius:15px;padding:10px 11px 9px;color:#eef3ff;min-height:214px;isolation:isolate;
     background:linear-gradient(150deg,#27345c 0%,#121b38 48%,#070b1a 100%);border:1px solid rgba(190,205,255,.28);
@@ -670,7 +656,7 @@
   .j3-r i{font-style:normal;font-size:9px;font-weight:700;opacity:.8;letter-spacing:.03em}.j3-r b{text-align:right;font-variant-numeric:tabular-nums;font-size:11px}.j3-r u{text-decoration:none;font-size:9px;opacity:.75;min-width:34px;text-align:right}
   .j3-r.r{color:#ffa9b6}.j3-r.s{color:#86f5bd}.j3-r.mj{background:rgba(255,255,255,.12);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}.j3-r.mj b{font-weight:900}
   .j3.fl-up .j3-px{animation:j3f 1s}.j3.fl-dn .j3-px{animation:j3f 1s}@keyframes j3f{0%{text-shadow:0 0 18px #fff}100%{}}
-  @media(max-width:1200px){.j3-row{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
+  @media(max-width:1480px){.j3-row{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
   @media(prefers-reduced-motion:reduce){.j3-in::before{animation:none}.j3-in{transition:none}}
   @media print{.j3-in{-webkit-print-color-adjust:exact;print-color-adjust:exact;transform:none!important}}`;
   document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5, i = t.firstChild; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
@@ -710,24 +696,10 @@
       if (be) { const out = []; for (let i = 0; i < list.length; i += 100) { const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=liveq&symbols=' + encodeURIComponent(list.slice(i, i + 100).map((x) => x + '.NS').join(','))), 40000)); if (j && j.ok) Object.keys(j.q).forEach((k) => { const a = j.q[k]; if (a && a[0] && a[1]) out.push({ s: k.replace(/\.NS$/, ''), p: a[0], pc: a[1] }); }); } if (out.length) rows = out; }
     } catch (e) { }
     if (!rows) { try { const rr = await fetchBatch(list.map((x) => x + '.NS')); rows = rr.filter((r) => r && r.p != null && r.pc).map((r) => ({ s: r.s.replace(/\.NS$/, ''), p: r.p, pc: r.pc })); } catch (e) { } }
-    S.mv[sym] = { rows: rows && rows.length ? rows : null, t: Date.now(), n: list.length }; paint();
-  }
-  function moversHTML(items) {
-    const sym = S.hm; if (!sym) return '';
-    const it = items.find((i) => i.sym === sym), nm = it ? it.n : sym;
-    const wrap = (inner) => `<div class="jd-mvx"><div class="jd-mvh"><b>${esc(nm)}</b><span>strongest &amp; weakest stocks${sym === '^BSESN' ? ' · Sensex list not published by BSE, showing Nifty 50 stocks' : ''}</span><button type="button" class="jd-mvb" data-xr="${esc(sym)}">X-ray index</button><button type="button" class="jd-mvb" data-hmx="1" title="Close">✕</button></div>${inner}</div>`;
-    const list = consOf(sym); if (!S.cons) return wrap('<div class="jd-fn">Loading constituents…</div>');
-    if (!list) return wrap('<div class="jd-fn">The stock list for this index isn’t available yet.</div>');
-    const m = S.mv[sym]; if (!m || !m.rows) return wrap(`<div class="jd-fn">${!m || m.busy ? 'Loading live quotes for ' + list.length + ' stocks…' : 'Quotes are unavailable right now — they retry automatically.'}</div>`);
-    const R = m.rows.map((r) => Object.assign({ c: (r.p / r.pc - 1) * 100 }, r)).sort((a, b) => b.c - a.c), up = R.filter((r) => r.c > 0.005).length, dn = R.filter((r) => r.c < -0.005).length, mx = Math.max(1, ...R.map((r) => Math.abs(r.c)));
-    const line = (r) => `<div class="jd-mvr ${r.c >= 0 ? 'u' : 'd'}" data-xr="${esc(r.s)}.NS" title="${esc(r.s)} · click for live X-ray"><span class="jd-mvn">${esc(r.s)}</span><span class="jd-mvp">${fmtN(r.p, 2)}</span><span class="jd-mvc">${r.c > 0 ? '+' : ''}${r.c.toFixed(2)}%</span><i style="width:${Math.min(100, Math.abs(r.c) / mx * 100).toFixed(0)}%"></i></div>`;
-    const topN = S.hmAll ? R.length : 5, g = R.filter((r) => r.c > 0).slice(0, topN), l = R.filter((r) => r.c < 0).slice(-topN).reverse();
-    return wrap(`<div class="jd-mvg"><div><h5 class="u">▲ Top performers</h5>${g.map(line).join('') || '<div class="jd-fn">none</div>'}</div><div><h5 class="d">▼ Non-performers</h5>${l.map(line).join('') || '<div class="jd-fn">none</div>'}</div></div>`
-      + `<div class="jd-mvf"><span>${up} advancing · ${dn} declining · ${R.length}/${list.length} stocks priced</span><button type="button" class="jd-mvb" data-hmall="1">${S.hmAll ? 'Show top 5' : 'Show all'}</button></div>`);
+    S.mv[sym] = { rows: rows && rows.length ? rows : null, t: Date.now(), n: list.length }; paint(); renderPop();
   }
   const CSS4 = `
   .jd-hmt[data-hm]{cursor:pointer;transition:transform .12s,box-shadow .12s}.jd-hmt[data-hm]:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(20,48,110,.25)}.jd-hmt.sel{outline:3px solid #14306e;outline-offset:1px}
-  .jd-mvx{margin-top:10px;border:1px solid #b9c7e6;border-radius:10px;background:linear-gradient(180deg,#f7f9ff,#fff);padding:8px 10px}
   .jd-mvh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}.jd-mvh b{font-size:13.5px;color:#0b2260}.jd-mvh span{font-size:10.5px;color:#4a5878;font-weight:600;flex:1}
   .jd-mvb{font:700 10px "Segoe UI",sans-serif;border:1px solid #bccae6;background:#fff;color:#14306e;border-radius:6px;padding:2px 8px;cursor:pointer}.jd-mvb:hover{background:#eef3ff}
   .jd-mvg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.jd-mvg h5{margin:0 0 4px;font-size:11px;letter-spacing:.04em}.jd-mvg h5.u{color:#0c7a42}.jd-mvg h5.d{color:#b3162f}
@@ -736,16 +708,184 @@
   .jd-mvn{font-weight:800;color:#14213d}.jd-mvp{font:600 11px ui-monospace,Consolas,monospace;color:#4a5878}.jd-mvc{font:800 11.5px ui-monospace,Consolas,monospace;min-width:58px;text-align:right}.jd-mvr.u .jd-mvc{color:#0c7a42}.jd-mvr.d .jd-mvc{color:#b3162f}
   .jd-mvf{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10.5px;color:#4a5878}
   @media(max-width:700px){.jd-mvg{grid-template-columns:1fr}}`;
+  /* ---------- small glass tiles for Global markets / Commodities / Currencies / Bonds, and the popups ---------- */
+  const PM = {}; // popup items by key
+  const GLOBAL_T = GLOBAL.map((g) => [g[0], g[1].map((it) => (PM[it[0]] = { k: it[0], n: it[1], fc: it[2] }))]);
+  const COMM_T = COMM.map((it) => (PM[it[0]] = { k: it[0], n: it[1].replace(/\s+/g, ' '), cat: 'comm' }));
+  const FX_T = [['EURINR=X', 'EUR / INR', 3], ['GBPINR=X', 'GBP / INR', 3], ['JPYINR=X', 'JPY / INR', 4], ['DX-Y.NYB', 'US DOLLAR INDEX', 3], ['EURUSD=X', 'EUR / USD', 4]].map((it) => (PM[it[0]] = { k: it[0], n: it[1], dp: it[2], cat: 'fx' }));
+  const BOND_T = [{ k: 'cnbc:IN10Y', cn: 'IN10Y', n: 'INDIA 10Y G-SEC', fc: 'in' }, { k: 'cnbc:JP10Y', cn: 'JP10Y', n: 'JAPAN 10Y JGB', fc: 'jp' }, { k: 'cnbc:UK10Y', cn: 'UK10Y', n: 'UK 10Y GILT', fc: 'gb' }, { k: 'cnbc:DE10Y', cn: 'DE10Y', n: 'GERMANY 10Y BUND', fc: 'de' }]
+    .concat(BONDS.map((it) => ({ k: it[0], n: it[1].replace(' YIELD', ''), fc: 'us', yld: 1 }))).map((it) => (PM[it.k] = Object.assign(it, { yld: 1, cat: 'bond' })));
+  function quoteOf(it) {
+    if (it.cn) { const x = it.cn === 'IN10Y' ? (S.x.in10y || S.bd.IN10Y || (manual().in10y ? { p: manual().in10y.v, pc: null } : null)) : S.bd[it.cn]; return x ? { p: x.p, pc: x.pc, sp: null, live: false, d: x.d } : null; }
+    const q = S.q[it.k]; return q ? { p: q.p, pc: q.pc, sp: q.sp, live: q.t ? (Date.now() / 1000 - q.t) / 60 < 20 : false, d: '' } : null;
+  }
+  function mtile(it, ms) {
+    const x = quoteOf(it); let cls = 'fl', pxt = '…', cht = '';
+    if (x && x.p != null) {
+      const dp = it.dp != null ? it.dp : it.yld ? 3 : dpOf(x.p), chg = x.pc != null ? x.p - x.pc : null, pct = x.pc ? chg / x.pc * 100 : null, dir = chg == null || Math.abs(pct) < 0.005 ? 0 : chg > 0 ? 1 : -1, good = it.yld ? -dir : dir;
+      cls = good > 0 ? 'up' : good < 0 ? 'dn' : 'fl'; pxt = fmtN(x.p, dp) + (it.yld ? '<u>%</u>' : '');
+      cht = chg == null ? '' : it.yld ? `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chg >= 0 ? '+' : ''}${(chg * 100).toFixed(1)} bp` : `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
+    }
+    const q = S.q[it.k], fl = q && q.flash ? ' fl-' + q.flash : '';
+    return `<button type="button" class="j3m ${cls}${fl}" data-pop="${esc(it.k)}" title="${esc(it.n)} · click for details &amp; trend signals"><span class="j3m-n">${it.fc ? flag(it.fc) : ''}<em>${esc(it.n)}</em>${x && x.live ? '<i class="j3m-l"></i>' : ''}</span><span class="j3m-p">${pxt}</span><span class="j3m-c">${cht || '&nbsp;'}</span></button>`;
+  }
+  const tgrid = (arr, ms) => `<div class="j3m-g">${arr.map((it) => mtile(it, ms)).join('')}</div>`;
+  const TIP = '<div class="jd-fn">Tap a tile for details and trend signals.</div>';
+
+  /* ---- history analytics + signals for the instrument popup ---- */
+  async function histOne(sym, quiet) {
+    const h = S.h[sym], ms = Date.now(); if (h && (h.busy || ms < h.due)) return; S.h[sym] = Object.assign(h || {}, { busy: 1 });
+    try {
+      const j = await fetchData(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=1y&interval=1d&includePrePost=false`, { kind: 'json', validate: (x) => !!(x && x.chart && x.chart.result && x.chart.result[0]) });
+      const r = j.chart.result[0], q = r.indicators.quote[0], ts = r.timestamp || [], bars = [];
+      ts.forEach((tt, i) => { if (q.close[i] != null && q.high[i] != null && q.low[i] != null) bars.push({ d: new Date((tt + 19800) * 1000).toISOString().slice(0, 10), h: q.high[i], l: q.low[i], c: q.close[i] }); });
+      S.h[sym] = { bars, due: ms + 30 * 60000 };
+    } catch (e) { S.h[sym] = { bars: (h && h.bars) || null, due: ms + 3 * 60000, err: 1 }; }
+    if (!quiet) renderPop();
+  }
+  function ana(sym, px) {
+    const h = S.h[sym]; if (!h || !h.bars || h.bars.length < 60 || px == null) return null;
+    const B = h.bars, cl = B.map((b) => b.c); cl[cl.length - 1] = px; const n = cl.length, last = px, sma = (k) => n >= k ? avg(cl.slice(-k)) : null, s20 = sma(20), s50 = sma(50), s200 = sma(200);
+    const ema = (a, k) => { const m = 2 / (k + 1); let e = a[0]; const o = [e]; for (let i = 1; i < a.length; i++) { e = a[i] * m + e * (1 - m); o.push(e); } return o; };
+    const e12 = ema(cl, 12), e26 = ema(cl, 26), macd = e12.map((v, i) => v - e26[i]), sg = ema(macd, 9), mh = macd[n - 1] - sg[n - 1], mhp = macd[n - 4] - sg[n - 4];
+    let g = 0, l = 0; for (let i = 1; i <= 14; i++) { const d = cl[i] - cl[i - 1]; if (d >= 0) g += d; else l -= d; } g /= 14; l /= 14;
+    for (let i = 15; i < n; i++) { const d = cl[i] - cl[i - 1]; g = (g * 13 + Math.max(d, 0)) / 14; l = (l * 13 + Math.max(-d, 0)) / 14; } const rsi = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+    const ret = (k) => n > k ? (last / cl[n - 1 - k] - 1) * 100 : null, yr = new Date(Date.now() + 19800000).getUTCFullYear() + '-01-01', iy = B.findIndex((b) => b.d >= yr), ytd = iy > 0 ? (last / cl[iy - 1] - 1) * 100 : null;
+    const hi52 = Math.max(...B.map((b) => b.h), last), lo52 = Math.min(...B.map((b) => b.l), last), pH = Math.max(...B.slice(-21, -1).map((b) => b.h)), pL = Math.min(...B.slice(-21, -1).map((b) => b.l));
+    const tr = (cur, ma, prev) => ma == null ? null : cur > ma && ma >= prev ? 1 : cur < ma && ma <= prev ? -1 : 0;
+    const T = { s: tr(last, s20, avg(cl.slice(-25, -5))), m: tr(last, s50, avg(cl.slice(-65, -15))), l: s200 == null ? null : tr(last, s200, avg(cl.slice(-230, -30).length ? cl.slice(-230, -30) : cl)) };
+    const S2 = []; // [text, tone g/r/a/n]
+    if (s200 != null) S2.push(s50 > s200 ? ['50-DMA above 200-DMA — golden-cross zone', 'g'] : ['50-DMA below 200-DMA — death-cross zone', 'r']);
+    S2.push(rsi >= 70 ? ['RSI ' + rsi.toFixed(0) + ' — overbought, stretched', 'a'] : rsi >= 55 ? ['RSI ' + rsi.toFixed(0) + ' — bullish momentum', 'g'] : rsi <= 30 ? ['RSI ' + rsi.toFixed(0) + ' — oversold, washed out', 'a'] : rsi <= 45 ? ['RSI ' + rsi.toFixed(0) + ' — bearish momentum', 'r'] : ['RSI ' + rsi.toFixed(0) + ' — neutral', 'n']);
+    S2.push(mh > 0 ? [mhp <= 0 ? 'MACD fresh bullish crossover' : 'MACD above signal line — bullish', 'g'] : [mhp >= 0 ? 'MACD fresh bearish crossover' : 'MACD below signal line — bearish', 'r']);
+    if (last > pH) S2.push(['Breakout above the 20-day high', 'g']); else if (last < pL) S2.push(['Breakdown below the 20-day low', 'r']);
+    if (last >= hi52 * 0.98) S2.push(['Within 2% of the 52-week high', 'g']); else if (last <= lo52 * 1.02) S2.push(['Within 2% of the 52-week low', 'r']);
+    const r1 = ret(21); if (r1 != null && r1 >= 5) S2.push(['Strong 1-month momentum (' + r1.toFixed(1) + '%)', 'g']); else if (r1 != null && r1 <= -5) S2.push(['Weak 1-month momentum (' + r1.toFixed(1) + '%)', 'r']);
+    const score = [T.s, T.m, T.l].reduce((a, v) => a + (v || 0), 0) + S2.reduce((a, v) => a + (v[1] === 'g' ? 1 : v[1] === 'r' ? -1 : 0), 0);
+    return { s20, s50, s200, rsi, mh, ret1w: ret(5), ret1m: ret(21), ret3m: ret(63), ret1y: n > 240 ? ret(n - 1) : null, ytd, hi52, lo52, pos: (last - lo52) / ((hi52 - lo52) || 1) * 100, T, sig: S2, bias: score >= 3 ? ['BULLISH BIAS', 'g'] : score <= -3 ? ['BEARISH BIAS', 'r'] : ['NEUTRAL / MIXED', 'n'], B, cl };
+  }
+  function chartSVG(A, L, dp) {
+    const N = Math.min(120, A.cl.length), pr = A.cl.slice(-N), sm = (k) => A.cl.map((_, i) => i >= k - 1 ? avg(A.cl.slice(i - k + 1, i + 1)) : null).slice(-N), s20 = sm(20), s50 = sm(50);
+    const lv = [[L && L.mr, 'r'], [L && L.nr, 'r'], [L && L.ns, 's'], [L && L.ms, 's']].filter((x) => x[0]).map((x) => [x[0][0], x[1]]);
+    const base = pr.concat(s20.filter((v) => v != null), s50.filter((v) => v != null)); let mn = Math.min(...base), mx = Math.max(...base); const pad = (mx - mn) * 0.08; mn -= pad; mx += pad;
+    const W = 640, H = 190, X = (i) => (i / (N - 1) * W).toFixed(1), Y = (v) => (H - 10 - (v - mn) / ((mx - mn) || 1) * (H - 20)).toFixed(1), line = (a, c, w, d) => `<polyline fill="none" stroke="${c}" stroke-width="${w}" ${d ? 'stroke-dasharray="4 3"' : ''} points="${a.map((v, i) => v == null ? null : X(i) + ',' + Y(v)).filter(Boolean).join(' ')}"/>`;
+    const hl = lv.filter((x) => x[0] > mn && x[0] < mx).map((x) => `<line x1="0" x2="${W}" y1="${Y(x[0])}" y2="${Y(x[0])}" stroke="${x[1] === 'r' ? '#d12a47' : '#16a05a'}" stroke-width="1" stroke-dasharray="5 4" opacity=".75"/><text x="${W - 3}" y="${(+Y(x[0]) - 3).toFixed(1)}" text-anchor="end" font-size="10" fill="${x[1] === 'r' ? '#b3162f' : '#0c7a42'}">${x[1] === 'r' ? 'R' : 'S'} ${fmtN(x[0], dp)}</text>`).join('');
+    return `<svg class="jd-pch" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><rect width="${W}" height="${H}" fill="#f6f8fd"/>${hl}${line(s50, '#2f5fd0', 1.4)}${line(s20, '#e08a00', 1.4)}${line(pr, '#0b2260', 2)}</svg><div class="jd-pleg"><span style="--c:#0b2260">price</span><span style="--c:#e08a00">20-DMA</span><span style="--c:#2f5fd0">50-DMA</span><span style="--c:#d12a47">resistance</span><span style="--c:#16a05a">support</span> · last ${N} sessions</div>`;
+  }
+  const roundStep = (p) => { let s = Math.pow(10, Math.floor(Math.log10(Math.abs(p) || 1)) - 1); if (p / s < 20) s /= 2; return s; };
+  const sgn = (v, d) => v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(d == null ? 2 : d) + '%';
+  const tcol = (v) => v == null ? 'n' : v > 0 ? 'g' : v < 0 ? 'r' : 'a';
+  function instPopHTML(P) {
+    const it = P.it, x = quoteOf(it), top = (inner) => `<div class="jd-pm-h"><div class="jd-pm-t">${it.fc ? flag(it.fc) : ''}<b>${esc(it.n)}</b><small>${it.cn ? 'CNBC quote feed' : esc(it.k)}</small></div><div class="jd-pm-bt">${it.cn ? '' : `<button type="button" class="jd-mvb" data-xr="${esc(it.k)}">X-ray</button>`}<button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div><div class="jd-pm-b">${inner}</div>`;
+    if (!x || x.p == null) return top('<div class="jd-fn">Waiting for the first quote…</div>');
+    const dp = it.dp != null ? it.dp : it.yld ? 3 : dpOf(x.p), chg = x.pc != null ? x.p - x.pc : null, pct = x.pc ? chg / x.pc * 100 : null, dir = chg == null ? 0 : chg > 0 ? 1 : chg < 0 ? -1 : 0, good = it.yld ? -dir : dir;
+    const head = `<div class="jd-pk ${good > 0 ? 'u' : good < 0 ? 'd' : ''}"><span class="jd-pkp">${fmtN(x.p, dp)}${it.yld ? '<u>%</u>' : ''}</span><span class="jd-pkc">${chg == null ? '' : (dir > 0 ? '▲ ' : dir < 0 ? '▼ ' : '■ ') + (it.yld ? (chg >= 0 ? '+' : '') + (chg * 100).toFixed(1) + ' bp' : (chg > 0 ? '+' : '') + fmtN(chg, dp) + ' (' + sgn(pct) + ')')}</span>${x.live ? '<span class="jd-pkl">● live</span>' : '<span class="jd-pkl off">last session</span>'}</div>`;
+    if (it.cn) return top(head + '<div class="jd-fn">Price history is not available for this yield on the free feed, so trend signals and levels are not shown. Change is versus the previous close.</div>');
+    const h = S.h[it.k];
+    if (!h || !h.bars) return top(head + `<div class="jd-fn">${h && h.err ? 'History could not be loaded right now — retrying.' : 'Loading 1-year history for trend signals…'}</div>`);
+    const A = ana(it.k, x.p); if (!A) return top(head + '<div class="jd-fn">Not enough history for signals.</div>');
+    const L = levels({ s: it.k, rnd: roundStep(x.p) }, x.p), f = (v) => fmtN(v, dp);
+    const chip = (v, k) => `<span class="jd-tc2 ${A.T[v] == null ? 'n' : tcol(A.T[v])}"><i>${k}</i>${A.T[v] == null ? 'n/a' : A.T[v] > 0 ? '▲ UP' : A.T[v] < 0 ? '▼ DOWN' : '■ FLAT'}</span>`;
+    const dist = (v) => ((v / x.p - 1) * 100).toFixed(1), lrow = (k, c, v) => `<div class="j3-r ${c}"><i>${k}</i><b>${v ? f(v[0]) : '—'}</b><u>${v ? (v[0] > x.p ? '+' : '') + dist(v[0]) + '%' : ''}</u></div>`;
+    const stat = (k, v) => `<div class="jd-st"><span>${k}</span><b>${v}</b></div>`;
+    const body = head + `<div class="jd-pbias ${A.bias[1]}">${A.bias[0]}</div><div class="jd-tcs">${chip('s', 'Short · 20D')}${chip('m', 'Medium · 50D')}${chip('l', 'Long · 200D')}</div>`
+      + `<h5>Trend signals</h5><div class="jd-sig">${A.sig.map((s) => `<span class="jd-sg ${s[1]}">${esc(s[0])}</span>`).join('')}</div>`
+      + chartSVG(A, L, dp)
+      + `<div class="jd-pgrid"><div><h5>Support &amp; resistance</h5><div class="j3-lv jd-lvl">${lrow('Major R', 'r mj', L && (L.mr || (L.at52h ? [A.hi52, ''] : null)))}${lrow('Near R', 'r', L && L.nr)}${lrow('Near S', 's', L && L.ns)}${lrow('Major S', 's mj', L && L.ms)}</div><div class="jd-fn">Pivot points, previous-day and 5-day extremes, round numbers; major from 20/60-session and 52-week extremes and the 50/200-day averages.</div></div>`
+      + `<div><h5>Key numbers</h5>${stat('52-week high / low', f(A.hi52) + ' / ' + f(A.lo52))}${stat('Position in 52-week range', A.pos.toFixed(0) + '%')}${stat('1W · 1M · 3M', sgn(A.ret1w, 1) + ' · ' + sgn(A.ret1m, 1) + ' · ' + sgn(A.ret3m, 1))}${stat('YTD · 1Y', sgn(A.ytd, 1) + ' · ' + sgn(A.ret1y, 1))}${stat('20 / 50 / 200-DMA', f(A.s20) + ' / ' + f(A.s50) + ' / ' + (A.s200 ? f(A.s200) : '—'))}${stat('RSI (14)', A.rsi.toFixed(0))}</div></div>`
+      + '<div class="jd-fn">Mechanical, rule-based signals from delayed daily data — research input, not advice; no outcome is guaranteed.</div>';
+    return top(body);
+  }
+
+  /* ---- index popup: weights and contribution to the index move ---- */
+  const HN = {}; [['^NSEI', 'NIFTY 50'], ['^NSEBANK', 'BANK NIFTY'], ['^BSESN', 'SENSEX']].concat(NIFTY_OTHERS.map((x) => [x[0], x[1]])).forEach((x) => { HN[x[0]] = x[1]; });
+  async function loadWeights() { if (S.wt || S.wtBusy) return; S.wtBusy = 1; try { const j = await (await fetch('data/weights.json?h=' + Math.floor(Date.now() / 3600000))).json(); S.wt = j.w || {}; S.wtSrc = j.source || ''; S.wtAt = (j.updated || '').slice(0, 10); } catch (e) { S.wt = {}; } finally { S.wtBusy = 0; renderPop(); } }
+  function idxCalc(sym) {
+    const list = consOf(sym), m = S.mv[sym]; if (!list || !m || !m.rows) return null;
+    const have = list.filter((s) => S.wt && S.wt[s]).length, eq = have < list.length * 0.7; let tot = 0; const cap = {}; list.forEach((s) => { cap[s] = eq ? 1 : (S.wt[s] || 0); tot += cap[s]; });
+    const q = S.q[sym], pc = q && q.pc ? q.pc : null;
+    return { eq, pc, rows: m.rows.map((r) => { const w = tot ? cap[r.s] / tot : 0, c = (r.p / r.pc - 1) * 100; return { s: r.s, p: r.p, c, w: w * 100, pts: pc ? w * c / 100 * pc : null }; }) };
+  }
+  function idxPopHTML(P) {
+    const sym = P.k, nm = HN[sym] || sym, q = S.q[sym], px = q ? q.p : null, chg = q && q.pc ? q.p - q.pc : null, pct = q && q.pc ? chg / q.pc * 100 : null;
+    const top = (inner) => `<div class="jd-pm-h"><div class="jd-pm-t"><b>${esc(nm)}</b><small>what is moving the index</small></div><div class="jd-pm-bt"><button type="button" class="jd-mvb" data-xr="${esc(sym)}">X-ray index</button><button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div><div class="jd-pm-b">${inner}</div>`;
+    const head = px == null ? '' : `<div class="jd-pk ${chg > 0 ? 'u' : chg < 0 ? 'd' : ''}"><span class="jd-pkp">${fmtN(px, 2)}</span><span class="jd-pkc">${chg == null ? '' : (chg > 0 ? '▲ +' : '▼ ') + fmtN(chg, 2) + ' pts (' + sgn(pct) + ')'}</span></div>`;
+    const list = consOf(sym); if (!S.cons) return top(head + '<div class="jd-fn">Loading constituents…</div>');
+    if (!list) return top(head + '<div class="jd-fn">The stock list for this index isn’t available yet.</div>');
+    const C = idxCalc(sym); if (!C) { const m = S.mv[sym]; return top(head + `<div class="jd-fn">${!m || m.busy ? 'Loading live quotes for ' + list.length + ' stocks…' : 'Quotes are unavailable right now — they retry automatically.'}</div>`); }
+    const R = C.rows.slice(), dp = C.pc && C.pc >= 1000 ? 1 : 2, haveP = C.pc != null;
+    R.sort((a, b) => haveP ? b.pts - a.pts : b.c - a.c);
+    const pos = R.filter((r) => (haveP ? r.pts : r.c) > 0), neg = R.filter((r) => (haveP ? r.pts : r.c) < 0).reverse(), sumP = pos.reduce((a, r) => a + (r.pts || 0), 0), sumN = neg.reduce((a, r) => a + (r.pts || 0), 0);
+    const mxp = Math.max(0.0001, ...R.map((r) => Math.abs(haveP ? r.pts : r.c))), N = P.all ? R.length : 8;
+    const line = (r) => `<div class="jd-cr ${(haveP ? r.pts : r.c) >= 0 ? 'u' : 'd'}" data-xr="${esc(r.s)}.NS" title="${esc(r.s)} · click for live X-ray"><span class="n">${esc(r.s)}</span><span class="w">${r.w.toFixed(2)}%</span><span class="c">${sgn(r.c)}</span><span class="p">${haveP ? (r.pts > 0 ? '+' : '') + r.pts.toFixed(dp) : ''}</span><i style="width:${(Math.abs(haveP ? r.pts : r.c) / mxp * 100).toFixed(0)}%"></i></div>`;
+    const hdr = '<div class="jd-cr jd-crh"><span class="n">Stock</span><span class="w">Weight</span><span class="c">Chg</span><span class="p">Pts</span></div>';
+    const bar = haveP ? `<div class="jd-net"><div class="jd-nb2"><i class="d" style="flex:${Math.max(0.0001, -sumN)}"></i><i class="u" style="flex:${Math.max(0.0001, sumP)}"></i></div><div class="jd-nl"><span class="d">Dragging ${fmtN(sumN, dp)} pts</span><b>Net ${(sumP + sumN > 0 ? '+' : '') + fmtN(sumP + sumN, dp)} pts${chg != null ? ' · index moved ' + (chg > 0 ? '+' : '') + fmtN(chg, dp) : ''}</b><span class="u">Lifting +${fmtN(sumP, dp)} pts</span></div></div>` : '';
+    const body = head + bar + `<div class="jd-mvg"><div><h5 class="u">▲ Lifting the index</h5>${hdr}${pos.slice(0, N).map(line).join('') || '<div class="jd-fn">none</div>'}</div><div><h5 class="d">▼ Dragging the index</h5>${hdr}${neg.slice(0, N).map(line).join('') || '<div class="jd-fn">none</div>'}</div></div>`
+      + `<div class="jd-mvf"><span>${pos.length} up · ${neg.length} down · ${R.length}/${list.length} stocks priced</span><button type="button" class="jd-mvb" data-popall="1">${P.all ? 'Show top 8' : 'Show all stocks'}</button></div>`
+      + `<div class="jd-fn">${C.eq ? 'Weights unavailable right now — equal weights assumed, so points are only indicative. ' : 'Weight = free-float market-cap share of the stocks in this index' + (S.wtAt ? ' (data of ' + esc(S.wtAt) + ')' : '') + '; points = weight × stock move × index close — an estimate, index caps and rebalancing not applied. '}${sym === '^BSESN' ? 'BSE does not publish the Sensex list, so Nifty 50 stocks are used — treat as approximate. ' : ''}Tap a stock for its X-ray.</div>`;
+    return top(body);
+  }
+  function renderPop() {
+    const el = $('jdPop'); if (!el) return; const P = S.pop;
+    if (!P) { if (!el.hidden) { el.hidden = true; el.innerHTML = ''; el.__sig = ''; document.body.style.overflow = ''; } return; }
+    const html = P.t === 'idx' ? idxPopHTML(P) : instPopHTML(P); if (el.__sig === html && !el.hidden) return; el.__sig = html;
+    const sc = el.querySelector('.jd-pm-b'), st = sc ? sc.scrollTop : 0; el.innerHTML = `<div class="jd-pm" role="dialog" aria-modal="true">${html}</div>`; el.hidden = false; document.body.style.overflow = 'hidden';
+    const sc2 = el.querySelector('.jd-pm-b'); if (sc2) sc2.scrollTop = st;
+  }
+  function openIdx(sym) { S.pop = { t: 'idx', k: sym, all: false }; renderPop(); loadCons().then(() => { loadMovers(sym); renderPop(); }); loadWeights(); }
+  function openInst(k) { const it = PM[k]; if (!it) return; S.pop = { t: 'inst', k, it }; if (!it.cn) histOne(it.k); renderPop(); }
+
+  /* ---- top-row combined tile: India 10Y G-Sec + Nifty PCR ---- */
+  function comboTile() {
+    const x = S.x.in10y || S.bd.IN10Y, m = manual().in10y, y = x && x.p != null ? x.p : m ? m.v : null, yc = x && x.pc != null ? (x.p - x.pc) * 100 : null, dy = yc == null || Math.abs(yc) < 0.05 ? 0 : yc > 0 ? 1 : -1;
+    const px = S.x.pcr, mp = manual().pcr, pv = px && px.pcr != null ? px.pcr : mp ? mp.v : null, tag = pv != null ? pcrTag(pv) : null, cls = dy ? (dy > 0 ? 'dn' : 'up') : tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 'fl';
+    return `<div class="j3 ${cls}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${flag('in')}INDIA 10Y G-SEC</span></div><div class="j3-px">${y == null ? manIn('in10y', 'yield %') : fmtN(y, 3) + '<i>%</i>'}</div>`
+      + `<div class="j3-ch">${yc == null ? '<span>' + (y == null ? 'feed unavailable · enter value' : m && !x ? 'manual value' : '—') + '</span>' : `<b>${dy > 0 ? '▲' : dy < 0 ? '▼' : '■'}</b> ${yc >= 0 ? '+' : ''}${yc.toFixed(1)} bp`}</div><div class="j3-sep"></div>`
+      + `<div class="j3-top"><span class="j3-nm">NIFTY PCR (OI)${px && px.expiry ? '<small> · ' + esc(px.expiry) + '</small>' : ''}</span></div><div class="j3-px">${pv == null ? manIn('pcr', 'PCR') : pv.toFixed(2)}</div>`
+      + `<div class="j3-tr ${tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 't0'}">${tag ? tag[0] : 'feed unavailable · enter value'}</div></div></div>`;
+  }
+  const CSS5 = `
+  .j3-sep{height:1px;margin:9px 0 6px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent)}.j3-nm small{font-weight:600;opacity:.7;letter-spacing:0}
+  .j3m-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:2px 0 8px}.j3m-sub{margin:8px 0 5px;font-size:9.5px;font-weight:800;letter-spacing:.14em;color:#52607f;text-align:center;border-bottom:1px solid #dfe7f6;padding-bottom:3px}
+  .j3m{position:relative;overflow:hidden;isolation:isolate;text-align:left;font:inherit;color:#eef3ff;cursor:pointer;border-radius:12px;padding:6px 9px 6px;min-height:62px;display:flex;flex-direction:column;justify-content:space-between;gap:1px;
+    background:linear-gradient(150deg,#27345c,#111a37 55%,#070b1a);border:1px solid rgba(190,205,255,.3);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -6px 10px rgba(0,0,0,.4) inset,0 4px 0 -1px #0a1128,0 10px 12px -6px rgba(5,12,40,.7);transition:transform .12s,box-shadow .12s}
+  .j3m:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -6px 10px rgba(0,0,0,.4) inset,0 4px 0 -1px #0a1128,0 16px 16px -8px rgba(5,12,40,.8)}
+  .j3m::before{content:'';position:absolute;inset:-25%;z-index:-1;filter:blur(9px);background:radial-gradient(40% 40% at 15% 90%,var(--g1),transparent 70%),radial-gradient(35% 35% at 90% 20%,rgba(150,175,255,.3),transparent 70%)}
+  .j3m::after{content:'';position:absolute;left:0;right:0;top:0;height:44%;z-index:0;pointer-events:none;border-radius:12px 12px 50% 50%/12px 12px 14px 14px;background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0))}
+  .j3m>*{position:relative;z-index:1}.j3m.up{--g1:rgba(30,214,120,.5);--ac:#42f0a0;border-color:rgba(66,240,160,.5)}.j3m.dn{--g1:rgba(255,70,95,.48);--ac:#ff8a9b;border-color:rgba(255,122,142,.5)}.j3m.fl{--g1:rgba(120,150,255,.38);--ac:#c5d1f7}
+  .j3m-n{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:800;letter-spacing:.05em;color:#dfe8ff;text-shadow:0 1px 2px rgba(0,0,0,.6);min-width:0}.j3m-n em{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.j3m .jd-flag{width:16px;height:11px;flex:none}
+  .j3m-l{width:6px;height:6px;border-radius:50%;background:#42f0a0;box-shadow:0 0 6px #42f0a0;flex:none;margin-left:auto}
+  .j3m-p{font-size:15.5px;font-weight:800;color:#fff;text-shadow:0 2px 5px rgba(0,0,0,.55),0 0 12px var(--g1);font-variant-numeric:tabular-nums}.j3m-p u{text-decoration:none;font-size:10px;opacity:.8;margin-left:1px}
+  .j3m-c{font-size:10.5px;font-weight:700;color:var(--ac);text-shadow:0 1px 2px rgba(0,0,0,.5)}.j3m-c b{font-size:8.5px}
+  .j3m.fl-up .j3m-p,.j3m.fl-dn .j3m-p{animation:j3f 1s}
+  .jd-pop{position:fixed;inset:0;z-index:99000;background:rgba(6,12,32,.6);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:18px}.jd-pop[hidden]{display:none}
+  .jd-pm{width:min(900px,100%);max-height:calc(100vh - 36px);display:flex;flex-direction:column;border-radius:16px;background:#fff;box-shadow:0 30px 70px -20px rgba(0,0,0,.7);overflow:hidden;animation:jdpop .18s ease-out}@keyframes jdpop{from{transform:translateY(12px) scale(.98);opacity:0}}
+  .jd-pm-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;color:#fff;background:linear-gradient(135deg,#1b2f66,#0b1330);border-bottom:2px solid #c9a24a}.jd-pm-t{display:flex;align-items:center;gap:9px;min-width:0}.jd-pm-t b{font-size:16px;letter-spacing:.03em}.jd-pm-t small{opacity:.7;font-size:11px}.jd-pm-t .jd-flag{width:28px;height:19px}
+  .jd-pm-bt{display:flex;gap:6px}.jd-pm-h .jd-mvb{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff}.jd-pm-h .jd-mvb:hover{background:rgba(255,255,255,.25)}
+  .jd-pm-b{padding:12px 16px 14px;overflow:auto}.jd-pm-b h5{margin:10px 0 5px;font-size:11px;letter-spacing:.06em;color:#14306e}.jd-pm-b h5.u{color:#0c7a42}.jd-pm-b h5.d{color:#b3162f}
+  .jd-pk{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.jd-pkp{font:800 30px "Segoe UI",sans-serif;color:#0b2260;font-variant-numeric:tabular-nums}.jd-pkp u{text-decoration:none;font-size:16px;opacity:.7}.jd-pkc{font-size:14px;font-weight:700}.jd-pk.u .jd-pkc{color:#0c7a42}.jd-pk.d .jd-pkc{color:#b3162f}.jd-pkl{font-size:10.5px;font-weight:700;color:#0c7a42}.jd-pkl.off{color:#7b88a6}
+  .jd-pbias{display:inline-block;margin:8px 0 4px;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.08em;background:#eef1f7;color:#4a5878}.jd-pbias.g{background:#dff5e8;color:#0c7a42}.jd-pbias.r{background:#fde3e8;color:#b3162f}
+  .jd-tcs{display:flex;gap:8px;flex-wrap:wrap}.jd-tc2{display:flex;flex-direction:column;gap:1px;padding:5px 12px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid #d5ddf0;background:#f6f8fd}.jd-tc2 i{font-style:normal;font-size:9px;letter-spacing:.06em;color:#52607f;font-weight:700}.jd-tc2.g{background:#e6f7ee;border-color:#9fdcbb;color:#0c7a42}.jd-tc2.r{background:#fdeaee;border-color:#f0a8b5;color:#b3162f}.jd-tc2.a{background:#fff4dc;border-color:#ecc77a;color:#8a5a00}
+  .jd-sig{display:flex;flex-wrap:wrap;gap:6px}.jd-sg{font-size:11px;font-weight:700;padding:3px 9px;border-radius:14px;background:#eef1f7;color:#34456a;border:1px solid #d5ddf0}.jd-sg.g{background:#e6f7ee;border-color:#9fdcbb;color:#0c7a42}.jd-sg.r{background:#fdeaee;border-color:#f0a8b5;color:#b3162f}.jd-sg.a{background:#fff4dc;border-color:#ecc77a;color:#8a5a00}
+  .jd-pch{display:block;width:100%;height:190px;margin-top:10px;border:1px solid #dde3f0;border-radius:8px}.jd-pleg{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;color:#52607f;margin:3px 2px 0}.jd-pleg span::before{content:'';display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle;background:var(--c)}
+  .jd-pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}.jd-lvl .j3-r{color:#14213d;background:#f3f6fc}.jd-lvl .j3-r.r{color:#b3162f}.jd-lvl .j3-r.s{color:#0c7a42}.jd-lvl .j3-r.mj{background:#e6ecfa}.jd-lvl{border-top:0;padding-top:0}
+  .jd-st{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:3px 0;border-bottom:1px solid #eef1f7}.jd-st span{color:#52607f}.jd-st b{color:#14213d;text-align:right}
+  .jd-net{margin:10px 0 2px}.jd-nb2{display:flex;height:12px;border-radius:7px;overflow:hidden;gap:2px}.jd-nb2 i{display:block}.jd-nb2 i.u{background:linear-gradient(90deg,#4fd28b,#12894b)}.jd-nb2 i.d{background:linear-gradient(90deg,#c1243e,#ff7a8e)}
+  .jd-nl{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;margin-top:3px;font-weight:700}.jd-nl .u{color:#0c7a42}.jd-nl .d{color:#b3162f}.jd-nl b{color:#14213d}
+  .jd-cr{position:relative;display:grid;grid-template-columns:1fr 54px 58px 62px;gap:6px;align-items:center;padding:3px 6px;margin-bottom:2px;border-radius:5px;font-size:11.5px;cursor:pointer;overflow:hidden;background:#f3f6fc}.jd-cr:hover{background:#e9effb}
+  .jd-cr i{position:absolute;left:0;bottom:0;height:2px;opacity:.75}.jd-cr.u i{background:#16a05a}.jd-cr.d i{background:#d12a47}.jd-cr .n{font-weight:800;color:#14213d}.jd-cr .w,.jd-cr .c,.jd-cr .p{text-align:right;font:700 11px ui-monospace,Consolas,monospace}.jd-cr .w{color:#52607f}
+  .jd-cr.u .c,.jd-cr.u .p{color:#0c7a42}.jd-cr.d .c,.jd-cr.d .p{color:#b3162f}.jd-cr .p{font-weight:800}.jd-crh{background:none;cursor:default;font-size:9.5px;color:#7b88a6;padding-bottom:0}.jd-crh span{font:700 9.5px "Segoe UI",sans-serif!important;color:#7b88a6!important}
+  @media(max-width:700px){.jd-pgrid{grid-template-columns:1fr}.jd-pkp{font-size:24px}.jd-cr{grid-template-columns:1fr 46px 50px 50px}}`;
   /* ---------- wiring ---------- */
   function build() {
     if ($('pDash')) return;
-    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3); const st4 = document.createElement('style'); st4.id = 'jdcss4'; st4.textContent = CSS4; document.head.appendChild(st4);
+    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3); const st4 = document.createElement('style'); st4.id = 'jdcss4'; st4.textContent = CSS4; document.head.appendChild(st4); const st5 = document.createElement('style'); st5.id = 'jdcss5'; st5.textContent = CSS5; document.head.appendChild(st5); if (!$('jdPop')) { const pm = document.createElement('div'); pm.id = 'jdPop'; pm.className = 'jd-pop'; pm.hidden = true; document.body.appendChild(pm); }
     const anchor = document.querySelector('details.datasec'); const p = document.createElement('div'); p.className = 'panel'; p.id = 'pDash'; p.innerHTML = '<div class="note">Loading dashboard…</div>'; anchor.parentNode.insertBefore(p, anchor);
     const sel = $('viewSel'); const og = document.createElement('optgroup'); og.label = "Joshi's Dashboard";
     const o = document.createElement('option'); o.value = 'pDash'; o.textContent = "📊 Joshi's Dashboard — live markets"; og.appendChild(o); sel.insertBefore(og, sel.firstChild); sel.value = window.__curTab || 'pSummary';
   }
   const origShow = window.showTab;
-  window.showTab = function (id) { origShow(id); if (id === 'pDash') { paint(); refresh(!S.last); startTimer(); } };
+  window.showTab = function (id) { origShow(id); if (id !== 'pDash' && S.pop) { S.pop = null; renderPop(); } if (id === 'pDash') { paint(); refresh(!S.last); startTimer(); } };
   const origPrint = window.printPDF;
   window.printPDF = function () { if ((window.__curTab || '') === 'pDash') { window.print(); return; } return origPrint.apply(this, arguments); };
   window.jdRefresh = () => { S.due = {}; S.xDue = 0; S.xNext = {}; S.newsAt = 0; refresh(true); };
@@ -761,11 +901,12 @@
     }, 1000);
   }
   document.addEventListener('click', (e) => {
-    const t = e.target.closest && e.target.closest('[data-hm]');
-    if (t) { const k = t.getAttribute('data-hm'); S.hm = S.hm === k ? null : k; S.hmAll = false; if (S.hm) loadCons().then(() => loadMovers(S.hm)); paint(); return; }
-    if (e.target.closest && e.target.closest('[data-hmx]')) { S.hm = null; paint(); return; }
-    if (e.target.closest && e.target.closest('[data-hmall]')) { S.hmAll = !S.hmAll; paint(); }
+    const c = (q) => e.target.closest && e.target.closest(q), hm = c('[data-hm]'); if (hm) { openIdx(hm.getAttribute('data-hm')); return; }
+    const pp = c('[data-pop]'); if (pp) { openInst(pp.getAttribute('data-pop')); return; }
+    if (c('[data-popx]') || e.target.id === 'jdPop') { S.pop = null; renderPop(); return; }
+    if (c('[data-popall]') && S.pop) { S.pop.all = !S.pop.all; renderPop(); }
   });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.pop) { S.pop = null; renderPop(); } });
   document.addEventListener('click', (e) => { const a = e.target.closest('[data-jdgo]'); if (!a) return; e.preventDefault(); const t = $(a.getAttribute('data-jdgo')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
   function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard' || !h) window.showTab('pDash'); }
