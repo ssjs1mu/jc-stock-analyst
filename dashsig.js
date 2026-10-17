@@ -22,19 +22,19 @@
 
   /* yesterday's levels + 20-day range, once per day */
   async function loadBase() {
-    if (G.baseBusy) return; try { const c = JSON.parse(localStorage.getItem(LSB) || 'null'); if (c && c.d === istToday() && c.b) { G.base = c.b; G.baseAt = c.d; return; } } catch (e) { }
+    if (G.baseBusy || (G.baseTry && Date.now() - G.baseTry < 90000)) return; try { const c = JSON.parse(localStorage.getItem(LSB) || 'null'); if (c && c.d === istToday() && c.b) { G.base = c.b; G.baseAt = c.d; return; } } catch (e) { }
     if (G.baseAt === istToday()) return; G.baseBusy = true;
     try {
       const syms = (window.jcUni ? window.jcUni() : []).map((s) => s + '.NS'), bt = []; for (let i = 0; i < syms.length; i += 30) bt.push(syms.slice(i, i + 30)); const today = istToday(), out = {}; let i = 0;
       await Promise.all([0, 1, 2].map(async () => { while (i < bt.length) { const b = bt[i++]; try { const j = await be('action=dailyb&range=1mo&symbols=' + encodeURIComponent(b.join(',')), 60000); Object.keys(j.bars || {}).forEach((k) => { const x = j.bars[k]; let n = x.t.length - 1; if (dateOf(x.t[n]) === today) n--; if (n < 5) return; let hi = 0, lo = 1e12; for (let q = Math.max(0, n - 19); q <= n; q++) { hi = Math.max(hi, x.h[q]); lo = Math.min(lo, x.l[q]); } out[k.replace(/\.NS$/, '')] = [x.h[n], x.l[n], x.c[n], hi, lo]; }); } catch (e) { } } }));
       if (Object.keys(out).length) { G.base = out; G.baseAt = today; try { localStorage.setItem(LSB, JSON.stringify({ d: today, b: out })); } catch (e) { } }
-    } finally { G.baseBusy = false; bump(); }
+    } finally { G.baseBusy = false; G.baseTry = Date.now(); if (G.baseAt === istToday()) bump(); }
   }
   /* quotes: reuse the radar's minute sweep; fetch on our own once if it has not run (market closed / just opened the page) */
   async function loadQ() {
     const R = window.jcRadar && window.jcRadar.state; if (R && R.last && Object.keys(R.q).length) { G.q = R.q; G.qAt = R.last; return; }
-    if (G.qBusy || (G.qAt && Date.now() - G.qAt < 120000)) return; G.qBusy = true;
-    try { const yf = (window.jcUni ? window.jcUni() : []).map((s) => s + '.NS'), q = {}; const rs = await Promise.all([yf.slice(0, 260), yf.slice(260)].filter((p) => p.length).map((p) => be('action=liveq&symbols=' + encodeURIComponent(p.join(',')), 45000))); rs.forEach((j) => { if (j && j.ok) Object.keys(j.q).forEach((k) => { q[k.replace(/\.NS$/, '')] = j.q[k]; }); }); if (Object.keys(q).length) { G.q = q; G.qAt = Date.now(); } } catch (e) { } finally { G.qBusy = false; bump(); }
+    if (G.qBusy || (G.qAt && Date.now() - G.qAt < 120000) || (G.qTry && Date.now() - G.qTry < 90000)) return; G.qBusy = true; const had = G.qAt;
+    try { const yf = (window.jcUni ? window.jcUni() : []).map((s) => s + '.NS'), q = {}; const rs = await Promise.all([yf.slice(0, 260), yf.slice(260)].filter((p) => p.length).map((p) => be('action=liveq&symbols=' + encodeURIComponent(p.join(',')), 45000))); rs.forEach((j) => { if (j && j.ok) Object.keys(j.q).forEach((k) => { q[k.replace(/\.NS$/, '')] = j.q[k]; }); }); if (Object.keys(q).length) { G.q = q; G.qAt = Date.now(); } } catch (e) { } finally { G.qBusy = false; G.qTry = Date.now(); if (G.qAt !== had) bump(); }
   }
   function bump() { G.ver++; try { if (window.__curTab === 'pDash' && window.jdRepaint) window.jdRepaint(); } catch (e) { } }
 
