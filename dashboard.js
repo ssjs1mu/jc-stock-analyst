@@ -182,7 +182,7 @@
       }
     } catch (e) { S.err = (e && e.message) || 'Refresh failed'; }
     finally { S.busy = false; setBusy(false); paint(); }
-    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now())); loadHist(false);
+    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now())); loadHist(false); loadBonds(false); if (S.hm) loadMovers(S.hm);
   }
 
   /* India 10Y + Nifty PCR: best-effort extras. NSE and some bond sites refuse Google's servers, so each is retried
@@ -302,7 +302,7 @@
     const w = wantNow(ms);
     return card('Commodities', '🛢', `<table class="jd-tb">${head}<tbody>${COMM.map((it) => row(it[0], it[1], {}, ms)).join('')}</tbody></table>`, `<span class="jd-chip ${w.fut ? 'on' : ''}">${w.fut ? '● LIVE' : 'CLOSED'}</span>`)
       + card('Currencies <small>vs rupee &amp; dollar</small>', '💱', `<table class="jd-tb">${head}<tbody>${['EURINR=X', 'GBPINR=X', 'JPYINR=X', 'DX-Y.NYB', 'EURUSD=X'].map((s) => row(s, { 'EURINR=X': 'EUR / INR', 'GBPINR=X': 'GBP / INR', 'JPYINR=X': 'JPY / INR', 'DX-Y.NYB': 'US DOLLAR INDEX', 'EURUSD=X': 'EUR / USD' }[s], { dp: s === 'JPYINR=X' || s === 'EURUSD=X' ? 4 : 3 }, ms)).join('')}</tbody></table>`)
-      + card('Bonds &amp; yields', '🏦', `<table class="jd-tb">${head}<tbody>${BONDS.map((it) => row(it[0], it[1], {}, ms, { yield: 1, flag: 'us' })).join('')}</tbody></table><div class="jd-fn">Yield change in basis points. India 10Y G-Sec sits in the Indian markets table.</div>`);
+      + card('Bonds &amp; yields', '🏦', `<table class="jd-tb">${head}<tbody><tr class="jd-sub"><td colspan="4">INDIA</td></tr>${in10yRow()}${pcrRow()}<tr class="jd-sub"><td colspan="4">GLOBAL 10-YEAR</td></tr>${bondRow('JAPAN 10Y JGB', 'jp', S.bd.JP10Y)}${bondRow('UK 10Y GILT', 'gb', S.bd.UK10Y)}${bondRow('GERMANY 10Y BUND', 'de', S.bd.DE10Y)}<tr class="jd-sub"><td colspan="4">UNITED STATES</td></tr>${BONDS.map((it) => row(it[0], it[1], {}, ms, { yield: 1, flag: 'us' })).join('')}</tbody></table><div class="jd-fn">Yield change in basis points. Japan, UK, Germany and India 10Y via the CNBC quote feed; US yields from Yahoo.</div>`);
   }
   const ago = (ts, ms) => { const m = Math.max(0, Math.round((ms - ts) / 60000)); return m < 1 ? 'now' : m < 60 ? m + 'm' : m < 1440 ? Math.floor(m / 60) + 'h' : Math.floor(m / 1440) + 'd'; };
   function colNews(ms) {
@@ -316,9 +316,9 @@
     const items = all.map((it) => { const q = S.q[it[0]]; const pct = q && q.pc ? (q.p - q.pc) / q.pc * 100 : null; return { n: it[1], sym: it[0], p: pct, px: q ? q.p : null, est: !!(q && q.est), big: it[0] === '^NSEI' || it[0] === '^NSEBANK' || it[0] === '^BSESN' }; });
     const have = items.filter((i) => i.p != null); const mx = Math.max(1.5, ...have.map((i) => Math.abs(i.p)));
     const col = (p) => { if (p == null) return ['#e9edf5', '#7b88a6']; const a = Math.min(1, Math.abs(p) / mx), t = Math.pow(a, .7); if (Math.abs(p) < 0.03) return ['#eef1f7', '#4a5878']; return p > 0 ? [`rgb(${Math.round(226 - t * 196)},${Math.round(244 - t * 90)},${Math.round(234 - t * 150)})`, t > .55 ? '#fff' : '#0b5a31'] : [`rgb(${Math.round(253 - t * 60)},${Math.round(228 - t * 190)},${Math.round(232 - t * 180)})`, t > .55 ? '#fff' : '#8f1228']; };
-    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}" data-xr="${esc(i.sym)}" style="cursor:pointer;background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for live X-ray"><b>${esc(i.n)}</b><em class="jd-hmv">${i.px == null ? '' : i.est ? '≈ est.' : fmtN(i.px, i.px >= 1000 ? 0 : 2)}</em><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
+    const tiles = items.slice().sort((a, b) => (b.big - a.big) || ((b.p == null ? -99 : b.p) - (a.p == null ? -99 : a.p))).map((i) => { const c = col(i.p); return `<div class="jd-hmt${i.big ? ' big' : ''}${S.hm === i.sym ? ' sel' : ''}" data-hm="${esc(i.sym)}" style="background:${c[0]};color:${c[1]}" title="${esc(i.n)} · ${i.px == null ? '—' : fmtN(i.px, 2)} · click for its strongest &amp; weakest stocks"><b>${esc(i.n)}</b><em class="jd-hmv">${i.px == null ? '' : i.est ? '≈ est.' : fmtN(i.px, i.px >= 1000 ? 0 : 2)}</em><span>${i.p == null ? '—' : (i.p > 0 ? '+' : '') + i.p.toFixed(2) + '%'}</span></div>`; }).join('');
     const adv = have.filter((i) => i.p > 0.03).length, dec = have.filter((i) => i.p < -0.03).length;
-    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div><div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
+    return `<section class="jd-card jd-tc jd-heat"><h3><span class="jd-ic">🟩</span>Indian indices heatmap <small>% change · sorted strongest → weakest</small><span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${adv} ▲ · ${dec} ▼</span></h3><div class="jd-hmg">${tiles}</div>${moversHTML(items)}<div class="jd-hml"><span>−${mx.toFixed(1)}%</span><i></i><span>0</span><i class="g"></i><span>+${mx.toFixed(1)}%</span></div></section>`;
   }
   function heroHTML(w, ms) {
     const ist = w.ist, ip = istParts(ms);
@@ -565,7 +565,7 @@
   const T3 = [
     { s: '^NSEI', n: 'NIFTY 50', lv: 1, rnd: 100 }, { s: '^NSEBANK', n: 'BANK NIFTY', lv: 1, rnd: 500 }, { s: '^BSESN', n: 'SENSEX', lv: 1, rnd: 500 },
     { s: '^INDIAVIX', n: 'INDIA VIX', lv: 1, rnd: 1, inv: 1 }, { s: 'USDINR=X', n: 'USD / INR', lv: 1, rnd: 0.5, inv: 1, dp: 3 },
-    { s: 'IN10Y', n: 'INDIA 10Y G-SEC', x: 'in10y' }, { s: 'PCR', n: 'NIFTY PCR (OI)', x: 'pcr' },
+    { s: 'BZ=F', n: 'BRENT CRUDE', lv: 1, rnd: 1, dp: 2 },
   ];
   S.h = {};
   async function loadHist(force) {
@@ -636,12 +636,12 @@
         if (!L.mr && L.at52h) body = body.replace('<b>—</b><u></u>', '<b>ATH zone</b><u></u>');
       }
     } else body = '<div class="j3-tr t0">levels n/a for this series</div>';
-    return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : t.x === 'in10y' ? flag('in') : ''}${esc(t.n)}</span>${xr}</div>`
+    return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.s === 'BZ=F' ? '🛢 ' : t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : ''}${esc(t.n)}</span>${xr}</div>`
       + `<div class="j3-px">${pxtxt}</div><div class="j3-ch">${chtxt}</div>${t.lv && q ? spark(q.sp, cls) : ''}${body}</div></div>`;
   }
   function tiles3d(ms) { return `<div class="j3-row">${T3.map((t) => tile3(t, ms)).join('')}</div>`; }
   const CSS3 = `
-  .j3-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}
+  .j3-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}
   .j3{position:relative;transform-style:preserve-3d}
   .j3-in{position:relative;overflow:hidden;border-radius:15px;padding:10px 11px 9px;color:#eef3ff;min-height:214px;isolation:isolate;
     background:linear-gradient(150deg,#27345c 0%,#121b38 48%,#070b1a 100%);border:1px solid rgba(190,205,255,.28);
@@ -670,16 +670,76 @@
   .j3-r i{font-style:normal;font-size:9px;font-weight:700;opacity:.8;letter-spacing:.03em}.j3-r b{text-align:right;font-variant-numeric:tabular-nums;font-size:11px}.j3-r u{text-decoration:none;font-size:9px;opacity:.75;min-width:34px;text-align:right}
   .j3-r.r{color:#ffa9b6}.j3-r.s{color:#86f5bd}.j3-r.mj{background:rgba(255,255,255,.12);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}.j3-r.mj b{font-weight:900}
   .j3.fl-up .j3-px{animation:j3f 1s}.j3.fl-dn .j3-px{animation:j3f 1s}@keyframes j3f{0%{text-shadow:0 0 18px #fff}100%{}}
-  @media(max-width:1360px){.j3-row{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
+  @media(max-width:1200px){.j3-row{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
   @media(prefers-reduced-motion:reduce){.j3-in::before{animation:none}.j3-in{transition:none}}
   @media print{.j3-in{-webkit-print-color-adjust:exact;print-color-adjust:exact;transform:none!important}}`;
   document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5, i = t.firstChild; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
   document.addEventListener('mouseout', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (t && !t.contains(e.relatedTarget)) { t.firstChild.style.setProperty('--rx', '0deg'); t.firstChild.style.setProperty('--ry', '0deg'); } }, { passive: true });
 
+  /* ---------- 10-year yields of Japan / UK / Germany (CNBC quote feed, called straight from the browser) ---------- */
+  S.bd = {}; S.bdAt = 0;
+  async function loadBonds(force) {
+    const ms = Date.now(); if (S.bdBusy || (!force && ms - S.bdAt < 300000)) return; S.bdBusy = 1;
+    try {
+      const u = 'https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=JP10Y|UK10Y|DE10Y|IN10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1';
+      const j = JSON.parse(await fetchWithTimeout(u, 12000)); let fq = j && j.FormattedQuoteResult && j.FormattedQuoteResult.FormattedQuote; fq = Array.isArray(fq) ? fq : fq ? [fq] : [];
+      const num = (v) => v == null ? NaN : parseFloat(String(v).replace(/[%,]/g, ''));
+      fq.forEach((q) => { const p = num(q.last), pc = num(q.previous_day_closing); if (q.symbol && !isNaN(p)) S.bd[q.symbol] = { p, pc: isNaN(pc) ? null : pc, d: q.last_time || '' }; });
+      if (Object.keys(S.bd).length) { S.bdAt = ms; if (!S.x.in10y && S.bd.IN10Y) S.x.in10y = S.bd.IN10Y; }
+    } catch (e) { S.bdAt = ms - 240000; } finally { S.bdBusy = 0; paint(); }
+  }
+  function bondRow(name, fc, x) {
+    if (!x) return `<tr class="jd-na"><td class="jd-nm">${flag(fc)}<span class="jd-live off"></span>${name}</td><td class="jd-px">…</td><td class="jd-ch"></td><td class="jd-pc"></td></tr>`;
+    const chg = x.pc != null ? (x.p - x.pc) * 100 : null, pp = x.pc ? (x.p - x.pc) / x.pc * 100 : null, cls = chg == null || Math.abs(chg) < .05 ? '' : chg > 0 ? 'd' : 'u';
+    return `<tr class="${cls}" title="${esc(name)} · ${esc(x.d || '')} · CNBC quote feed"><td class="jd-nm">${flag(fc)}<span class="jd-live on"></span>${name}</td><td class="jd-px">${fmtN(x.p, 3)}<i>%</i></td><td class="jd-ch"><b>${chg == null ? '■' : chg > 0 ? '▲' : '▼'}</b> ${chg == null ? '—' : (chg >= 0 ? '+' : '') + chg.toFixed(1) + ' bp'}</td><td class="jd-pc"><span>${pp == null ? '—' : (pp > 0 ? '+' : '') + pp.toFixed(2) + '%'}</span></td></tr>`;
+  }
+
+  /* ---------- heatmap drill-down: click an index tile to see its strongest and weakest stocks ---------- */
+  S.hm = null; S.hmAll = false; S.cons = null; S.mv = {};
+  async function loadCons() {
+    if (S.cons || S.consBusy) return; S.consBusy = 1;
+    try { const r = await fetch('data/constituents.json?h=' + Math.floor(Date.now() / 3600000)); S.cons = (await r.json()).idx || {}; } catch (e) { S.cons = {}; } finally { S.consBusy = 0; }
+  }
+  const consOf = (sym) => S.cons ? S.cons[sym === '^BSESN' ? '^NSEI' : sym] : null; // BSE does not publish the Sensex list; Nifty 50 holds almost all of its stocks
+  async function loadMovers(sym) {
+    const list = consOf(sym) || []; if (!list.length) return;
+    const m = S.mv[sym]; if (m && (m.busy || Date.now() - m.t < 45000)) return;
+    S.mv[sym] = Object.assign(m || { rows: null, t: 0 }, { busy: 1 }); let rows = null;
+    try {
+      const be = getBackend();
+      if (be) { const out = []; for (let i = 0; i < list.length; i += 100) { const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=liveq&symbols=' + encodeURIComponent(list.slice(i, i + 100).map((x) => x + '.NS').join(','))), 40000)); if (j && j.ok) Object.keys(j.q).forEach((k) => { const a = j.q[k]; if (a && a[0] && a[1]) out.push({ s: k.replace(/\.NS$/, ''), p: a[0], pc: a[1] }); }); } if (out.length) rows = out; }
+    } catch (e) { }
+    if (!rows) { try { const rr = await fetchBatch(list.map((x) => x + '.NS')); rows = rr.filter((r) => r && r.p != null && r.pc).map((r) => ({ s: r.s.replace(/\.NS$/, ''), p: r.p, pc: r.pc })); } catch (e) { } }
+    S.mv[sym] = { rows: rows && rows.length ? rows : null, t: Date.now(), n: list.length }; paint();
+  }
+  function moversHTML(items) {
+    const sym = S.hm; if (!sym) return '';
+    const it = items.find((i) => i.sym === sym), nm = it ? it.n : sym;
+    const wrap = (inner) => `<div class="jd-mvx"><div class="jd-mvh"><b>${esc(nm)}</b><span>strongest &amp; weakest stocks${sym === '^BSESN' ? ' · Sensex list not published by BSE, showing Nifty 50 stocks' : ''}</span><button type="button" class="jd-mvb" data-xr="${esc(sym)}">X-ray index</button><button type="button" class="jd-mvb" data-hmx="1" title="Close">✕</button></div>${inner}</div>`;
+    const list = consOf(sym); if (!S.cons) return wrap('<div class="jd-fn">Loading constituents…</div>');
+    if (!list) return wrap('<div class="jd-fn">The stock list for this index isn’t available yet.</div>');
+    const m = S.mv[sym]; if (!m || !m.rows) return wrap(`<div class="jd-fn">${!m || m.busy ? 'Loading live quotes for ' + list.length + ' stocks…' : 'Quotes are unavailable right now — they retry automatically.'}</div>`);
+    const R = m.rows.map((r) => Object.assign({ c: (r.p / r.pc - 1) * 100 }, r)).sort((a, b) => b.c - a.c), up = R.filter((r) => r.c > 0.005).length, dn = R.filter((r) => r.c < -0.005).length, mx = Math.max(1, ...R.map((r) => Math.abs(r.c)));
+    const line = (r) => `<div class="jd-mvr ${r.c >= 0 ? 'u' : 'd'}" data-xr="${esc(r.s)}.NS" title="${esc(r.s)} · click for live X-ray"><span class="jd-mvn">${esc(r.s)}</span><span class="jd-mvp">${fmtN(r.p, 2)}</span><span class="jd-mvc">${r.c > 0 ? '+' : ''}${r.c.toFixed(2)}%</span><i style="width:${Math.min(100, Math.abs(r.c) / mx * 100).toFixed(0)}%"></i></div>`;
+    const topN = S.hmAll ? R.length : 5, g = R.filter((r) => r.c > 0).slice(0, topN), l = R.filter((r) => r.c < 0).slice(-topN).reverse();
+    return wrap(`<div class="jd-mvg"><div><h5 class="u">▲ Top performers</h5>${g.map(line).join('') || '<div class="jd-fn">none</div>'}</div><div><h5 class="d">▼ Non-performers</h5>${l.map(line).join('') || '<div class="jd-fn">none</div>'}</div></div>`
+      + `<div class="jd-mvf"><span>${up} advancing · ${dn} declining · ${R.length}/${list.length} stocks priced</span><button type="button" class="jd-mvb" data-hmall="1">${S.hmAll ? 'Show top 5' : 'Show all'}</button></div>`);
+  }
+  const CSS4 = `
+  .jd-hmt[data-hm]{cursor:pointer;transition:transform .12s,box-shadow .12s}.jd-hmt[data-hm]:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(20,48,110,.25)}.jd-hmt.sel{outline:3px solid #14306e;outline-offset:1px}
+  .jd-mvx{margin-top:10px;border:1px solid #b9c7e6;border-radius:10px;background:linear-gradient(180deg,#f7f9ff,#fff);padding:8px 10px}
+  .jd-mvh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}.jd-mvh b{font-size:13.5px;color:#0b2260}.jd-mvh span{font-size:10.5px;color:#4a5878;font-weight:600;flex:1}
+  .jd-mvb{font:700 10px "Segoe UI",sans-serif;border:1px solid #bccae6;background:#fff;color:#14306e;border-radius:6px;padding:2px 8px;cursor:pointer}.jd-mvb:hover{background:#eef3ff}
+  .jd-mvg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.jd-mvg h5{margin:0 0 4px;font-size:11px;letter-spacing:.04em}.jd-mvg h5.u{color:#0c7a42}.jd-mvg h5.d{color:#b3162f}
+  .jd-mvr{position:relative;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:3px 6px;margin-bottom:2px;border-radius:5px;font-size:11.5px;cursor:pointer;overflow:hidden;background:#f3f6fc}
+  .jd-mvr i{position:absolute;left:0;bottom:0;height:2px;opacity:.7}.jd-mvr.u i{background:#16a05a}.jd-mvr.d i{background:#d12a47}.jd-mvr:hover{background:#e9effb}
+  .jd-mvn{font-weight:800;color:#14213d}.jd-mvp{font:600 11px ui-monospace,Consolas,monospace;color:#4a5878}.jd-mvc{font:800 11.5px ui-monospace,Consolas,monospace;min-width:58px;text-align:right}.jd-mvr.u .jd-mvc{color:#0c7a42}.jd-mvr.d .jd-mvc{color:#b3162f}
+  .jd-mvf{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10.5px;color:#4a5878}
+  @media(max-width:700px){.jd-mvg{grid-template-columns:1fr}}`;
   /* ---------- wiring ---------- */
   function build() {
     if ($('pDash')) return;
-    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3);
+    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3); const st4 = document.createElement('style'); st4.id = 'jdcss4'; st4.textContent = CSS4; document.head.appendChild(st4);
     const anchor = document.querySelector('details.datasec'); const p = document.createElement('div'); p.className = 'panel'; p.id = 'pDash'; p.innerHTML = '<div class="note">Loading dashboard…</div>'; anchor.parentNode.insertBefore(p, anchor);
     const sel = $('viewSel'); const og = document.createElement('optgroup'); og.label = "Joshi's Dashboard";
     const o = document.createElement('option'); o.value = 'pDash'; o.textContent = "📊 Joshi's Dashboard — live markets"; og.appendChild(o); sel.insertBefore(og, sel.firstChild); sel.value = window.__curTab || 'pSummary';
@@ -700,6 +760,12 @@
       if (!S.busy && sec % 10 === 0) { const ms = Date.now(); if (SETS.some((g) => !S.due[g.id] || ms >= S.due[g.id])) refresh(false); else { extras(false); news(false); } }
     }, 1000);
   }
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest && e.target.closest('[data-hm]');
+    if (t) { const k = t.getAttribute('data-hm'); S.hm = S.hm === k ? null : k; S.hmAll = false; if (S.hm) loadCons().then(() => loadMovers(S.hm)); paint(); return; }
+    if (e.target.closest && e.target.closest('[data-hmx]')) { S.hm = null; paint(); return; }
+    if (e.target.closest && e.target.closest('[data-hmall]')) { S.hmAll = !S.hmAll; paint(); }
+  });
   document.addEventListener('click', (e) => { const a = e.target.closest('[data-jdgo]'); if (!a) return; e.preventDefault(); const t = $(a.getAttribute('data-jdgo')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
   function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard' || !h) window.showTab('pDash'); }

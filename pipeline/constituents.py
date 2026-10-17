@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Index constituents for the dashboard heatmap drill-down -> data/constituents.json
-Source: niftyindices.com official constituent CSVs. Keys are the Yahoo symbols used by the dashboard heatmap.
-Also probes free bond-yield sources (stooq) and prints the result as run notices."""
+Source: niftyindices.com official constituent CSVs. Keys are the Yahoo symbols used by the dashboard heatmap."""
 import csv, io, json, os, sys, urllib.request, datetime
 
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36', 'Accept': '*/*'}
@@ -46,21 +45,6 @@ def main():
     for b in bad: print('::warning::' + b[:300])
     for sym in ('^NSEI', '^CNXIT'):
         if sym in out: print(f'::notice::{sym} {len(out[sym])} stocks e.g. {",".join(out[sym][:6])}')
-    # --- probes (one summary line each) ---
-    import urllib.request as ur
-    res=[]
-    u='https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=JP10Y|UK10Y|DE10Y|IN10Y|US10Y&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1'
-    try:
-        rq=ur.Request(u,headers=dict(UA,Origin='https://ssjs1mu.github.io')); r=ur.urlopen(rq,timeout=20); hd=dict(r.headers); j=json.loads(r.read().decode())
-        fq=j['FormattedQuoteResult']['FormattedQuote']; fq=fq if isinstance(fq,list) else [fq]
-        res.append('cnbc cors=%s '%hd.get('Access-Control-Allow-Origin')+' | '.join('%s %s prev %s chg %s'%(q.get('symbol'),q.get('last'),q.get('previous_day_closing'),q.get('change')) for q in fq))
-    except Exception as e: res.append('cnbc ERR %s'%e)
-    print('::notice::'+' ## '.join(res)[:900]); res=[]
-    for u in ['https://api.bseindia.com/BseIndiaAPI/api/GetSensexData/w','https://api.bseindia.com/BseIndiaAPI/api/ComHeader/w?quotetype=EQ&scripcode=500325&seriesid=','https://www.bseindia.com/markets/equity/EQReports/MktWatchR.html','https://www.niftyindices.com/IndexConstituent/ind_niftyindiadefence_list.csv','https://www.niftyindices.com/IndexConstituent/ind_nifty_sensexlist.csv','https://www.asiaindex.co.in/']:
-        try:
-            rq=ur.Request(u,headers=dict(UA,Referer='https://www.bseindia.com/',Origin='https://www.bseindia.com')); r=ur.urlopen(rq,timeout=20); res.append('%s %s %r'%(u[-45:],r.status,r.read(120).decode('utf-8','replace')))
-        except Exception as e: res.append('%s miss %s'%(u[-45:],e))
-    print('::notice::'+' ## '.join(res)[:1200])
     if out:
         json.dump({'updated': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z', 'source': 'niftyindices.com', 'idx': out}, open('data/constituents.json', 'w'), separators=(',', ':'))
     else:
