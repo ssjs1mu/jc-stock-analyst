@@ -916,7 +916,7 @@
   .jd-trs{display:flex;gap:4px;justify-content:center}.jd-trs.na{color:#9aa6c2;font-size:10px}.jd-tr{width:20px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:#e6ebf7;color:#52607f}.jd-tr.g{background:#d6f3e3;color:#0c7a42}.jd-tr.r{background:#fbdce2;color:#b3162f}.jd-tr.a{background:#fff0c7;color:#8a5a00}
   .jd-pbias.sm{margin:0;padding:2px 8px;font-size:9px;text-align:center}.jd-irh{background:none!important;box-shadow:none!important;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#7b88a6;padding-bottom:0}.jd-irh span{font:800 9.5px "Segoe UI",sans-serif!important;color:#7b88a6!important;text-align:inherit}.jd-irh .l,.jd-irh .c{text-align:right}
   .jd-isub{margin:10px 0 4px;font-size:9.5px;font-weight:800;letter-spacing:.14em;color:#52607f;border-bottom:1px solid #dfe7f6;padding-bottom:3px}
-  @media(max-width:700px){.jd-ir{grid-template-columns:1fr 1fr 1fr}.jd-ir .jd-trs,.jd-ir .jd-pbias{display:none}.jd-ir .a{grid-column:1 / -1}.jd-irh{display:none}.jd-cats{grid-template-columns:1fr 1fr}}`;
+  @media(max-width:700px){#viewSel{max-width:calc(100vw - 100px)}.jd-ir{grid-template-columns:1fr 1fr 1fr}.jd-ir .jd-trs,.jd-ir .jd-pbias{display:none}.jd-ir .a{grid-column:1 / -1}.jd-irh{display:none}.jd-cats{grid-template-columns:1fr 1fr}}`;
   /* ---------- wiring ---------- */
   function build() {
     if ($('pDash')) return;
