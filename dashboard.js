@@ -182,7 +182,7 @@
       }
     } catch (e) { S.err = (e && e.message) || 'Refresh failed'; }
     finally { S.busy = false; setBusy(false); paint(); }
-    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now()));
+    extras(false); news(false); deriveIdx(Date.now(), wantNow(Date.now())); loadHist(false);
   }
 
   /* India 10Y + Nifty PCR: best-effort extras. NSE and some bond sites refuse Google's servers, so each is retried
@@ -290,10 +290,9 @@
   function card(title, icon, body, extra) { return `<section class="jd-card jd-tc"><h3><span class="jd-ic">${icon}</span>${title}${extra || ''}</h3>${body}</section>`; }
 
   function colIndia(ms) {
-    const top = IN_TOP.map((it) => row(it[0], it[1], it[2], ms, { flag: it[0] === 'USDINR=X' ? null : 'in' })).join('') + in10yRow() + pcrRow();
-    return card('Indian markets', '🇮🇳', `<table class="jd-tb" id="jd-in">${head}<tbody>${top}</tbody></table>`, `<span class="jd-chip ${indiaState(ms).cls !== 'off' ? 'on' : ''}">${indiaState(ms).cls !== 'off' ? '● LIVE' : 'CLOSED'}</span>`)
-      + (window.jcSig ? window.jcSig.html(ms) : '');
+    return window.jcSig ? window.jcSig.html(ms) : '';
   }
+
   function colGlobal(ms) {
     const w = wantNow(ms); const anyOpen = ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]);
     const body = GLOBAL.map((g) => `<tbody><tr class="jd-sub"><td colspan="4">${g[0]}</td></tr>${g[1].map((it) => row(it[0], it[1], {}, ms, { flag: it[2] })).join('')}</tbody>`).join('');
@@ -450,6 +449,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn" onclick="window.jdRefresh()">⟳ Refresh now</button></div>`
+      + tiles3d(ms)
       + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}${window.jcFD ? window.jcFD.html(ms) : ''}<div class="jd-newsw">${colNews(ms)}</div></div><div class="jd-col jd-c3">${colGlobal(ms)}${colComm(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
@@ -558,10 +558,128 @@
   @media(max-width:640px){.jd-board{grid-template-columns:1fr;grid-template-areas:"m" "a" "r"}}
   @media print{.jd-btn,.jd-status{display:none}.jd-hero{background:#0f2352!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
 
+  /* ---------- top row: 3D smoky-glass tiles (replaces the Indian markets table) ----------
+     Trend = price vs 20/50-day averages. Levels are mechanical, from the last year of daily bars:
+       nearest S/R  = closest of classic pivots (S1,S2,R1,R2,P), previous-day high/low, 5-day high/low, round number
+       major S/R    = next level beyond that from 20/60-session and 52-week extremes, 50/200-day averages, S2/R2 */
+  const T3 = [
+    { s: '^NSEI', n: 'NIFTY 50', lv: 1, rnd: 100 }, { s: '^NSEBANK', n: 'BANK NIFTY', lv: 1, rnd: 500 }, { s: '^BSESN', n: 'SENSEX', lv: 1, rnd: 500 },
+    { s: '^INDIAVIX', n: 'INDIA VIX', lv: 1, rnd: 1, inv: 1 }, { s: 'USDINR=X', n: 'USD / INR', lv: 1, rnd: 0.5, inv: 1, dp: 3 },
+    { s: 'IN10Y', n: 'INDIA 10Y G-SEC', x: 'in10y' }, { s: 'PCR', n: 'NIFTY PCR (OI)', x: 'pcr' },
+  ];
+  S.h = {};
+  async function loadHist(force) {
+    const ms = Date.now();
+    await Promise.all(T3.filter((t) => t.lv).map(async (t) => {
+      const h = S.h[t.s]; if (h && (h.busy || (!force && ms < h.due))) return;
+      S.h[t.s] = Object.assign(h || {}, { busy: 1 });
+      try {
+        const j = await fetchData(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(t.s)}?range=1y&interval=1d&includePrePost=false`, { kind: 'json', validate: (x) => !!(x && x.chart && x.chart.result && x.chart.result[0]) });
+        const r = j.chart.result[0], q = r.indicators.quote[0], ts = r.timestamp || [], bars = [];
+        ts.forEach((tt, i) => { if (q.close[i] != null && q.high[i] != null && q.low[i] != null) bars.push({ d: new Date((tt + 19800) * 1000).toISOString().slice(0, 10), h: q.high[i], l: q.low[i], c: q.close[i] }); });
+        S.h[t.s] = { bars, due: ms + 30 * 60000 };
+      } catch (e) { S.h[t.s] = { bars: (h && h.bars) || null, due: ms + 3 * 60000 }; }
+    }));
+    paint();
+  }
+  const avg = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
+  function levels(t, px) {
+    const h = S.h[t.s]; if (!h || !h.bars || h.bars.length < 30 || px == null) return null;
+    const ist = new Date(Date.now() + 19800000), today = ist.toISOString().slice(0, 10), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+    const done = h.bars.slice(); let forming = false;
+    if (done[done.length - 1].d >= today && mins < 960) { done.pop(); forming = true; }
+    if (done.length < 30) return null;
+    const pv = done[done.length - 1], cl = done.map((b) => b.c).concat(forming ? [px] : []);
+    const hi = (n) => Math.max(px, ...done.slice(-n).map((b) => b.h)), lo = (n) => Math.min(px, ...done.slice(-n).map((b) => b.l));
+    const sma = (n) => avg(cl.slice(-n)), s20 = sma(20), s50 = sma(50), s200 = cl.length >= 150 ? sma(Math.min(200, cl.length)) : null;
+    const P = (pv.h + pv.l + pv.c) / 3, R1 = 2 * P - pv.l, S1 = 2 * P - pv.h, R2 = P + (pv.h - pv.l), S2 = P - (pv.h - pv.l), rd = t.rnd;
+    const gap = px * 0.0006;
+    const nS = [[S1, 'Pivot S1'], [S2, 'Pivot S2'], [P, 'Pivot'], [pv.l, 'Prev-day low'], [Math.min(...done.slice(-5).map((b) => b.l)), '5-day low'], [Math.floor(px / rd) * rd, 'Round level']].filter((x) => x[0] < px - gap);
+    const nR = [[R1, 'Pivot R1'], [R2, 'Pivot R2'], [P, 'Pivot'], [pv.h, 'Prev-day high'], [Math.max(...done.slice(-5).map((b) => b.h)), '5-day high'], [Math.ceil(px / rd) * rd, 'Round level']].filter((x) => x[0] > px + gap);
+    const ns = nS.sort((a, b) => b[0] - a[0])[0] || null, nr = nR.sort((a, b) => a[0] - b[0])[0] || null;
+    const mS = [[lo(20), '20-session low'], [lo(60), '60-session low'], [lo(252), '52-week low'], [s50, '50-day avg'], [s200, '200-day avg'], [S2, 'Pivot S2']].filter((x) => x[0] != null && x[0] < (ns ? ns[0] : px) - gap);
+    const mR = [[hi(20), '20-session high'], [hi(60), '60-session high'], [hi(252), '52-week high'], [s50, '50-day avg'], [s200, '200-day avg'], [R2, 'Pivot R2']].filter((x) => x[0] != null && x[0] > (nr ? nr[0] : px) + gap);
+    const ms = mS.sort((a, b) => b[0] - a[0])[0] || null, mr = mR.sort((a, b) => a[0] - b[0])[0] || null;
+    let tr, tc;
+    if (px > s20 && s20 > s50) { tr = 'UPTREND'; tc = 1; } else if (px < s20 && s20 < s50) { tr = 'DOWNTREND'; tc = -1; }
+    else if (px > s50 && px < s20) { tr = 'PULLBACK IN UPTREND'; tc = 0.5; } else if (px < s50 && px > s20) { tr = 'RELIEF BOUNCE'; tc = -0.5; } else { tr = 'SIDEWAYS'; tc = 0; }
+    return { ns, nr, ms, mr, tr, tc, a20: px >= s20, a50: px >= s50, at52h: px >= hi(252) * 0.999 };
+  }
+  function spark(sp, up) {
+    if (!sp || sp.length < 4) return '<svg class="j3-sp" viewBox="0 0 100 22"></svg>';
+    const mn = Math.min(...sp), mx = Math.max(...sp), rg = mx - mn || 1, pts = sp.map((v, i) => (i / (sp.length - 1) * 100).toFixed(1) + ',' + (20 - (v - mn) / rg * 18).toFixed(1)).join(' ');
+    return `<svg class="j3-sp ${up}" viewBox="0 0 100 22" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+  function tile3(t, ms) {
+    const dp0 = t.dp, xr = t.lv ? `<button class="jd-xr" type="button" data-xr="${esc(t.s)}" title="Live X-ray of ${esc(t.n)}">X-ray</button>` : '';
+    let q = null, px = null, chg = null, pct = null, cls = '', body = '', dirTxt = '', extra = '', chtxt = '—', pxtxt = '…';
+    if (t.lv) { q = S.q[t.s]; if (q && q.p != null) { px = q.p; if (q.pc) { chg = q.p - q.pc; pct = chg / q.pc * 100; } } }
+    else if (t.x === 'in10y') { const x = S.x.in10y, m = manual().in10y; if (x && x.p != null) { px = x.p; if (x.pc != null) chg = (x.p - x.pc) * 100; } else if (m) px = m.v; }
+    else { const x = S.x.pcr, m = manual().pcr; px = x && x.pcr != null ? x.pcr : m ? m.v : null; }
+    const dp = dp0 != null ? dp0 : t.x === 'in10y' ? 3 : t.x === 'pcr' ? 2 : dpOf(px);
+    const dir = chg == null || (pct != null && Math.abs(pct) < 0.005) ? 0 : chg > 0 ? 1 : -1, good = t.inv || t.x === 'in10y' ? -dir : dir;
+    cls = good > 0 ? 'up' : good < 0 ? 'dn' : 'fl';
+    if (t.x === 'pcr' && px != null) { const g = pcrTag(px)[1]; cls = g === 'g' ? 'up' : g === 'r' ? 'dn' : 'fl'; }
+    if (px != null) pxtxt = fmtN(px, dp) + (t.x === 'in10y' ? '<i>%</i>' : '');
+    if (t.lv) chtxt = chg == null ? '—' : `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chg > 0 ? '+' : ''}${fmtN(chg, dp)} <span>(${pct > 0 ? '+' : ''}${pct.toFixed(2)}%)</span>`;
+    else if (t.x === 'in10y') chtxt = chg == null ? '<span>manual / last value</span>' : `<b>${dir > 0 ? '▲' : dir < 0 ? '▼' : '■'}</b> ${chg >= 0 ? '+' : ''}${chg.toFixed(1)} bp`;
+    else chtxt = px == null ? '' : `<b>${pcrTag(px)[1] === 'g' ? '▲' : pcrTag(px)[1] === 'r' ? '▼' : '■'}</b> <span>${pcrTag(px)[0]}</span>`;
+    if (t.x && px == null) { pxtxt = manIn(t.x, t.x === 'pcr' ? 'PCR' : 'yield %'); chtxt = '<span>feed unavailable · enter value</span>'; }
+    if (t.lv) {
+      const L = levels(t, px), f = (v) => fmtN(v, dp), dist = (v) => (v / px - 1) * 100, row = (k, c, x) => x ? `<div class="j3-r ${c}" title="${esc(x[1])}"><i>${k}</i><b>${f(x[0])}</b><u>${dist(x[0]) > 0 ? '+' : ''}${dist(x[0]).toFixed(1)}%</u></div>` : `<div class="j3-r ${c}"><i>${k}</i><b>—</b><u></u></div>`;
+      if (!px) body = '';
+      else if (!L) body = '<div class="j3-tr t0">levels loading…</div>';
+      else {
+        const tcls = (t.inv ? -L.tc : L.tc) > 0 ? 'up' : (t.inv ? -L.tc : L.tc) < 0 ? 'dn' : 'fl';
+        body = `<div class="j3-tr ${tcls}" title="Price ${L.a20 ? 'above' : 'below'} 20-day average, ${L.a50 ? 'above' : 'below'} 50-day average"><span>TREND</span> ${L.tr}</div>`
+          + `<div class="j3-lv">${row('Major R', 'r mj', L.mr || (L.at52h ? ['', '52-week high zone'] : null))}${row('Near R', 'r', L.nr)}${row('Near S', 's', L.ns)}${row('Major S', 's mj', L.ms)}</div>`;
+        if (!L.mr && L.at52h) body = body.replace('<b>—</b><u></u>', '<b>ATH zone</b><u></u>');
+      }
+    } else body = '<div class="j3-tr t0">levels n/a for this series</div>';
+    return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : t.x === 'in10y' ? flag('in') : ''}${esc(t.n)}</span>${xr}</div>`
+      + `<div class="j3-px">${pxtxt}</div><div class="j3-ch">${chtxt}</div>${t.lv && q ? spark(q.sp, cls) : ''}${body}</div></div>`;
+  }
+  function tiles3d(ms) { return `<div class="j3-row">${T3.map((t) => tile3(t, ms)).join('')}</div>`; }
+  const CSS3 = `
+  .j3-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin:12px 0 10px;perspective:1300px}
+  .j3{position:relative;transform-style:preserve-3d}
+  .j3-in{position:relative;overflow:hidden;border-radius:15px;padding:10px 11px 9px;color:#eef3ff;min-height:214px;isolation:isolate;
+    background:linear-gradient(150deg,#27345c 0%,#121b38 48%,#070b1a 100%);border:1px solid rgba(190,205,255,.28);
+    box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -10px 18px rgba(0,0,0,.45) inset,0 7px 0 -2px #0a1128,0 8px 0 -2px rgba(150,170,230,.25),0 20px 24px -12px rgba(5,12,40,.75),0 0 0 1px rgba(8,14,40,.6);
+    transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out,box-shadow .2s}
+  .j3:hover .j3-in{box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 -10px 18px rgba(0,0,0,.45) inset,0 7px 0 -2px #0a1128,0 8px 0 -2px rgba(150,170,230,.3),0 28px 30px -12px rgba(5,12,40,.85)}
+  .j3-in::before{content:'';position:absolute;inset:-30%;z-index:-1;filter:blur(14px);opacity:.95;animation:j3smoke 11s ease-in-out infinite alternate;
+    background:radial-gradient(38% 34% at 18% 82%,var(--g1),transparent 70%),radial-gradient(34% 30% at 86% 24%,rgba(150,175,255,.34),transparent 70%),radial-gradient(40% 28% at 55% 55%,rgba(255,255,255,.10),transparent 72%)}
+  .j3-in::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;z-index:0;pointer-events:none;border-radius:15px 15px 55% 55%/15px 15px 26px 26px;
+    background:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.12) 45%,rgba(255,255,255,0) 100%)}
+  .j3.up{--g1:rgba(30,214,120,.50);--ac:#42f0a0}.j3.dn{--g1:rgba(255,70,95,.48);--ac:#ff7a8e}.j3.fl{--g1:rgba(120,150,255,.38);--ac:#b9c8f5}
+  .j3.up .j3-in{border-color:rgba(66,240,160,.55)}.j3.dn .j3-in{border-color:rgba(255,122,142,.55)}
+  @keyframes j3smoke{0%{transform:translate(-4%,2%) rotate(0deg) scale(1)}50%{transform:translate(3%,-3%) rotate(8deg) scale(1.08)}100%{transform:translate(-2%,4%) rotate(-6deg) scale(1.02)}}
+  .j3-in>*{position:relative;z-index:1}
+  .j3-top{display:flex;justify-content:space-between;align-items:center;gap:4px}.j3-nm{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.06em;color:#dfe8ff;text-shadow:0 1px 2px rgba(0,0,0,.6);white-space:nowrap}
+  .j3-nm .jd-flag{width:19px;height:13px}
+  .j3 .jd-xr{font-size:8.5px;padding:1px 5px;border-radius:6px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
+  .j3-px{font-size:21px;font-weight:800;letter-spacing:.01em;margin-top:3px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.55),0 0 14px var(--g1);font-variant-numeric:tabular-nums}.j3-px i{font-size:12px;font-style:normal;opacity:.8}
+  .j3-px .jd-man{width:90px;font-size:13px;padding:2px 4px;border-radius:5px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.35);color:#fff}
+  .j3-ch{font-size:11.5px;font-weight:700;color:var(--ac);text-shadow:0 1px 2px rgba(0,0,0,.55)}.j3-ch span{color:#cfd9f7;font-weight:600}.j3-ch b{font-size:10px}
+  .j3-sp{display:block;width:100%;height:20px;margin:3px 0 1px}.j3-sp polyline{stroke:var(--ac);filter:drop-shadow(0 0 3px var(--ac))}
+  .j3-tr{margin-top:3px;font-size:9.5px;font-weight:800;letter-spacing:.07em;padding:2px 7px;border-radius:20px;display:inline-block;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.2);color:#e6ecff}
+  .j3-tr span{opacity:.6;font-weight:700;margin-right:3px}.j3-tr.up{color:#54f5aa;border-color:rgba(84,245,170,.5)}.j3-tr.dn{color:#ff8da0;border-color:rgba(255,141,160,.5)}.j3-tr.t0{font-weight:600;opacity:.75;letter-spacing:.02em}
+  .j3-lv{margin-top:5px;display:flex;flex-direction:column;gap:2px;border-top:1px solid rgba(255,255,255,.18);padding-top:4px}
+  .j3-r{display:grid;grid-template-columns:50px 1fr auto;gap:4px;align-items:baseline;font-size:10.5px;padding:1px 5px;border-radius:5px;background:rgba(0,0,0,.28)}
+  .j3-r i{font-style:normal;font-size:9px;font-weight:700;opacity:.8;letter-spacing:.03em}.j3-r b{text-align:right;font-variant-numeric:tabular-nums;font-size:11px}.j3-r u{text-decoration:none;font-size:9px;opacity:.75;min-width:34px;text-align:right}
+  .j3-r.r{color:#ffa9b6}.j3-r.s{color:#86f5bd}.j3-r.mj{background:rgba(255,255,255,.12);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}.j3-r.mj b{font-weight:900}
+  .j3.fl-up .j3-px{animation:j3f 1s}.j3.fl-dn .j3-px{animation:j3f 1s}@keyframes j3f{0%{text-shadow:0 0 18px #fff}100%{}}
+  @media(max-width:1360px){.j3-row{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
+  @media(prefers-reduced-motion:reduce){.j3-in::before{animation:none}.j3-in{transition:none}}
+  @media print{.j3-in{-webkit-print-color-adjust:exact;print-color-adjust:exact;transform:none!important}}`;
+  document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5, i = t.firstChild; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
+  document.addEventListener('mouseout', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (t && !t.contains(e.relatedTarget)) { t.firstChild.style.setProperty('--rx', '0deg'); t.firstChild.style.setProperty('--ry', '0deg'); } }, { passive: true });
+
   /* ---------- wiring ---------- */
   function build() {
     if ($('pDash')) return;
-    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st);
+    const st = document.createElement('style'); st.id = 'jdcss'; st.textContent = CSS; document.head.appendChild(st); const st3 = document.createElement('style'); st3.id = 'jdcss3'; st3.textContent = CSS3; document.head.appendChild(st3);
     const anchor = document.querySelector('details.datasec'); const p = document.createElement('div'); p.className = 'panel'; p.id = 'pDash'; p.innerHTML = '<div class="note">Loading dashboard…</div>'; anchor.parentNode.insertBefore(p, anchor);
     const sel = $('viewSel'); const og = document.createElement('optgroup'); og.label = "Joshi's Dashboard";
     const o = document.createElement('option'); o.value = 'pDash'; o.textContent = "📊 Joshi's Dashboard — live markets"; og.appendChild(o); sel.insertBefore(og, sel.firstChild); sel.value = window.__curTab || 'pSummary';
