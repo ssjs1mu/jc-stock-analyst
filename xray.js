@@ -105,6 +105,117 @@
       <div class="xr-cg"><div><i>Entry</i><b>${f2(s.entry)}</b><small>5-min close ${buy ? 'above' : 'below'}</small></div><div><i>Stop-loss</i><b class="r">${f2(s.sl)}</b><small>${sg((s.sl / s.entry - 1) * 100)}%</small></div><div><i>Target 1</i><b class="g">${f2(s.t1)}</b><small>${E(s.t1Why)}</small></div><div><i>Target 2</i><b class="g">${f2(s.t2)}</b><small>${E(s.t2Why)}</small></div><div><i>R : R</i><b>${s.rr1.toFixed(1)} / ${s.rr2.toFixed(1)}</b><small>to T1 / T2</small></div></div></div>${pts}`;
   }
 
+  /* ---------- trend behaviour: where this move can stop, and what kind of reversal to expect ---------- */
+  function trendData(d) {
+    const H = d.hist, n = H.length, I = d.I || {}, x = d.x, cmp = d.cmp, atr = num(x.atr) ? x.atr : cmp * 0.015, e20 = x.e20, e50 = x.e50, e200 = x.e200;
+    if (n < 40) return null;
+    const K = 3, lo0 = Math.max(K, n - 140), sw = [];
+    for (let i = lo0; i < n - K; i++) { let hi = true, lw = true; for (let j = 1; j <= K; j++) { if (H[i].h <= H[i - j].h || H[i].h <= H[i + j].h) hi = false; if (H[i].l >= H[i - j].l || H[i].l >= H[i + j].l) lw = false; } if (hi) sw.push({ i, t: 'H', p: H[i].h }); if (lw) sw.push({ i, t: 'L', p: H[i].l }); }
+    const sH = sw.filter((s) => s.t === 'H'), sL = sw.filter((s) => s.t === 'L'), lastH = sH[sH.length - 1], prevH = sH[sH.length - 2], lastL = sL[sL.length - 1], prevL = sL[sL.length - 2];
+    const up = cmp > e20 && e20 > e50, dn = cmp < e20 && e20 < e50, belowSlow = cmp < e50 && !(cmp > e20);
+    const hh = !!(lastH && prevH && lastH.p > prevH.p), hl = !!(lastL && prevL && lastL.p > prevL.p), lh = !!(lastH && prevH && lastH.p < prevH.p), ll = !!(lastL && prevL && lastL.p < prevL.p);
+    // volume: average on up days vs down days, last 20 sessions
+    let uv = 0, dv = 0, un = 0, dnn = 0; for (let i = n - 20; i < n; i++) { const b = H[i], pc = H[i - 1].c, v = b.v || 0; if (b.c >= pc) { uv += v; un++; } else { dv += v; dnn++; } }
+    const vr = un && dnn && dv ? (uv / un) / (dv / dnn) : null;
+    const s20 = H.slice(-20), hi20 = Math.max(...s20.map((b) => b.h)), lo20 = Math.min(...s20.map((b) => b.l)), rangePct = (hi20 - lo20) / ((hi20 + lo20) / 2) * 100;
+    const l10 = Math.min(...H.slice(-10).map((b) => b.l)), lp10 = Math.min(...H.slice(-20, -10).map((b) => b.l)), h10 = Math.max(...H.slice(-10).map((b) => b.h)), hp10 = Math.max(...H.slice(-20, -10).map((b) => b.h));
+    const stretch = (cmp - e20) / atr, rsi = x.rsi, e20s = I.e20 ? I.e20[n - 1] - I.e20[n - 6] : 0;
+    // last down-leg (for bounce size) and last up-leg (for pull-back size)
+    const w60 = H.slice(-120), iH = w60.reduce((m, b, i) => (b.h >= w60[m].h ? i : m), 0), Hleg = w60[iH].h; let Lleg = Infinity, iL = -1; for (let i = iH; i < w60.length; i++) if (w60[i].l < Lleg) { Lleg = w60[i].l; iL = i; }
+    const bounce = iL > iH && Hleg > Lleg && (Hleg - Lleg) / Hleg > 0.08 ? (cmp - Lleg) / (Hleg - Lleg) : null;
+    const iL2 = w60.reduce((m, b, i) => (b.l <= w60[m].l ? i : m), 0), Lleg2 = w60[iL2].l; let Hleg2 = -Infinity, iH2 = -1; for (let i = iL2; i < w60.length; i++) if (w60[i].h > Hleg2) { Hleg2 = w60[i].h; iH2 = i; }
+    const pull = iH2 > iL2 && Hleg2 > Lleg2 && (Hleg2 - Lleg2) / Lleg2 > 0.08 ? (Hleg2 - cmp) / (Hleg2 - Lleg2) : null;
+    // RSI divergence on the last two swing points
+    let div = null; if (I.rsi && lastH && prevH && lastH.p > prevH.p && num(I.rsi[lastH.i]) && num(I.rsi[prevH.i]) && I.rsi[lastH.i] < I.rsi[prevH.i] - 2) div = 'bear'; else if (I.rsi && lastL && prevL && lastL.p < prevL.p && num(I.rsi[lastL.i]) && num(I.rsi[prevL.i]) && I.rsi[lastL.i] > I.rsi[prevL.i] + 2) div = 'bull';
+    const ev = [], T = { H, sw, lastH, prevH, lastL, prevL, vr, rangePct, stretch, bounce, pull, div, atr };
+    let state, tone, kind; // kind: up | down | side
+    // bigger picture: a bounce inside a larger fall (price under a falling 200-day average, last leg down not yet recovered) is still a down-trend until proven otherwise
+    const bigDown = num(e200) && cmp < e200 && e50 < e200 && bounce != null && bounce < 0.62;
+    const b0 = H.slice(-45, -8), b0hi = Math.max(...b0.map((b) => b.h)), b0lo = Math.min(...b0.map((b) => b.l)), baseW = (b0hi - b0lo) / ((b0hi + b0lo) / 2) * 100;
+    const fresh = up && !bigDown && baseW < 16 && cmp > b0hi && vr != null && vr >= 1.1;
+    if (dn || (belowSlow && lh) || bigDown) {
+      kind = 'down';
+      const dead = [vr != null && vr < 0.95, cmp < e20 || e20s < 0, num(rsi) && rsi < 50, lh || (bounce != null && bounce < 0.5)].filter(Boolean).length;
+      const acc = [l10 > lp10, rangePct < 12, vr != null && vr > 1.1, cmp > e20, num(rsi) && rsi > 50, !ll].filter(Boolean).length;
+      if (acc >= 4 && vr != null && vr > 1.1) { state = 'DOWNTREND → BASE / ACCUMULATION forming'; tone = 'a'; T.type = 'acc'; }
+      else if (bounce != null && bounce > 0.12 && dead >= 2) { state = 'DOWNTREND — relief bounce in progress (dead-cat risk)'; tone = 'r'; T.type = 'dead'; }
+      else { state = 'DOWNTREND — still falling, no base yet'; tone = 'r'; T.type = 'down'; }
+      ev.push(`Lower highs ${lh ? 'yes' : 'no'}, lower lows ${ll ? 'yes' : 'no'}; price ${cmp < e20 ? 'below' : 'above'} a ${e20s < 0 ? 'falling' : 'rising'} 20-day average and ${cmp < e50 ? 'below' : 'above'} the 50-day.`);
+      if (bounce != null) ev.push(`The bounce so far has retraced <b>${(bounce * 100).toFixed(0)}%</b> of the last fall (${f2(Hleg)} → ${f2(Lleg)}); dead-cat bounces usually stall below 38–50%.`);
+      if (vr != null) ev.push(`Volume on up days is ${vr.toFixed(2)}× the volume on down days over 20 sessions — ${vr < 0.95 ? 'buyers are weaker than sellers (relief-bounce sign)' : vr > 1.1 ? 'buyers are stronger than sellers (accumulation sign)' : 'balanced'}.`);
+      ev.push(`Base test: ${acc}/6 accumulation signs (higher 10-day low, tight range, up-volume, above 20-day, RSI>50, no new low) · dead-cat test: ${dead}/4 relief signs.`);
+    } else if (up) {
+      kind = 'up';
+      const dist = [vr != null && vr < 0.9, div === 'bear', stretch > 2.5, num(rsi) && rsi > 72].filter(Boolean).length;
+      if (fresh) { state = 'UPTREND — fresh breakout from a base (accumulation-zone breakout)'; tone = 'g'; T.type = 'brk'; }
+      else if (dist >= 3) { state = 'UPTREND — topping / distribution risk'; tone = 'r'; T.type = 'top'; }
+      else if (stretch > 2.5 || (num(rsi) && rsi > 72)) { state = 'UPTREND — extended (pause or pull-back likely)'; tone = 'a'; T.type = 'ext'; }
+      else if (pull != null && pull > 0.12) { state = 'UPTREND — pull-back in progress'; tone = 'g'; T.type = 'pull'; }
+      else { state = 'UPTREND — healthy'; tone = 'g'; T.type = 'up'; }
+      ev.push(`Higher highs ${hh ? 'yes' : 'no'}, higher lows ${hl ? 'yes' : 'no'}; price ${stretch.toFixed(1)} ATR ${stretch >= 0 ? 'above' : 'below'} the 20-day average${stretch > 2.5 ? ' — stretched' : ''}.`);
+      if (fresh) ev.push(`The ~35 sessions before this move were a base only <b>${baseW.toFixed(0)}%</b> wide (${f2(b0lo)} – ${f2(b0hi)}); price has now closed above it with up-day volume ${vr.toFixed(1)}× down-day volume — the signature of an accumulation-zone breakout. It fails if price closes back inside the base (below ${f2(b0hi)}).`);
+      if (pull != null) ev.push(`Pull-back from the last high retraced <b>${(pull * 100).toFixed(0)}%</b> of the up-leg (${f2(Lleg2)} → ${f2(Hleg2)}); healthy pull-backs hold above 38–50%.`);
+      if (vr != null) ev.push(`Volume on up days is ${vr.toFixed(2)}× the volume on down days — ${vr > 1.1 ? 'accumulation continues' : vr < 0.9 ? 'distribution creeping in' : 'balanced'}${div === 'bear' ? '; RSI is making lower highs while price makes higher highs (bearish divergence)' : ''}.`);
+    } else {
+      kind = 'side';
+      const acc = [rangePct < 12, vr != null && vr > 1.15, cmp > (hi20 + lo20) / 2, l10 > lp10].filter(Boolean).length, dis = [vr != null && vr < 0.87, cmp < (hi20 + lo20) / 2, h10 < hp10].filter(Boolean).length;
+      if (acc >= 3) { state = 'SIDEWAYS — accumulation bias (breakout candidate)'; tone = 'g'; T.type = 'acc'; }
+      else if (dis >= 2) { state = 'SIDEWAYS — distribution bias (breakdown risk)'; tone = 'r'; T.type = 'dist'; }
+      else { state = 'SIDEWAYS — no edge yet'; tone = 'a'; T.type = 'side'; }
+      ev.push(`20-day range ${f2(lo20)} – ${f2(hi20)} (${rangePct.toFixed(1)}% wide); price ${cmp > (hi20 + lo20) / 2 ? 'in the upper' : 'in the lower'} half.`);
+      if (vr != null) ev.push(`Volume on up days is ${vr.toFixed(2)}× the volume on down days — ${vr > 1.15 ? 'buyers are quietly stronger' : vr < 0.87 ? 'sellers are quietly stronger' : 'balanced'}.`);
+    }
+    // where this move can stop
+    const stops = [];
+    if (kind === 'up' || (kind === 'side' && T.type === 'acc')) {
+      sH.filter((s) => s.p > cmp * 1.003).forEach((s) => stops.push([s.p, 'Earlier swing high (' + (H[s.i].date || '') + ')']));
+      if (lastL && lastH && lastL.i > lastH.i) { const st = sL.filter((s) => s.i < lastH.i).pop(); if (st) { const tg = lastL.p + (lastH.p - st.p); if (tg > cmp) stops.push([tg, 'Measured move (equal to the last up-leg)']); } }
+      if (d.hi52 > cmp * 1.003) stops.push([d.hi52, '52-week high']);
+      stops.push([e20 + 3 * atr, 'Stretch zone (3 ATR above the 20-day average)']);
+    } else if (kind === 'down') {
+      sL.filter((s) => s.p < cmp * 0.997).forEach((s) => stops.push([s.p, 'Earlier swing low (' + (H[s.i].date || '') + ')']));
+      if (lastH && lastL && lastH.i > lastL.i) { const st = sH.filter((s) => s.i < lastL.i).pop(); if (st) { const tg = lastH.p - (st.p - lastL.p); if (tg < cmp) stops.push([tg, 'Measured move (equal to the last down-leg)']); } }
+      if (d.lo52 < cmp * 0.997) stops.push([d.lo52, '52-week low']);
+      stops.push([e20 - 3 * atr, 'Stretch zone (3 ATR below the 20-day average)']);
+    }
+    const ordered = stops.filter((q) => num(q[0]) && q[0] > 0).sort((a, b) => (kind === 'down' ? b[0] - a[0] : a[0] - b[0])).filter((q, i, a) => !i || Math.abs(q[0] - a[i - 1][0]) > 0.35 * atr).slice(0, 4);
+    // what a real reversal needs (live checklist)
+    const chk = [];
+    if (kind === 'down') {
+      const rec = lastH ? lastH.p : e50; chk.push(['Closes above the 20-day average', cmp > e20], ['Closes above the last lower high ' + f2(rec), cmp > rec], ['Higher low formed', hl], ['Up-day volume ≥ 1.1× down-day volume', vr != null && vr >= 1.1], ['RSI above 50', num(rsi) && rsi > 50], ['Closes above the 50-day average ' + f2(e50), cmp > e50], ['Breakout-day volume ≥ 1.5× average', num(x.rv) && x.rv >= 1.5]);
+      T.invalid = lastH ? lastH.p : e50; T.invalidTxt = 'A close above ' + f2(T.invalid) + ' (the last lower high) on rising volume would end the down-trend; until then rallies are for selling or lightening.';
+    } else if (kind === 'up') {
+      const hl2 = lastL ? lastL.p : e50; chk.push(['Closes below the 20-day average', cmp < e20], ['Closes below the last higher low ' + f2(hl2), cmp < hl2], ['Lower high formed', lh], ['Down-day volume ≥ 1.1× up-day volume', vr != null && vr > 0 && vr <= 0.9], ['RSI below 50', num(rsi) && rsi < 50], ['Closes below the 50-day average ' + f2(e50), cmp < e50], ['Breakdown-day volume ≥ 1.5× average', num(x.rv) && x.rv >= 1.5 && H[n - 1].c < H[n - 2].c]);
+      T.invalid = fresh ? b0hi : hl2; T.invalidTxt = fresh ? 'Breakout fails on a close back below ' + f2(b0hi) + ' (the base high); the trend ends below the last higher low ' + f2(hl2) + '.' : 'A close below ' + f2(hl2) + ' (the last higher low) would break the up-trend; below the 50-day average (' + f2(e50) + ') the trend is clearly over.';
+    } else {
+      chk.push(['Closes above the range high ' + f2(hi20), cmp > hi20], ['Closes below the range low ' + f2(lo20), cmp < lo20], ['Up-day volume ≥ 1.15× down-day volume (accumulation)', vr != null && vr >= 1.15], ['Breakout-day volume ≥ 1.5× average', num(x.rv) && x.rv >= 1.5]);
+      T.invalid = null; T.invalidTxt = 'Direction is decided by a close beyond ' + f2(hi20) + ' (up) or ' + f2(lo20) + ' (down), ideally on 1.5× volume.';
+    }
+    Object.assign(T, { state, tone, kind, ev, ordered, chk, hi20, lo20 });
+    return T;
+  }
+  const TXT = {
+    dead: 'A <b>dead-cat (relief) bounce</b> stays below the falling 20/50-day averages, retraces less than 50% of the fall, comes on weaker volume than the selling, and RSI stays under 50. Treat it as a place to sell or lighten, not to buy.',
+    acc: 'An <b>accumulation-zone breakout</b> needs a base first: sideways trade with higher lows, tight range and heavier volume on up-days — then a close above the base high on about 1.5× volume.',
+    down: 'No base has formed yet. A bounce from here is more likely a relief move than a trend change; wait for the checklist below to turn green.',
+    brk: 'A breakout from a base is strongest when volume is heavy on the breakout day and the base high holds as support on any retest. A close back inside the base would make it a failed breakout.',
+    up: 'Trend is intact. The usual next phases are a pause at the stop zones below, a pull-back that holds the last higher low, then another leg — or, if the checklist turns green, a trend change.',
+    pull: 'A pull-back is healthy while it holds the last higher low and the 50-day average on lighter volume; heavy selling below those levels turns it into a reversal.',
+    ext: 'The stock is stretched above its averages. Stretched trends can run further, but the next move is more often a pause or pull-back than a fresh surge — avoid chasing.',
+    top: 'Several distribution signs (weak up-volume, RSI divergence, stretch) together warn of a top. It is not confirmed until the last higher low breaks.',
+    dist: 'Sellers are quietly stronger inside the range; a close below the range low would confirm a breakdown.',
+    side: 'The stock is in a range with no clear volume edge; wait for a close beyond the range, ideally on 1.5× volume.',
+  };
+  function trendHtml(T) {
+    if (!T) return '';
+    const chk = T.chk.map((c) => `<tr><td class="xr-v ${c[1] ? 'g' : 'r'}" style="width:26px">${c[1] ? '✔' : '✖'}</td><td class="xr-k" style="white-space:normal;font-weight:700">${c[0]}</td></tr>`).join('');
+    const stops = T.ordered.length ? `<table class="xr-t">${T.ordered.map((s) => `<tr><td class="xr-k">${f2(s[0])}</td><td class="xr-s">${E(s[1])}</td><td class="xr-s">${sg((s[0] / T.H[T.H.length - 1].c - 1) * 100, 1)}% from last close</td></tr>`).join('')}</table>` : '<div class="xr-note">No clear levels in this direction.</div>';
+    return `<div class="xr-tr ${T.tone}"><div class="xr-ts">${E(T.state)}</div><ul class="jb-ul">${T.ev.map((q) => `<li>${q}</li>`).join('')}</ul></div>
+      <h5 class="xr-h5">${T.kind === 'down' ? 'Where the fall can stop (support zones, nearest first)' : T.kind === 'up' ? 'Where the rise can stall (resistance zones, nearest first)' : 'Range edges'}</h5>${T.kind === 'side' ? `<table class="xr-t"><tr><td class="xr-k">${f2(T.hi20)}</td><td class="xr-s">Range high — breakout trigger</td></tr><tr><td class="xr-k">${f2(T.lo20)}</td><td class="xr-s">Range low — breakdown trigger</td></tr></table>` : stops}
+      <h5 class="xr-h5">What kind of reversal to expect</h5><div class="xr-note">${TXT[T.type] || ''}</div>
+      <h5 class="xr-h5">Reversal checklist (live) — ${T.kind === 'down' ? 'down-trend turning up' : T.kind === 'up' ? 'up-trend turning down' : 'range resolving'}</h5><table class="xr-t">${chk}</table><div class="xr-note"><b>Trend verdict line:</b> ${T.invalidTxt}</div>`;
+  }
+
   /* ---------- Why? · what next · what to do (same idea as the Why? pop-ups of the dashboard tiles) ---------- */
   function briefHtml(d) {
     const J = window.jcBrief; if (!J || !J.scenCore || d.err) return '';
@@ -140,7 +251,7 @@
     const sch = sc.map((s) => { const l = s.lv ? '<table class="jb-lv">' + s.lv.map((r) => `<tr><td>${E(r[0])}</td><td>${E(r[1])}</td></tr>`).join('') + '</table>' : ''; return `<div class="jb-sc ${s.c}"><h5>${E(s.h)}</h5>${l}<p>${s.t}</p></div>`; }).join('');
     return `<section class="xr-wide xr-why"><h4>Why is it moving? · what next · what to do</h4>
       <h4 class="jb-h" style="margin-top:6px">1 · Why is it behaving like this?</h4><ul class="jb-ul">${W.map((q) => `<li>${q}</li>`).join('')}</ul>
-      <h4 class="jb-h">2 · What can come next — breakout, breakdown and reversal levels</h4>${sch || '<div class="xr-note">Levels unavailable.</div>'}<div class="xr-note">Stops sit about ⅓–½ of the stock’s average daily range (${f(atr)}) beyond the level. Levels: pivots, CPR, Camarilla, previous and day high/low, 15-minute range, VWAP, 20-day and 52-week extremes, 20/50/200-day averages.</div>
+      <h4 class="jb-h">2 · What can come next — how far this trend can run, and what kind of reversal to expect</h4>${trendHtml(trendData(d))}<h4 class="jb-h" style="margin-top:12px">Trade levels — breakout, breakdown and reversal zones with stops</h4>${sch || '<div class="xr-note">Levels unavailable.</div>'}<div class="xr-note">Stops sit about ⅓–½ of the stock’s average daily range (${f(atr)}) beyond the level. Levels: pivots, CPR, Camarilla, previous and day high/low, 15-minute range, VWAP, 20-day and 52-week extremes, 20/50/200-day averages.</div>
       <h4 class="jb-h">3 · How to handle positions</h4><ul class="jb-ul">${A.map((q) => `<li>${q}</li>`).join('')}</ul>
       <div class="xr-note"><b>Please read:</b> a rule-based reading of delayed data — not investment advice or a forecast; levels can fail. Decide your own size and stops, or consult a registered adviser.</div></section>`;
   }
@@ -177,18 +288,29 @@
   .xr-call{border-radius:10px;padding:9px 11px;margin-bottom:8px}.xr-call.g{background:#e3f6ec}.xr-call.r{background:#fde6ea}.xr-cs{font-weight:900;font-size:17px}.xr-cs small{font-size:11px;color:#34456a;margin-left:6px}.xr-cg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:6px}.xr-cg div{background:#fff;border-radius:8px;padding:5px 7px}.xr-cg i{display:block;font-style:normal;font-size:9.5px;letter-spacing:.7px;text-transform:uppercase;color:#34456a;font-weight:800}.xr-cg b{display:block;font:900 14px ui-monospace,Consolas,monospace}.xr-cg small{display:block;font-size:9.5px;color:#34456a}
   .xr-nocall{background:#eef1f8;border-radius:10px;padding:10px 12px;margin-bottom:8px}.xr-nocall b{display:block;font-size:15px;color:#34456a}.xr-nocall span{font-size:11.5px;color:#34456a}.xr-note,.xr-na,.xr-foot{font-size:11px;color:#34456a;padding:6px 2px}.xr-foot{margin-top:8px}.xr-err{padding:30px;text-align:center;color:#c0102e;font-weight:800}.xr-ld{padding:50px;text-align:center;color:#34456a;font-weight:800}
   .xr-pts .xr-v{width:44px}
+  .xr-tr{border-radius:10px;padding:8px 12px;margin-bottom:6px;border:1px solid #dbe3f4;border-left:6px solid #8a96b5;background:#f8faff}.xr-tr.g{border-left-color:#12a05a}.xr-tr.r{border-left-color:#e03a3a}.xr-tr.a{border-left-color:#e0a30a}.xr-ts{font-weight:900;font-size:14px;color:#0b1330;margin-bottom:3px}.xr-h5{margin:10px 0 4px;font-size:11.5px;letter-spacing:.04em;color:#14306e}
   .xrbtn,.jd-xr{border:1px solid #b8c6e6;background:#eef3ff;color:#14306e;border-radius:6px;font-size:9.5px;font-weight:900;padding:1px 6px;margin-left:5px;cursor:pointer;letter-spacing:.4px;line-height:1.5}.xrbtn:hover,.jd-xr:hover{background:#14306e;color:#fff}.jd-xr{padding:0 4px;font-size:8.5px;margin-left:4px;opacity:.85}
   @media(max-width:760px){.xr-grid{grid-template-columns:1fr}.xr-cg{grid-template-columns:repeat(2,minmax(0,1fr))}.xr-px b{font-size:24px}.xr-meta{margin-left:0}}
-  @media print{#jcxr{display:none!important}}`;
+  @media print{body.xr-printing>*:not(#jcxr){display:none!important}body.xr-printing{overflow:visible!important;background:#fff!important}body.xr-printing #jcxr{position:static!important;display:block!important;background:none!important;padding:0!important;overflow:visible!important;backdrop-filter:none!important}
+    body.xr-printing .xr-box{box-shadow:none!important;width:100%!important;border-radius:0!important;background:#fff!important}body.xr-printing .xr-hd button{display:none!important}body.xr-printing .xr-hd,body.xr-printing .xr-chip,body.xr-printing .xr-call,body.xr-printing .jb-sc,body.xr-printing .xr-tr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body.xr-printing .xr-grid section,body.xr-printing .jb-sc,body.xr-printing .xr-tr{break-inside:avoid}body.xr-printing .xr-grid{display:block}body.xr-printing .xr-grid section{margin-bottom:8px}body:not(.xr-printing) #jcxr{display:none!important}}`;
 
   function ensure() {
     if ($('jcxr')) return;
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
-    const o = document.createElement('div'); o.id = 'jcxr'; o.innerHTML = '<div class="xr-box"><div class="xr-hd"><h3 id="xrT">X-ray</h3><small id="xrS"></small><span class="sp"></span><button id="xrRef" title="Refresh now">⟳ Refresh</button><button id="xrRep" title="Open the full Stock Analyst report">Full report</button><button id="xrX" title="Close (Esc)">✕ Close</button></div><div class="xr-body" id="xrB"></div></div>';
+    const o = document.createElement('div'); o.id = 'jcxr'; o.innerHTML = '<div class="xr-box"><div class="xr-hd"><h3 id="xrT">X-ray</h3><small id="xrS"></small><span class="sp"></span><button id="xrRef" title="Refresh now">⟳ Refresh</button><button id="xrPdf" title="Print or save this X-ray as a PDF">🖨 PDF</button><button id="xrRep" title="Open the full Stock Analyst report">Full report</button><button id="xrX" title="Close (Esc)">✕ Close</button></div><div class="xr-body" id="xrB"></div></div>';
     document.body.appendChild(o);
     o.addEventListener('click', (e) => { if (e.target === o) close(); });
-    $('xrX').onclick = close; $('xrRef').onclick = () => run(true); $('xrRep').onclick = () => { const s = X.sym; close(); if (s && !isIndexLike(s) && typeof loadSymbol === 'function') loadSymbol(s); else alert('The full Stock Analyst report is for stocks — use the X-ray for indices.'); };
+    $('xrPdf').onclick = printXr; $('xrX').onclick = close; $('xrRef').onclick = () => run(true); $('xrRep').onclick = () => { const s = X.sym; close(); if (s && !isIndexLike(s) && typeof loadSymbol === 'function') loadSymbol(s); else alert('The full Stock Analyst report is for stocks — use the X-ray for indices.'); };
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && o.classList.contains('on')) close(); });
+  }
+
+  /* print / save as PDF: only the X-ray is printed (everything else on the page is hidden while printing) */
+  function printXr() {
+    const o = $('jcxr'); if (!o || !o.classList.contains('on')) return; const old = document.title, t = ($('xrT') ? $('xrT').textContent : 'X-ray').replace(/[^\w .&-]/g, ''), d = new Date(Date.now() + 19800000).toISOString().slice(0, 16).replace('T', ' ');
+    document.title = t + ' X-ray ' + d + ' IST'; document.body.classList.add('xr-printing');
+    const done = () => { document.body.classList.remove('xr-printing'); document.title = old; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); setTimeout(() => window.print(), 80); setTimeout(done, 60000);
   }
   function close() { clearInterval(X.timer); X.timer = null; const o = $('jcxr'); if (o) o.classList.remove('on'); document.body.style.overflow = ''; }
   async function run(manual) {
@@ -197,6 +319,7 @@
     try { const d = await load(y); if (tok !== X.token) return; X.data = d; $('xrT').textContent = (d.name || label(y)); $('xrS').textContent = y + (d.cur ? ' · ' + d.cur : ''); $('xrB').innerHTML = render(d); }
     catch (e) { if (tok !== X.token) return; $('xrB').innerHTML = '<div class="xr-err">X-ray failed for ' + E(y) + ': ' + E((e && e.message) || e) + '</div>'; }
   }
+  window.jcXrayApi = { load, trendData, norm };
   window.jcXray = function (sym) {
     const y = norm(sym); if (!y || y === '.NS') return; ensure(); X.sym = y; X.data = null; $('xrT').textContent = label(y); $('xrS').textContent = y; $('jcxr').classList.add('on'); document.body.style.overflow = 'hidden'; $('jcxr').scrollTop = 0;
     run(false); clearInterval(X.timer); X.timer = setInterval(() => { if (document.hidden || !$('jcxr').classList.contains('on')) return; if (X.data && X.data.live) run(false); }, 45000);
