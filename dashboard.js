@@ -241,7 +241,7 @@
   const moodLabel = (s) => s >= 80 ? ['VERY BULLISH', '#0b7a3f'] : s >= 60 ? ['BULLISH', '#2ea05f'] : s >= 40 ? ['NEUTRAL', '#c79a1b'] : s >= 20 ? ['BEARISH', '#e0643a'] : ['VERY BEARISH', '#b3162f'];
   function gaugeSVG(score) { // horizontal heartbeat bar with a needle at the level
     const sc = score == null ? 50 : Math.max(0, Math.min(100, score));
-    return `<div class="jd-mbar" aria-hidden="true" style="--pos:${sc}%"><div class="jd-mtrack"><i></i><i></i><i></i><i></i><i></i></div><div class="jd-mneedle"><b></b></div></div><div class="jd-mscale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>`;
+    return `<div class="jd-mbar" aria-hidden="true" style="--pos:${sc}%"><div class="jd-mtrack" style="background:${moodGrad()}"><i></i><i></i><i></i><i></i><i></i></div><div class="jd-mneedle"><b></b></div></div><div class="jd-mscale"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span></div>`;
   }
 
   /* ---------- PCR / 10Y values ---------- */
@@ -995,6 +995,7 @@
 
   const CSS7 = `
   .jd-btn.busy{opacity:.7;cursor:progress}
+  .jd-mtrack{gap:0!important}.jd-mtrack i{background:transparent!important;border-right:1px solid rgba(255,255,255,.45)}.jd-mtrack i:last-child{border-right:0}
   .jd-bias{position:relative;z-index:1;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:132px;padding:7px 12px 8px;border-radius:16px;background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.03) 55%,rgba(0,0,0,.18));border:1px solid color-mix(in srgb,var(--bc) 55%,#fff 15%);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -8px 14px rgba(0,0,0,.35) inset,0 0 22px -4px var(--bc),0 8px 0 -3px rgba(0,0,0,.35);transition:box-shadow .6s,border-color .6s,transform .15s;-webkit-tap-highlight-color:transparent}
   .jd-bias:hover{transform:translateY(-2px)}.jd-bias:focus-visible{outline:2px solid #e4c97a;outline-offset:2px}
   .jd-bias small{font-size:9.5px;font-weight:800;letter-spacing:.14em;opacity:.85}
