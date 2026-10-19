@@ -726,11 +726,7 @@
   @media(max-width:1480px){.j3-row{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:700px){.j3-row{grid-template-columns:repeat(2,minmax(0,1fr))}.j3-px{font-size:18px}}
   @media(prefers-reduced-motion:reduce){.j3-in::before{animation:none}.j3-in{transition:none}}
   @media print{.j3-in{-webkit-print-color-adjust:exact;print-color-adjust:exact;transform:none!important}}`;
-  document.addEventListener('mousemove', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (!t) return; const r = t.getBoundingClientRect(), i = t.firstChild, hd = t.querySelector('.j3-top');
-    /* keep the tile flat while the pointer is on its header band (name + X-ray button) or any control, so the button never slides out from under the cursor */
-    if (e.target.closest('button,input,a,[data-xr]') || (hd && e.clientY - r.top < hd.offsetTop + hd.offsetHeight + 10)) { i.style.setProperty('--rx', '0deg'); i.style.setProperty('--ry', '0deg'); return; }
-    const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; i.style.setProperty('--ry', (x * 14).toFixed(1) + 'deg'); i.style.setProperty('--rx', (-y * 14).toFixed(1) + 'deg'); }, { passive: true });
-  document.addEventListener('mouseout', (e) => { const t = e.target.closest && e.target.closest('.j3'); if (t && !t.contains(e.relatedTarget)) { t.firstChild.style.setProperty('--rx', '0deg'); t.firstChild.style.setProperty('--ry', '0deg'); } }, { passive: true });
+  /* (the pointer-following 3D tilt of the top tiles was removed: it cost frames on every mouse move and the market view needs speed first) */
 
   /* ---------- 10-year yields of Japan / UK / Germany (CNBC quote feed, called straight from the browser) ---------- */
   S.bd = {}; S.bdAt = 0;

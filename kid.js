@@ -42,7 +42,7 @@
   #jkRoot .kb .kx{position:absolute;right:5px;top:3px;margin:0;background:transparent;color:#cfd8f3;font-size:13px;padding:0 4px}
   #jkRing{position:fixed;z-index:7999;pointer-events:none;border-radius:14px;border:3px solid #ffd166;box-shadow:0 0 0 4px rgba(255,209,102,.28),0 0 22px 4px rgba(255,209,102,.7);opacity:0;transition:opacity .25s;animation:jkRing 1.1s ease-in-out infinite}#jkRing.on{opacity:1}
   #jkChip{position:fixed;left:10px;bottom:10px;z-index:7998;cursor:pointer;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:5px 10px;font:800 11px "Segoe UI",system-ui,sans-serif;color:#fff;background:linear-gradient(150deg,#1d3f8f,#0b1330);box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:.85}#jkChip:hover{opacity:1}
-  #jkRoot.fol{transition:opacity .25s;pointer-events:none}#jkRoot.fol .kb{pointer-events:none;margin-bottom:60px;display:none}#jkRoot.fol.hot .kb{display:block}
+  #jkRoot.fol{transition:transform .28s ease-out,opacity .25s;pointer-events:none}#jkRoot.fol .kb{pointer-events:none;margin-bottom:60px;display:none}#jkRoot.fol.hot .kb{display:block}
   #jkRoot.fol .kd{width:56px;height:70px}#jkRoot.fol .kw{display:block;flex:none}#jkRoot.fol.hot .kd{animation:jkHop .6s ease-in-out infinite}
   @keyframes jkHop{0%,100%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.1,.88)}50%{transform:translateY(-22px) scale(.95,1.08)}85%{transform:translateY(0) scale(1.08,.9)}}
   @keyframes jkBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes jkPop{0%{transform:scale(.2) translateY(30px)}100%{transform:none}}
@@ -151,7 +151,7 @@
     K.root.innerHTML = `<div class="kw">${KID}</div><div class="kb"><b></b><small></small></div>`;
     K.root.classList.add('on', 'fol'); K.root.classList.remove('rev'); F.x = F.tx; F.y = F.ty; fLoop();
   }
-  function fStop() { if (!F.on) return; F.on = false; F.hot = null; cancelAnimationFrame(F.raf); K.root.classList.remove('on', 'fol', 'hot', 'rev'); K.ring.classList.remove('on'); }
+  function fStop() { if (!F.on) return; F.on = false; F.hot = null; K.root.classList.remove('on', 'fol', 'hot', 'rev'); K.ring.classList.remove('on'); }
   function fHot(t) {
     if (!t || !t.closest || t.closest('#jkRoot,#jkChip')) return null;
     for (const T of TIPS) { const el = t.closest(T.sel); if (el) return { T, el }; }
@@ -167,13 +167,14 @@
     if (e.pointerType === 'touch') return; F.tx = e.clientX; F.ty = e.clientY;
     if (!F.on) { if (!fBlocked()) fStart(); return; }
     if (fBlocked()) { fStop(); return; }
+    if (!F.pend) { F.pend = 1; setTimeout(fLoop, 90); }
+    if (e.target === F.lt) return; F.lt = e.target; // same element as last time: nothing new to work out
     const h = fHot(e.target);
     if (h) { if (!F.hot || F.hot.el !== h.el) { F.hot = h; pref.seen[h.T.id] = (pref.seen[h.T.id] || 0) + 1; fSay(h); } }
     else F.hot = null;
   }
-  function fLoop() {
-    if (!F.on) return;
-    F.x += (F.tx - F.x) * 0.2; F.y += (F.ty - F.y) * 0.2;
+  function fLoop() { // one placement per pointer move (throttled), no animation-frame loop: the browser tweens the move with a CSS transition
+    F.pend = 0; if (!F.on) return; F.x = F.tx; F.y = F.ty;
     const W = innerWidth, H = innerHeight, kw = 56, kh = 70, bw = F.hot ? 230 : 0;
     const rev = F.x + 22 + kw + bw + 12 > W, down = F.y + 20 + kh > H - 6;
     let left = rev ? F.x - 22 - kw : F.x + 22; let top = down ? F.y - 20 - kh : F.y + 20;
@@ -189,8 +190,6 @@
       const sx = left + (rev ? kw * 0.22 : kw * 0.78), sy = top + kh * 0.53;
       let ang = Math.atan2(F.ty - sy, F.tx - sx) * 180 / Math.PI; if (rev) ang = 180 - ang; if (arm) arm.style.transform = `rotate(${ang.toFixed(0)}deg)`;
     } else { K.ring.classList.remove('on'); if (arm) arm.style.transform = 'rotate(-35deg)'; }
-    if (fBlocked()) { fStop(); return; }
-    F.raf = requestAnimationFrame(fLoop);
   }
   function fClick(e) {
     if (!F.on || !F.hot) return; const h = fHot(e.target); if (!h) return;
