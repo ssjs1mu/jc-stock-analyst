@@ -342,25 +342,33 @@
       const o = J.outlook(); if (!o.F.some((f) => f[1] !== '—')) return null; return o;
     } catch (e) { return null; }
   }
+  /* Colour of the mood, graded light → deep inside every band: the further a reading is from neutral, the deeper the shade */
+  const MSTOPS = [[0, '#7d0b20'], [20, '#ee6b73'], [20.01, '#d9501a'], [40, '#f8b27a'], [40.01, '#f4a65a'], [50, '#f2c21f'], [60, '#f6dd5a'], [60.01, '#d3ed95'], [80, '#7cc43c'], [80.01, '#62d48c'], [100, '#08753a']];
+  const hex2 = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  function moodColor(sc) {
+    sc = Math.max(0, Math.min(100, sc)); for (let i = 1; i < MSTOPS.length; i++) { const a = MSTOPS[i - 1], b = MSTOPS[i]; if (sc <= b[0]) { const t = b[0] === a[0] ? 0 : (sc - a[0]) / (b[0] - a[0]), x = hex2(a[1]), y = hex2(b[1]); return '#' + x.map((v, k) => Math.round(v + (y[k] - v) * t).toString(16).padStart(2, '0')).join(''); } }
+    return MSTOPS[MSTOPS.length - 1][1];
+  }
+  const moodGrad = () => 'linear-gradient(90deg,' + [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((v) => moodColor(v) + ' ' + v + '%').join(',') + ')';
   const moodLvl = (s) => (s >= 80 ? 2 : s >= 60 ? 1 : s >= 40 ? 0 : s >= 20 ? -1 : -2);
   /* The header shows ONE reading: the Market Mood (Nifty move, breadth, VIX, global markets, rupee, crude, yields, PCR). Badge text, colour and map all follow it. */
   function biasHTML() {
-    const md = moodScore(), col = md ? BCOL[moodLvl(md.score)] : '#8a94ad', lab = md ? moodLabel(md.score)[0] : 'LOADING', sc = md ? 'mood ' + md.score + ' / 100' : 'reading the market…';
+    const md = moodScore(), col = md ? moodColor(md.score) : '#8a94ad', lab = md ? moodLabel(md.score)[0] : 'LOADING', sc = md ? 'mood ' + md.score + ' / 100' : 'reading the market…';
     return `<div class="jd-bias" role="button" tabindex="0" data-jdbias="1" style="--bc:${col}" title="Market bias = the Market Mood reading (Nifty, breadth, VIX, global markets, rupee, crude, yields, PCR) — tap for the drivers"><small>MARKET BIAS</small>`
       + `<svg class="jd-imap" viewBox="0 0 ${IMAP.w} 100" aria-label="Map of India coloured by market mood"><defs><linearGradient id="jdMg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient></defs><path class="mp" d="${IMAP.d}"/><path d="${IMAP.d}" fill="url(#jdMg)" stroke="rgba(255,255,255,.7)" stroke-width=".35" stroke-linejoin="round"/></svg>`
-      + `<b>${esc(lab)}</b><span>${esc(sc)}</span></div>`;
+      + `<b>${esc(lab)}</b><span>${esc(sc)}</span>${md ? `<i class="jd-bs" style="background:${moodGrad()}"><u style="left:${Math.max(0, Math.min(100, md.score))}%"></u></i>` : ''}</div>`;
   }
   function biasPopHTML() {
     const md = moodScore(), o = biasInfo(), top = (inner) => `<div class="jd-pm-h"><div class="jd-pm-t"><b>🧭 Market bias</b><small>the same reading as the Market Mood gauge — mechanical, not advice</small></div><div class="jd-pm-bt">${inner}<button type="button" class="jd-mvb" data-popx="1" title="Close (Esc)">✕</button></div></div>`;
     if (!md) return top('') + '<div class="jd-pm-b"><div class="jd-fn">The reading is still loading — it needs a few live quotes. Try again in a moment.</div></div>';
-    const col = BCOL[moodLvl(md.score)], sg = (v, d) => (v >= 0 ? '+' : '') + v.toFixed(d == null ? 2 : d);
+    const col = moodColor(md.score), sg = (v, d) => (v >= 0 ? '+' : '') + v.toFixed(d == null ? 2 : d);
     const vote = (v) => (v > 0.15 ? '<span style="color:#12a05a;font-weight:800">▲ bullish</span>' : v < -0.15 ? '<span style="color:#e03a3a;font-weight:800">▼ bearish</span>' : '<span style="color:#7a869f;font-weight:800">● flat</span>');
     const rows = md.parts.slice().sort((a, b) => Math.abs(b.w * b.v) - Math.abs(a.w * a.v)).map((p) => `<tr><td>${esc(p.name)}</td><td><b>${esc(p.txt || '—')}</b></td><td>${vote(p.v)}</td><td>${Math.round(p.w / md.parts.reduce((a, q) => a + q.w, 0) * 100)}%</td></tr>`).join('');
     const mac = o ? `<h4 class="jd-bph">Macro positioning detail <small>PCR · India VIX · Brent · yields — one input above, and what the Trade desk uses for carry / exit</small></h4><div class="jd-bpm">Macro read on its own: <b style="color:${BCOL[Math.max(-2, Math.min(2, o.sc))]}">${esc(o.lab[0])}</b> (score ${o.sc > 0 ? '+' : ''}${o.sc} of ±4). ${esc(o.lab[2])}${o.trend ? ` Nifty is ${sg(o.trend.ch)} % at ${fmtN(o.trend.p, 2)}.` : ''}</div><table class="jd-bpx"><thead><tr><th>Factor</th><th>Reading</th><th>Vote</th><th>Meaning</th></tr></thead><tbody>${o.F.map((f) => `<tr><td>${esc(f[0])}</td><td><b>${esc(f[1])}</b></td><td style="font-weight:800;color:${f[2] > 0 ? '#12a05a' : f[2] < 0 ? '#e03a3a' : '#7a869f'}">${f[2] > 0 ? '▲ +1' : f[2] < 0 ? '▼ −1' : '● 0'}</td><td>${esc(f[3])}<div style="font-size:10.5px;color:#7a869f">${esc(f[4])}</div></td></tr>`).join('')}</tbody></table>` : '';
     return top('<button type="button" class="jd-mvb" onclick="window.jdBiasGo()">Trade desk ▸</button>')
-      + `<div class="jd-pm-b"><div class="jd-bpop"><div class="jd-bpb" style="background:${col}"><i>MARKET BIAS = MARKET MOOD</i><b>${esc(moodLabel(md.score)[0])}</b><span>${md.score} / 100</span></div><div class="jd-bpt">One reading, shown three ways: this badge, the India map colour and the Market Mood gauge. It blends the Nifty move, breadth of the Indian indices, India VIX, global markets, rupee, crude, US yields and PCR.</div></div>`
+      + `<div class="jd-pm-b"><div class="jd-bpop"><div class="jd-bpb" style="background:${col}"><i>MARKET BIAS = MARKET MOOD</i><b>${esc(moodLabel(md.score)[0])}</b><span>${md.score} / 100</span><i class="jd-bs" style="background:${moodGrad()}"><u style="left:${Math.max(0, Math.min(100, md.score))}%"></u></i></div><div class="jd-bpt">One reading, shown three ways: this badge, the India map colour and the Market Mood gauge. It blends the Nifty move, breadth of the Indian indices, India VIX, global markets, rupee, crude, US yields and PCR.</div></div>`
       + `<table class="jd-bpx"><thead><tr><th>Driver</th><th>Reading</th><th>Tone</th><th>Weight</th></tr></thead><tbody>${rows}</tbody></table>${mac}`
-      + `<div class="jd-fn"><b>Bands:</b> 0–20 very bearish (red) · 20–40 bearish (orange) · 40–60 neutral (amber) · 60–80 bullish (lime) · 80–100 very bullish (green). Delayed data; a reading of tone, not a forecast or advice.</div></div>`;
+      + `<div class="jd-fn"><b>Bands:</b> 0–20 very bearish (red) · 20–40 bearish (orange) · 40–60 neutral (amber) · 60–80 bullish (lime) · 80–100 very bullish (green). <b>Shade:</b> inside each band the colour runs from light (close to neutral) to deep (the extreme), so a deep red or deep green means a strong, one-sided market and a pale one a mild lean. Delayed data; a reading of tone, not a forecast or advice.</div></div>`;
   }
   window.jdBiasGo = () => { S.pop = null; renderPop(); if (typeof window.showTab === 'function') window.showTab('pCalls'); };
 
@@ -999,6 +1007,8 @@
   .jd-hero{grid-template-columns:auto auto minmax(0,1fr) 270px}
   @media(max-width:1180px){.jd-hero{grid-template-columns:auto auto minmax(0,1fr)}}
   @media(max-width:900px){.jd-hero{grid-template-columns:1fr}.jd-bias{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px 12px;width:min(320px,100%);margin:0 auto;box-sizing:border-box;padding:7px 14px}.jd-bias small{flex:0 0 100%;text-align:center}.jd-imap{height:84px}.jd-bias b,.jd-bias span{flex:0 1 auto;text-align:left}}
+  .jd-bs{position:relative;display:block;width:100%;min-width:104px;height:7px;border-radius:5px;margin-top:3px;box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 1px 3px rgba(0,0,0,.4)}.jd-bs u{position:absolute;top:-3px;width:3px;height:13px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.55),0 0 6px #fff;transition:left 1s ease}
+  .jd-bpb .jd-bs{margin-top:7px;min-width:140px}
   .jd-bpop{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;margin-bottom:10px}.jd-bpb{border-radius:12px;padding:10px 18px;text-align:center;color:#fff;min-width:150px}.jd-bpb i{display:block;font-style:normal;font-size:10px;letter-spacing:1px;opacity:.9}.jd-bpb b{display:block;font-size:19px}.jd-bpb span{font-size:11px;opacity:.95}
   .jd-bpt{flex:1;min-width:220px;background:#fff7e0;border:1px solid #f0d58a;border-radius:10px;padding:9px 12px;line-height:1.5;color:#3a2e00;font-size:13px}
   .jd-bph{margin:14px 0 4px;font-size:14px}.jd-bph small{font-weight:400;color:#7b88a6;font-size:11px}.jd-bpm{margin:0 0 6px;font-size:12.5px;line-height:1.5}
