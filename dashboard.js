@@ -330,17 +330,19 @@
 
   /* ---------- live business TV: tiles in the header + one persistent docked player (lives on <body>, so it keeps playing when the tab/view changes) ---------- */
   const TV = [
-    { k: 'zee', n: 'Zee Business', c: 'UCkXopQ3ubd-rnXnStZqCl2w', col: '#e53935' },
-    { k: 'cnbc', n: 'CNBC Awaaz', c: 'UCQIycDaLsBpMKjOCeaKUYVg', col: '#f9a825' },
-    { k: 'ndtv', n: 'NDTV Profit', c: 'UC3uJIdRFTGgLWrUziaHbzrg', col: '#1e88e5' },
-    { k: 'etnow', n: 'ET Now', c: 'UCI_mwTKUhicNzFrhm33MzBQ', col: '#d81b60' },
+    { k: 'zee', n: 'Zee Business', c: 'UCkXopQ3ubd-rnXnStZqCl2w', h: 'ZeeBusiness', col: '#e53935' },
+    { k: 'cnbc', n: 'CNBC Awaaz', c: 'UCQIycDaLsBpMKjOCeaKUYVg', h: 'CNBCAwaaz', col: '#f9a825' },
+    { k: 'ndtv', n: 'NDTV Profit', c: 'UC3uJIdRFTGgLWrUziaHbzrg', h: 'NDTVProfitIndia', col: '#1e88e5' },
+    { k: 'etnow', n: 'ET Now', c: 'UCWmUOYVa7ETRkJ63YaZRhhA', alt: ['UCI_mwTKUhicNzFrhm33MzBQ'], h: 'ETNOWlive', col: '#d81b60' },
   ];
+  const tvYt = (t) => 'https://www.youtube.com/' + (t.h ? '@' + t.h : 'channel/' + t.c) + '/live';
   const tvCur = () => { try { return window.__jdtv && window.__jdtv.cur; } catch (e) { return null; } };
+  const tvStat = (t) => { const c = tvVid[t.k]; return c && c.live === true ? '● LIVE' : c && c.live === false ? '○ OFFLINE?' : '▶ WATCH'; };
   function tvTiles() {
     const cur = tvCur();
-    return '<div class="jd-tvh">LIVE TV <small>tap to watch · keeps playing on every tab</small></div><div class="jd-tvg">' + TV.map((t) => `<button type="button" class="jd-tvb${cur === t.k ? ' on' : ''}" data-jdtv="${t.k}" style="--tc:${t.col}" title="Watch ${esc(t.n)} live"><i class="jd-tvd"></i><b>${esc(t.n)}</b><span>${cur === t.k ? 'NOW PLAYING' : '● LIVE'}</span></button>`).join('') + '</div>';
+    return '<div class="jd-tvh">LIVE TV <small>tap to watch · keeps playing on every tab</small></div><div class="jd-tvg">' + TV.map((t) => `<button type="button" class="jd-tvb${cur === t.k ? ' on' : ''}" data-jdtv="${t.k}" style="--tc:${t.col}" title="Watch ${esc(t.n)} live"><i class="jd-tvd"></i><b>${esc(t.n)}</b><span>${cur === t.k ? 'NOW PLAYING' : tvStat(t)}</span></button>`).join('') + '</div>';
   }
-  const tvSrc = (t) => (t.vid ? 'https://www.youtube.com/embed/' + t.vid + '?' : 'https://www.youtube.com/embed/live_stream?channel=' + t.c + '&') + 'autoplay=1&rel=0&playsinline=1';
+  const tvSrc = (t, cid) => (t.vid ? 'https://www.youtube.com/embed/' + t.vid + '?' : 'https://www.youtube.com/embed/live_stream?channel=' + (cid || t.cc || t.c) + '&') + 'autoplay=1&rel=0&playsinline=1&enablejsapi=1&origin=' + encodeURIComponent(location.origin);
   function tvEnsure() {
     let el = document.getElementById('jdTvDock'); if (el) return el;
     const st = document.createElement('style'); st.textContent = `
@@ -355,15 +357,19 @@
     el = document.createElement('div'); el.id = 'jdTvDock';
     el.innerHTML = '<div class="tvbar"><span class="tt" id="jdTvT">Live TV</span><button type="button" data-tvact="min" title="Minimise (audio keeps playing)">▁</button><button type="button" data-tvact="pop" title="Open in a separate small window — keeps playing even if you minimise or leave this page">⧉ Pop out</button><button type="button" data-tvact="yt" title="Open on YouTube">YouTube ↗</button><button type="button" data-tvact="x" title="Stop and close">✕</button></div><div class="tvch" id="jdTvCh"></div><div class="tvbox" id="jdTvBox"></div>';
     document.body.appendChild(el);
-    el.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const a = b.getAttribute('data-tvact'), k = b.getAttribute('data-tvch'); if (k) tvPlay(k); else if (a === 'x') tvStop(); else if (a === 'min') { el.classList.toggle('min'); b.textContent = el.classList.contains('min') ? '▢' : '▁'; } else if (a === 'pop') tvPop(); else if (a === 'yt') { const t = TV.find((x) => x.k === tvCur()); if (t) window.open('https://www.youtube.com/channel/' + t.c + '/live', '_blank', 'noopener'); } });
+    el.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const a = b.getAttribute('data-tvact'), k = b.getAttribute('data-tvch'); if (k) tvPlay(k); else if (a === 'x') tvStop(); else if (a === 'min') { el.classList.toggle('min'); b.textContent = el.classList.contains('min') ? '▢' : '▁'; } else if (a === 'pop') tvPop(); else if (a === 'yt') { const t = TV.find((x) => x.k === tvCur()); if (t) window.open(tvYt(t), '_blank', 'noopener'); } });
     return el;
   }
-  function tvMark(k) { document.querySelectorAll('.jd-tvb').forEach((b) => { const on = b.getAttribute('data-jdtv') === k; b.classList.toggle('on', on); const sp = b.querySelector('span'); if (sp) sp.textContent = on ? 'NOW PLAYING' : '● LIVE'; }); }
+  function tvMark(k) { document.querySelectorAll('.jd-tvb').forEach((b) => { const on = b.getAttribute('data-jdtv') === k; b.classList.toggle('on', on); const sp = b.querySelector('span'); if (sp) { const t = TV.find((x) => x.k === b.getAttribute('data-jdtv')); sp.textContent = on ? 'NOW PLAYING' : t ? tvStat(t) : '▶ WATCH'; } }); }
   const tvVid = {};
   async function tvResolve(t) {
     const c = tvVid[t.k]; if (c && Date.now() - c.at < 180000) return c.vid;
-    try { const u = typeof getBackend === 'function' ? getBackend() : ''; if (u) { const j = JSON.parse(await fetchWithTimeout(beUrl(u, 'action=ytlive&channel=' + t.c), 20000)); if (j && j.ok && j.vid) { tvVid[t.k] = { vid: j.vid, at: Date.now() }; return j.vid; } } } catch (e) { }
+    try { const u = typeof getBackend === 'function' ? getBackend() : ''; if (u) { const j = JSON.parse(await fetchWithTimeout(beUrl(u, 'action=ytlive&channel=' + t.c), 20000)); if (j && j.ok && j.vid) { tvVid[t.k] = { vid: j.vid, live: !!j.live, at: Date.now() }; return j.live ? j.vid : null; } } } catch (e) { }
     return null;
+  }
+  function tvFail(t, why) {
+    const box = document.getElementById('jdTvBox'); if (!box) return;
+    box.innerHTML = '<div class="tvld" style="flex-direction:column;gap:8px;text-align:center;padding:10px"><b>' + esc(t.n) + ' will not play inside this page</b><span style="color:#9fb3e6">' + esc(why) + '</span><a href="' + tvYt(t) + '" target="_blank" rel="noopener" style="color:#fff;background:#e53935;border-radius:8px;padding:6px 12px;font-weight:800;text-decoration:none">Open ' + esc(t.n) + ' on YouTube ↗</a></div>';
   }
   async function tvPlay(k) {
     const t = TV.find((x) => x.k === k); if (!t) return; const el = tvEnsure(); window.__jdtv = window.__jdtv || {}; window.__jdtv.cur = k; const tok = (window.__jdtv.tok = (window.__jdtv.tok || 0) + 1);
@@ -372,8 +378,29 @@
     document.getElementById('jdTvCh').innerHTML = TV.map((x) => `<button type="button" data-tvch="${x.k}" class="${x.k === k ? 'on' : ''}">${esc(x.n)}</button>`).join('');
     const box = document.getElementById('jdTvBox'); box.innerHTML = '<div class="tvld">Connecting to ' + esc(t.n) + '…</div>'; tvMark(k);
     const vid = await tvResolve(t); if (window.__jdtv.tok !== tok || window.__jdtv.cur !== k) return;
-    t.vid = vid; box.innerHTML = '<iframe title="' + esc(t.n) + ' live" src="' + tvSrc(t) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    t.vid = vid; tvMark(k);
+    const cands = vid ? [null] : [t.c].concat(t.alt || []); let i = 0, why = 'The broadcaster may have switched off embedded playback, or the stream is offline right now.';
+    const tryNext = () => {
+      if (window.__jdtv.tok !== tok || window.__jdtv.cur !== k) return;
+      if (i >= cands.length) { tvFail(t, why); return; }
+      const cid = cands[i++]; t.cc = cid || t.c;
+      box.innerHTML = '<iframe title="' + esc(t.n) + ' live" src="' + tvSrc(t, cid) + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+      const f = box.querySelector('iframe'); let done = false;
+      const off = () => { window.removeEventListener('message', on); clearTimeout(tm); };
+      const on = (ev) => {
+        if (!f || ev.source !== f.contentWindow || !/youtube(-nocookie)?\.com$/.test(String(ev.origin).replace(/^https?:\/\//, ''))) return;
+        let d = ev.data; try { if (typeof d === 'string') d = JSON.parse(d); } catch (e) { return; }
+        if (d && d.event === 'onError') { const c = +d.info; if (c === 101 || c === 150) why = 'YouTube reports that this broadcaster has blocked embedding of its live stream.'; else if (c === 100) why = 'YouTube reports this stream is not available (offline or private).'; if (!done) { done = true; off(); tryNext(); } }
+        else if (d && d.event === 'onStateChange' && (+d.info === 1 || +d.info === 3)) { done = true; off(); const c = tvVid[t.k] = tvVid[t.k] || { at: Date.now() }; c.live = true; tvMark(k); }
+      };
+      window.addEventListener('message', on);
+      f.addEventListener('load', () => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'jdtv', channel: 'widget' }), '*'); f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onError'], id: 'jdtv' }), '*'); f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'], id: 'jdtv' }), '*'); } catch (e) { } });
+      const tm = setTimeout(() => { if (!done) { done = true; off(); /* no signal: leave the player as is (autoplay may be waiting for a tap) */ } }, 20000);
+    };
+    tryNext();
   }
+  async function tvProbe() { for (const t of TV) { try { await tvResolve(t); } catch (e) { } } tvMark(tvCur()); }
+  setTimeout(tvProbe, 6000); setInterval(() => { if (!document.hidden) tvProbe(); }, 240000);
   function tvStop() { const el = document.getElementById('jdTvDock'); if (!el) return; document.getElementById('jdTvBox').innerHTML = ''; el.classList.remove('on'); window.__jdtv.cur = null; tvMark(null); }
   function tvPop() {
     const t = TV.find((x) => x.k === tvCur()); if (!t) return;
