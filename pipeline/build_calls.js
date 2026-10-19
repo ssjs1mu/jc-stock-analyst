@@ -19,6 +19,7 @@ const BACKEND = process.env.JC_BACKEND || (fs.readFileSync(path.join(ROOT, 'engi
 const OUT_DIR = path.join(ROOT, 'data', 'calls'), LATEST = path.join(OUT_DIR, 'latest.json');
 const FINAL = { SL: 1, T1: 1, T2: 1, NT: 1, SKIP: 1, 'EOD+': 1, 'EOD−': 1, EXPIRED: 1 };
 
+const ERRS = { be: [], yh: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function getJSON(url, ms, opts) {
   const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms);
@@ -46,7 +47,7 @@ function parseYahoo(j) {
 async function yahoo(sym) {
   for (let a = 0; a < 3; a++) {
     for (const host of ['query1', 'query2']) {
-      try { return parseYahoo(await getJSON(`https://${host}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=2y&interval=1d&includePrePost=false`, 20000)); } catch (e) { /* try next */ }
+      try { return parseYahoo(await getJSON(`https://${host}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=2y&interval=1d&includePrePost=false`, 20000)); } catch (e) { if (ERRS.yh.length < 4) ERRS.yh.push(sym + ': ' + ((e && e.message) || e)); }
     }
     await sleep(800 * (a + 1));
   }
@@ -68,15 +69,18 @@ function addSessions(iso, n) { const d = new Date(iso + 'T00:00:00Z'); let c = 0
   const uni = universe(), yf = uni.map(yfOf); console.log('Universe: ' + uni.length + ' symbols, date ' + today);
   const bars = {}, parts = []; for (let i = 0; i < yf.length; i += 25) parts.push(yf.slice(i, i + 25));
   let viaBe = 0, viaYh = 0;
-  await mapLimit(parts, 3, async (part) => {
-    let got = {}; try { got = await viaBackend(part); } catch (e) { /* relay failed — Yahoo direct below */ }
+  await mapLimit(parts, 2, async (part) => {
+    let got = {};
+    for (let a = 0; a < 3 && !Object.keys(got).length; a++) { try { got = await viaBackend(part); } catch (e) { if (ERRS.be.length < 4) ERRS.be.push(((e && e.message) || e) + ''); await sleep(1500 * (a + 1)); } }
     Object.assign(bars, got); viaBe += Object.keys(got).length;
     const miss = part.filter((y) => !bars[y]);
     await mapLimit(miss, 6, async (y) => { const b = await yahoo(y); if (b && b.length >= 150) { bars[y] = b; viaYh++; } });
   });
   console.log('Daily bars: ' + viaBe + ' via backend relay, ' + viaYh + ' via Yahoo direct, ' + (yf.length - viaBe - viaYh) + ' missing');
+  if (ERRS.be.length) console.log('Backend relay errors (sample): ' + ERRS.be.join(' | '));
+  if (ERRS.yh.length) console.log('Yahoo errors (sample): ' + ERRS.yh.join(' | '));
   const minOk = Math.max(60, Math.floor(yf.length * 0.5));
-  if (viaBe + viaYh < minOk) { console.error('::error::Only ' + (viaBe + viaYh) + ' of ' + yf.length + ' symbols returned data — not publishing a partial call book.'); process.exit(1); }
+  if (viaBe + viaYh < minOk) { console.error('::error::Only ' + (viaBe + viaYh) + ' of ' + yf.length + ' symbols returned data — not publishing a partial call book.'); console.error('::error::' + 'backend: ' + (ERRS.be.join(' | ') || 'no error') + ' ; yahoo: ' + (ERRS.yh.join(' | ') || 'no error')); process.exit(1); }
 
   const idx = {}; for (const s of ['^NSEI', '^INDIAVIX']) { try { const g = await viaBackend([s]); idx[s] = g[s] || null; } catch (e) { idx[s] = null; } if (!idx[s]) idx[s] = await yahoo(s); }
   if (!idx['^NSEI'] || idx['^NSEI'].length < 150) { console.error('::error::Nifty history unavailable — cannot judge the market regime.'); process.exit(1); }
