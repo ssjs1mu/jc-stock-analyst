@@ -14,6 +14,8 @@ on:
     - cron: '43 12 * * 1-5'   # 18:13 IST  evening-market-wrap retry
     - cron: '13 13 * * 1-5'   # 18:43 IST  evening-news-wrap (due 19:00) + market-wrap retry
     - cron: '43 13 * * 1-5'   # 19:13 IST  evening-news-wrap retry
+  push:
+    paths: ['.pulse/**']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
   workflow_dispatch:
     inputs:
       ids:
@@ -61,7 +63,12 @@ jobs:
             "43 13 * * 1-5") IDS="evening-news-wrap" ;;
             *) IDS="${{ github.event.inputs.ids }}" ;;
           esac
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # heartbeat: build whatever is due for this time of day (IST); finished reports are skipped below
+            H=$(TZ=Asia/Kolkata date +%H)
+            if [ "$H" -lt 12 ]; then IDS="premarket-news morning-brief morning-detailed morning-pulse"; else IDS="evening-market-wrap evening-news-wrap"; fi
+          fi
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             # drop reports already published (or marked holiday) today, so retries finish in seconds
             IDS=$(python3 - $IDS <<'PY'
           import json, sys, datetime as dt
