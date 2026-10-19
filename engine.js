@@ -39,11 +39,18 @@ const isBackendUrl = (u) => /^https:\/\/script\.google(usercontent)?\.com\//.tes
 function beAcquire() { if (beInflight < BE_MAX_INFLIGHT) { beInflight++; return Promise.resolve(); } return new Promise((res) => beQueue.push(res)); }
 function beRelease() { const n = beQueue.shift(); if (n) n(); else beInflight = Math.max(0, beInflight - 1); }
 
+/* Apps Script's free daily URL-fetch quota ("Service invoked too many times for one day: urlfetch") — once seen, every backend call fails after ~11 s.
+   Remember it until the quota resets (midnight Pacific = 07:00/08:00 UTC) so the terminal stops waiting on a backend that cannot answer. */
+const BE_QK = 'jc_be_quota_v1';
+function beQuotaUntil() { try { return +localStorage.getItem(BE_QK) || 0; } catch (e) { return 0; } }
+function beQuotaOut() { return Date.now() < beQuotaUntil(); }
+function beQuotaMark() { try { const d = new Date(), t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 8, 5); localStorage.setItem(BE_QK, String(t > Date.now() ? t : t + 86400000)); } catch (e) { } }
 async function fetchWithTimeout(url, ms = 9000) {
   const gated = isBackendUrl(url);
+  if (gated && beQuotaOut() && /[?&]action=(fetch|dash)\b/.test(url)) throw new Error('backend daily quota used up');
   if (gated) await beAcquire(); // the timeout starts only once this request actually goes out
   const ctl = new AbortController(); const id = setTimeout(() => ctl.abort(), ms);
-  try { const r = await fetch(url, { cache: 'no-store', signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); }
+  try { const r = await fetch(url, { cache: 'no-store', signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); const tx = await r.text(); if (gated && tx.length < 400 && /Service invoked too many times/i.test(tx)) { beQuotaMark(); throw new Error('backend daily quota used up'); } return tx; }
   finally { clearTimeout(id); if (gated) beRelease(); }
 }
 

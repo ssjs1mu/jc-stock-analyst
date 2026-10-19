@@ -183,7 +183,7 @@
         else if (first.length) apply(await fetchBatch(first));
         if (rest.length) apply(await fetchBatch(rest));
         sets.forEach((g) => { S.due[g.id] = ms + cadence(g, w) * 1000; });
-        S.last = ms; S.err = ok ? '' : 'No quotes returned — check the Data backend box or your connection.';
+        S.last = ms; S.err = ok ? '' : (typeof beQuotaOut === 'function' && beQuotaOut() ? 'Your Google Apps Script data backend has used its free daily URL-fetch quota (it resets around 1:30 PM IST). Showing the last saved prices; live prices return after the reset.' : 'No quotes returned — check the Data backend box or your connection.');
       }
     } catch (e) { S.err = (e && e.message) || 'Refresh failed'; }
     finally { S.busy = false; setBusy(false); paint(); }
