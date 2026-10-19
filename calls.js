@@ -48,6 +48,21 @@
     try { await post('calls_save', { calls: recs, days }); recs.forEach((r) => { if (C.dirty[r.id] === r) delete C.dirty[r.id]; }); C.err = ''; } catch (e) { C.err = 'Could not save to Drive: ' + ((e && e.message) || e); }
   }
 
+  /* ---------- the GitHub-built call book (data/calls/latest.json, built by the "Day & investment calls" workflow before 8:30 AM) ---------- */
+  async function ghBook(force) {
+    const today = istToday(); if (!isWeekday() || C.book.days[today]) return false;
+    if (!force && C.ghAt && Date.now() - C.ghAt < 120000) return false; C.ghAt = Date.now();
+    try {
+      const j = JSON.parse(await fetchWithTimeout('data/calls/latest.json?t=' + Date.now(), 15000));
+      if (!j || j.date !== today || !Array.isArray(j.calls) || !j.calls.length && !j.generatedAt) return false;
+      const open = {}; C.book.calls.forEach((c) => { if (c.type === 'INV' && !FINAL[c.status]) open[symKey(c)] = 1; });
+      const recs = j.calls.filter((c) => !(c.type === 'INV' && open[symKey(c)]));
+      const have = new Set(C.book.calls.map((c) => c.id)); recs.forEach((r) => { if (!have.has(r.id)) C.book.calls.push(r); });
+      C.book.days[today] = { generatedAt: j.generatedAt, source: 'github', scanned: j.scanned, missing: j.missing, dayCalls: j.dayCalls, invCalls: j.invCalls, noTrade: j.noTrade, ctx: j.ctx };
+      recs.forEach((r) => { C.dirty[r.id] = r; }); cacheBook(); flush(); return true;
+    } catch (e) { return false; }
+  }
+
   /* ---------- building today's book in the browser (fallback when the 8:10 trigger has not run) ---------- */
   async function mapLimit(items, n, fn) { const out = new Array(items.length); let i = 0; await Promise.all(Array.from({ length: n }, async () => { while (i < items.length) { const k = i++; try { out[k] = await fn(items[k], k); } catch (e) { out[k] = null; } } })); return out; }
   function universe() {
@@ -59,7 +74,7 @@
     if (C.busy) return; C.busy = true; const today = istToday();
     try {
       C.msg = 'Building today’s call book…'; paint();
-      await loadBook(); if (C.book.days[today] && !force) return;
+      await loadBook(); if (!force && await ghBook(true)) return; if (C.book.days[today] && !force) return;
       const uni = universe(), yf = uni.map((s) => (/\.BO$/.test(s) ? s : s.replace(/\.NS$/, '') + '.NS')); let done = 0;
       const res = new Array(yf.length).fill(null), be = getBackend && getBackend(), bt = []; for (let i = 0; i < yf.length; i += 25) bt.push(i);
       await mapLimit(bt, 3, async (i0) => {
@@ -114,6 +129,7 @@
   async function tick(force) {
     if (C.busy) return; const now = Date.now(), mkt = isWeekday() && istMin() >= 555 && istMin() <= 945;
     try {
+      if (isWeekday() && istMin() >= 6 * 60 && !C.book.days[istToday()]) await ghBook(false);
       if (force || (mkt && now - C.trackAt > 55e3) || (!mkt && now - C.trackAt > 600e3)) { await trackDay(); }
       if (force || now - C.invAt > (mkt ? 600e3 : 1800e3)) { await trackInv(); }
     } catch (e) { C.err = (e && e.message) || String(e); }
@@ -143,10 +159,10 @@
     const closed = wd && min >= 935, early = wd && min < 8 * 60 + 10, build = C.busy;
     let status;
     if (!wd) status = `<span class="cl-s off">MARKET CLOSED</span> Weekend — the next call book arrives on the next trading day by 8:30 AM IST.`;
-    else if (d) status = `<span class="cl-s ok">CALLS LOCKED</span> Issued ${new Date(d.generatedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })} IST by the ${d.source === 'server' ? 'Apps Script 8:10 AM trigger' : 'terminal'} · ${d.scanned} stocks scanned · ${d.dayCalls} day calls · ${d.invCalls} investment calls · ${d.noTrade} stocks with no edge.`;
+    else if (d) status = `<span class="cl-s ok">CALLS LOCKED</span> Issued ${new Date(d.generatedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })} IST by the ${d.source === 'server' ? 'Apps Script 8:10 AM trigger' : d.source === 'github' ? 'automatic morning build' : 'terminal'} · ${d.scanned} stocks scanned · ${d.dayCalls} day calls · ${d.invCalls} investment calls · ${d.noTrade} stocks with no edge.`;
     else if (build) status = `<span class="cl-s wait">BUILDING…</span> ${E(C.msg)}`;
-    else if (early) status = `<span class="cl-s wait">AWAITING 8:10 AM</span> The call book is built automatically between 8:10 and 8:25 AM IST and is final by 8:30 AM.`;
-    else status = `<span class="cl-s wait">NOT BUILT YET</span> The backend trigger has not run — the terminal builds it automatically; you can also press <b>Build now</b>.`;
+    else if (early) status = `<span class="cl-s wait">AWAITING 8:10 AM</span> The call book is built automatically before 8:30 AM IST.`;
+    else status = `<span class="cl-s wait">NOT BUILT YET</span> The automatic morning build has not landed yet — the terminal builds it itself; you can also press <b>Build now</b>.`;
     const ctx = d && d.ctx ? `Nifty regime <b>${E(d.ctx.regime)}</b> · India VIX <b>${num(d.ctx.vix) ? d.ctx.vix.toFixed(1) : '—'}</b>${d.ctx.vixHigh ? ' <span class="r">(high — stricter filters)</span>' : ''} · prior session ${sg(d.ctx.niftyChg)}%` : '';
     const trig = dayCalls.filter(isTrig), tgt = dayCalls.filter((c) => c.status === 'T1' || c.status === 'T2'), slc = dayCalls.filter((c) => c.status === 'SL'), wait = dayCalls.filter((c) => c.status === 'WAIT'), liveN = dayCalls.filter((c) => c.status === 'LIVE');
     const avg = trig.length ? trig.reduce((a, c) => a + (c.retPct || 0), 0) / trig.length : null;
@@ -211,16 +227,16 @@
     if (t === 'pRecs' && $('pRecs')) { $('pRecs').innerHTML = renderRecs(); window.scrollTo(0, st); }
   }
   async function onShow(first) {
-    paint(); if (!C.loaded || first) await loadBook(); paint();
+    paint(); if (!C.loaded || first) await loadBook(); await ghBook(false); paint();
     const today = istToday(); if (isWeekday() && istMin() >= 8 * 60 + 30 && !C.book.days[today] && !C.busy) await buildClient(false);
     await tick(true);
   }
   window.jcCalls = {
-    refresh: async () => { C.err = ''; await loadBook(); paint(); await tick(true); },
+    refresh: async () => { C.err = ''; await loadBook(); await ghBook(true); paint(); await tick(true); },
     build: async () => { const t = istToday(); if (C.book.days[t] && !confirm('Rebuild today’s call book? Calls already issued today will be kept; only new stocks are added. Use this only if the 8:10 AM build failed.')) return; await buildClient(true); },
     setF: (g, v) => { C.recF[g] = v; try { localStorage.setItem('jc_recf', JSON.stringify(C.recF)); } catch (e) {} paint(); },
     csv, state: C, tiles: dashTiles,
-    ensure: async (cb) => { const c0 = readCache(); if (c0 && !C.loaded) { mergeBook(c0); } if (!C.loaded && !C.ensuring) { C.ensuring = true; try { await loadBook(); } catch (e) {} C.ensuring = false; if (cb) cb(); } },
+    ensure: async (cb) => { const c0 = readCache(); if (c0 && !C.loaded) { mergeBook(c0); } if (!C.loaded && !C.ensuring) { C.ensuring = true; try { await loadBook(); await ghBook(false); } catch (e) {} C.ensuring = false; if (cb) cb(); } },
   };
 
   /* ---------- dashboard tiles (second row of Joshi's Dashboard) ---------- */

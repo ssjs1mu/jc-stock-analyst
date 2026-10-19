@@ -1,0 +1,68 @@
+name: Day & investment calls (ready before 8:30 AM IST)
+
+# Builds the morning call book with calls_engine.js (same rules as the terminal and the Apps Script trigger) and publishes it to
+# data/calls/latest.json, which Today's Calls reads. A day that is already built does nothing, so retries are free.
+# GitHub's own cron is often late or skipped, so an external heartbeat (a push to .pulse/) also starts it.
+on:
+  schedule:
+    - cron: '33 1 * * 1-5'    # 07:03 IST
+    - cron: '3 2 * * 1-5'     # 07:33 IST retry
+    - cron: '33 2 * * 1-5'    # 08:03 IST last retry (must land before 08:30)
+  push:
+    paths: ['.pulse/calls.txt', '.pulse/last.txt']
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Rebuild even if today is already built'
+        type: boolean
+        default: false
+      dry:
+        description: 'Dry run: build and print, do not publish'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: day-calls
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Skip late heartbeats
+        id: gate
+        run: |
+          H=$(TZ=Asia/Kolkata date +%H)
+          if [ "${{ github.event_name }}" = "push" ] && [ "$H" -ge 10 ]; then echo "go=no" >> "$GITHUB_OUTPUT"; echo "Heartbeat after 10:00 IST — the morning call book is not rebuilt."; else echo "go=yes" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v5
+        if: ${{ steps.gate.outputs.go == 'yes' }}
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        if: ${{ steps.gate.outputs.go == 'yes' }}
+        with:
+          node-version: '22'
+      - name: Build call book
+        if: ${{ steps.gate.outputs.go == 'yes' }}
+        run: |
+          F=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then F="$F --force"; fi
+          if [ "${{ github.event.inputs.dry }}" = "true" ]; then F="$F --dry"; fi
+          node pipeline/build_calls.js $F
+      - name: Publish
+        if: ${{ steps.gate.outputs.go == 'yes' && github.event.inputs.dry != 'true' }}
+        run: |
+          git config user.name "jc-calls-bot"
+          git config user.email "jc-calls-bot@users.noreply.github.com"
+          git add data/calls
+          if git diff --cached --quiet; then echo "No change."; exit 0; fi
+          git commit -m "calls: $(TZ=Asia/Kolkata date +%F) call book"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+          done
+          exit 1

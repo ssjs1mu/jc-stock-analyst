@@ -15,7 +15,7 @@ on:
     - cron: '13 13 * * 1-5'   # 18:43 IST  evening-news-wrap (due 19:00) + market-wrap retry
     - cron: '43 13 * * 1-5'   # 19:13 IST  evening-news-wrap retry
   push:
-    paths: ['.pulse/**']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
+    paths: ['.pulse/last.txt']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
   workflow_dispatch:
     inputs:
       ids:
