@@ -12,6 +12,10 @@
   body{font:12.5px/1.35 'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;color:var(--ink);background:#f1f4fa;min-height:100vh;position:relative;overflow-x:hidden;}
   body::before{content:'';position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(60px);background:radial-gradient(34% 30% at 14% 14%,rgba(0,140,255,.10),transparent 60%),radial-gradient(30% 32% at 86% 10%,rgba(255,70,160,.07),transparent 60%),radial-gradient(34% 34% at 76% 90%,rgba(0,200,140,.08),transparent 60%);animation:smoke 34s ease-in-out infinite alternate;}
   @keyframes smoke{to{transform:translate3d(4%,-3%,0) scale(1.1)}}
+  /* speed: the big blurred 'smoke' layers were animating forever on ~20 tiles + the page background (the whole page repainted every frame).
+     They now stay still and drift only while the pointer is over a tile. */
+  body::before,.j3-in::before,.dc-tile::before,.jd-cat::before,.fdg-in::before{animation:none!important}
+  .j3:hover .j3-in::before,.dc-tile:hover::before,.jd-cat:hover::before,.fdg-in:hover::before{animation:j3smoke 11s ease-in-out infinite alternate!important}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
   .wrap{max-width:1560px;margin:0 auto;padding:6px 10px 36px;}
   /* top bar */
@@ -200,7 +204,7 @@
 <script src="calls_engine.js?v=2"></script>
 <script src="engine.js?v=13"></script>
 <script src="schedules.js?v=4"></script>
-<script src="dashboard.js?v=28"></script>
+<script src="dashboard.js?v=29"></script>
 <script src="fiidii.js?v=2"></script>
 <script src="calls.js?v=9"></script>
 <script src="xray.js?v=3"></script>

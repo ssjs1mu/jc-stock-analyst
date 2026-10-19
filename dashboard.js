@@ -176,8 +176,12 @@
       const sets = SETS.filter((g) => force || !S.due[g.id] || ms >= S.due[g.id]);
       const syms = []; sets.forEach((g) => syms.push(...g.syms));
       if (syms.length) {
-        const rows = await fetchBatch(syms); let ok = 0;
-        rows.forEach((r) => { if (r && !r.err && r.p != null) { const old = S.q[r.s]; S.q[r.s] = Object.assign({}, r, { flash: old && old.p !== r.p ? (r.p > old.p ? 'up' : 'dn') : '' }); ok++; } });
+        /* the eight top tiles + the map come first: fetch their symbols on their own and paint, then the long tail (other indices, world markets, commodities) */
+        const top = sets.some((g) => g.id === 'in5') ? IN_TOP.map((x) => x[0]).concat(['BZ=F']) : [], first = syms.filter((x) => top.includes(x)), rest = syms.filter((x) => !top.includes(x)); let ok = 0;
+        const apply = (rows) => rows.forEach((r) => { if (r && !r.err && r.p != null) { const old = S.q[r.s]; S.q[r.s] = Object.assign({}, r, { flash: old && old.p !== r.p ? (r.p > old.p ? 'up' : 'dn') : '' }); ok++; } });
+        if (first.length && rest.length) { apply(await fetchBatch(first)); S.last = Date.now(); paint(); }
+        else if (first.length) apply(await fetchBatch(first));
+        if (rest.length) apply(await fetchBatch(rest));
         sets.forEach((g) => { S.due[g.id] = ms + cadence(g, w) * 1000; });
         S.last = ms; S.err = ok ? '' : 'No quotes returned — check the Data backend box or your connection.';
       }
