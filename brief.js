@@ -94,8 +94,8 @@
   }
 
   /* ---------- scenarios with levels, stop-loss, targets ---------- */
-  function scen(key, o, C) {
-    const K = KEYS[key], f = (v) => C.fmtN(v, K.dp), atr = o.atr || (o.px ? o.px * 0.006 : 0), px = o.px; if (px == null) return null;
+  function scenCore(K, o, C) {
+    const f = (v) => C.fmtN(v, K.dp), atr = o.atr || (o.px ? o.px * 0.006 : 0), px = o.px; if (px == null) return null;
     const S = [], rr = (e, sl, t) => { const r = Math.abs(sl - e); return r > 0 ? Math.abs(t - e) / r : null; }, rrT = (x) => x == null ? '' : ` · reward:risk ≈ ${x.toFixed(1)}${x < 1 ? ' (thin — not worth chasing)' : ''}`;
     const nr = o.nr, ns = o.ns, mr = o.mr || (nr ? nr + 1.5 * atr : null), ms = o.ms || (ns ? ns - 1.5 * atr : null);
     if (K.kind === 'pcr') {
@@ -119,6 +119,8 @@
     }
     return S;
   }
+
+  const scen = (key, o, C) => scenCore(KEYS[key], o, C);
 
   /* ---------- what to do with positions ---------- */
   function act(key, o, C) {
@@ -229,7 +231,7 @@
   .jb-als{display:flex;flex-wrap:wrap;gap:6px}.jb-al{cursor:pointer;font:700 11.5px "Segoe UI",sans-serif;border:1px solid #bccae6;background:#fff;color:#14306e;border-radius:9px;padding:5px 10px;text-align:left}.jb-al small{display:block;font-weight:600;color:#5a6a8e;font-size:10.5px}.jb-al.on{background:#fff3c9;border-color:#d9b23a}
   .jb-all{width:100%;border-collapse:collapse;font-size:12.2px}.jb-all th{text-align:left;font-size:10.5px;letter-spacing:.06em;color:#7b88a6;padding:4px 6px;border-bottom:1px solid #dfe5f2}.jb-all td{padding:5px 6px;border-bottom:1px solid #eef1f7;vertical-align:top;color:#1a2540}.jb-all tr.me td{background:#eef3ff;font-weight:700}
   .jb-vd{margin-top:8px;padding:8px 11px;border-radius:9px;background:#eef3ff;border:1px solid #c9d6f2;font-size:12.6px;line-height:1.5;color:#0b1330}
-  .j3 .jd-br{font-size:9.5px;font-weight:800;padding:3px 6px;border-radius:7px;flex:none;border:1px solid rgba(255,214,102,.7);background:rgba(255,214,102,.18);color:#ffe08a;cursor:pointer;white-space:nowrap}.j3 .jd-br:hover{background:rgba(255,214,102,.32)}
+  .j3[data-brief]{cursor:pointer}.j3[data-brief]:focus-visible .j3-in{outline:2px solid #ffd166;outline-offset:2px}.j3 .jd-br{font-size:9.5px;font-weight:800;padding:3px 6px;border-radius:7px;flex:none;border:1px solid rgba(255,214,102,.7);background:rgba(255,214,102,.18);color:#ffe08a;cursor:pointer;white-space:nowrap}.j3 .jd-br:hover{background:rgba(255,214,102,.32)}
   .j3-top .jb-btns{display:flex;gap:3px;align-items:center;flex:none}.j3-top .j3-nm{font-size:9.5px;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis}.j3-top .jd-xr{padding:3px 6px!important}.j3-nm.jb-sm{font-size:10px}.j3-top.jb-sub{margin-top:2px}
   #jbToast{position:fixed;left:50%;top:14px;transform:translate(-50%,-120%);z-index:99990;max-width:min(560px,calc(100vw - 24px));padding:10px 36px 10px 14px;border-radius:12px;background:linear-gradient(150deg,#1d3f8f,#0b1330);color:#fff;border:2px solid #e4c97a;box-shadow:0 12px 30px rgba(0,0,0,.5);font:700 13px/1.4 "Segoe UI",system-ui,sans-serif;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}#jbToast.on{transform:translate(-50%,0)}#jbToast button{position:absolute;right:8px;top:8px;background:transparent;border:0;color:#cfd8f3;cursor:pointer;font-size:14px}
   @media(max-width:700px){.jb-hero{grid-template-columns:repeat(2,minmax(0,1fr))}.jb-lv td:first-child{width:96px}}
@@ -241,5 +243,5 @@
     const b = e.target.closest && e.target.closest('[data-jb-al]'); if (!b) return; e.preventDefault(); const p = b.getAttribute('data-jb-al').split('|'); toggleAlert(p[0], parseFloat(p[1]), p[2], p.slice(3).join('|'));
     if (window.jdRepaintPop) window.jdRepaintPop();
   });
-  window.jcBrief = { html, check, keys: KEYS, together, read };
+  window.jcBrief = { html, check, keys: KEYS, together, read, scenCore };
 })();

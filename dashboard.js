@@ -688,7 +688,7 @@
         if (!L.mr && L.at52h) body = body.replace('<b>—</b><u></u>', '<b>ATH zone</b><u></u>');
       }
     } else body = '<div class="j3-tr t0">levels n/a for this series</div>';
-    return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.s === 'BZ=F' ? '🛢 ' : t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : ''}${esc(t.n)}</span>${xr}</div>`
+    return `<div class="j3 ${cls}${q && q.flash ? ' fl-' + q.flash : ''}" data-brief="${esc(t.s)}" role="button" tabindex="0" title="Tap for: why it is moving, what next, what to do"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${t.s === 'BZ=F' ? '🛢 ' : t.lv ? flag(t.s === 'USDINR=X' ? 'us' : 'in') : ''}${esc(t.n)}</span>${xr}</div>`
       + `<div class="j3-px">${pxtxt}</div><div class="j3-ch">${chtxt}</div>${t.lv && q ? spark(q.sp, cls) : ''}${body}</div></div>`;
   }
   function callTiles() { try { if (!window.jcCalls || !window.jcCalls.tiles) return ''; window.jcCalls.ensure(() => { if ((window.__curTab || '') === 'pDash') paint(); }); return window.jcCalls.tiles(); } catch (e) { return ''; } }
@@ -879,7 +879,7 @@
     return top(body);
   }
   function briefCtx() { return { S, levels, T3, moodScore, moodLabel, pcrVal, pcrTag, pctOf, fmtN, manual }; }
-  window.jdRepaintPop = () => renderPop();
+  window.jdRepaintPop = () => renderPop(); window.jdCtx = briefCtx;
   function renderPop() {
     const el = $('jdPop'); if (!el) return; const P = S.pop;
     if (!P) { if (!el.hidden) { el.hidden = true; el.innerHTML = ''; el.__sig = ''; document.body.style.overflow = ''; } return; }
@@ -894,10 +894,10 @@
   function comboTile() {
     const x = S.x.in10y || S.bd.IN10Y, m = manual().in10y, y = x && x.p != null ? x.p : m ? m.v : null, yc = x && x.pc != null ? (x.p - x.pc) * 100 : null, dy = yc == null || Math.abs(yc) < 0.05 ? 0 : yc > 0 ? 1 : -1;
     const px = S.x.pcr, mp = manual().pcr, pv = px && px.pcr != null ? px.pcr : mp ? mp.v : null, tag = pv != null ? pcrTag(pv) : null, cls = dy ? (dy > 0 ? 'dn' : 'up') : tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 'fl';
-    return `<div class="j3 ${cls}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${flag('in')}INDIA 10Y G-SEC</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="IN10Y" title="Why is the 10Y yield moving, what next, what to do">Why?</button></span></div><div class="j3-px">${y == null ? manIn('in10y', 'yield %') : fmtN(y, 3) + '<i>%</i>'}</div>`
-      + `<div class="j3-ch">${yc == null ? '<span>' + (y == null ? 'feed unavailable · enter value' : m && !x ? 'manual value' : '—') + '</span>' : `<b>${dy > 0 ? '▲' : dy < 0 ? '▼' : '■'}</b> ${yc >= 0 ? '+' : ''}${yc.toFixed(1)} bp`}</div><div class="j3-sep"></div>`
-      + `<div class="j3-top"><span class="j3-nm">NIFTY PCR (OI)${px && px.expiry ? '<small> · ' + esc(px.expiry) + '</small>' : ''}</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="PCR" title="What does PCR say, what next, what to do">Why?</button></span></div><div class="j3-px">${pv == null ? manIn('pcr', 'PCR') : pv.toFixed(2)}</div>`
-      + `<div class="j3-tr ${tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 't0'}">${tag ? tag[0] : 'feed unavailable · enter value'}</div></div></div>`;
+    return `<div class="j3 ${cls}"><div class="j3-in"><div class="j3-sec" data-brief="IN10Y" role="button" tabindex="0" title="Tap for: why the yield is moving, what next, what to do"><div class="j3-top"><span class="j3-nm">${flag('in')}INDIA 10Y G-SEC</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="IN10Y" title="Why is the 10Y yield moving, what next, what to do">Why?</button></span></div><div class="j3-px">${y == null ? manIn('in10y', 'yield %') : fmtN(y, 3) + '<i>%</i>'}</div>`
+      + `<div class="j3-ch">${yc == null ? '<span>' + (y == null ? 'feed unavailable · enter value' : m && !x ? 'manual value' : '—') + '</span>' : `<b>${dy > 0 ? '▲' : dy < 0 ? '▼' : '■'}</b> ${yc >= 0 ? '+' : ''}${yc.toFixed(1)} bp`}</div></div><div class="j3-sep"></div>`
+      + `<div class="j3-sec" data-brief="PCR" role="button" tabindex="0" title="Tap for: what PCR says, what next, what to do"><div class="j3-top"><span class="j3-nm">NIFTY PCR (OI)${px && px.expiry ? '<small> · ' + esc(px.expiry) + '</small>' : ''}</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="PCR" title="What does PCR say, what next, what to do">Why?</button></span></div><div class="j3-px">${pv == null ? manIn('pcr', 'PCR') : pv.toFixed(2)}</div>`
+      + `<div class="j3-tr ${tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 't0'}">${tag ? tag[0] : 'feed unavailable · enter value'}</div></div></div></div>`;
   }
   const CSS5 = `
   .j3-sep{height:1px;margin:9px 0 6px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent)}.j3-nm small{font-weight:600;opacity:.7;letter-spacing:0}
@@ -1044,7 +1044,7 @@
   }
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q), hm = c('[data-hm]'); if (hm) { openIdx(hm.getAttribute('data-hm')); return; }
-    const bf = c('[data-brief]'); if (bf) { S.pop = { t: 'brief', k: bf.getAttribute('data-brief') }; renderPop(); return; }
+    const bf = c('[data-brief]'); if (bf && !c('[data-xr],input,select,textarea,a,.jd-man')) { S.pop = { t: 'brief', k: bf.getAttribute('data-brief') }; renderPop(); return; }
     const bz = c('[data-jdbias]'); if (bz) { S.pop = { t: 'bias' }; renderPop(); return; }
     const ct = c('[data-cat]'); if (ct) { openCat(ct.getAttribute('data-cat')); return; }
     if (c('[data-popback]') && S.pop && S.pop.back) { S.pop = S.pop.back; renderPop(); return; }
@@ -1052,7 +1052,7 @@
     if (c('[data-popx]') || e.target.id === 'jdPop') { S.pop = null; renderPop(); return; }
     if (c('[data-popall]') && S.pop) { S.pop.all = !S.pop.all; renderPop(); }
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.pop) { S.pop = null; renderPop(); } const b = e.target && e.target.closest && e.target.closest('[data-jdbias]'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); S.pop = { t: 'bias' }; renderPop(); } });
+  document.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('[data-brief][role=button]')) { e.preventDefault(); S.pop = { t: 'brief', k: e.target.getAttribute('data-brief') }; renderPop(); return; } if (e.key === 'Escape' && S.pop) { S.pop = null; renderPop(); } const b = e.target && e.target.closest && e.target.closest('[data-jdbias]'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); S.pop = { t: 'bias' }; renderPop(); } });
   document.addEventListener('click', (e) => { const a = e.target.closest('[data-jdgo]'); if (!a) return; e.preventDefault(); const t = $(a.getAttribute('data-jdgo')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
   function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard' || !h) window.showTab('pDash'); }
