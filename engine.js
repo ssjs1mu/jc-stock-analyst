@@ -6,7 +6,7 @@
    ============================================================ */
 'use strict';
 const IS_BROWSER = typeof document !== 'undefined';
-const DEFAULT_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwMOG9NRYk4OEDdaOEYDERgk3Fyt0zVTbuajAAe3cIAccOOGI_fLR9kYCqlARSZYJlB6Q/exec';           // paste your Apps Script /exec URL here, or set it from the page
+const DEFAULT_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzMp82oHzLzKpaE0LrnUqEGGot7jqSw9e9VA1QhJNOPV35vOIYcfIChFL5PCDuD2Ahi5Q/exec';           // paste your Apps Script /exec URL here, or set it from the page
 const LS_BACKEND = 'jc_backend_url';
 
 /* ---------- small utils ---------- */
