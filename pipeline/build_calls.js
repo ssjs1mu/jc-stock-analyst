@@ -101,6 +101,8 @@ function addSessions(iso, n) { const d = new Date(iso + 'T00:00:00Z'); let c = 0
   // best effort: put the records in the Drive call book too (same call the browser makes), so settlement and history see them
   if (BACKEND) {
     try {
+      let cur = null; try { cur = await getJSON(BACKEND + '?action=calls_load', 40000); } catch (e) { /* unknown — save anyway */ }
+      if (cur && cur.days && cur.days[today]) { console.log('Drive call book already has ' + today + ' (' + cur.days[today].source + ') — not adding a second set of calls.'); return; }
       const r = await fetch(BACKEND, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'calls_save', data: { calls: recs, days: { [today]: day } } }), redirect: 'follow' });
       console.log('Drive call book: HTTP ' + r.status + ' ' + (await r.text()).slice(0, 120));
     } catch (e) { console.log('Drive call book not updated (' + ((e && e.message) || e) + ') — the terminal will save it when opened.'); }
