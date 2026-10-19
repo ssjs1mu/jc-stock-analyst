@@ -78,6 +78,7 @@ const fcAge = (ms) => { const m = Math.round(ms / 60000); return m < 60 ? m + ' 
 
 /* Route order: Apps Script backend (with one retry) → direct + public proxies raced in parallel
    → last good copy saved on this device. `validate` rejects bad payloads so the next route is tried. */
+const FC_DIRECT_BAD = { n: 0, until: 0 };
 async function fetchData(url, { kind = 'json', validate = null, trace = null } = {}) {
   const parse = (txt) => { const out = kind === 'json' ? JSON.parse(txt) : txt; if (validate && !validate(out)) throw new Error('no usable data returned'); return out; };
   const hit = FC_MEM.get(url);
@@ -88,6 +89,10 @@ async function fetchData(url, { kind = 'json', validate = null, trace = null } =
     const errs = []; const be = getBackend();
     const tryRoute = async (name, u, ms) => { const txt = await fetchWithTimeout(u, ms); parse(txt); return { via: name, d: txt }; };
     const note = (name, e) => errs.push(name + ': ' + (e && e.name === 'AbortError' ? 'timed out' : (e && e.message) || 'failed'));
+    /* hedge: Yahoo / news answer the browser directly in ~0.1-0.6 s while the Apps Script backend needs 5-12 s, so try direct first and keep the backend as the fallback */
+    if (/^https:\/\/(query\d\.finance\.yahoo\.com)\//.test(url) && !(FC_DIRECT_BAD.n >= 3 && Date.now() < FC_DIRECT_BAD.until)) {
+      try { const r = await tryRoute('direct', url, 6000); FC_DIRECT_BAD.n = 0; return r; } catch (e) { note('direct', e); if (++FC_DIRECT_BAD.n >= 3) FC_DIRECT_BAD.until = Date.now() + 120000; }
+    }
     if (be) {
       const bu = beUrl(be, 'action=fetch&url=' + encodeURIComponent(url));
       try { return await tryRoute('backend', bu, 20000); } catch (e) { note('backend', e); }

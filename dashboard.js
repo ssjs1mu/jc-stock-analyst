@@ -133,21 +133,24 @@
     const m = r.meta || {}, c = ((r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || []).filter((v) => v != null);
     return { s, p: m.regularMarketPrice, pc: m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose, t: m.regularMarketTime, sp: c.slice(-40) };
   }
+  /* FAST PATH (measured in the live browser: Yahoo direct 0.1-0.6 s per symbol, Apps Script backend 5-12 s per call):
+     fetch every symbol straight from Yahoo in parallel; only symbols that fail go to the backend batch. */
   async function fetchBatch(syms) {
-    const be = getBackend();
-    if (be) {
-      try {
-        const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=dash&symbols=' + encodeURIComponent(syms.join(','))), 25000));
-        if (j && Array.isArray(j.rows)) { S.mode = 'backend batch'; return j.rows; }
-      } catch (e) { /* old backend or timeout: fall through */ }
-    }
-    const out = []; let i = 0; const run = async () => {
+    const out = [], miss = []; let i = 0;
+    const run = async () => {
       while (i < syms.length) {
         const s = syms[i++];
-        try { const j = await fetchData(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?range=1d&interval=15m&includePrePost=false`, { kind: 'json', validate: (x) => !!(x && x.chart && x.chart.result && x.chart.result[0]) }); out.push(parseRow(s, j.chart.result[0])); } catch (e) { out.push({ s, err: 1 }); }
+        try { const j = JSON.parse(await fetchWithTimeout(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?range=1d&interval=15m&includePrePost=false`, 5000)); if (!j || !j.chart || !j.chart.result || !j.chart.result[0]) throw 0; out.push(parseRow(s, j.chart.result[0])); }
+        catch (e) { miss.push(s); }
       }
     };
-    await Promise.all(Array.from({ length: 6 }, run)); S.mode = be ? 'backend (per symbol)' : 'direct / proxy'; return out;
+    await Promise.all(Array.from({ length: 10 }, run)); if (out.length) S.mode = 'direct (fast)';
+    if (miss.length) {
+      const be = getBackend(); let got = false;
+      if (be) { try { const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=dash&symbols=' + encodeURIComponent(miss.join(','))), 15000)); if (j && Array.isArray(j.rows)) { j.rows.forEach((r) => out.push(r)); got = true; S.mode = out.length > j.rows.length ? 'direct + backend' : 'backend batch'; } } catch (e) { } }
+      if (!got) { for (const s of miss) { try { const j = await fetchData(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(s)}?range=1d&interval=15m&includePrePost=false`, { kind: 'json', validate: (x) => !!(x && x.chart && x.chart.result && x.chart.result[0]) }); out.push(parseRow(s, j.chart.result[0])); } catch (e) { out.push({ s, err: 1 }); } } }
+    }
+    return out;
   }
 
   function cadence(set, w) { // seconds between refreshes (keeps the Apps Script daily fetch quota safe)
