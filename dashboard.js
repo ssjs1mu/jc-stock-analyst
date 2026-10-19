@@ -504,6 +504,7 @@
   }
 
   function paint() {
+    try { if (window.jcBrief) window.jcBrief.check(briefCtx()); } catch (e) { }
     const el = $('pDash'); if (!el || !el.classList.contains('active')) return; const ms = Date.now(), w = wantNow(ms);
     const keep = window.scrollY, sc = [...el.querySelectorAll('.jd-scroll,.jd-nlist')].map((n) => n.scrollTop), act = document.activeElement;
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
@@ -658,7 +659,7 @@
     return `<svg class="j3-sp ${up}" viewBox="0 0 100 22" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
   }
   function tile3(t, ms) {
-    const dp0 = t.dp, xr = t.lv ? `<button class="jd-xr" type="button" data-xr="${esc(t.s)}" title="Live X-ray of ${esc(t.n)}">X-ray</button>` : '';
+    const dp0 = t.dp, xr = t.lv ? `<span class="jb-btns"><button class="jd-br" type="button" data-brief="${esc(t.s)}" title="Why is ${esc(t.n)} moving, what next, what to do">Why?</button><button class="jd-xr" type="button" data-xr="${esc(t.s)}" title="Live X-ray of ${esc(t.n)}">X-ray</button></span>` : '';
     let q = null, px = null, chg = null, pct = null, cls = '', body = '', dirTxt = '', extra = '', chtxt = '—', pxtxt = '…';
     if (t.lv) { q = S.q[t.s]; if (q && q.p != null) { px = q.p; if (q.pc) { chg = q.p - q.pc; pct = chg / q.pc * 100; } } }
     else if (t.x === 'in10y') { const x = S.x.in10y, m = manual().in10y; if (x && x.p != null) { px = x.p; if (x.pc != null) chg = (x.p - x.pc) * 100; } else if (m) px = m.v; }
@@ -877,10 +878,12 @@
       + `<div class="jd-fn">${C.eq ? 'Weights unavailable right now — equal weights assumed, so points are only indicative. ' : 'Weight = free-float market-cap share of the stocks in this index' + (S.wtAt ? ' (data of ' + esc(S.wtAt) + ')' : '') + '; points = weight × stock move × index close — an estimate, index caps and rebalancing not applied. '}${sym === '^BSESN' ? 'BSE does not publish the Sensex list, so Nifty 50 stocks are used — treat as approximate. ' : ''}Tap a stock for its X-ray.</div>`;
     return top(body);
   }
+  function briefCtx() { return { S, levels, T3, moodScore, moodLabel, pcrVal, pcrTag, pctOf, fmtN, manual }; }
+  window.jdRepaintPop = () => renderPop();
   function renderPop() {
     const el = $('jdPop'); if (!el) return; const P = S.pop;
     if (!P) { if (!el.hidden) { el.hidden = true; el.innerHTML = ''; el.__sig = ''; document.body.style.overflow = ''; } return; }
-    const html = P.t === 'idx' ? idxPopHTML(P) : P.t === 'cat' ? catPopHTML(P) : P.t === 'bias' ? biasPopHTML() : instPopHTML(P); if (el.__sig === html && !el.hidden) return; el.__sig = html;
+    const html = P.t === 'idx' ? idxPopHTML(P) : P.t === 'cat' ? catPopHTML(P) : P.t === 'bias' ? biasPopHTML() : P.t === 'brief' ? (window.jcBrief ? window.jcBrief.html(P.k, briefCtx()) : '') : instPopHTML(P); if (el.__sig === html && !el.hidden) return; el.__sig = html;
     const sc = el.querySelector('.jd-pm-b'), st = sc ? sc.scrollTop : 0; el.innerHTML = `<div class="jd-pm" role="dialog" aria-modal="true">${html}</div>`; el.hidden = false; document.body.style.overflow = 'hidden';
     const sc2 = el.querySelector('.jd-pm-b'); if (sc2) sc2.scrollTop = st;
   }
@@ -891,9 +894,9 @@
   function comboTile() {
     const x = S.x.in10y || S.bd.IN10Y, m = manual().in10y, y = x && x.p != null ? x.p : m ? m.v : null, yc = x && x.pc != null ? (x.p - x.pc) * 100 : null, dy = yc == null || Math.abs(yc) < 0.05 ? 0 : yc > 0 ? 1 : -1;
     const px = S.x.pcr, mp = manual().pcr, pv = px && px.pcr != null ? px.pcr : mp ? mp.v : null, tag = pv != null ? pcrTag(pv) : null, cls = dy ? (dy > 0 ? 'dn' : 'up') : tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 'fl';
-    return `<div class="j3 ${cls}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${flag('in')}INDIA 10Y G-SEC</span></div><div class="j3-px">${y == null ? manIn('in10y', 'yield %') : fmtN(y, 3) + '<i>%</i>'}</div>`
+    return `<div class="j3 ${cls}"><div class="j3-in"><div class="j3-top"><span class="j3-nm">${flag('in')}INDIA 10Y G-SEC</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="IN10Y" title="Why is the 10Y yield moving, what next, what to do">Why?</button></span></div><div class="j3-px">${y == null ? manIn('in10y', 'yield %') : fmtN(y, 3) + '<i>%</i>'}</div>`
       + `<div class="j3-ch">${yc == null ? '<span>' + (y == null ? 'feed unavailable · enter value' : m && !x ? 'manual value' : '—') + '</span>' : `<b>${dy > 0 ? '▲' : dy < 0 ? '▼' : '■'}</b> ${yc >= 0 ? '+' : ''}${yc.toFixed(1)} bp`}</div><div class="j3-sep"></div>`
-      + `<div class="j3-top"><span class="j3-nm">NIFTY PCR (OI)${px && px.expiry ? '<small> · ' + esc(px.expiry) + '</small>' : ''}</span></div><div class="j3-px">${pv == null ? manIn('pcr', 'PCR') : pv.toFixed(2)}</div>`
+      + `<div class="j3-top"><span class="j3-nm">NIFTY PCR (OI)${px && px.expiry ? '<small> · ' + esc(px.expiry) + '</small>' : ''}</span><span class="jb-btns"><button class="jd-br" type="button" data-brief="PCR" title="What does PCR say, what next, what to do">Why?</button></span></div><div class="j3-px">${pv == null ? manIn('pcr', 'PCR') : pv.toFixed(2)}</div>`
       + `<div class="j3-tr ${tag ? (tag[1] === 'g' ? 'up' : tag[1] === 'r' ? 'dn' : 'fl') : 't0'}">${tag ? tag[0] : 'feed unavailable · enter value'}</div></div></div>`;
   }
   const CSS5 = `
@@ -1041,6 +1044,7 @@
   }
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q), hm = c('[data-hm]'); if (hm) { openIdx(hm.getAttribute('data-hm')); return; }
+    const bf = c('[data-brief]'); if (bf) { S.pop = { t: 'brief', k: bf.getAttribute('data-brief') }; renderPop(); return; }
     const bz = c('[data-jdbias]'); if (bz) { S.pop = { t: 'bias' }; renderPop(); return; }
     const ct = c('[data-cat]'); if (ct) { openCat(ct.getAttribute('data-cat')); return; }
     if (c('[data-popback]') && S.pop && S.pop.back) { S.pop = S.pop.back; renderPop(); return; }
