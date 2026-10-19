@@ -23,6 +23,8 @@
     { id: 'stk', sel: '#pDash .dc-st', say: ['Tap this stock tile!', 'It opens a live X-ray 🔍'] },
     { id: 'fii', sel: '#pDash .fdg', say: ['FII / DII money flow!', 'Who is buying, who is selling? Look here 💰'] },
     { id: 'tv', sel: '#pDash .jd-tvb', say: ['Press here to watch live TV!', 'It keeps playing on every tab 📺'] },
+    { id: 'inv', sel: '#pDash .dc-tile.t2', say: ['Press here — Investment calls!', 'Buy zone, stop-loss, targets 📈'] },
+    { id: 'xr2', sel: '#pDash [data-xr]', say: ['Press here for the X-ray! 🔍', 'Everything about {n} inside!'] },
     { id: 'rf', sel: '#pDash #jdRf', say: ['Press here to refresh!', 'Fresh prices, right now ⟳'] },
   ];
 
@@ -40,6 +42,9 @@
   #jkRoot .kb .kx{position:absolute;right:5px;top:3px;margin:0;background:transparent;color:#cfd8f3;font-size:13px;padding:0 4px}
   #jkRing{position:fixed;z-index:7999;pointer-events:none;border-radius:14px;border:3px solid #ffd166;box-shadow:0 0 0 4px rgba(255,209,102,.28),0 0 22px 4px rgba(255,209,102,.7);opacity:0;transition:opacity .25s;animation:jkRing 1.1s ease-in-out infinite}#jkRing.on{opacity:1}
   #jkChip{position:fixed;left:10px;bottom:10px;z-index:7998;cursor:pointer;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:5px 10px;font:800 11px "Segoe UI",system-ui,sans-serif;color:#fff;background:linear-gradient(150deg,#1d3f8f,#0b1330);box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:.85}#jkChip:hover{opacity:1}
+  #jkRoot.fol{transition:opacity .25s;pointer-events:none}#jkRoot.fol .kb{pointer-events:none;margin-bottom:60px;display:none}#jkRoot.fol.hot .kb{display:block}
+  #jkRoot.fol .kd{width:56px;height:70px}#jkRoot.fol .kw{display:block;flex:none}#jkRoot.fol.hot .kd{animation:jkHop .6s ease-in-out infinite}
+  @keyframes jkHop{0%,100%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.1,.88)}50%{transform:translateY(-22px) scale(.95,1.08)}85%{transform:translateY(0) scale(1.08,.9)}}
   @keyframes jkBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}@keyframes jkPop{0%{transform:scale(.2) translateY(30px)}100%{transform:none}}
   @keyframes jkBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}@keyframes jkRing{0%,100%{box-shadow:0 0 0 3px rgba(255,209,102,.25),0 0 14px 2px rgba(255,209,102,.55)}50%{box-shadow:0 0 0 8px rgba(255,209,102,.18),0 0 28px 8px rgba(255,209,102,.85)}}
   @media(prefers-reduced-motion:reduce){#jkRoot .kd,#jkRing{animation:none!important}#jkRoot{transition:none}}
@@ -76,7 +81,7 @@
     setInterval(tick, 2500);
   }
   function chip() { K.chip.textContent = pref.off ? '👶 Helper: off' : '👶 Helper: on'; K.chip.title = pref.off ? 'Bring the little helper back' : 'Switch the little helper off'; K.chip.style.display = (window.__curTab || '') === 'pDash' ? '' : 'none'; }
-  function toggle() { pref.off = !pref.off; save(); chip(); if (pref.off) hide(); else { K.last = 0; K.since = Date.now() - 8000; setTimeout(show, 600); } }
+  function toggle() { pref.off = !pref.off; save(); chip(); if (pref.off) { hide(); fStop(); } else { K.last = 0; K.since = Date.now() - 8000; setTimeout(show, 600); } }
 
   const visible = (el) => { if (!el || !el.getBoundingClientRect) return false; const r = el.getBoundingClientRect(); return r.width > 8 && r.height > 8 && r.bottom > 70 && r.top < innerHeight - 70 && r.right > 8 && r.left < innerWidth - 8; };
   const blocked = () => { const p = $('jdPop'); if (p && !p.hidden) return true; const x = $('jcxr'); if (x && x.classList.contains('on')) return true; const i = $('jcIntro'); if (i && !i.classList.contains('out')) return true; return document.hidden; };
@@ -91,6 +96,7 @@
   }
 
   function show() {
+    if (F.on) return;
     if (pref.off || K.cur || blocked() || (window.__curTab || '') !== 'pDash') return;
     const c = choose(); if (!c) return;
     K.cur = c; pref.seen[c.t.id] = (pref.seen[c.t.id] || 0) + 1; save(); K.shown++;
@@ -129,11 +135,74 @@
 
   function tick() {
     chip();
+    if (F.on) return;
     if (K.cur) { place(); if ((window.__curTab || '') !== 'pDash' || blocked()) hide(); return; }
     if (pref.off || blocked() || (window.__curTab || '') !== 'pDash') return;
     const now = Date.now(), warm = K.since + 9000, gap = K.shown < 2 ? 22000 : 55000;
     if (now > warm && now - K.last > gap && K.shown < 14) show();
   }
+
+
+  /* ---- follow mode (mouse / trackpad): Chhotu trails the pointer; when the pointer is over something pressable he hops and says "Press here!" ---- */
+  const F = { on: false, x: -200, y: -200, tx: -200, ty: -200, hot: null, raf: 0, cheerT: 0, rev: false, ok: window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches };
+  function fBlocked() { return pref.off || (window.__curTab || '') !== 'pDash' || blocked(); }
+  function fStart() {
+    if (F.on || !F.ok || fBlocked()) return; F.on = true; hide();
+    K.root.innerHTML = `<div class="kw">${KID}</div><div class="kb"><b></b><small></small></div>`;
+    K.root.classList.add('on', 'fol'); K.root.classList.remove('rev'); F.x = F.tx; F.y = F.ty; fLoop();
+  }
+  function fStop() { if (!F.on) return; F.on = false; F.hot = null; cancelAnimationFrame(F.raf); K.root.classList.remove('on', 'fol', 'hot', 'rev'); K.ring.classList.remove('on'); }
+  function fHot(t) {
+    if (!t || !t.closest || t.closest('#jkRoot,#jkChip')) return null;
+    for (const T of TIPS) { const el = t.closest(T.sel); if (el) return { T, el }; }
+    return null;
+  }
+  function fSay(h) {
+    let name = ''; try { name = h.T.pick ? h.T.pick(h.el) : ((h.el.closest('.j3') || h.el).querySelector && (h.el.closest('.j3,.dc-st,[data-xr]') || h.el).textContent.replace(/\s+/g, ' ').trim().slice(0, 18)) || ''; } catch (e) { }
+    const b = K.root.querySelector('.kb'); if (!b) return;
+    b.querySelector('b').textContent = h.T.say[0].replace('{n}', name || 'this');
+    b.querySelector('small').textContent = (h.T.say[1] || '').replace('{n}', name || 'this');
+  }
+  function fMove(e) {
+    if (e.pointerType === 'touch') return; F.tx = e.clientX; F.ty = e.clientY;
+    if (!F.on) { if (!fBlocked()) fStart(); return; }
+    if (fBlocked()) { fStop(); return; }
+    const h = fHot(e.target);
+    if (h) { if (!F.hot || F.hot.el !== h.el) { F.hot = h; pref.seen[h.T.id] = (pref.seen[h.T.id] || 0) + 1; fSay(h); } }
+    else F.hot = null;
+  }
+  function fLoop() {
+    if (!F.on) return;
+    F.x += (F.tx - F.x) * 0.2; F.y += (F.ty - F.y) * 0.2;
+    const W = innerWidth, H = innerHeight, kw = 56, kh = 70, bw = F.hot ? 230 : 0;
+    const rev = F.x + 22 + kw + bw + 12 > W, down = F.y + 20 + kh > H - 6;
+    let left = rev ? F.x - 22 - kw : F.x + 22; let top = down ? F.y - 20 - kh : F.y + 20;
+    left = Math.max(6, Math.min(W - kw - 6, left)); top = Math.max(6, top);
+    const bub = K.root.querySelector('.kb'), bwid = bub && F.hot ? bub.offsetWidth : 0;
+    K.root.classList.toggle('rev', rev); K.root.classList.toggle('hot', !!F.hot);
+    K.root.style.transform = `translate(${rev ? Math.max(6, left - bwid - 2) : left}px,${top}px)`;
+    const kwEl = K.root.querySelector('.kw'); if (kwEl) kwEl.style.transform = rev ? 'scaleX(-1)' : '';
+    const arm = $('jkArm');
+    if (F.hot && F.hot.el.isConnected) {
+      const r = F.hot.el.getBoundingClientRect();
+      K.ring.style.cssText = `left:${r.left - 4}px;top:${r.top - 4}px;width:${r.width + 8}px;height:${r.height + 8}px`; K.ring.classList.add('on');
+      const sx = left + (rev ? kw * 0.22 : kw * 0.78), sy = top + kh * 0.53;
+      let ang = Math.atan2(F.ty - sy, F.tx - sx) * 180 / Math.PI; if (rev) ang = 180 - ang; if (arm) arm.style.transform = `rotate(${ang.toFixed(0)}deg)`;
+    } else { K.ring.classList.remove('on'); if (arm) arm.style.transform = 'rotate(-35deg)'; }
+    if (fBlocked()) { fStop(); return; }
+    F.raf = requestAnimationFrame(fLoop);
+  }
+  function fClick(e) {
+    if (!F.on || !F.hot) return; const h = fHot(e.target); if (!h) return;
+    const b = K.root.querySelector('.kb'); if (b) { b.querySelector('b').textContent = 'Yay! 🎉'; b.querySelector('small').textContent = 'Well done!'; }
+    F.hot = null; clearTimeout(F.cheerT); K.root.classList.add('hot'); F.cheerT = setTimeout(() => K.root.classList.remove('hot'), 1100);
+    if (b) b.style.display = 'block'; setTimeout(() => { if (b) b.style.display = ''; }, 1100);
+  }
+  document.addEventListener('pointermove', fMove, { passive: true });
+  document.addEventListener('click', fClick, true);
+  document.addEventListener('mouseleave', () => { if (F.on) { K.root.style.opacity = 0; F.hot = null; } });
+  document.addEventListener('mouseenter', () => { if (K.root) K.root.style.opacity = ''; });
+  setInterval(() => { if (!K.root) return; if (F.on && fBlocked()) fStop(); }, 1000);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
   window.jcKid = { show, hide, toggle, state: K };
