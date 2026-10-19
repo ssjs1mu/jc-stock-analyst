@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-10-19T21:18:39+05:30",
+   "date": "2026-10-19",
+   "status": "ok",
+   "caption": "Circuit Watch, session of 19 Oct 2026: Sensex -1.17%, Nifty -1.11%; six lower-circuit locks and several upper-circuit smallcaps, all flagged where unverified",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-19.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-19.pdf",
+     "type": "pdf",
+     "bytes": 10780
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-19T21:16:41+05:30",
    "date": "2026-10-19",
    "status": "ok",
@@ -32,5 +47,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-19T21:16:41+05:30"
+ "updated_at": "2026-10-19T21:18:39+05:30"
 }
