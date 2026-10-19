@@ -150,12 +150,12 @@
     await Promise.all(Array.from({ length: 6 }, run)); S.mode = be ? 'backend (per symbol)' : 'direct / proxy'; return out;
   }
 
-  function cadence(set, w) { // seconds between refreshes (keeps the Apps Script daily fetch quota safe)
+  function cadence(set, w) { // seconds between refreshes — tuned to stay far below Apps Script's free 20,000 URL-fetches/day (each symbol = 1 fetch)
     const active = w.ist.cls !== 'off';
-    if (set.kind === 'in') return active ? 60 : 900;
-    if (set.kind === 'in2') return active ? 120 : 1200;
-    if (set.kind === 'gl') return ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]) ? 180 : 1200;
-    return (w.fut || w.open.us) ? 120 : 1200;
+    if (set.kind === 'in') return active ? 60 : 900;                 // 6 top tiles: the only minute-by-minute set
+    if (set.kind === 'in2') return active ? 300 : 1800;              // sector indices
+    if (set.kind === 'gl') return ['jp', 'kr', 'cn', 'hk', 'uk', 'de', 'fr', 'us'].some((k) => w.open[k]) ? 900 : 3600;   // world markets
+    return active ? 600 : 1800;                                       // commodities / bonds / FX
   }
   const wantNow = (ms) => { const defs = mktDef(ms), open = {}; defs.forEach((m) => { open[m.k] = isOpen(m, ms); }); return { open, ist: indiaState(ms), fx: FX_OPEN(ms), fut: FUT_OPEN(ms) }; };
   /* Yahoo has no feed for some NSE sector indices: estimate their % change as the equal-weight average of the constituents' live change (marked "est.") */

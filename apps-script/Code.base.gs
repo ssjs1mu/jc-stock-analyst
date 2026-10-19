@@ -63,6 +63,15 @@ function yahooAuth_(force) {
 
 function proxyFetch_(url) {
   if (!url || !ALLOW.some(function (re) { return re.test(url); })) throw new Error('host not allowed');
+  /* shared response cache so the same chart / news / summary is fetched from Yahoo at most once per TTL, whoever asks (saves the free daily URL-fetch quota) */
+  var ttl = /interval=1d|range=(1mo|3mo|6mo|1y|2y|5y|max)/.test(url) ? 900 : /quoteSummary|fundamentals-timeseries/.test(url) ? 3600 : /news\.google/.test(url) ? 900 : /interval=(1|2|5|15)m/.test(url) ? 45 : 60;
+  var ck = 'pf:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, url)).slice(0, 40), cc = CacheService.getScriptCache();
+  try { var hit = cc.get(ck); if (hit) return hit; } catch (e) {}
+  var res = proxyFetchRaw_(url);
+  try { if (res && res.length < 95000 && /^[\s]*[\{<\[]/.test(res) && !/"error"\s*:\s*"?Exception/.test(res)) cc.put(ck, res, ttl); } catch (e) {}
+  return res;
+}
+function proxyFetchRaw_(url) {
   var needsCrumb = /quoteSummary|fundamentals-timeseries/.test(url);
   for (var attempt = 0; attempt < 2; attempt++) {
     var headers = { 'User-Agent': UA, 'Accept': '*/*' }, u = url;
@@ -164,6 +173,13 @@ function bfUniverse_() {
 /* live quotes for up to ~500 symbols in a handful of Yahoo v7/quote calls (crumb auth): [price, prevClose, open, dayHigh, dayLow, dayVolume, avgVol10d, marketTime, 52wHigh, 52wLow] */
 function liveQ_(symbols) {
   var syms = String(symbols || '').split(',').filter(String).slice(0, 520), out = {}, codes = [];
+  var lk = 'lq:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, syms.join(','))).slice(0, 40), lc = CacheService.getScriptCache();
+  try { var lh = lc.get(lk); if (lh) return lh; } catch (e) {}
+  var res = liveQRaw_(syms); try { if (res.length < 95000 && res.indexOf('"ok":true') > -1) lc.put(lk, res, 25); } catch (e) {}
+  return res;
+}
+function liveQRaw_(syms) {
+  var out = {}, codes = [];
   for (var attempt = 0; attempt < 2 && !Object.keys(out).length; attempt++) {
     var a = yahooAuth_(attempt > 0), reqs = [];
     for (var i = 0; i < syms.length; i += 100) reqs.push({ url: 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(syms.slice(i, i + 100).join(',')) + '&crumb=' + encodeURIComponent(a.crumb), muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*', 'Cookie': a.cookies } });
@@ -255,20 +271,26 @@ function earnDates_(symbols) {
 function dashQuotes_(symbols) {
   var list = String(symbols || '').split(',').map(function (x) { return x.trim(); }).filter(function (x) { return /^[A-Za-z0-9\^=.\-&]+$/.test(x); }).slice(0, 60);
   if (!list.length) throw new Error('symbols required');
-  var cache = CacheService.getScriptCache(), key = 'dash:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, list.join(','))).slice(0, 40), hit = cache.get(key);
-  if (hit) return hit;
-  var rs = UrlFetchApp.fetchAll(list.map(function (s) {
-    return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=1d&interval=15m&includePrePost=false', headers: { 'User-Agent': UA, 'Accept': '*/*' }, muteHttpExceptions: true };
-  }));
-  var rows = rs.map(function (r, i) {
-    var j = parseJson_(r), x = j && j.chart && j.chart.result && j.chart.result[0];
-    if (!x) return { s: list[i], err: r.getResponseCode() };
-    var m = x.meta || {}, q = (x.indicators && x.indicators.quote && x.indicators.quote[0]) || {}, c = (q.close || []).filter(function (v) { return v != null; }).slice(-40).map(function (v) { return Math.round(v * 10000) / 10000; });
-    return { s: list[i], p: m.regularMarketPrice, pc: m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose, t: m.regularMarketTime, sp: c };
-  });
-  var out = JSON.stringify({ rows: rows, ts: new Date().toISOString() });
-  if (out.length < 90000) cache.put(key, out, 20);
-  return out;
+  /* per-symbol cache (55 s, shared by every tab/device): only symbols nobody fetched in the last minute cost a URL-fetch */
+  var cache = CacheService.getScriptCache(), keys = list.map(function (s) { return 'dq:' + s; }), got = {};
+  try { got = cache.getAll(keys); } catch (e) { got = {}; }
+  var rowsBy = {}, miss = [];
+  list.forEach(function (s, i) { var h = got['dq:' + s]; if (h) { try { rowsBy[s] = JSON.parse(h); return; } catch (e) {} } miss.push(s); });
+  if (miss.length) {
+    var rs = UrlFetchApp.fetchAll(miss.map(function (s) {
+      return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=1d&interval=15m&includePrePost=false', headers: { 'User-Agent': UA, 'Accept': '*/*' }, muteHttpExceptions: true };
+    }));
+    var put = {};
+    rs.forEach(function (r, i) {
+      var s = miss[i], j = parseJson_(r), x = j && j.chart && j.chart.result && j.chart.result[0];
+      if (!x) { rowsBy[s] = { s: s, err: r.getResponseCode() }; return; }
+      var m = x.meta || {}, q = (x.indicators && x.indicators.quote && x.indicators.quote[0]) || {}, c = (q.close || []).filter(function (v) { return v != null; }).slice(-40).map(function (v) { return Math.round(v * 10000) / 10000; });
+      var row = { s: s, p: m.regularMarketPrice, pc: m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose, t: m.regularMarketTime, sp: c };
+      rowsBy[s] = row; put['dq:' + s] = JSON.stringify(row);
+    });
+    try { cache.putAll(put, 55); } catch (e) {}
+  }
+  return JSON.stringify({ rows: list.map(function (s) { return rowsBy[s]; }), ts: new Date().toISOString(), cached: list.length - miss.length });
 }
 
 /* ---------- India 10Y G-Sec yield + Nifty PCR (best effort; the app shows n/a when a source refuses) ---------- */
