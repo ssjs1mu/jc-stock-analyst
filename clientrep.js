@@ -138,15 +138,15 @@
     const syms = (list.syms || []).slice(); if (!syms.length) return null;
     let mkt = {}; try { mkt = (await wlMkt(false)) || {}; } catch (e) { }
     const out = [], q = syms.slice(); let n = 0;
-    const w = async () => { while (q.length) { const s = q.shift(); out.push(await analyse(s, mode, mkt)); n++; R.prog = `${list.name}: ${n}/${syms.length} stocks`; if (!quiet) paintStatus(); } };
-    await Promise.all([w(), w(), w()]);
+    const w = async () => { while (q.length) { const s = q.shift(); out.push(await analyse(s, mode, mkt)); n++; R.prog = `${list.name}: ${n}/${syms.length} stocks`; if (!quiet) paintStatus(); else await new Promise((r) => setTimeout(r, 2500)); } };
+    await Promise.all(quiet ? [w()] : [w(), w(), w()]);
     const html = reportHTML(list.name, P.names[list.id] || list.name, out, mode, P.notes && P.notes[list.id]);
     CACHE[istDay() + '|' + mode + '|' + list.id] = { t: Date.now(), html, n: out.length, bad: out.filter((r) => r.err).length }; saveC();
     return html;
   }
-  async function run(listIds, mode) {
-    if (R.busy) return; R.busy = true; R.mode = mode; R.msg = 'Building…'; paintStatus();
-    try { let last = null; for (const id of listIds) { const l = listsAll().find((x) => x.id === id); if (!l) continue; const h = await build(l, mode); if (h) { last = id; } } R.msg = last ? 'Done ' + ist().toISOString().slice(11, 16) + ' IST' : 'Nothing to build — the list is empty.'; if (last) { R.cur = { id: last, mode }; } }
+  async function run(listIds, mode, auto) {
+    if (R.busy) return; R.auto = !!auto; R.busy = true; R.mode = mode; R.msg = 'Building…'; paintStatus();
+    try { let last = null; for (const id of listIds) { const l = listsAll().find((x) => x.id === id); if (!l) continue; const h = await build(l, mode, R.auto); if (h) { last = id; } } R.msg = last ? 'Done ' + ist().toISOString().slice(11, 16) + ' IST' : 'Nothing to build — the list is empty.'; if (last) { R.cur = { id: last, mode }; } }
     catch (e) { R.msg = 'Failed: ' + ((e && e.message) || e); } finally { R.busy = false; R.prog = ''; paint(); }
   }
   function openPrint(html) {
@@ -186,17 +186,17 @@
   /* ---------- automatic build: 08:45 and 16:00 IST on weekdays while the page is open ---------- */
   async function autoTick() {
     if (!P.auto || R.busy || document.hidden === undefined) return; const d = ist(), dow = d.getUTCDay(), m = istMinNow(); if (dow < 1 || dow > 5 || typeof WL === 'undefined') return;
-    const td = istDay(); let mode = null; if (m >= 525 && m < 900) mode = 'morning'; else if (m >= 960) mode = 'closing'; if (!mode) return;
+    const td = istDay(); let mode = null; if (m >= 525 && m < 560) mode = 'morning'; else if (m >= 935 && m < 1080) mode = 'closing'; if (!mode) return; /* only just before the open / after the close — never while the market is live and the dashboard needs every request */
     const ids = listsAll().filter((l) => l.syms.length && !CACHE[td + '|' + mode + '|' + l.id]).map((l) => l.id); if (!ids.length) return;
     if (R.autoTried && R.autoTried[td + mode] && Date.now() - R.autoTried[td + mode] < 600000) return; (R.autoTried = R.autoTried || {})[td + mode] = Date.now();
-    await run(ids, mode); R.mode = mode;
+    await run(ids, mode, true); R.mode = mode;
   }
   function build0() {
     const sel = $('viewSel'), anchor = document.querySelector('details.datasec'); if (!sel || !anchor || $('pClient')) return;
     const o = document.createElement('option'); o.value = 'pClient'; o.textContent = '📋 Client reports (Morning / Closing)'; const g = sel.querySelector('optgroup'); (g || sel).appendChild(o);
     const p = document.createElement('div'); p.className = 'panel'; p.id = 'pClient'; p.innerHTML = '<div class="note">Loading…</div>'; anchor.parentNode.insertBefore(p, anchor);
     const orig = window.showTab; window.showTab = function (id) { orig(id); if (id === 'pClient') { paint(); } };
-    setInterval(autoTick, 30000); setTimeout(autoTick, 8000);
+    setInterval(autoTick, 30000); setTimeout(autoTick, 45000);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build0); else build0();
   window.jcClientRep = { build, reportHTML, analyse, run, state: R, cache: () => CACHE };
