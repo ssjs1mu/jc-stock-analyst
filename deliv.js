@@ -41,7 +41,7 @@
     let sUp = 0, sDn = 0, delFall = 0, trFall = 0; for (let i = pk + 1; i < n; i++) { const dq = q(i); if (dq == null) continue; delFall += dq; trFall += B[i].v; if (B[i].c > B[i - 1].c) sUp += dq; else if (B[i].c < B[i - 1].c) sDn += dq; }
     out.exitNet = sDn - sUp; out.exitPct = A > 0 ? (out.exitNet / A) * 100 : null; out.sUp = sUp; out.sDn = sDn;
     out.delPctRally = trRally ? (delRally / trRally) * 100 : null; out.delPctFall = trFall ? (delFall / trFall) * 100 : null;
-    const avg = (a, z, f) => { let s = 0, c = 0; for (let i = a; i < z; i++) { const v = f(B[i]); if (num(v)) { s += v; c++; } } return c ? s / c : null; };
+    const avg = (a, z, f) => { let s = 0, c = 0; for (let i = Math.max(0, a); i < Math.min(n, z); i++) { const v = f(B[i]); if (num(v)) { s += v; c++; } } return c ? s / c : null; };
     const vPk = avg(Math.max(0, pk - 9), Math.min(n, pk + 3), (b) => b.v), v5 = avg(n - 5, n, (b) => b.v), v20 = avg(n - 20, n, (b) => b.v);
     out.vPeak = vPk; out.v5 = v5; out.v20 = v20; out.dry = vPk ? v5 / vPk : null; out.lastDelPct = last.tq ? (last.dq / last.tq) * 100 : null;
     out.d5 = avg(n - 5, n, (b) => (num(b.dq) && b.tq ? (b.dq / b.tq) * 100 : null));
