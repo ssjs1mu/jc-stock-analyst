@@ -144,6 +144,39 @@ def summarize(rows):
             'pkday': int(st.median([x[4] for x in rows]))}
 
 
+def results_study(S):
+    """event study around board-meeting (financial results) dates: pre-run vs reaction"""
+    try:
+        res = json.load(open(os.path.join(ROOT, 'data', 'results.json')))
+    except Exception:
+        return None, {}
+    hist, up = res.get('hist', {}), res.get('upcoming', {})
+    ev = []
+    for s_, R in S.items():
+        n = len(R)
+        dts = [r[0] for r in R]
+        for d in hist.get(s_, []):
+            i0 = next((k for k in range(n) if dts[k] >= d), None)
+            if i0 is None or i0 < 31 or i0 + 6 >= n:
+                continue
+            c = [r[4] for r in R]; v = [r[5] for r in R]
+            pre = c[i0 - 1] / c[i0 - 11] - 1
+            vr = mean(v[i0 - 5:i0]) / max(1.0, mean(v[i0 - 30:i0 - 5]))
+            react = c[i0 + 1] / c[i0 - 1] - 1
+            fol = c[i0 + 6] / c[i0 + 1] - 1
+            ev.append((pre, vr, react, fol))
+    def grp(rows):
+        if len(rows) < 5:
+            return {'n': len(rows)}
+        rc_ = [x[2] for x in rows]; fl = [x[3] for x in rows]
+        return {'n': len(rows), 'react': round(mean(rc_) * 100, 1), 'react_med': round(st.median(rc_) * 100, 1), 'neg': round(sum(1 for x in rc_ if x < 0) / len(rc_) * 100),
+                'absmove': round(mean([abs(x) for x in rc_]) * 100, 1), 'follow5': round(mean(fl) * 100, 1)}
+    out = {'all': grp(ev), 'run_up_10pct': grp([e for e in ev if e[0] >= 0.10]), 'run_up_5_10': grp([e for e in ev if 0.05 <= e[0] < 0.10]),
+           'flat': grp([e for e in ev if -0.05 < e[0] < 0.05]), 'sold_off': grp([e for e in ev if e[0] <= -0.05]),
+           'run_up_on_volume': grp([e for e in ev if e[0] >= 0.05 and e[1] >= 1.5])}
+    return out, up
+
+
 def main():
     dates, S = load()
     last = dates[-1]
@@ -215,6 +248,25 @@ def main():
     for p in picks:
         p['score'] = round(score(p), 1)
         p['exit_by'] = max([stats[k].get('pkday', 10) for k in p['sigs'] if stats[k]['n'] >= 20] or [10])
+    rstat, upc = results_study(S)
+    today_d = dt.date.today()
+    watch_res = []
+    for s_, R in S.items():
+        ds = [x['date'] for x in upc.get(s_, []) if today_d.isoformat() <= x['date'] <= (today_d + dt.timedelta(days=7)).isoformat()]
+        if not ds or R[-1][0] != last or len(R) < 40:
+            continue
+        c = [r[4] for r in R]; i = len(R) - 1
+        pre = c[i] / c[i - 10] - 1
+        val = mean([r[5] for r in R[-20:]]) * c[i]
+        if pre >= 0.08 and val >= 3e7 and c[i] >= 40:
+            g = (rstat or {}).get('run_up_5_10' if pre < 0.10 else 'run_up_10pct', {})
+            tail = (' · after such run-ups, results-time moves averaged ±%.1f%% and %d%% fell (n=%d) — direction not predictable' % (g['absmove'], g['neg'], g['n'])) if g.get('absmove') is not None else ''
+            watch_res.append({'sym': s_, 'date': min(ds), 'pre': round(pre * 100, 1), 'why': 'up %.0f%% in the last 10 sessions into results%s' % (pre * 100, tail)})
+    watch_res.sort(key=lambda x: x['date'])
+    for p in picks:
+        d_ = [x['date'] for x in upc.get(p['sym'], []) if today_d.isoformat() <= x['date'] <= (today_d + dt.timedelta(days=12)).isoformat()]
+        if d_:
+            p['results'] = min(d_)
     good = [k for k in SIGS if stats[k]['evidence'] == 'modest edge']
     main_ = [p for p in picks if any(k in good for k in p['sigs'])]
     watch = [p for p in picks if not any(k in good for k in p['sigs'])]
@@ -222,7 +274,7 @@ def main():
     picks = main_
     exits.sort(key=lambda p: -p['chg10'])
     out = {'updated': dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).isoformat(timespec='seconds'), 'asof': last, 'sessions': len(dates), 'stocks': len(S),
-           'stats': stats, 'picks': picks[:40], 'picks_total': len(picks), 'watch': watch[:15], 'watch_total': len(watch), 'exits': exits[:25],
+           'stats': stats, 'picks': picks[:40], 'picks_total': len(picks), 'watch': watch[:15], 'watch_total': len(watch), 'results_stats': rstat, 'results_watch': watch_res[:15], 'exits': exits[:25],
            'method': {'ABSORB': 'delivery share up >=20% vs prior 40 sessions while 10-day range <=9% and price within 15% of its 60-day high',
                       'SHAKE': 'a >=3% fall on >=2x volume, then >=3 quiet sessions (<=70% volume, delivery held) without a new low',
                       'HHHL': 'last two swing lows and last two swing highs both rising, volume contracting',

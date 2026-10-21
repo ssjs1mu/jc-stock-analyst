@@ -61,7 +61,7 @@ function tgAccum_(s, m, today) {
     if (P.length) { L.push('<b>Accumulation / continuation candidates</b>'); P.slice(0, 8).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> ' + tgNum_(p.close) + ' — ' + tgEsc_(nm(p.sigs)) + '\n   above ' + tgNum_(p.trigger) + ' · stop ' + tgNum_(p.stop) + ' · plan exit by ~session ' + p.exit_by + (p.results ? ' · ⚠ results ' + tgEsc_(p.results) : '')); }); }
     else L.push('No candidate from the tested signals today.');
     if (X.length) { L.push('', '<b>Exit / avoid watch</b>'); X.slice(0, 6).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> ' + tgNum_(p.close) + ' — ' + tgEsc_(nm(p.sigs))); }); }
-    if (W.length) { L.push('', '<b>Results due soon after a run-up</b>'); W.slice(0, 6).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> results ' + tgEsc_(p.date) + ' — ' + tgEsc_(p.why)); }); }
+    if (W.length) { L.push('', '<b>Results due within a week after a run-up</b> (a risk flag, not a sell signal)'); W.slice(0, 6).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> results ' + tgEsc_(p.date) + ' — ' + tgEsc_(p.why)); }); }
     L.push('', 'Confirmation check follows at about 10 AM.', '<i>Back-tested rule-based signals (modest edge, not certainty). Not advice; no outcome is guaranteed. Track record: terminal → Accumulation &amp; Exit.</i>');
     if (tgSend_(s, L.join('\n'))) { st.LIST = today; s.p.setProperty('TG_ACC', JSON.stringify(st)); }
     return;
