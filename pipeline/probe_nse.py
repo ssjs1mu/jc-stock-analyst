@@ -3,15 +3,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import results_cal as rc
 op = rc.opener()
 out = {}
-syms = ['HSCL', 'HFCL', 'TCS', 'INFY', 'RELIANCE', 'ABB', 'DLF', 'ITC', 'SBIN', 'LT', 'ZEEL', 'MRF', 'PIIND', 'SRF', 'UPL', 'TITAN']
-for gap in (0.5, 2.0):
-    for s in syms:
-        t = time.time()
-        j = rc.get(op, 'https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol=%s&period=Quarterly' % s)
-        rows = rc.rows_of(j)
-        ds = [rc.pdate(r.get('broadCastDate')) for r in rows]
-        ds = [d for d in ds if d]
-        out['%s@%.1f' % (s, gap)] = {'n': len(rows), 'max': max(ds).strftime('%Y-%m-%d') if ds else None, 'sec': round(time.time() - t, 1)}
-        time.sleep(gap)
-json.dump({'out': out, 'errors': rc.status['errors'][:10]}, open(os.path.join(rc.ROOT, 'data', 'probe.json'), 'w'), indent=1)
-print(json.dumps(out))
+for s in ['HSCL', 'HFCL', 'TCS', 'HEROMOTORS']:
+    j = rc.get(op, 'https://www.nseindia.com/api/event-calendar?index=equities&symbol=%s' % s)
+    rows = rc.rows_of(j)
+    rec = []
+    for r in rows:
+        p = rc.pdate(r.get('date'))
+        if p and p.year >= 2025:
+            rec.append([p.strftime('%Y-%m-%d'), str(r.get('purpose'))[:50]])
+    out[s] = {'n': len(rows), 'recent': sorted(rec)[-12:]}
+    time.sleep(1)
+j = rc.get(op, 'https://www.nseindia.com/api/top-corp-info?symbol=HSCL&market=equities')
+out['corp_keys'] = list(j.keys()) if isinstance(j, dict) else None
+out['fin'] = json.dumps(j.get('financial_results'))[:700] if isinstance(j, dict) else None
+json.dump(out, open(os.path.join(rc.ROOT, 'data', 'probe.json'), 'w'), indent=1)
+print(json.dumps(out)[:1500])
