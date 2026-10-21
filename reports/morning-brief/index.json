@@ -2,6 +2,21 @@
  "schedule_id": "morning-brief",
  "runs": [
   {
+   "generated_at": "2026-10-21T07:23:10+05:30",
+   "date": "2026-10-21",
+   "status": "ok",
+   "caption": "morning-brief 21 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Brief_2026-10-21.pdf",
+     "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-10-21.pdf",
+     "type": "pdf",
+     "bytes": 444595
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-20T07:21:42+05:30",
    "date": "2026-10-20",
    "status": "holiday",
@@ -55,5 +70,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-20T07:21:42+05:30"
+ "updated_at": "2026-10-21T07:23:10+05:30"
 }
