@@ -1,32 +1,167 @@
 {
- "rporates-financial-results?index=equities&symbol=HSCL&period=Quarterly": {
-  "code": 200,
-  "len": 73384,
-  "head": "[{\"audited\":\"Un-Audited\",\"bank\":\"N\",\"broadCastDate\":\"14-Jan-2025 12:11:07\",\"companyName\":\"Himadri Speciality Chemical Limited\",\"consolidated\":\"Consolidated\",\"cumulative\":\"Non-cumulative\",\"difference\":\"00:00:14\",\"exchdisstime\":\"14-Jan-2025 12:11:21\",\"filingDate\":\"14-Jan-2025 12:11\",\"financialYear\":\"01-Apr-2024 To 31-Mar-2025\",\"format\":\"New\",\"fromDate\":\"01-Oct-2024\",\"indAs\":\"Ind-AS New\",\"industry\":\"-\",\"isin\":\"INE019C01026\",\"oldNewFlag\":\"N\",\"params\":\"01-Oct-202431-Dec-2024Q3UNNCNEHSCL\",\"period\":\"Quarterly\",\"reInd\":\"N\",\"relatingTo\":\"Third Quarter\",\"resultDescription\":null,\"resultDetailedDataLink\":null,\"seqNumber\":\"1189663\",\"symbol\":\"HSCL\",\"toDate\":\"31-Dec-2024\",\"xbrl\":\"https://nsearchives.nseindia.com/corporate/xbrl/INDAS_117215_1344634_14012025121107.xml\"},{\"audited\":\"Un-Audited\",\"bank\":\"N\",\"broadCastDate\":\"14-Jan-2025 11:58:33\",\"companyName\":\"Himadri Speciality Chemical Limited\",\"consolida"
+ "out": {
+  "HSCL@0.5": {
+   "n": 94,
+   "max": "2025-01-14",
+   "sec": 0.1
+  },
+  "HFCL@0.5": {
+   "n": 83,
+   "max": "2025-02-04",
+   "sec": 0.3
+  },
+  "TCS@0.5": {
+   "n": 162,
+   "max": "2025-01-09",
+   "sec": 0.5
+  },
+  "INFY@0.5": {
+   "n": 144,
+   "max": "2025-01-16",
+   "sec": 0.3
+  },
+  "RELIANCE@0.5": {
+   "n": 130,
+   "max": "2025-01-16",
+   "sec": 0.5
+  },
+  "ABB@0.5": {
+   "n": 87,
+   "max": "2025-02-17",
+   "sec": 0.5
+  },
+  "DLF@0.5": {
+   "n": 144,
+   "max": "2025-01-24",
+   "sec": 0.6
+  },
+  "ITC@0.5": {
+   "n": 107,
+   "max": "2025-02-06",
+   "sec": 0.3
+  },
+  "SBIN@0.5": {
+   "n": 145,
+   "max": "2025-02-06",
+   "sec": 0.5
+  },
+  "LT@0.5": {
+   "n": 129,
+   "max": "2025-01-31",
+   "sec": 0.6
+  },
+  "ZEEL@0.5": {
+   "n": 166,
+   "max": "2025-01-23",
+   "sec": 0.5
+  },
+  "MRF@0.5": {
+   "n": 98,
+   "max": "2025-02-07",
+   "sec": 0.6
+  },
+  "PIIND@0.5": {
+   "n": 86,
+   "max": "2025-02-07",
+   "sec": 0.5
+  },
+  "SRF@0.5": {
+   "n": 122,
+   "max": "2025-01-29",
+   "sec": 0.5
+  },
+  "UPL@0.5": {
+   "n": 159,
+   "max": "2025-01-31",
+   "sec": 0.6
+  },
+  "TITAN@0.5": {
+   "n": 113,
+   "max": "2025-02-04",
+   "sec": 0.4
+  },
+  "HSCL@2.0": {
+   "n": 94,
+   "max": "2025-01-14",
+   "sec": 0.5
+  },
+  "HFCL@2.0": {
+   "n": 83,
+   "max": "2025-02-04",
+   "sec": 0.5
+  },
+  "TCS@2.0": {
+   "n": 162,
+   "max": "2025-01-09",
+   "sec": 0.8
+  },
+  "INFY@2.0": {
+   "n": 144,
+   "max": "2025-01-16",
+   "sec": 0.5
+  },
+  "RELIANCE@2.0": {
+   "n": 130,
+   "max": "2025-01-16",
+   "sec": 0.5
+  },
+  "ABB@2.0": {
+   "n": 87,
+   "max": "2025-02-17",
+   "sec": 0.6
+  },
+  "DLF@2.0": {
+   "n": 144,
+   "max": "2025-01-24",
+   "sec": 0.6
+  },
+  "ITC@2.0": {
+   "n": 107,
+   "max": "2025-02-06",
+   "sec": 0.5
+  },
+  "SBIN@2.0": {
+   "n": 145,
+   "max": "2025-02-06",
+   "sec": 0.5
+  },
+  "LT@2.0": {
+   "n": 129,
+   "max": "2025-01-31",
+   "sec": 0.7
+  },
+  "ZEEL@2.0": {
+   "n": 166,
+   "max": "2025-01-23",
+   "sec": 0.6
+  },
+  "MRF@2.0": {
+   "n": 98,
+   "max": "2025-02-07",
+   "sec": 0.5
+  },
+  "PIIND@2.0": {
+   "n": 86,
+   "max": "2025-02-07",
+   "sec": 0.6
+  },
+  "SRF@2.0": {
+   "n": 122,
+   "max": "2025-01-29",
+   "sec": 0.6
+  },
+  "UPL@2.0": {
+   "n": 159,
+   "max": "2025-01-31",
+   "sec": 0.5
+  },
+  "TITAN@2.0": {
+   "n": 115,
+   "max": "2025-02-04",
+   "sec": 0.5
+  }
  },
- "eindia.com/api/corporates-financial-results?index=equities&symbol=HSCL": {
-  "code": 200,
-  "len": 3070,
-  "head": "[{\"audited\":\"Un-Audited\",\"bank\":\"N\",\"broadCastDate\":\"13-Nov-2010 14:53:01\",\"companyName\":\"Himadri Speciality Chemical Limited\",\"consolidated\":\"Non-Consolidated\",\"cumulative\":\"Cumulative\",\"difference\":\"::\",\"exchdisstime\":null,\"filingDate\":\"13-Nov-2010 15:25\",\"financialYear\":\"01-Apr-2010 To 31-Mar-2011\",\"format\":\"Old\",\"fromDate\":\"01-Apr-2010\",\"indAs\":\"Non-Ind-AS\",\"industry\":\"-\",\"isin\":\"INE019C01026\",\"oldNewFlag\":null,\"params\":\"01-Apr-201030-Sep-2010H1UNCNAEHSCL\",\"period\":\"Half-Yearly\",\"reInd\":\"-\",\"relatingTo\":\"First Half\",\"resultDescription\":null,\"resultDetailedDataLink\":\"https://nsearchives.nseindia.com/archives/financial_results/financial_res_HSCL_80787.html\",\"seqNumber\":\"80787\",\"symbol\":\"HSCL\",\"toDate\":\"30-Sep-2010\",\"xbrl\":\"https://nsearchives.nseindia.com/corporate/xbrl/-\"},{\"audited\":\"Un-Audited\",\"bank\":\"N\",\"broadCastDate\":\"16-Oct-2009 18:17:27\",\"companyName\":\"Himadri Speciality Chemi"
- },
- "https://www.nseindia.com/api/results-comparision?symbol=HSCL": {
-  "code": 200,
-  "len": 29561,
-  "head": "{\"resCmpData\":[{\"re_amt_grs_np_asst\":null,\"re_bal_rbi_oth_bnk_funds\":null,\"re_basic_eps\":null,\"re_basic_eps_for_cont_dic_opr\":\"2.87\",\"re_bsc_eps_bfr_exi\":null,\"re_cap_ade_rat\":null,\"re_cet_1_ret\":null,\"re_con_pro_loss\":\"14194\",\"re_create_dt\":\"14-JAN-2025\",\"re_curr_tax\":\"3595\",\"re_debt_eqt_rat\":null,\"re_debt_rdmption\":null,\"re_debt_ser_cov\":null,\"re_deff_tax\":\"2790\",\"re_depr_und_exp\":\"1250\",\"re_desc_note_fin\":\"1. The above unaudited standalone financial results have been reviewed by the Audit Committee and approved by the Board of Directors in their respective meetings held on 13 January 2025. A Limited Review of these standalone financial results for the quarter and nine months ended 31 December 2024 has been carried out by the Statutory Auditors, as required under Regulation 33 of SEBI (LODR) Regulations, 2015.   2. Other expenses includes foreign exchange fluctuation loss/ (gain) (net)"
- },
- "https://www.nseindia.com/api/top-corp-info?symbol=HSCL&market=equities": {
-  "code": 200,
-  "len": 6201,
-  "head": "{\"latest_announcements\":{\"data\":[{\"symbol\":\"HSCL\",\"broadcastdate\":\"17-Oct-2026 19:07:43\",\"subject\":\"Copy of Newspaper Publication\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"17-Oct-2026 19:05:01\",\"subject\":\"Investor Presentation\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"17-Oct-2026 19:05:01\",\"subject\":\"Press Release\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"16-Oct-2026 19:58:12\",\"subject\":\"Analysts/Institutional Investor Meet/Con. Call Updates\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"16-Oct-2026 19:12:11\",\"subject\":\"Monitoring Agency Report\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"16-Oct-2026 19:02:05\",\"subject\":\"General Updates\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"16-Oct-2026 18:19:26\",\"subject\":\"Outcome of Board Meeting\"},{\"symbol\":\"HSCL\",\"broadcastdate\":\"09-Oct-2026 17:49:09\",\"subject\":\"Updates\"}]},\"corporate_actions\":{\"data\":[{\"symbol\":\"HSCL\",\"exdate\":\"22-May-2026\",\"purpose\":\"Dividend - Re 0.80 Per Share\"},{\"symbo"
- },
- "e-announcements?index=equities&symbol=HSCL&subject=Financial%20Results": {
-  "code": 200,
-  "len": 2,
-  "head": "[]"
- },
- "https://www.nseindia.com/api/event-calendar?index=equities&symbol=HSCL": {
-  "code": 200,
-  "len": 18511,
-  "head": "[{\"symbol\":\"HSCL\",\"company\":\"Himadri Speciality Chemical Limited\",\"purpose\":\"Results/Dividend\",\"bm_desc\":\"Inter alia, to consider the following : (1) To consider and take on record the Audited Financial Results of the Company for the year ended March 31, 2010; (2) To recommend payment of dividend, if any, for the financial year ended March 31, 2010; (3) To consider sub-division of equity shares of Rs. 10 each into smaller denomination as the Board may deem appropriate, subject to the approval of the shareholders at the ensuing Annual General Meeting.\",\"date\":\"28-May-2010\"},{\"symbol\":\"HSCL\",\"company\":\"Himadri Speciality Chemical Limited\",\"purpose\":\"Results/Dividend\",\"bm_desc\":\"Inter-alia :- (1) To consider and take on record the Audited Financial Results of the Company for the year ended March 31, 2011; (2) To recommend payment of dividend if any, for the financial year ended March 31, 20"
- }
+ "errors": [
+  "warm https://www.nseindia.com/: HTTP Error 403: Forbidden"
+ ]
 }
