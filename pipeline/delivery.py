@@ -4,14 +4,14 @@
 Source: NSE 'sec_bhavdata_full_DDMMYYYY.csv' (security-wise delivery position,
 published after the close). Free, no API key, no Apps Script quota.
 Stored per trading day as {SYMBOL: [delivery_qty, traded_qty]} for the index
-universe in data/constituents.json plus a few extra symbols. Keeps ~160 days.
+universe in data/constituents.json plus a few extra symbols. Keeps ~250 days.
 """
 import csv, io, json, os, sys, time, datetime as dt, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'delivery.json')
-KEEP_DAYS = 160
-BACKFILL_DAYS = 100          # calendar days looked back when history is thin
+KEEP_DAYS = 250
+BACKFILL_DAYS = 300         # calendar days looked back when history is thin
 EXTRA = {'HEROMOTORS', 'HSCL'}
 URL = 'https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_%s.csv'
 UA = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
@@ -110,7 +110,7 @@ def main():
             pass
     have = store.setdefault('d', {})
     today = dt.date.today()
-    start = today - dt.timedelta(days=BACKFILL_DAYS if len(have) < 60 else 7)
+    start = today - dt.timedelta(days=BACKFILL_DAYS if len(have) < 200 else 7)
     got = blocked = 0
     d = start
     while d <= today:
