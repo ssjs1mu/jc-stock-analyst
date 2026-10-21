@@ -92,10 +92,28 @@ def features(R, i):
                 if abs(c[i] - lv) / c[i] <= 0.03 and mean(v[i - 4:i + 1]) <= 0.4 * mean(v[max(0, pk - 9):pk + 3]):
                     out['FIBDRY'] = {'stop': lv * 0.97, 'info': 'volume %.0f%% of peak-time at the %.1f%% level (%.1f)' % (mean(v[i - 4:i + 1]) / mean(v[max(0, pk - 9):pk + 3]) * 100, L * 100, lv)}
                     break
-    # G greed / exit-watch: sharp run on heavy volume with delivery share falling (retail churn)
+    # SURGEQ quality surge: >=3% up on >=2x volume with delivery share >=1.2x its 40-session norm (big hands buying in size)
+    r1 = c[i] / c[i - 1] - 1
+    if r1 >= 0.03 and v[i] >= 2 * av20 and dp[i] >= 1.2 * dp40:
+        out['SURGEQ'] = {'stop': l[i], 'info': 'up %.1f%% on %.1fx volume with %.0f%% delivery (norm %.0f%%)' % (r1 * 100, v[i] / mean(v[i - 20:i]), dp[i], dp40)}
+    # SURGEHOLD: a quality surge 3-10 sessions ago that has held, with volume gone quiet (<=60%) and no lower low
+    for k in range(i - 10, i - 2):
+        if k < 51:
+            continue
+        a_ = mean(v[k - 20:k]); d40 = mean(dp[k - 50:k - 10])
+        if c[k] / c[k - 1] - 1 >= 0.03 and v[k] >= 2 * a_ and dp[k] >= 1.2 * d40 and c[i] >= c[k] * 0.97 and mean(v[k + 1:i + 1]) <= 0.6 * v[k] and min(l[k + 1:i + 1]) >= l[k]:
+            out['SURGEHOLD'] = {'stop': l[k], 'info': 'quality surge on %s (%.1fx volume) is holding; volume since is %.0f%% of that day' % (R[k][0], v[k] / a_, mean(v[k + 1:i + 1]) / v[k] * 100)}
+            break
+    # RUNLOWDEL: >=20% in 10 sessions while delivery share is <=70% of norm (retail-heavy run) - momentum with high risk
     gain10 = c[i] / c[i - 10] - 1
-    if gain10 >= 0.20 and mean(v[i - 9:i + 1]) >= 2 * mean(v[i - 49:i - 9]) and dp10 <= 0.85 * dp40:
-        out['GREED'] = {'stop': None, 'info': 'up %.0f%% in 10 sessions on %.1fx volume while delivery fell to %.0f%% (from %.0f%%)' % (gain10 * 100, mean(v[i - 9:i + 1]) / mean(v[i - 49:i - 9]), dp10, dp40)}
+    if gain10 >= 0.20 and dp10 <= 0.7 * dp40:
+        out['RUNLOWDEL'] = {'stop': min(l[i - 4:i + 1]), 'info': 'up %.0f%% in 10 sessions but delivery only %.0f%% (norm %.0f%%) - retail-heavy run' % (gain10 * 100, dp10, dp40)}
+    # exit watches after a >=20% run
+    rng = (h[i] - l[i]) or 1e-9
+    if gain10 >= 0.20 and v[i] >= 2.5 * mean(v[i - 20:i]) and (c[i] - l[i]) / rng <= 0.35:
+        out['CLIMAX'] = {'stop': None, 'info': 'after +%.0f%% in 10 sessions: %.1fx volume and close in the lower third of the day range' % (gain10 * 100, v[i] / mean(v[i - 20:i]))}
+    if gain10 >= 0.20 and v[i] >= 2 * mean(v[i - 20:i]) and c[i] < o[i]:
+        out['REDHEAVY'] = {'stop': None, 'info': 'after +%.0f%% in 10 sessions: red candle on %.1fx volume' % (gain10 * 100, v[i] / mean(v[i - 20:i]))}
     return out
 
 
@@ -129,7 +147,9 @@ def summarize(rows):
 def main():
     dates, S = load()
     last = dates[-1]
-    ev = {k: [] for k in ('ABSORB', 'SHAKE', 'HHHL', 'FIBDRY', 'GREED')}
+    SIGS = ('SURGEQ', 'SURGEHOLD', 'RUNLOWDEL', 'ABSORB', 'SHAKE', 'HHHL', 'FIBDRY', 'CLIMAX', 'REDHEAVY')
+    EXITS = ('CLIMAX', 'REDHEAVY')
+    ev = {k: [] for k in SIGS}
     evd = {k: [] for k in ev}      # (date index, row) for halves
     base = []
     cool = {}
@@ -156,7 +176,7 @@ def main():
             continue
         F = features(R, i)
         F1 = features(R, i - 1) if n > 62 else {}
-        sigs = {k: v for k, v in {**F1, **F}.items() if k != 'GREED'}
+        sigs = {k: v for k, v in {**F1, **F}.items() if k not in EXITS}
         c = R[i][4]; av20v = mean([x[5] for x in R[i - 19:i + 1]]); val = av20v * c
         if c < 40 or val < 3e7:        # liquidity / price filter: avg traded value >= 3 crore
             continue
@@ -167,10 +187,22 @@ def main():
                   'val_cr': round(val / 1e7, 1), 'dp5': round(mean([R[j][6] / R[j][5] * 100 for j in range(i - 4, i + 1)]), 1), 'vol5x': round(mean([x[5] for x in R[i - 4:i + 1]]) / av20v, 2),
                   'chg1': round((c / R[i - 1][4] - 1) * 100, 1), 'chg10': round((c / R[i - 10][4] - 1) * 100, 1)}
             picks.append(pr)
-        if 'GREED' in F:
-            exits.append({'sym': s, 'close': c, 'why': F['GREED']['info'], 'chg10': round((c / R[i - 10][4] - 1) * 100, 1), 'val_cr': round(val / 1e7, 1)})
+        ex = {k: v for k, v in {**F1, **F}.items() if k in EXITS}
+        if ex:
+            exits.append({'sym': s, 'close': c, 'sigs': sorted(ex), 'why': [ex[k]['info'] for k in sorted(ex)], 'chg10': round((c / R[i - 10][4] - 1) * 100, 1), 'val_cr': round(val / 1e7, 1)})
     stats = {k: summarize(v) for k, v in ev.items()}
     stats['BASE'] = summarize(base)
+    bw = stats['BASE']['win20']
+    for k in ev:
+        x = stats[k]
+        if x['n'] >= 30 and x['win20'] >= bw + 5 and x['r20'] > stats['BASE']['r20']:
+            x['evidence'] = 'modest edge'
+        elif x['n'] >= 20 and x['win20'] <= bw - 10 and x['r20'] < stats['BASE']['r20']:
+            x['evidence'] = 'weak exit tendency'
+        elif x['n'] < 30:
+            x['evidence'] = 'small sample'
+        else:
+            x['evidence'] = 'no edge'
     # stability: first half vs second half of the dates
     mid = dates[len(dates) // 2 + 30] if len(dates) > 100 else dates[len(dates) // 2]
     for k in ev:
@@ -178,20 +210,28 @@ def main():
         stats[k]['h1'] = summarize(a); stats[k]['h2'] = summarize(b)
     # rank picks by the historical 20-day win-rate of their signals, then number of signals
     def score(p):
-        w = [stats[k].get('win20', 50) - 50 + stats[k].get('r20', 0) for k in p['sigs'] if stats[k]['n'] >= 20]
+        w = [stats[k].get('win20', 50) - bw + stats[k].get('r20', 0) - stats['BASE']['r20'] for k in p['sigs'] if stats[k]['n'] >= 20]
         return (sum(w) / len(w) if w else -99) + 4 * (len(p['sigs']) - 1)
     for p in picks:
         p['score'] = round(score(p), 1)
         p['exit_by'] = max([stats[k].get('pkday', 10) for k in p['sigs'] if stats[k]['n'] >= 20] or [10])
-    picks.sort(key=lambda p: -p['score'])
+    good = [k for k in SIGS if stats[k]['evidence'] == 'modest edge']
+    main_ = [p for p in picks if any(k in good for k in p['sigs'])]
+    watch = [p for p in picks if not any(k in good for k in p['sigs'])]
+    main_.sort(key=lambda p: -p['score']); watch.sort(key=lambda p: -p['score'])
+    picks = main_
     exits.sort(key=lambda p: -p['chg10'])
     out = {'updated': dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).isoformat(timespec='seconds'), 'asof': last, 'sessions': len(dates), 'stocks': len(S),
-           'stats': stats, 'picks': picks[:40], 'picks_total': len(picks), 'exits': exits[:25],
+           'stats': stats, 'picks': picks[:40], 'picks_total': len(picks), 'watch': watch[:15], 'watch_total': len(watch), 'exits': exits[:25],
            'method': {'ABSORB': 'delivery share up >=20% vs prior 40 sessions while 10-day range <=9% and price within 15% of its 60-day high',
                       'SHAKE': 'a >=3% fall on >=2x volume, then >=3 quiet sessions (<=70% volume, delivery held) without a new low',
                       'HHHL': 'last two swing lows and last two swing highs both rising, volume contracting',
                       'FIBDRY': '>=40% leg, price within 3% of a 38.2/50/61.8/78.6% level and 5-day volume <=40% of peak-time volume',
-                      'GREED': '>=20% gain in 10 sessions on >=2x volume while delivery share falls (retail churn) - exit/avoid watch',
+                      'SURGEQ': '>=3% up on >=2x volume with delivery share >=1.2x its 40-session norm',
+                      'SURGEHOLD': 'a SURGEQ day 3-10 sessions ago that has held with volume <=60% of that day and no lower low',
+                      'RUNLOWDEL': '>=20% in 10 sessions with delivery share <=70% of norm (retail-heavy run, high risk)',
+                      'CLIMAX': 'exit watch: after >=20% in 10 sessions, >=2.5x volume and close in the lower third of the range',
+                      'REDHEAVY': 'exit watch: after >=20% in 10 sessions, a red candle on >=2x volume',
                       'entry': 'next-session open', 'liquidity': 'price >= 40 and 20-day average traded value >= 3 crore'}}
     with open(OUT, 'w') as f:
         json.dump(out, f, separators=(',', ':'))

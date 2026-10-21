@@ -119,10 +119,71 @@
     const rows = R.scan.filter((a) => !a.err).sort((x, y) => rank[x.state[2]] - rank[y.state[2]]);
     return `<div style="overflow-x:auto"><table class="tbl" style="width:100%;font-size:13px"><tr><th>Stock</th><th>State</th><th>Exited</th><th>Volume vs peak</th><th>Near level</th></tr>${rows.map((a) => `<tr><td><a href="#" data-dv="${E(a.sym)}">${E(a.sym)}</a></td><td style="color:${CL[a.state[2]]}"><b>${E(a.state[0])}</b></td><td>${a.exitPct == null ? '—' : a.exitPct.toFixed(0) + ' %'}</td><td>${a.dry == null ? '—' : (a.dry * 100).toFixed(0) + ' %'}</td><td>${a.near ? (a.near[0] * 100).toFixed(1) + ' % ' + a.near[1].toFixed(0) : '—'}</td></tr>`).join('')}</table></div>`;
   }
+
+  /* ---------- pre-market list (built nightly by pipeline/accum_scan.py) + live 10 AM confirmation ---------- */
+  const AC = { j: null, err: '', live: null, liveMsg: '', busy: false };
+  const NM = { SURGEQ: 'Quality surge', SURGEHOLD: 'Surge holding', RUNLOWDEL: 'Retail-heavy run', ABSORB: 'Absorption', SHAKE: 'Shakeout → quiet', HHHL: 'Higher highs/lows', FIBDRY: 'Fib level, volume dry', CLIMAX: 'Climax reversal', REDHEAVY: 'Red on heavy volume' };
+  const istMin = () => { const d = new Date(Date.now() + 19800000); return d.getUTCHours() * 60 + d.getUTCMinutes(); };
+  const istDow = () => new Date(Date.now() + 19800000).getUTCDay();
+  const istDate = () => new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+  async function loadAccum() {
+    if (AC.j || AC.err) return AC.j;
+    try { const r = await fetch('data/accum.json?h=' + Math.floor(Date.now() / 600000), { cache: 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); AC.j = await r.json(); }
+    catch (e) { AC.err = 'List not published yet (' + e.message + ')'; }
+    return AC.j;
+  }
+  async function confirmLive(auto) {
+    if (AC.busy || !AC.j) return; const L = (AC.j.picks || []).concat(AC.j.exits || []); const syms = [...new Set(L.map((p) => p.sym))]; if (!syms.length) return;
+    AC.busy = true; AC.liveMsg = 'Checking live prices…'; paint();
+    try {
+      const u = getBackend(); if (!u) throw new Error('Data backend not connected');
+      const j = JSON.parse(await fetchWithTimeout(beUrl(u, 'action=liveq&symbols=' + encodeURIComponent(syms.map((x) => x + '.NS').join(','))), 45000));
+      if (!j || !j.ok) throw new Error('no quotes');
+      AC.live = {}; Object.keys(j.q).forEach((k) => { AC.live[k.replace(/\.NS$/, '')] = j.q[k]; }); AC.liveAt = Date.now(); AC.liveMsg = '';
+      try { localStorage.setItem('jc_dv_conf', istDate()); } catch (e) { }
+    } catch (e) { AC.liveMsg = 'Live check failed: ' + e.message; }
+    AC.busy = false; paint();
+  }
+  function status(p) {
+    const q = AC.live && AC.live[p.sym]; if (!q) return ['', '#94a3b8', ''];
+    const px = q[0], pc = q[1], h = q[3], v = q[5], av = q[6], m = istMin(), frac = Math.min(1, Math.max((m - 555) / 375, 0.06)), pace = av > 0 ? v / (av * frac) : null;
+    const t = `${px.toFixed(2)} (${((px / pc - 1) * 100).toFixed(1)} %)${pace != null ? ', volume pace ' + pace.toFixed(1) + '×' : ''}`;
+    if (px <= p.stop) return ['FAILED — at/below stop', '#ef4444', t];
+    if (px >= p.trigger) return ['TRIGGERED — above ' + p.trigger, '#22c55e', t];
+    if (px >= p.close * 0.995 && (pace == null || pace >= 0.8)) return ['CONFIRMED — holding the close', '#38bdf8', t];
+    return ['WAIT — weak so far', '#f59e0b', t];
+  }
+  function statsTable(j) {
+    const order = ['SURGEQ', 'SURGEHOLD', 'RUNLOWDEL', 'CLIMAX', 'REDHEAVY', 'ABSORB', 'SHAKE', 'HHHL', 'FIBDRY'], b = j.stats.BASE, ev = { 'modest edge': '#22c55e', 'weak exit tendency': '#f59e0b', 'no edge': '#94a3b8', 'small sample': '#94a3b8' };
+    return `<details style="margin:8px 0"><summary><b>Track record of each signal</b> (${j.sessions} sessions, ${j.stocks} stocks; entry next-session open; random-day baseline: win ${b.win20} % at 20 days, avg ${b.r20} %)</summary>
+      <div style="overflow-x:auto"><table class="tbl" style="width:100%;font-size:12.5px"><tr><th>Signal</th><th>Cases</th><th>Avg 10d</th><th>Avg 20d</th><th>Win 20d</th><th>Hit +5 % within 20d</th><th>Avg worst dip</th><th>Median day of high</th><th>1st half → 2nd half (win 20d)</th><th>Reading</th></tr>
+      ${order.map((k) => { const x = j.stats[k]; if (!x) return ''; return `<tr><td title="${E((j.method || {})[k] || '')}">${E(NM[k] || k)}</td><td>${x.n}</td><td>${x.r10} %</td><td>${x.r20} %</td><td>${x.win20} %</td><td>${x.p5_20} %</td><td>${x.mae} %</td><td>day ${x.pkday}</td><td>${(x.h1 && x.h1.n ? x.h1.win20 + ' % (' + x.h1.n + ')' : '—')} → ${(x.h2 && x.h2.n ? x.h2.win20 + ' % (' + x.h2.n + ')' : '—')}</td><td style="color:${ev[x.evidence]}"><b>${E(x.evidence)}</b></td></tr>`; }).join('')}</table></div>
+      <p style="font-size:12px;color:#94a3b8">One year, one market phase, overlapping cases — a modest edge here is not a guarantee. "Absorption / shakeout / higher-high-low / Fibonacci-dry" showed no edge over a random day in this data; they are shown as context only.</p></details>`;
+  }
+  function pickRows(L, withStatus) {
+    return `<div style="overflow-x:auto"><table class="tbl" style="width:100%;font-size:12.5px"><tr><th>Stock</th><th>Close</th><th>Signals</th><th>Why</th><th>Trigger / stop</th><th>Plan exit by</th><th>Delivery 5d</th>${withStatus ? '<th>Live status</th>' : ''}</tr>
+      ${L.map((p) => { const s = withStatus ? status(p) : null; return `<tr><td><a href="#" data-dv="${E(p.sym)}"><b>${E(p.sym)}</b></a></td><td>${p.close}</td><td>${p.sigs.map((k) => E(NM[k] || k)).join(', ')}</td><td style="max-width:320px">${E(p.why.join(' · '))}</td><td>${p.trigger ? 'above ' + p.trigger + ' / stop ' + p.stop : '—'}</td><td>${p.exit_by ? 'about session ' + p.exit_by : '—'}</td><td>${p.dp5 != null ? p.dp5 + ' %' : '—'}</td>${withStatus ? `<td style="color:${s[1]}"><b>${E(s[0] || '—')}</b><br><span style="font-size:11px;color:#94a3b8">${E(s[2])}</span></td>` : ''}</tr>`; }).join('')}</table></div>`;
+  }
+  function accumHTML() {
+    const j = AC.j; if (!j) return `<div class="note" style="margin:8px 0">${E(AC.err || 'Loading the pre-market list…')}</div>`;
+    const exits = (j.exits || []).map((p) => ({ ...p, trigger: null, stop: null }));
+    return `<div style="border:1px solid #334155;border-radius:10px;padding:12px;margin:10px 0">
+      <div style="font-size:16px"><b>Pre-market list</b> <span style="color:#94a3b8;font-size:12px">built from NSE delivery + prices as of ${E(j.asof)} (${E(String(j.updated || '').replace('T', ' ').slice(0, 16))} IST), updated nightly after NSE posts</span></div>
+      <p style="margin:6px 0;font-size:13px">Stocks where the big-hands signatures that held up in the back-test fired on the last sessions. Each is a candidate to confirm live, not a call. <b>Entry plan:</b> check at 10 AM; use the stop shown; plan the exit around the listed session count or earlier on an exit-watch signal.</p>
+      <div class="bar2"><button class="btn" id="dvConf">${AC.busy ? 'Checking…' : 'Confirm now (live, one quote call)'}</button> <span style="font-size:12px;color:#94a3b8">${AC.liveAt ? 'last live check ' + new Date(AC.liveAt + 19800000).toISOString().slice(11, 16) + ' IST' : 'auto-runs once between 9:55 and 10:30 when this panel is open'}</span></div>
+      ${AC.liveMsg ? `<div class="note">${E(AC.liveMsg)}</div>` : ''}
+      <h4 style="margin:10px 0 4px">Accumulation / continuation candidates (${(j.picks || []).length}${j.picks_total > (j.picks || []).length ? ' of ' + j.picks_total : ''})</h4>${(j.picks || []).length ? pickRows(j.picks, true) : '<div class="note">None fired on the last sessions.</div>'}
+      <h4 style="margin:10px 0 4px">Exit / avoid watch (${exits.length})</h4>${exits.length ? pickRows(exits, true) : '<div class="note">No climax or red-heavy-volume reversal after a 20 % run on the last sessions.</div>'}
+      ${(j.watch || []).length ? `<details style="margin:8px 0"><summary>Context only — ${j.watch_total} stocks with absorption / shakeout / higher-low / Fibonacci-dry signals (no tested edge)</summary>${pickRows(j.watch, false)}</details>` : ''}
+      ${statsTable(j)}
+      <p style="font-size:12px;color:#94a3b8">Research view, not advice or a guarantee. The 10 AM confirmation rules are not back-tested (no intraday history is stored); delivery data is end-of-day, so a signal is always at least one session old.</p></div>`;
+  }
+
   function paint() {
     const el = $('pDeliv'); if (!el || !el.classList.contains('active')) return;
     const upd = R.dl && R.dl.updated ? 'Delivery file updated ' + R.dl.updated.replace('T', ' ').slice(0, 16) + ' IST · ' + Object.keys(R.dl.d || {}).length + ' sessions' : '';
     el.innerHTML = `<div class="note" style="margin-bottom:8px"><b>Accumulation &amp; Exit (delivery).</b> How much a stock accumulated on the way up, how much has exited since the peak, whether volume is drying up, and where the 38.2 / 50 / 61.8 / 78.6 % retracement levels sit. Past volume only — a research view, not a forecast or advice. ${E(upd)}</div>
+      ${accumHTML()}
       <div class="bar2"><label>Stock <input class="sel" id="dvSym" value="${E(R.sym)}" style="width:130px;text-transform:uppercase"></label> <button class="btn" id="dvGo">Analyse</button> <button class="btn" id="dvScan">Scan active watchlist (max 25)</button> ${['HSCL', 'HEROMOTORS', 'HFCL'].map((s) => `<a href="#" data-dv="${s}" style="margin-left:8px">${s}</a>`).join('')}</div>
       ${R.dlErr ? `<div class="note" style="color:#f59e0b">${E(R.dlErr)}</div>` : ''}${R.msg ? `<div class="note">${E(R.msg)}</div>` : ''}
       ${R.scanBusy ? '<div class="note">Scanning the watchlist one stock at a time…</div>' : ''}${scanTable()}${R.res ? card(R.res) : ''}`;
@@ -130,14 +191,14 @@
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q); if (!c('#pDeliv')) return;
     const a = c('[data-dv]'); if (a) { e.preventDefault(); run(a.getAttribute('data-dv')); return; }
-    if (c('#dvGo')) run(($('dvSym') || {}).value); else if (c('#dvScan')) scan();
+    if (c('#dvGo')) run(($('dvSym') || {}).value); else if (c('#dvScan')) scan(); else if (c('#dvConf')) confirmLive();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target && e.target.id === 'dvSym') run(e.target.value); });
   function build0() {
     const sel = $('viewSel'), anchor = document.querySelector('details.datasec'); if (!sel || !anchor || $('pDeliv')) return;
     const o = document.createElement('option'); o.value = 'pDeliv'; o.textContent = '📦 Accumulation & Exit (delivery)'; const g = sel.querySelector('optgroup'); (g || sel).appendChild(o);
     const p = document.createElement('div'); p.className = 'panel'; p.id = 'pDeliv'; p.innerHTML = '<div class="note">Loading…</div>'; anchor.parentNode.insertBefore(p, anchor);
-    const orig = window.showTab; window.showTab = function (id) { orig(id); if (id === 'pDeliv') { paint(); if (!R.res && !R.busy) run(R.sym); } };
+    const orig = window.showTab; window.showTab = function (id) { orig(id); if (id === 'pDeliv') { paint(); loadAccum().then(() => { paint(); const m = istMin(), d = istDow(); let done = ''; try { done = localStorage.getItem('jc_dv_conf') || ''; } catch (e) { } if (d >= 1 && d <= 5 && m >= 595 && m <= 630 && done !== istDate()) confirmLive(true); }); if (!R.res && !R.busy) run(R.sym); } };
   }
   window.JCDeliv = { analyse, run, loadDeliv };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build0); else build0();
