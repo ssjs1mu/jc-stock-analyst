@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - 'pipeline/delivery.py'
+      - 'pipeline/accum_scan.py'
       - '.github/workflows/delivery.yml'
 
 permissions:
@@ -30,12 +31,16 @@ jobs:
           python-version: '3.12'
       - name: Collect
         run: python pipeline/delivery.py
+      - name: Accumulation scan
+        continue-on-error: true
+        run: python pipeline/accum_scan.py
       - name: Commit if changed
         run: |
-          if git diff --quiet -- data/delivery.json && git ls-files --error-unmatch data/delivery.json >/dev/null 2>&1; then echo "No change"; exit 0; fi
+          if git diff --quiet -- data/delivery.json data/ohlc.json data/accum.json && git ls-files --error-unmatch data/delivery.json data/ohlc.json >/dev/null 2>&1; then echo "No change"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/delivery.json
+          git add data/delivery.json data/ohlc.json
+          git add data/accum.json 2>/dev/null || true
           git commit -m "data: delivery $(date -u +%F)"
           for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done
           exit 1

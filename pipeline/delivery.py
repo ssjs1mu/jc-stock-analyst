@@ -10,6 +10,7 @@ import csv, io, json, os, sys, time, datetime as dt, urllib.request, urllib.erro
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'delivery.json')
+OUT_OHLC = os.path.join(ROOT, 'data', 'ohlc.json')   # NSE's own daily bars (feeds the accumulation scanner; not loaded by the browser)
 KEEP_DAYS = 250
 BACKFILL_DAYS = 300         # calendar days looked back when history is thin
 EXTRA = {'HEROMOTORS', 'HSCL'}
@@ -63,8 +64,16 @@ def num(x):
         return None
 
 
+def fnum(x):
+    try:
+        return round(float(str(x).replace(',', '').strip()), 2)
+    except Exception:
+        return None
+
+
 def parse(txt, uni):
     rows = {}
+    bars = {}
     rd = csv.reader(io.StringIO(txt))
     hdr = [h.strip().upper() for h in next(rd)]
     ix = {h: i for i, h in enumerate(hdr)}
@@ -81,7 +90,11 @@ def parse(txt, uni):
         if dq is None or tq is None:
             continue
         rows[sym] = [dq, tq]
-    return rows
+        if all(k in ix for k in ('OPEN_PRICE', 'HIGH_PRICE', 'LOW_PRICE', 'CLOSE_PRICE')):
+            b = [fnum(r[ix[k]]) for k in ('OPEN_PRICE', 'HIGH_PRICE', 'LOW_PRICE', 'CLOSE_PRICE')]
+            if None not in b:
+                bars[sym] = b
+    return rows, bars
 
 
 def file_date(txt):
@@ -109,13 +122,20 @@ def main():
         except Exception:
             pass
     have = store.setdefault('d', {})
+    ohl = {'updated': None, 'note': 'd[date][SYMBOL]=[open, high, low, close]; NSE security-wise bhavcopy', 'd': {}}
+    if os.path.exists(OUT_OHLC):
+        try:
+            ohl = json.load(open(OUT_OHLC))
+        except Exception:
+            pass
+    oh = ohl.setdefault('d', {})
     today = dt.date.today()
-    start = today - dt.timedelta(days=BACKFILL_DAYS if len(have) < 200 else 7)
+    start = today - dt.timedelta(days=BACKFILL_DAYS if len(have) < 200 or len(oh) < 200 else 7)
     got = blocked = 0
     d = start
     while d <= today:
         iso = d.isoformat()
-        if d.weekday() < 5 and iso not in have:
+        if d.weekday() < 5 and (iso not in have or iso not in oh):
             txt = fetch_day(d)
             if txt == 'HTTP403':
                 blocked += 1
@@ -128,9 +148,11 @@ def main():
                     if fd and fd != d:
                         print('date mismatch', iso, fd)
                     else:
-                        rows = parse(txt, uni)
+                        rows, bars = parse(txt, uni)
                         if len(rows) > 50:
                             have[iso] = rows
+                            if len(bars) > 50:
+                                oh[iso] = bars
                             got += 1
                             print('ok', iso, len(rows))
                 except Exception as e:
@@ -139,9 +161,14 @@ def main():
         d += dt.timedelta(days=1)
     for k in sorted(have)[:-KEEP_DAYS]:
         have.pop(k)
+    for k in sorted(oh)[:-KEEP_DAYS]:
+        oh.pop(k)
     store['updated'] = dt.datetime.now(dt.timezone(dt.timedelta(hours=5, minutes=30))).isoformat(timespec='seconds')
     with open(OUT, 'w') as f:
         json.dump(store, f, separators=(',', ':'), sort_keys=True)
+    ohl['updated'] = store['updated']
+    with open(OUT_OHLC, 'w') as f:
+        json.dump(ohl, f, separators=(',', ':'), sort_keys=True)
     print('days stored: %d, newly added: %d, size: %d bytes' % (len(have), got, os.path.getsize(OUT)))
     if not have:
         sys.exit(1)
