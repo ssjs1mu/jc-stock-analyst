@@ -1,0 +1,41 @@
+name: NSE delivery volumes (dashboard)
+
+# Collects NSE security-wise delivery quantities into data/delivery.json (free, no Apps Script quota).
+# NSE posts the file in the evening; the second run catches late posting.
+on:
+  schedule:
+    - cron: '17 14 * * 1-5'   # 19:47 IST
+    - cron: '47 16 * * 1-5'   # 22:17 IST (catch late NSE posting)
+  workflow_dispatch:
+  push:
+    paths:
+      - 'pipeline/delivery.py'
+      - '.github/workflows/delivery.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: delivery
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Collect
+        run: python pipeline/delivery.py
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/delivery.json && git ls-files --error-unmatch data/delivery.json >/dev/null 2>&1; then echo "No change"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/delivery.json
+          git commit -m "data: delivery $(date -u +%F)"
+          for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done
+          exit 1
