@@ -1,167 +1,146 @@
 {
- "out": {
-  "HSCL@0.5": {
-   "n": 94,
-   "max": "2025-01-14",
-   "sec": 0.1
-  },
-  "HFCL@0.5": {
-   "n": 83,
-   "max": "2025-02-04",
-   "sec": 0.3
-  },
-  "TCS@0.5": {
-   "n": 162,
-   "max": "2025-01-09",
-   "sec": 0.5
-  },
-  "INFY@0.5": {
-   "n": 144,
-   "max": "2025-01-16",
-   "sec": 0.3
-  },
-  "RELIANCE@0.5": {
-   "n": 130,
-   "max": "2025-01-16",
-   "sec": 0.5
-  },
-  "ABB@0.5": {
-   "n": 87,
-   "max": "2025-02-17",
-   "sec": 0.5
-  },
-  "DLF@0.5": {
-   "n": 144,
-   "max": "2025-01-24",
-   "sec": 0.6
-  },
-  "ITC@0.5": {
-   "n": 107,
-   "max": "2025-02-06",
-   "sec": 0.3
-  },
-  "SBIN@0.5": {
-   "n": 145,
-   "max": "2025-02-06",
-   "sec": 0.5
-  },
-  "LT@0.5": {
-   "n": 129,
-   "max": "2025-01-31",
-   "sec": 0.6
-  },
-  "ZEEL@0.5": {
-   "n": 166,
-   "max": "2025-01-23",
-   "sec": 0.5
-  },
-  "MRF@0.5": {
-   "n": 98,
-   "max": "2025-02-07",
-   "sec": 0.6
-  },
-  "PIIND@0.5": {
-   "n": 86,
-   "max": "2025-02-07",
-   "sec": 0.5
-  },
-  "SRF@0.5": {
-   "n": 122,
-   "max": "2025-01-29",
-   "sec": 0.5
-  },
-  "UPL@0.5": {
-   "n": 159,
-   "max": "2025-01-31",
-   "sec": 0.6
-  },
-  "TITAN@0.5": {
-   "n": 113,
-   "max": "2025-02-04",
-   "sec": 0.4
-  },
-  "HSCL@2.0": {
-   "n": 94,
-   "max": "2025-01-14",
-   "sec": 0.5
-  },
-  "HFCL@2.0": {
-   "n": 83,
-   "max": "2025-02-04",
-   "sec": 0.5
-  },
-  "TCS@2.0": {
-   "n": 162,
-   "max": "2025-01-09",
-   "sec": 0.8
-  },
-  "INFY@2.0": {
-   "n": 144,
-   "max": "2025-01-16",
-   "sec": 0.5
-  },
-  "RELIANCE@2.0": {
-   "n": 130,
-   "max": "2025-01-16",
-   "sec": 0.5
-  },
-  "ABB@2.0": {
-   "n": 87,
-   "max": "2025-02-17",
-   "sec": 0.6
-  },
-  "DLF@2.0": {
-   "n": 144,
-   "max": "2025-01-24",
-   "sec": 0.6
-  },
-  "ITC@2.0": {
-   "n": 107,
-   "max": "2025-02-06",
-   "sec": 0.5
-  },
-  "SBIN@2.0": {
-   "n": 145,
-   "max": "2025-02-06",
-   "sec": 0.5
-  },
-  "LT@2.0": {
-   "n": 129,
-   "max": "2025-01-31",
-   "sec": 0.7
-  },
-  "ZEEL@2.0": {
-   "n": 166,
-   "max": "2025-01-23",
-   "sec": 0.6
-  },
-  "MRF@2.0": {
-   "n": 98,
-   "max": "2025-02-07",
-   "sec": 0.5
-  },
-  "PIIND@2.0": {
-   "n": 86,
-   "max": "2025-02-07",
-   "sec": 0.6
-  },
-  "SRF@2.0": {
-   "n": 122,
-   "max": "2025-01-29",
-   "sec": 0.6
-  },
-  "UPL@2.0": {
-   "n": 159,
-   "max": "2025-01-31",
-   "sec": 0.5
-  },
-  "TITAN@2.0": {
-   "n": 115,
-   "max": "2025-02-04",
-   "sec": 0.5
-  }
+ "HSCL": {
+  "n": 65,
+  "recent": [
+   [
+    "2025-01-13",
+    "Financial Results"
+   ],
+   [
+    "2025-04-21",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2025-07-15",
+    "Financial Results"
+   ],
+   [
+    "2025-10-17",
+    "Financial Results"
+   ],
+   [
+    "2026-01-16",
+    "Financial Results"
+   ],
+   [
+    "2026-04-23",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2026-07-15",
+    "Financial Results"
+   ],
+   [
+    "2026-10-16",
+    "Financial Results"
+   ]
+  ]
  },
- "errors": [
-  "warm https://www.nseindia.com/: HTTP Error 403: Forbidden"
- ]
+ "HFCL": {
+  "n": 81,
+  "recent": [
+   [
+    "2025-02-03",
+    "Financial Results"
+   ],
+   [
+    "2025-05-22",
+    "Dividend"
+   ],
+   [
+    "2025-05-22",
+    "Financial Results"
+   ],
+   [
+    "2025-07-25",
+    "Financial Results"
+   ],
+   [
+    "2025-07-25",
+    "Fund Raising"
+   ],
+   [
+    "2025-10-17",
+    "Financial Results"
+   ],
+   [
+    "2026-02-03",
+    "Financial Results"
+   ],
+   [
+    "2026-03-25",
+    "Fund Raising"
+   ],
+   [
+    "2026-04-30",
+    "Dividend"
+   ],
+   [
+    "2026-04-30",
+    "Financial Results"
+   ],
+   [
+    "2026-07-22",
+    "Financial Results"
+   ],
+   [
+    "2026-10-19",
+    "Financial Results"
+   ]
+  ]
+ },
+ "TCS": {
+  "n": 72,
+  "recent": [
+   [
+    "2025-01-09",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2025-04-10",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2025-07-10",
+    "Dividend/Other business matters"
+   ],
+   [
+    "2025-10-09",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2026-01-12",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2026-04-09",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2026-07-09",
+    "Financial Results/Dividend"
+   ],
+   [
+    "2026-10-08",
+    "Financial Results/Dividend"
+   ]
+  ]
+ },
+ "HEROMOTORS": {
+  "n": 1,
+  "recent": [
+   [
+    "2026-10-13",
+    "Financial Results"
+   ]
+  ]
+ },
+ "corp_keys": [
+  "latest_announcements",
+  "corporate_actions",
+  "shareholdings_patterns",
+  "financial_results",
+  "borad_meeting"
+ ],
+ "fin": "{\"data\": [{\"from_date\": null, \"to_date\": \"30 Sep 2026\", \"expenditure\": null, \"income\": \"158700\", \"audited\": \"Un-Audited\", \"cumulative\": null, \"consolidated\": \"Non-Consolidated\", \"reDilEPS\": \"4.75\", \"reProLossBefTax\": \"31787\", \"proLossAftTax\": \"23977\", \"re_broadcast_timestamp\": \"16-Oct-2026 19:24\", \"xbrl_attachment\": \"https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING_INDAS_1740408_16102026072443_WEB.xml\", \"na_attachment\": null}, {\"from_date\": null, \"to_date\": \"30 Jun 2026\", \"expenditure\": null, \"income\": \"133271\", \"audited\": \"Un-Audited\", \"cumulative\": null, \"consolidated\": \"Non-Consolidated\", \"reDilEPS\": \"4.43\", \"reProLossBefTax\": \"29407\", \"proLossAftTax\": \"22342\", \"re_broadc"
 }
