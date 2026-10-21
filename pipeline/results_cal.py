@@ -101,12 +101,14 @@ def main():
         sys_ = sorted(delivery.universe())
     except Exception as e:
         status['errors'].append('universe: %s' % e)
+    cut = today - dt.timedelta(days=340)
     if sys_ and (len(hist) < 300 or today.weekday() == 5):
         fails = 0
+        hist.clear()
         for n, sym in enumerate(sys_):
             if n and n % 120 == 0:
                 op = opener()
-            j = get(op, 'https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol=%s&period=Quarterly' % urllib.parse.quote(sym))
+            j = get(op, 'https://www.nseindia.com/api/event-calendar?index=equities&symbol=%s' % urllib.parse.quote(sym))
             status['hist_calls'] += 1
             if j is None:
                 fails += 1
@@ -114,14 +116,16 @@ def main():
                     status['errors'].append('stopping after repeated failures at %s' % sym)
                     break
             else:
-                ingest(rows_of(j))
+                ds = set()
+                for r in rows_of(j):
+                    txt = ' '.join(str(r.get(k) or '') for k in ('purpose',)).lower()
+                    p_ = pdate(r.get('date'))
+                    if p_ and 'result' in txt and cut <= p_.date() <= today + dt.timedelta(days=45):
+                        ds.add(p_.strftime('%Y-%m-%d'))
+                if ds:
+                    hist[sym] = sorted(ds)
+                    status['hist_rows'] += len(ds)
             time.sleep(0.5)
-    else:
-        d = today - dt.timedelta(days=6)
-        url = 'https://www.nseindia.com/api/corporates-financial-results?index=equities&from_date=%s&to_date=%s&period=Quarterly' % (d.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'))
-        j = get(op, url)
-        status['hist_calls'] += 1
-        ingest(rows_of(j))
     up = {}
     url = 'https://www.nseindia.com/api/event-calendar?index=equities&from_date=%s&to_date=%s' % (today.strftime('%d-%m-%Y'), (today + dt.timedelta(days=30)).strftime('%d-%m-%Y'))
     j = get(op, url)
