@@ -2,6 +2,21 @@
  "schedule_id": "evening-news-wrap",
  "runs": [
   {
+   "generated_at": "2026-10-21T23:31:10+05:30",
+   "date": "2026-10-21",
+   "status": "ok",
+   "caption": "evening-news-wrap 21 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "Evening_News_Wrap_2026-10-21.pdf",
+     "path": "reports/evening-news-wrap/Evening_News_Wrap_2026-10-21.pdf",
+     "type": "pdf",
+     "bytes": 440547
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-20T00:46:35+05:30",
    "date": "2026-10-20",
    "status": "holiday",
@@ -40,5 +55,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-20T00:46:35+05:30"
+ "updated_at": "2026-10-21T23:31:10+05:30"
 }
