@@ -47,6 +47,38 @@ function tgLive_(s) {
   var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16);
   if (m >= 480 && m <= 1260) tgNews_(s);
   if (dow >= 1 && dow <= 5 && m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm);
+  if (dow >= 1 && dow <= 5) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
+}
+/* ---------- pre-market accumulation list (08:45-09:30) and 10 AM live confirmation (10:00-11:00) from data/accum.json ---------- */
+function tgAccum_(s, m, today) {
+  var phase = (m >= 525 && m <= 570) ? 'LIST' : (m >= 600 && m <= 660) ? 'CONF' : ''; if (!phase) return;
+  var st = {}; try { st = JSON.parse(s.p.getProperty('TG_ACC') || '{}'); } catch (e) { } if (st[phase] === today) return;
+  var r = UrlFetchApp.fetch(TG_SITE + 'data/accum.json?t=' + Date.now(), { muteHttpExceptions: true }); if (r.getResponseCode() !== 200) return;
+  var j = JSON.parse(r.getContentText()), P = j.picks || [], X = j.exits || [], W = j.results_watch || [], NM = { SURGEQ: 'Quality surge', SURGEHOLD: 'Surge holding', RUNLOWDEL: 'Retail-heavy run', ABSORB: 'Absorption', SHAKE: 'Shakeout then quiet', HHHL: 'Higher highs/lows', FIBDRY: 'Fib level, volume dry', CLIMAX: 'Climax reversal', REDHEAVY: 'Red on heavy volume' };
+  var nm = function (a) { return a.map(function (k) { return NM[k] || k; }).join(', '); };
+  if (phase === 'LIST') {
+    var L = ['🌅 <b>Pre-market list</b> · data as of ' + tgEsc_(j.asof) + ' (NSE delivery + prices, ' + j.stocks + ' stocks)', ''];
+    if (P.length) { L.push('<b>Accumulation / continuation candidates</b>'); P.slice(0, 8).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> ' + tgNum_(p.close) + ' — ' + tgEsc_(nm(p.sigs)) + '\n   above ' + tgNum_(p.trigger) + ' · stop ' + tgNum_(p.stop) + ' · plan exit by ~session ' + p.exit_by + (p.results ? ' · ⚠ results ' + tgEsc_(p.results) : '')); }); }
+    else L.push('No candidate from the tested signals today.');
+    if (X.length) { L.push('', '<b>Exit / avoid watch</b>'); X.slice(0, 6).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> ' + tgNum_(p.close) + ' — ' + tgEsc_(nm(p.sigs))); }); }
+    if (W.length) { L.push('', '<b>Results due soon after a run-up</b>'); W.slice(0, 6).forEach(function (p) { L.push('• <b>' + tgEsc_(p.sym) + '</b> results ' + tgEsc_(p.date) + ' — ' + tgEsc_(p.why)); }); }
+    L.push('', 'Confirmation check follows at about 10 AM.', '<i>Back-tested rule-based signals (modest edge, not certainty). Not advice; no outcome is guaranteed. Track record: terminal → Accumulation &amp; Exit.</i>');
+    if (tgSend_(s, L.join('\n'))) { st.LIST = today; s.p.setProperty('TG_ACC', JSON.stringify(st)); }
+    return;
+  }
+  var syms = {}; P.concat(X).forEach(function (p) { syms[p.sym] = 1; }); syms = Object.keys(syms); if (!syms.length) { st.CONF = today; s.p.setProperty('TG_ACC', JSON.stringify(st)); return; }
+  var q = JSON.parse(liveQ_(syms.map(function (x) { return x + '.NS'; }).join(','))); if (!q.ok) return; q = q.q;
+  var frac = Math.min(1, Math.max((m - 555) / 375, 0.06));
+  var stat = function (p) {
+    var a = q[p.sym + '.NS']; if (!a) return '— no quote'; var px = a[0], pc = a[1], v = a[5], av = a[6], pace = av > 0 ? v / (av * frac) : null, t = tgNum_(px) + ' (' + ((px / pc - 1) * 100).toFixed(1) + '%)' + (pace != null ? ' · vol ' + pace.toFixed(1) + '×' : '');
+    if (p.stop && px <= p.stop) return '❌ FAILED (at/below stop) ' + t; if (p.trigger && px >= p.trigger) return '✅ TRIGGERED ' + t;
+    if (px >= p.close * 0.995 && (pace == null || pace >= 0.8)) return '🟦 CONFIRMED (holding the close) ' + t; return '🟧 WAIT ' + t;
+  };
+  var C = ['🕙 <b>10 AM confirmation</b>', ''];
+  P.slice(0, 8).forEach(function (p) { C.push('• <b>' + tgEsc_(p.sym) + '</b> — ' + stat(p) + '\n   above ' + tgNum_(p.trigger) + ' · stop ' + tgNum_(p.stop)); });
+  if (X.length) { C.push('', '<b>Exit / avoid watch</b>'); X.slice(0, 6).forEach(function (p) { var a = q[p.sym + '.NS']; C.push('• <b>' + tgEsc_(p.sym) + '</b> ' + (a ? tgNum_(a[0]) + ' (' + ((a[0] / a[1] - 1) * 100).toFixed(1) + '%)' : '')); }); }
+  C.push('', '<i>Confirmation rules are not back-tested (no intraday history). Not advice; no outcome is guaranteed.</i>');
+  if (tgSend_(s, C.join('\n'))) { st.CONF = today; s.p.setProperty('TG_ACC', JSON.stringify(st)); }
 }
 function tgNews_(s) {
   var qs = ['Sensex OR Nifty OR "Bank Nifty" when:1d', 'RBI OR rupee OR "FII" OR "crude oil" India when:1d', '"Wall Street" OR Nasdaq OR "Fed" stocks when:1d'], tags = ['INDIA', 'MACRO', 'GLOBAL'], items = [];
