@@ -23,13 +23,13 @@
   function delivOf(sym, dl) { const m = {}; if (!dl) return m; Object.keys(dl.d || {}).forEach((d) => { const x = dl.d[d][sym]; if (x) m[d] = x; }); return m; }
 
   function analyse(sym, bars, dm) {
-    const n = bars.length; if (n < 40) return { sym, err: 'Not enough price history' };
+    const n = bars.length; if (n < 12) return { sym, err: 'Not enough price history (needs at least 12 sessions)' };
     const B = bars.map((x) => ({ d: day(x.t), o: x.o, h: x.h, l: x.l, c: x.c, v: x.v, dq: (dm[day(x.t)] || [])[0], tq: (dm[day(x.t)] || [])[1] }));
     const from = Math.max(1, n - 130); let pk = from, ph = 0; for (let i = from; i < n; i++) if (B[i].h > ph) { ph = B[i].h; pk = i; }
     let lo = 1e18, li = Math.max(0, pk - 90); for (let i = Math.max(0, pk - 90); i <= pk; i++) if (B[i].l < lo) { lo = B[i].l; li = i; }
     const last = B[n - 1], R_ = ph - lo, out = { sym, B, pk, li, ph, lo, last, hasDel: B.filter((b) => num(b.dq)).length };
     out.swingPct = (ph / lo - 1) * 100; out.ret = R_ > 0 ? (ph - last.c) / R_ : 0; out.fib = LV.map((L) => [L, ph - R_ * L]);
-    out.fromPeak = n - 1 - pk;
+    out.fromPeak = n - 1 - pk; out.short = n < 60;
     if (out.swingPct < 25) { out.state = ['No major swing', 'Not enough of a rally in the last ~6 months to measure accumulation and exit.', 'n']; return out; }
     // signed delivered flow: delivery on up-close days minus delivery on down-close days (falls back to traded volume when delivery is missing)
     const sgn = (i) => (B[i].c > B[i - 1].c ? 1 : B[i].c < B[i - 1].c ? -1 : 0);
@@ -94,7 +94,7 @@
     return `<div style="border:1px solid ${c};border-left:6px solid ${c};border-radius:10px;padding:12px;margin:10px 0">
       <div style="font-size:16px"><b>${E(a.sym)}</b> &nbsp;<span style="color:${c};font-weight:700">${E(st[0])}</span></div>
       <p style="margin:6px 0 10px">${E(st[1])}</p>${a.flag ? `<p style="color:#f59e0b;margin:0 0 8px">⚠ ${E(a.flag)}</p>` : ''}
-      ${svg(a)}<div style="margin-top:8px">${t}</div>${a.covNote ? `<p style="color:#94a3b8;font-size:12px">${E(a.covNote)}</p>` : ''}</div>`;
+      ${svg(a)}<div style="margin-top:8px">${t}</div>${a.covNote ? `<p style="color:#94a3b8;font-size:12px">${E(a.covNote)}</p>` : ''}${a.short ? '<p style="color:#94a3b8;font-size:12px">Recently listed — only ' + a.B.length + ' sessions of history, so every figure here rests on a short record.</p>' : ''}</div>`;
   }
 
   async function run(sym) {
