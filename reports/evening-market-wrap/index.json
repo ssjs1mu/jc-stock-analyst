@@ -2,6 +2,21 @@
  "schedule_id": "evening-market-wrap",
  "runs": [
   {
+   "generated_at": "2026-10-22T22:49:15+05:30",
+   "date": "2026-10-22",
+   "status": "ok",
+   "caption": "evening-market-wrap 22 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "Evening_Market_Wrap_2026-10-22.pdf",
+     "path": "reports/evening-market-wrap/Evening_Market_Wrap_2026-10-22.pdf",
+     "type": "pdf",
+     "bytes": 540957
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-21T22:37:59+05:30",
    "date": "2026-10-21",
    "status": "ok",
@@ -55,5 +70,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-21T22:37:59+05:30"
+ "updated_at": "2026-10-22T22:49:15+05:30"
 }
