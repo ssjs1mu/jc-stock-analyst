@@ -28,7 +28,7 @@ function doGet(e) {
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
     else if (p.action === 'pcr') out = pcrNifty_();
-    else if (p.action === 'wl_load') out = wlLoad_();
+    else if (p.action === 'wl_load') out = admLocked_() ? JSON.stringify({ error: 'locked', locked: true }) : wlLoad_();
     else if (p.action === 'cl_get') out = clGet_(p.k);
     else if (p.action === 'calls_load') out = callsLoad_();
     else if (p.action === 'calls_build') out = callsBuild_(p.force === '1');
@@ -353,12 +353,12 @@ function wlSave_(obj) {
     return { id: String(l.id), name: String(l.name || 'List').slice(0, 30), syms: syms.slice(0, 300) };
   }) };
   var txt = JSON.stringify(clean), f = wlFile_();
-  if (f) f.setContent(txt); else DriveApp.createFile(WL_FILE, txt, MimeType.PLAIN_TEXT);
+  if (f) { bkRun_('JC_Watchlists', f.getBlob().getDataAsString()); f.setContent(txt); } else DriveApp.createFile(WL_FILE, txt, MimeType.PLAIN_TEXT);
   return JSON.stringify({ ok: true, updated: clean.updated, bytes: txt.length });
 }
 function doPost(e) {
   var out;
-  try { var b = JSON.parse((e && e.postData && e.postData.contents) || '{}'); out = b.action === 'wl_save' ? wlSave_(b.data) : b.action === 'calls_save' ? callsSave_(b.data) : JSON.stringify({ error: 'unknown action' }); }
+  try { out = postRoute_(JSON.parse((e && e.postData && e.postData.contents) || '{}')); }
   catch (err) { out = JSON.stringify({ error: String(err) }); }
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.TEXT);
 }
