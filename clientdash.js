@@ -7,7 +7,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const E = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const S = { locked: null, ok: false, clients: [], trash: 0, msg: '', err: '', chats: [], bot: '', edit: null, busy: false, synced: false };
+  const S = { draft: {}, locked: null, ok: false, clients: [], trash: 0, msg: '', err: '', chats: [], bot: '', edit: null, busy: false, synced: false };
   async function api(action, extra) {
     const be = getBackend(); if (!be) throw new Error('Data backend not set');
     let r, txt;
@@ -38,10 +38,11 @@
   }
   const msg = (m, bad) => { S.msg = (bad ? '⚠ ' : '✓ ') + m; draw(); };
   const row = (l, c) => {
-    const nm = c ? c.name : l.name;
+    const dv = (f, d) => { const k = l.id + '|' + f; return S.draft[k] != null ? S.draft[k] : d; };
+    const nm = dv('name', c ? c.name : l.name), ch = dv('chat', c ? c.chat || '' : '');
     return `<tr data-l="${E(l.id)}"><td><b>${E(l.name)}</b><br><small>${l.syms.length} in terminal</small></td>
       <td><input class="cdn" data-f="name" value="${E(nm)}" style="width:120px"></td>
-      <td><input class="cdn" data-f="chat" list="cdChats" value="${E(c ? c.chat : '')}" placeholder="Telegram chat id" style="width:140px"></td>
+      <td><input class="cdn" data-f="chat" list="cdChats" value="${E(ch)}" placeholder="Telegram chat id" style="width:140px">${c && !c.chat && !ch ? '<br><small style="color:#b3261e">no chat id saved yet</small>' : ''}</td>
       <td>${c ? `<span class="pos">● Linked</span> · ${c.syms.length} stocks kept<br><small>safe in Drive + backups</small>` : '<span style="color:#8a94ad">Not linked</span>'}</td>
       <td>${c ? `<button class="ghostBtn" data-a="save">Save</button> <button class="ghostBtn" data-a="send">📨 Send dashboard now</button> <button class="ghostBtn" data-a="copy">🔗 Copy link</button> <button class="ghostBtn" data-a="stocks">✎ Stocks</button> <button class="ghostBtn" data-a="del" style="color:#b3261e">Remove client</button>` : `<button class="goBtn" data-a="link">Link client</button>`}</td></tr>
       ${S.edit && c && S.edit === c.id ? `<tr><td colspan="5"><div class="note">Stocks kept for ${E(c.name)} (comma separated). Saving here <b>replaces</b> the client's list — this is the only place stocks are removed.<br><textarea id="cdSyms" style="width:100%;height:70px">${E(c.syms.join(', '))}</textarea><br><button class="goBtn" data-a="saveSyms" data-c="${E(c.id)}">Save stocks</button> <button class="ghostBtn" data-a="cancel">Cancel</button></div></td></tr>` : ''}`;
@@ -70,10 +71,10 @@
       if (a === 'claim' || a === 'unlock') { const k = ($('cdPass') || {}).value || ''; if (a === 'claim') { if (k.length < 8) return msg('Use at least 8 characters', 1); const r = await (async () => { const be = getBackend(); const x = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'adm_claim', key: k }) }); return JSON.parse(await x.text()); })(); if (r.error) return msg(r.error, 1); }
         try { localStorage.setItem('jc_admin_key', k); } catch (e) { } S.msg = ''; await load(); if (S.ok) { msg(a === 'claim' ? 'Locked. Watchlists now need this passcode.' : 'Unlocked.'); if (typeof wlDriveSync === 'function') wlDriveSync(); } return; }
       if (a === 'chats') { const j = await api('tg_updates'); S.chats = j.chats || []; S.bot = j.bot || ''; return msg(S.chats.length ? S.chats.length + ' chat(s) found' : 'No one has pressed Start on the bot recently (Telegram keeps this list for 24 hours)', !S.chats.length); }
-      if (a === 'link') { const l = lists().find((x) => x.id === lid); if (!l) return; const j = await api('cl_link', { listId: l.id, listName: l.name, name: g('name') || l.name, chat: g('chat'), syms: l.syms }); S.clients = (await api('cl_list')).clients; return msg('Linked ' + j.client.name + ' — ' + j.client.syms.length + ' stocks saved to Drive' + (j.client.chat ? '' : ' (add the Telegram chat id to send messages)')); }
+      if (a === 'link') { const l = lists().find((x) => x.id === lid); if (!l) return; const lk = { listId: l.id, listName: l.name, name: g('name') || l.name, syms: l.syms }; if (g('chat')) lk.chat = g('chat'); const j = await api('cl_link', lk); S.clients = (await api('cl_list')).clients; return msg('Linked ' + j.client.name + ' — ' + j.client.syms.length + ' stocks saved to Drive' + (j.client.chat ? '' : ' (add the Telegram chat id to send messages)')); }
       if (!c && a !== 'cancel') return;
-      if (a === 'save') { await api('cl_set', { id: c.id, name: g('name'), chat: g('chat') }); S.clients = (await api('cl_list')).clients; return msg('Saved'); }
-      if (a === 'send') { await api('cl_set', { id: c.id, name: g('name'), chat: g('chat') }); const j = await api('cl_send', { id: c.id }); S.clients = (await api('cl_list')).clients; return msg(j.ok ? 'Dashboard sent to ' + c.name + ' on Telegram' : 'Telegram said: ' + j.msg + (/chat not found|blocked|Forbidden/i.test(j.msg) ? ' — the client must open the bot and press Start first' : ''), !j.ok); }
+      if (a === 'save') { const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; if (sv.chat) delete S.draft[lid + '|chat']; return msg('Saved' + (sv.chat ? ' — chat id stored' : ' (no chat id entered)')); }
+      if (a === 'send') { const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; const cc = S.clients.find((x) => x.id === c.id); if (!cc || !cc.chat) return msg('No Telegram chat id is saved for ' + c.name + '. Type the chat id in the row (or use “Find Telegram users”), then press Send again.', 1); const j = await api('cl_send', { id: c.id }); S.clients = (await api('cl_list')).clients; return msg(j.ok ? 'Dashboard sent to ' + c.name + ' on Telegram' : 'Telegram said: ' + j.msg + (/chat not found|blocked|Forbidden/i.test(j.msg) ? ' — the client must open the bot and press Start first' : ''), !j.ok); }
       if (a === 'copy') { try { await navigator.clipboard.writeText(c.link); msg('Link copied — private to ' + c.name + ', do not post it publicly'); } catch (e) { prompt('Copy this private link', c.link); } return; }
       if (a === 'stocks') { S.edit = c.id; return draw(); }
       if (a === 'cancel') { S.edit = null; return draw(); }
@@ -81,6 +82,7 @@
       if (a === 'del') { if (!confirm('Remove client "' + c.name + '"?\n\nTheir dashboard link stops working. Their record is kept in the backup trash, and the terminal watchlist is not touched.')) return; await api('cl_delete', { id: c.id }); const j = await api('cl_list'); S.clients = j.clients; S.trash = j.trash; return msg('Client removed (kept in backup trash)'); }
     } catch (e) { msg(e.message || 'failed', 1); }
   }
+  document.addEventListener('input', (e) => { const i = e.target; if (i && i.matches && i.matches('#cdBox input[data-f]')) { const tr = i.closest('tr'); S.draft[tr.getAttribute('data-l') + '|' + i.getAttribute('data-f')] = i.value; } });
   document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#cdBox [data-a]'); if (b) act(b.getAttribute('data-a'), b.closest('tr'), b); });
   function mount() {
     const p = $('pClient'); if (!p) return; if (!$('cdBox')) { const d = document.createElement('div'); d.id = 'cdBox'; d.className = 'crb'; p.appendChild(d); draw(); if (!S.synced && p.classList.contains('active')) { S.synced = true; load(); } }
