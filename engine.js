@@ -1080,6 +1080,7 @@ const symEx = (s) => (/\.BO$/.test(s) ? 'BO' : 'NS');
 const symYf = (s) => symBase(s) + '.' + symEx(s);
 const sortSyms = (a) => [...new Set(a)].sort((x, y) => symBase(x).localeCompare(symBase(y)) || x.localeCompare(y));
 function wlLoad() { try { const j = JSON.parse(localStorage.getItem(LS_WL) || 'null'); if (j && Array.isArray(j.lists) && j.lists.length) { j.lists.forEach((l) => { l.syms = sortSyms(l.syms || []); }); return j; } } catch (e) {} return { updated: 0, lists: [{ id: 'l' + Date.now().toString(36), name: 'My watchlist', syms: [] }], active: null }; }
+const admKey = () => { try { return localStorage.getItem('jc_admin_key') || ''; } catch (e) { return ''; } };
 function wlSave(localOnly) {
   WL.store.lists.forEach((l) => { l.syms = sortSyms(l.syms); }); if (!localOnly) WL.store.updated = Date.now();
   try { localStorage.setItem(LS_WL, JSON.stringify(WL.store)); } catch (e) {}
@@ -1092,14 +1093,17 @@ function wlDriveQueue() { if (!getBackend()) { wlCloudSet('off'); return; } clea
 async function wlDrivePush() {
   const be = getBackend(); if (!be) return;
   try {
-    const r = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'wl_save', data: WL.store }) }), j = JSON.parse(await r.text());
+    const r = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'wl_save', key: admKey(), data: WL.store }) }), j = JSON.parse(await r.text());
+    if (j.error === 'locked') { wlCloudSet('error', 'Locked — enter the admin passcode in Client reports › Client dashboards'); return; }
     if (j.error) throw new Error(/unknown action|DriveApp|permission/i.test(j.error) ? j.error + ' — redeploy Code.gs as a New version and approve the Drive permission' : j.error); wlCloudSet('saved');
   } catch (e) { wlCloudSet('error', (e && e.message) || 'failed'); }
 }
 async function wlDriveSync() {
   const be = getBackend(); if (!be) { wlCloudSet('off'); return; }
   try {
-    const j = JSON.parse(await fetchWithTimeout(beUrl(be, 'action=wl_load'), 20000)); if (j && j.error) throw new Error(j.error);
+    const j = JSON.parse(await (await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'wl_load', key: admKey() }) })).text());
+    if (j && j.error === 'locked') { wlCloudSet('error', 'Locked — enter the admin passcode in Client reports › Client dashboards'); return; }
+    if (j && j.error) throw new Error(j.error);
     if (j.empty || !Array.isArray(j.lists)) { if (WL.store.lists.some((l) => l.syms.length)) await wlDrivePush(); else wlCloudSet('saved'); return; }
     if ((j.updated || 0) > (WL.store.updated || 0)) { j.lists.forEach((l) => { l.syms = sortSyms(l.syms || []); }); WL.store = { updated: j.updated, lists: j.lists, active: j.lists.find((l) => l.id === WL.store.active) ? WL.store.active : j.active || j.lists[0].id }; wlSave(true); wlCloudSet('loaded'); if (IS_BROWSER && $('wlBar')) { wlRenderBar(); wlRenderBody(); wlRefreshAll(false); } }
     else if ((WL.store.updated || 0) > (j.updated || 0)) await wlDrivePush(); else wlCloudSet('saved');
