@@ -24,3 +24,10 @@ Edit the source parts, never `Code.gs` directly: `Code.base.gs` (routes, watchli
 2. No guaranteed-profit claims. Signal-agreement score is not a probability.
 3. Every commit: update `docs/CHANGELOG.md`; end the message with the attribution lines.
 4. Trading day = weekday and not in the holiday lists.
+
+## Radar universe & screen (added 2026-10-26, radar v6 / backend v11) [Claude]
+- `apps-script/Radar.server.gs`: `qstat` (price, mcap, EPS, P/E, volumes, 50/200-DMA, 52w range) and `qfund` (revenue growth, margin, ROE, D/E, op. cash flow) via Yahoo; routes in Code.base.gs.
+- `radarcore.js` `POOL` + `eligible()`: the conservative screen. Change thresholds there only.
+- `data/radar_pool.json`: screened extras (seed: 207 of 1,875 on 26-Oct). Re-screen from the radar panel ("re-screen"); update the file by committing the new list.
+- `data/nse_equity.json` / `data/universe_extra.json`: candidate lists, written by the constituents job.
+- Core 499 (`bigfish.js`) is never altered. Client/own watchlists merge from browser localStorage only; never commit them.
