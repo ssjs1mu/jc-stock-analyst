@@ -4,6 +4,7 @@ Public GitHub Pages app `ssjs1mu/jc-stock-analyst` + a Google Apps Script backen
 
 ## Front end (repo root)
 - `index.html` — terminal shell. Script tags carry `?v=N` cache-busters: **bump N when you edit that file.**
+- `radarcore.js` — Early-Mover Radar detection rules (pure functions; loaded before `radar.js`); change thresholds here, then re-run the back-test (see project doc 'early-mover-study'). `radar.js` = panel, popups, universe, results tags. Extra symbols: `data/radar_extra.json` (hand list), `data/universe_extra.json` (Microcap 250, auto).
 - `engine.js` (data/analysis, watchlist sync), `dashboard.js` (live dashboard), `calls.js` / `calls_engine.js` (day-trading call engine), `clientrep.js` + `clientdash.js` (Client reports page + client manager UI), `intro.js` (splash), `schedules.js`.
 - `c/index.html` — mobile client page (opened from Telegram). Token via `?k=` (24 hex) or localStorage. No client data in the repo; fetched from the backend by token.
 - `data/calls/board.json` — generic public per-stock board (no client data).

@@ -50,5 +50,23 @@ def main():
     else:
         print('::error::no constituents fetched'); sys.exit(1)
 
+def extra():
+    """Nifty Microcap 250 -> data/universe_extra.json (stocks outside the NSE-500 the radar also watches). Failure is non-fatal."""
+    for f in ('ind_niftymicrocap250_list.csv',):
+        for b in BASE:
+            try:
+                st, _, txt = get(b + f)
+                if 'Symbol' not in txt[:400]: raise ValueError('not a constituent csv')
+                rows = list(csv.DictReader(io.StringIO(txt.lstrip('\ufeff'))))
+                syms = [(r.get('Symbol') or '').strip() for r in rows if (r.get('Symbol') or '').strip() and not (r.get('Symbol') or '').upper().startswith('DUMMY')]
+                if len(syms) >= 100:
+                    json.dump({'updated': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z', 'source': 'niftyindices.com ' + f, 'micro250': syms}, open('data/universe_extra.json', 'w'), separators=(',', ':'))
+                    print(f'::notice::microcap250 {len(syms)} stocks'); return
+            except Exception as e:
+                last = f'{b}{f}: {type(e).__name__} {e}'
+    print('::warning::microcap250 not fetched: ' + last[:200])
+
+
 if __name__ == '__main__':
     main()
+    extra()

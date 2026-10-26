@@ -14,7 +14,7 @@
     thinTurn: 2e7,                   /* below Rs 2 crore a day = THIN: wide spreads, circuits, size small */
     surgeChg: 2.5, surgePace: 3, burstPx: 1.5, burstVol: 0.1, burstMs: 8 * 60000, watchPace: 2.5,
     rushChg: 2.0, rushPace: 6, rushUntil: 615,            /* RUSH only until 10:15 */
-    stealthPace: 4, stealthBand: 1.3, stealthRange: 3.2, stealthFrom: 580, stealthUntil: 840,   /* from 09:40 to 14:00 */
+    stealthPace: 5, stealthBand: 1.3, stealthRange: 3.2, stealthFrom: 580, stealthUntil: 840,   /* from 09:40 to 14:00 */
     t1: 1.5, t2: 3, t3: 5, sl: 1.5
   };
   /* fraction of the day's normal volume expected to have traded by minute-of-day m (flat profile with a floor so the first minutes are not over-weighted) */
@@ -37,7 +37,7 @@
     if (st.seen[sym + ':' + kind]) return null; if (kind === 'STEALTH' && (st.seen[sym + ':SURGE'] || st.seen[sym + ':BURST'] || st.seen[sym + ':RUSH'])) return null;
     st.seen[sym + ':' + kind] = 1;
     const entry = kind === 'STEALTH' ? h * 1.002 : px, late = chg >= 6, slp = late ? 2 : cfg.sl;
-    return { sym, kind, t: now, m, px, chg, pace, hi: h, why, entry, slp, sl: entry * (1 - slp / 100), t1: entry * (1 + cfg.t1 / 100), t2: entry * (1 + cfg.t2 / 100), t3: entry * (1 + cfg.t3 / 100), late, thin: turn < cfg.thinTurn, gap: (o / pc - 1) * 100, mx: px };
+    return { sym, kind, t: now, m, px, chg, pace, hi: h, why, entry, slp, sl: entry * (1 - slp / 100), t1: entry * (1 + cfg.t1 / 100), t2: entry * (1 + cfg.t2 / 100), t3: entry * (1 + cfg.t3 / 100), late, thin: turn < cfg.thinTurn, gap: (o / pc - 1) * 100, lo: l, info: kind === 'STEALTH', mx: px };
   }
   /* the OLD radar-v3 rules, kept only so the back-test can compare like with like */
   function judgeOld(sym, a, now, m, st) {

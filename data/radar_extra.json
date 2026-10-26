@@ -1,0 +1,7 @@
+{
+ "always": [
+  "STERTOOLS",
+  "TFCILTD"
+ ],
+ "note": "Always-scanned stocks outside the NSE-500 universe. Added 2026-10-26 after STERTOOLS and TFCILTD moved and the radar could not see them. Add more here (NSE symbols) or use 'Also watch' in the radar panel."
+}

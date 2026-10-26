@@ -6,6 +6,8 @@ on:
     - cron: '30 2 * * 0'     # Sunday 08:00 IST (constituents + weights)
     - cron: '30 3 * * 1-5'   # 09:00 IST weekdays (weights refresh)
   workflow_dispatch:
+  push:
+    paths: ['pipeline/constituents.py']
 
 permissions:
   contents: write
@@ -25,7 +27,7 @@ jobs:
           python-version: '3.12'
       - name: Collect
         run: |
-          if [ "$(date -u +%u)" = "7" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then python pipeline/constituents.py; fi
+          if [ "$(date -u +%u)" = "7" ] || [ "${{ github.event_name }}" != "schedule" ]; then python pipeline/constituents.py; fi
           python pipeline/weights.py
       - name: Commit if changed
         run: |
