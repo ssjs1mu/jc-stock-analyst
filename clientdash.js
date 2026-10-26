@@ -10,8 +10,16 @@
   const S = { locked: null, ok: false, clients: [], trash: 0, msg: '', err: '', chats: [], bot: '', edit: null, busy: false, synced: false };
   async function api(action, extra) {
     const be = getBackend(); if (!be) throw new Error('Data backend not set');
-    const r = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, key: admKey() }, extra || {})) });
-    const j = JSON.parse(await r.text()); if (j.error) { const e = new Error(j.error); e.code = j.error; throw e; } return j;
+    let r, txt;
+    try { r = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, key: admKey() }, extra || {})) }); txt = await r.text(); }
+    catch (e) { throw new Error(await diagnose(be, e)); }
+    let j; try { j = JSON.parse(txt); } catch (e) { throw new Error('The backend answered with a web page instead of data (' + txt.slice(0, 80).replace(/\s+/g, ' ') + '…). It is usually a sign-in or permission page — open the backend link in this browser once, or redeploy it as "Anyone".'); } if (j.error) { const e = new Error(j.error); e.code = j.error; throw e; } return j;
+  }
+  async function diagnose(be, e) {
+    const tail = '…' + String(be).slice(-14);
+    let ping = null; try { const r = await fetch(be + (be.indexOf('?') < 0 ? '?' : '&') + 'action=ping&t=' + Date.now()); ping = JSON.parse(await r.text()); } catch (x) { ping = null; }
+    if (ping && ping.ok) return 'The backend (' + tail + ') answers reads but refused the secure request (' + (e.message || 'failed') + '). Reload the page with Ctrl+F5 so the newest files load; if it stays, sign out of other Google accounts in this browser and retry.';
+    return 'Cannot reach the data backend (' + tail + ') — ' + (e.message || 'failed') + '. Check the internet connection and that the Data backend link saved in this terminal is the current /exec URL (Settings › Data backend). Ad-blockers or a VPN can also block script.google.com.';
   }
   const lists = () => (typeof WL !== 'undefined' && WL.store && WL.store.lists) || [];
   async function load() {
