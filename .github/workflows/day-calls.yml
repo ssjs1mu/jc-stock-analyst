@@ -37,15 +37,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: Skip late heartbeats
         id: gate
         run: |
-          H=$(TZ=Asia/Kolkata date +%H)
-          if [ "${{ github.event_name }}" = "push" ] && [ "$H" -ge 10 ]; then echo "go=no" >> "$GITHUB_OUTPUT"; echo "Heartbeat after 10:00 IST — the morning call book is not rebuilt."; else echo "go=yes" >> "$GITHUB_OUTPUT"; fi
-      - uses: actions/checkout@v5
-        if: ${{ steps.gate.outputs.go == 'yes' }}
-        with:
-          fetch-depth: 0
+          H=$(TZ=Asia/Kolkata date +%H); T=$(TZ=Asia/Kolkata date +%F)
+          if [ "${{ github.event_name }}" = "push" ] && [ "$H" -ge 10 ] && grep -q "\"date\":\"$T\"" data/calls/board.json 2>/dev/null; then echo "go=no" >> "$GITHUB_OUTPUT"; echo "Heartbeat after 10:00 IST and today's board exists — nothing to rebuild."; else echo "go=yes" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
         if: ${{ steps.gate.outputs.go == 'yes' }}
         with:
