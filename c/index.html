@@ -118,9 +118,9 @@ var G2=[['Commodities',[['GC=F','Gold $/oz','🥇'],['SI=F','Silver $/oz','🥈'
 function spark(a,up){if(!a||a.length<3)return'';var mn=Math.min.apply(0,a),mx=Math.max.apply(0,a),w=64,h=26,r=mx-mn||1;
 var p=a.map(function(v,i){return(i/(a.length-1)*w).toFixed(1)+','+(h-(v-mn)/r*h).toFixed(1)}).join(' ');
 return'<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><polyline fill="none" stroke="'+(up?'#0f9d58':'#d93025')+'" stroke-width="2" points="'+p+'"/></svg>'}
-function tile(d,def){var q=S.q[def[0]],ch=q&&q.p!=null&&q.pc?(q.p/q.pc-1)*100:null,up=ch!=null&&ch>=0;
+function tile(d,def){var q=S.q[def[0]],ch=q&&q.p!=null&&q.pc?(q.p/q.pc-1)*100:null,up=ch!=null&&ch>=0,good=def[3]?!up:up;
 var dp=Math.abs(q&&q.p||0)<100?2:Math.abs(q&&q.p||0)<1000?2:0;
-return'<div class="t '+(ch==null?'':up?'u':'d')+'"><i class="ic">'+def[2]+'</i><b>'+def[1]+'</b><div class="p">'+(q?f2(q.p,dp):'…')+'</div><div class="c">'+(ch==null?'':(up?'▲ ':'▼ ')+f2(Math.abs(ch))+'%')+'</div>'+spark(q&&q.sp,up)+'</div>'}
+return'<div class="t '+(ch==null?'':good?'u':'d')+'"><i class="ic">'+def[2]+'</i><b>'+def[1]+'</b><div class="p">'+(q?f2(q.p,dp):'…')+'</div><div class="c">'+(ch==null?'':(up?'▲ ':'▼ ')+f2(Math.abs(ch))+'%')+'</div>'+spark(q&&q.sp,good)+'</div>'}
 function paintPulse(){
 var h='';G1.forEach(function(g){h+='<div class="sub">'+g[0]+'</div><div class="grid">'+g[1].map(function(d){return tile(d,d)}).join('')+'</div>'});
 h+='<div class="sub">GIFT Nifty</div><div class="box" style="background:rgba(255,255,255,.55)">GIFT Nifty (the pre-open indicator) has no free live feed wired in yet, so it is <b>not shown</b> rather than guessed. The outlook below uses Asia, US, crude, dollar, bonds and VIX instead.</div>';
