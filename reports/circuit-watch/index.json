@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-10-26T21:10:52+05:30",
+   "date": "2026-10-26",
+   "status": "ok",
+   "caption": "Circuit Watch: Price-Band & Momentum Scanner - session 26 Oct 2026",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-26.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-26.pdf",
+     "type": "pdf",
+     "bytes": 9306
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-20T21:08:40+05:30",
    "date": "2026-10-20",
    "status": "holiday",
@@ -55,5 +70,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-20T21:08:40+05:30"
+ "updated_at": "2026-10-26T21:10:52+05:30"
 }
