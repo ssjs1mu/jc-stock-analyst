@@ -769,6 +769,7 @@ function installCallsTriggers() {
           TG_TOKEN = <bot token>      TG_CHAT = @yourchannelname   (or the numeric id like -100123456789)
      3. Run installTelegramTrigger() once (authorise when asked). Run tgTest() to send a test line.            */
 var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
+var TG_MORNING = { 'premarket-news': 1, 'morning-brief': 1, 'morning-detailed': 1, 'morning-pulse': 1 }; // posted one by one from 08:15 IST, at least 10 minutes apart, in this order
 var TG_IDS = ['premarket-news', 'morning-brief', 'morning-detailed', 'morning-pulse', 'evening-market-wrap', 'evening-news-wrap', 'circuit-watch'];
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
@@ -780,8 +781,12 @@ function tgPostReports() {
   var pp = PropertiesService.getScriptProperties(); if (!pp.getProperty('TG_TOKEN') || !pp.getProperty('TG_CHAT')) return 0; // not configured yet - stay quiet
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
+  var ist0 = new Date(Date.now() + 19800000), dow0 = ist0.getUTCDay(), min0 = ist0.getUTCHours() * 60 + ist0.getUTCMinutes(), tradingDay = dow0 >= 1 && dow0 <= 5;
+  var mq = {}; try { mq = JSON.parse(s.p.getProperty('TG_MQ') || '{}'); } catch (e) { } if (mq.d !== today) mq = { d: today, t: 0 };
+  var morningDone = false;
   TG_IDS.forEach(function (id) {
     try {
+      if (TG_MORNING[id] && tradingDay) { if (min0 < 495 || morningDone || Date.now() - mq.t < 540000) return; } // 08:15 start, one report per turn, 10-minute gap
       var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + id + '/index.json?t=' + Date.now(), { muteHttpExceptions: true });
       if (r.getResponseCode() !== 200) return;
       var runs = (JSON.parse(r.getContentText()).runs || []).filter(function (x) { return x.date === today && x.status === 'ok' && x.files && x.files.length; });
@@ -792,7 +797,7 @@ function tgPostReports() {
       var blob = UrlFetchApp.fetch(TG_SITE + f.path, { muteHttpExceptions: true }).getBlob().setName(f.name);
       var cap = (run.caption || f.name).slice(0, 900);
       var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/' + (f.type === 'png' ? 'sendPhoto' : 'sendDocument'), { method: 'post', payload: { chat_id: s.c, caption: cap, [f.type === 'png' ? 'photo' : 'document']: blob }, muteHttpExceptions: true });
-      if (res.getResponseCode() === 200) { sent[id] = run.generated_at; n++; } else Logger.log(id + ' ' + res.getContentText());
+      if (res.getResponseCode() === 200) { sent[id] = run.generated_at; n++; if (TG_MORNING[id] && tradingDay) { morningDone = true; mq.t = Date.now(); s.p.setProperty('TG_MQ', JSON.stringify(mq)); } } else Logger.log(id + ' ' + res.getContentText());
     } catch (e) { Logger.log(id + ' ' + e); }
   });
   s.p.setProperty('TG_SENT', JSON.stringify(sent));
@@ -806,11 +811,16 @@ function tgEsc_(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').re
 function tgNum_(v, d) { return Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
 function tgLive_(s) {
   var ist = new Date(Date.now() + 19800000), dow = ist.getUTCDay(), m = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-  var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16);
-  if (m >= 480 && m <= 1260) tgNews_(s);
-  if (dow >= 1 && dow <= 5 && m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm);
-  if (dow >= 1 && dow <= 5 && m >= 500 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
-  if (dow >= 1 && dow <= 5) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
+  var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16), wk = dow >= 1 && dow <= 5;
+  var trading = wk && m >= 555 && m <= 930; // 09:15-15:30 IST
+  /* trading hours: live news + live stock signals every 5 minutes. Outside trading hours: live news every 30 minutes (06:00-23:00 IST, every day), quiet overnight. */
+  if (trading) { tgNews_(s); if (m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm); }
+  else if (m >= 360 && m <= 1380) {
+    var last = parseInt(s.p.getProperty('TG_LT') || '0', 10);
+    if (Date.now() - last >= 28 * 60000) { s.p.setProperty('TG_LT', String(Date.now())); tgNews_(s); }
+  }
+  if (wk) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
+  if (wk && m >= 495 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
 }
 /* ---------- pre-market accumulation list (08:45-09:30) and 10 AM live confirmation (10:00-11:00) from data/accum.json ---------- */
 function tgAccum_(s, m, today) {
