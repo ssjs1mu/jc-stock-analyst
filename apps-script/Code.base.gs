@@ -38,6 +38,8 @@ function doGet(e) {
     else if (p.action === 'universe') out = bfUniverse_();
     else if (p.action === 'ytlive') out = ytLive_(p.channel);
     else if (p.action === 'liveq') out = liveQ_(p.symbols);
+    else if (p.action === 'qstat') out = qStat_(p.symbols);
+    else if (p.action === 'qfund') out = qFund_(p.symbols);
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));

@@ -48,6 +48,23 @@
     if (!kind) return null; if (st.seen[sym + ':' + kind]) return null; if (kind === 'WATCH' && (st.seen[sym + ':SURGE'] || st.seen[sym + ':BURST'])) return null; st.seen[sym + ':' + kind] = 1;
     const entry = kind === 'WATCH' ? h * 1.002 : px; return { sym, kind, t: now, m, px, chg, pace, hi: h, entry, slp: chg >= 6 ? 2 : 1.5, mx: px };
   }
-  const api = { CFG, frac, judge, judgeOld };
+  /* Which extra (non-NSE-500) stocks deserve a place in the scan list? Deliberately conservative: all rules must pass.
+     st = [price, mcap, eps, pe, avgVol3m, avgVol10d, ma50, ma200, hi52, lo52] (qstat);  fu = [revGrowth, profitMargin, roe, debtToEquity, opCashFlow] or null (qfund).
+     Fundamental fields that Yahoo does not publish for a company are not held against it; the profit and size tests above always apply. */
+  const POOL = { minPx: 50, minMcap: 1e10 /* Rs 1,000 cr */, minTurn: 3e7 /* Rs 3 cr traded a day (3-month average) */, maxPe: 70, nearHigh: 0.70, minRev: -0.05, maxDe: 250 };
+  function eligible(st, fu, P) {
+    P = P || POOL; if (!st) return { ok: false, why: 'no data' }; const [px, mc, eps, pe, av3, av10, m50, m200, hi] = st; const why = [];
+    if (!(px >= P.minPx)) why.push('price < ' + P.minPx);
+    if (!(mc >= P.minMcap)) why.push('market cap < ₹1,000 cr');
+    if (!(px * Math.max(av3 || 0, av10 || 0) >= P.minTurn && px * (av3 || av10 || 0) >= P.minTurn)) why.push('turnover < ₹3 cr/day');
+    if (!(eps > 0)) why.push('not profitable (EPS ≤ 0)');
+    if (num(pe) && pe > P.maxPe) why.push('P/E > ' + P.maxPe);
+    if (!(m200 > 0 && px >= m200)) why.push('below 200-day average');
+    if (!(hi > 0 && px >= P.nearHigh * hi)) why.push('> 30 % below 52-week high');
+    if (num(m50) && num(m200) && m50 < 0.97 * m200) why.push('50-day below 200-day');
+    if (fu) { if (num(fu[0]) && fu[0] < P.minRev) why.push('sales shrinking'); if (num(fu[1]) && fu[1] <= 0) why.push('negative margin'); if (num(fu[2]) && fu[2] < 0) why.push('negative ROE'); if (num(fu[3]) && fu[3] > P.maxDe) why.push('debt/equity > 2.5×'); }
+    return { ok: !why.length, why };
+  }
+  const api = { CFG, POOL, frac, judge, judgeOld, eligible };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.JCRadarCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);
