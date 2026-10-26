@@ -2,6 +2,21 @@
  "schedule_id": "morning-detailed",
  "runs": [
   {
+   "generated_at": "2026-10-26T07:32:54+05:30",
+   "date": "2026-10-26",
+   "status": "ok",
+   "caption": "morning-detailed 26 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Detailed_2026-10-26.pdf",
+     "path": "reports/morning-detailed/JCGG_Morning_Updates_Detailed_2026-10-26.pdf",
+     "type": "pdf",
+     "bytes": 558553
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-23T13:30:33+05:30",
    "date": "2026-10-23",
    "status": "ok",
@@ -100,5 +115,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-23T13:30:33+05:30"
+ "updated_at": "2026-10-26T07:32:54+05:30"
 }
