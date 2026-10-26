@@ -3,6 +3,7 @@
  * Pure CSS 3D (no libraries, no video file). Shown on every fresh load, then fades into the dashboard. */
 (function () {
   'use strict';
+  if (/[?&]embed=1/.test(location.search)) return; /* embedded inside the client dashboard: no splash */
   var d = document, root = d.documentElement, t0 = Date.now(), MIN = 3900, MAX = 9000, done = false;
   var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { }
   if (reduce) MIN = 900;

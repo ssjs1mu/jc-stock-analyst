@@ -47,7 +47,7 @@ function cliSyms_(a) {
   var seen = {}, out = []; (a || []).forEach(function (x) { var u = String(x).toUpperCase(), bo = /\.BO$/.test(u); u = u.replace(/\.(NS|BO)$/, '').replace(/[^A-Z0-9&\-]/g, ''); if (u) { u = bo ? u + '.BO' : u; if (!seen[u]) { seen[u] = 1; out.push(u); } } });
   return out.slice(0, 60);
 }
-function cliPub_(c) { return { id: c.id, name: c.name, chat: c.chat, listId: c.listId, listName: c.listName, syms: c.syms, token: c.token, link: CL_PAGE + '#' + c.token, created: c.created, updated: c.updated }; }
+function cliPub_(c) { return { id: c.id, name: c.name, chat: c.chat, listId: c.listId, listName: c.listName, syms: c.syms, token: c.token, link: CL_PAGE + '?k=' + c.token, created: c.created, updated: c.updated }; }
 function cliTx_(fn) { var lk = LockService.getScriptLock(); lk.waitLock(20000); try { return fn(); } finally { lk.releaseLock(); } }
 function cliRoute_(a, b) {
   if (a === 'cl_list') { var d = cliRead_(); return JSON.stringify({ ok: true, clients: Object.keys(d.clients).map(function (k) { return cliPub_(d.clients[k]); }), trash: Object.keys(d.trash).length }); }
@@ -102,7 +102,7 @@ function tgUpdates_() {
   return JSON.stringify({ ok: true, bot: me.result && me.result.username || '', chats: Object.keys(seen).map(function (k) { return seen[k]; }) });
 }
 function tgClientMsg_(s, c) {
-  var url = CL_PAGE + '#' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(String(c.name || '').split(' ')[0]) + '</b>\nYour pre-market pulse is ready — world markets, today’s outlook and your stocks with levels.\n<i>Educational information, not investment advice.</i>';
+  var url = CL_PAGE + '?k=' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(String(c.name || '').split(' ')[0]) + '</b>\nYour pre-market pulse is ready — world markets, today’s outlook and your stocks with levels.\n<i>Educational information, not investment advice.</i>';
   var kb = { inline_keyboard: [[{ text: '📱 Open my dashboard', web_app: { url: url } }], [{ text: '🌐 Open in browser', url: url }]] };
   var send = function (markup) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', reply_markup: JSON.stringify(markup) }, muteHttpExceptions: true }); var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (j.description || 'failed') }; };
   var o = send(kb);
