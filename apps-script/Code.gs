@@ -1009,8 +1009,11 @@ function tgUpdates_() {
 function tgClientMsg_(s, c) {
   var url = CL_PAGE + '#' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(String(c.name || '').split(' ')[0]) + '</b>\nYour pre-market pulse is ready — world markets, today’s outlook and your stocks with levels.\n<i>Educational information, not investment advice.</i>';
   var kb = { inline_keyboard: [[{ text: '📱 Open my dashboard', web_app: { url: url } }], [{ text: '🌐 Open in browser', url: url }]] };
-  var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', reply_markup: JSON.stringify(kb) }, muteHttpExceptions: true });
-  return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (JSON.parse(r.getContentText() || '{}').description || 'failed') };
+  var send = function (markup) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', reply_markup: JSON.stringify(markup) }, muteHttpExceptions: true }); var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (j.description || 'failed') }; };
+  var o = send(kb);
+  if (!o.ok && /button|web_app|url/i.test(o.msg)) { o = send({ inline_keyboard: [[{ text: '\uD83D\uDCF1 Open my dashboard', url: url }]] }); if (o.ok) o.msg = 'sent (link button)'; }
+  if (!o.ok && /chat not found|bot was blocked|user is deactivated|Forbidden/i.test(o.msg)) o.msg += ' \u2014 the client must open the bot and press Start first, and the chat id must be theirs';
+  return o;
 }
 function tgClients_(s, today) { // once per day per client, weekdays 08:20-10:00 IST (called from the 5-minute trigger)
   var d = cliRead_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_CL') || '{}'); } catch (e) { }
