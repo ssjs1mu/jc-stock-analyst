@@ -21,6 +21,8 @@
     if (ping && ping.ok) return 'The backend (' + tail + ') answers reads but refused the secure request (' + (e.message || 'failed') + '). Reload the page with Ctrl+F5 so the newest files load; if it stays, sign out of other Google accounts in this browser and retry.';
     return 'Cannot reach the data backend (' + tail + ') — ' + (e.message || 'failed') + '. Check the internet connection and that the Data backend link saved in this terminal is the current /exec URL (Settings › Data backend). Ad-blockers or a VPN can also block script.google.com.';
   }
+  const okChat = (v) => !v || /^-?\d{5,15}$/.test(v);
+  const CHATERR = 'Telegram chat id must be NUMBERS only (like 123456789) — not a name or @username. Ask the client to press Start on your bot, then use “Find Telegram users who pressed Start”.';
   const lists = () => (typeof WL !== 'undefined' && WL.store && WL.store.lists) || [];
   async function load() {
     if (S.busy) return; S.busy = true; S.err = '';
@@ -63,7 +65,7 @@
         ${S.trash ? `<div style="font-size:11px;color:#5a6a8e">${S.trash} removed client(s) are kept in the Drive trash copy of JC_Clients.json and in JC_Backups.</div>` : ''}`;
     }
     if (S.msg) h += `<div style="font-size:12.5px;margin:6px 0">${E(S.msg)}</div>`;
-    el.innerHTML = h;
+    el.innerHTML = '<style>#cdBox button{cursor:pointer;transition:transform .08s,filter .15s,opacity .15s;border:1px solid #1f3a85;background:#fff;color:#0b1c45;border-radius:8px;padding:5px 10px;font-weight:600;margin:2px}#cdBox button.goBtn{background:#0b1c45;color:#fff}#cdBox button:hover{filter:brightness(.93)}#cdBox button:active{transform:scale(.95);filter:brightness(.8)}#cdBox button:disabled{opacity:.45;cursor:wait}</style>' + (S.working ? h.replace(/<button /g, '<button disabled ') : h);
   }
   async function act(a, tr, t) {
     const lid = tr && tr.getAttribute('data-l'), c = S.clients.find((x) => x.listId === lid), g = (f) => { const i = tr && tr.querySelector('[data-f="' + f + '"]'); return i ? i.value.trim() : ''; };
@@ -71,10 +73,10 @@
       if (a === 'claim' || a === 'unlock') { const k = ($('cdPass') || {}).value || ''; if (a === 'claim') { if (k.length < 8) return msg('Use at least 8 characters', 1); const r = await (async () => { const be = getBackend(); const x = await fetch(be, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'adm_claim', key: k }) }); return JSON.parse(await x.text()); })(); if (r.error) return msg(r.error, 1); }
         try { localStorage.setItem('jc_admin_key', k); } catch (e) { } S.msg = ''; await load(); if (S.ok) { msg(a === 'claim' ? 'Locked. Watchlists now need this passcode.' : 'Unlocked.'); if (typeof wlDriveSync === 'function') wlDriveSync(); } return; }
       if (a === 'chats') { const j = await api('tg_updates'); S.chats = j.chats || []; S.bot = j.bot || ''; return msg(S.chats.length ? S.chats.length + ' chat(s) found' : 'No one has pressed Start on the bot recently (Telegram keeps this list for 24 hours)', !S.chats.length); }
-      if (a === 'link') { const l = lists().find((x) => x.id === lid); if (!l) return; const lk = { listId: l.id, listName: l.name, name: g('name') || l.name, syms: l.syms }; if (g('chat')) lk.chat = g('chat'); const j = await api('cl_link', lk); S.clients = (await api('cl_list')).clients; return msg('Linked ' + j.client.name + ' — ' + j.client.syms.length + ' stocks saved to Drive' + (j.client.chat ? '' : ' (add the Telegram chat id to send messages)')); }
+      if (a === 'link') { const l = lists().find((x) => x.id === lid); if (!l) return; if (!okChat(g('chat'))) return msg(CHATERR, 1); const lk = { listId: l.id, listName: l.name, name: g('name') || l.name, syms: l.syms }; if (g('chat')) lk.chat = g('chat'); const j = await api('cl_link', lk); S.clients = (await api('cl_list')).clients; return msg('Linked ' + j.client.name + ' — ' + j.client.syms.length + ' stocks saved to Drive' + (j.client.chat ? '' : ' (add the Telegram chat id to send messages)')); }
       if (!c && a !== 'cancel') return;
-      if (a === 'save') { const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; if (sv.chat) delete S.draft[lid + '|chat']; return msg('Saved' + (sv.chat ? ' — chat id stored' : ' (no chat id entered)')); }
-      if (a === 'send') { const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; const cc = S.clients.find((x) => x.id === c.id); if (!cc || !cc.chat) return msg('No Telegram chat id is saved for ' + c.name + '. Type the chat id in the row (or use “Find Telegram users”), then press Send again.', 1); const j = await api('cl_send', { id: c.id }); S.clients = (await api('cl_list')).clients; return msg(j.ok ? 'Dashboard sent to ' + c.name + ' on Telegram' : 'Telegram said: ' + j.msg + (/chat not found|blocked|Forbidden/i.test(j.msg) ? ' — the client must open the bot and press Start first' : ''), !j.ok); }
+      if (a === 'save') { if (!okChat(g('chat'))) return msg(CHATERR, 1); const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; const cs = S.clients.find((x) => x.id === c.id); if (sv.chat && !(cs && cs.chat)) return msg('The server did not keep the chat id — check it is numbers only.', 1); if (sv.chat) delete S.draft[lid + '|chat']; return msg(sv.chat ? 'Saved — chat id ' + cs.chat + ' stored' : 'Saved (no chat id entered — nothing to store)', !sv.chat); }
+      if (a === 'send') { if (!okChat(g('chat'))) return msg(CHATERR, 1); const sv = {}; if (g('name')) sv.name = g('name'); if (g('chat')) sv.chat = g('chat'); await api('cl_set', Object.assign({ id: c.id }, sv)); S.clients = (await api('cl_list')).clients; const cc = S.clients.find((x) => x.id === c.id); if (!cc || !cc.chat) return msg('No Telegram chat id is saved for ' + c.name + '. Type the chat id in the row (or use “Find Telegram users”), then press Send again.', 1); const j = await api('cl_send', { id: c.id }); S.clients = (await api('cl_list')).clients; return msg(j.ok ? 'Dashboard sent to ' + c.name + ' on Telegram' : 'Telegram said: ' + j.msg + (/chat not found|blocked|Forbidden/i.test(j.msg) ? ' — the client must open the bot and press Start first' : ''), !j.ok); }
       if (a === 'copy') { try { await navigator.clipboard.writeText(c.link); msg('Link copied — private to ' + c.name + ', do not post it publicly'); } catch (e) { prompt('Copy this private link', c.link); } return; }
       if (a === 'stocks') { S.edit = c.id; return draw(); }
       if (a === 'cancel') { S.edit = null; return draw(); }
@@ -83,7 +85,12 @@
     } catch (e) { msg(e.message || 'failed', 1); }
   }
   document.addEventListener('input', (e) => { const i = e.target; if (i && i.matches && i.matches('#cdBox input[data-f]')) { const tr = i.closest('tr'); S.draft[tr.getAttribute('data-l') + '|' + i.getAttribute('data-f')] = i.value; } });
-  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#cdBox [data-a]'); if (b) act(b.getAttribute('data-a'), b.closest('tr'), b); });
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest && e.target.closest('#cdBox [data-a]'); if (!b || S.working) return;
+    const a = b.getAttribute('data-a'), tr = b.closest('tr'), quick = a === 'cancel' || a === 'stocks';
+    if (!quick) { S.working = true; S.msg = '⏳ Working…'; draw(); }
+    try { await act(a, tr, b); } finally { S.working = false; draw(); }
+  });
   function mount() {
     const p = $('pClient'); if (!p) return; if (!$('cdBox')) { const d = document.createElement('div'); d.id = 'cdBox'; d.className = 'crb'; p.appendChild(d); draw(); if (!S.synced && p.classList.contains('active')) { S.synced = true; load(); } }
   }
