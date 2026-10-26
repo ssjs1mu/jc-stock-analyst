@@ -187,11 +187,12 @@ toast('🔔 '+sym+': '+msg);beep();try{navigator.vibrate&&navigator.vibrate([200
 try{if(window.Notification&&Notification.permission==='granted')new Notification('JC · '+sym,{body:msg})}catch(e){}
 $('alog').innerHTML=S.alog.map(function(x){return'<div class="box">'+esc(x)+'</div>'}).join('');paintTiles()}
 function check(){S.syms.forEach(function(s){var r=row(s),l=S.live[s];if(!l)return;var p=l[0];
-if(r&&r.p&&r.b!=='WAIT'){var buy=r.b==='BUY',e=r.p;
-if(buy?p>=e.e:p<=e.e)alertNow(s+'e',s,r.b+' entry level ₹'+f2(e.e)+' reached (CMP ₹'+f2(p)+')');
+if(r&&r.p&&r.b!=='WAIT'){var buy=r.b==='BUY',e=r.p,hi=l[3]!=null?l[3]:p,lo=l[4]!=null?l[4]:p;
+var entered=buy?(Math.max(p,hi)>=e.e):(Math.min(p,lo)<=e.e);
+if(entered){alertNow(s+'e',s,r.b+' trigger ₹'+f2(e.e)+' crossed today (CMP ₹'+f2(p)+') — SL ₹'+f2(e.sl)+', T1 ₹'+f2(e.t1));
 if(buy?p>=e.t1:p<=e.t1)alertNow(s+'t1',s,'Target 1 ₹'+f2(e.t1)+' reached — consider booking part');
 if(buy?p>=e.t2:p<=e.t2)alertNow(s+'t2',s,'Target 2 ₹'+f2(e.t2)+' reached');
-if(buy?p<=e.sl:p>=e.sl)alertNow(s+'sl',s,'Stop-loss ₹'+f2(e.sl)+' touched — plan invalid')}
+if(buy?p<=e.sl:p>=e.sl)alertNow(s+'sl',s,'Stop-loss ₹'+f2(e.sl)+' touched — plan invalid')}}
 else if(r){if(p>r.ph*1.003&&r.lean==='BUY')alertNow(s+'bk',s,'broke above yesterday\'s high ₹'+f2(r.ph));if(p<r.pl*.997&&r.lean==='SELL')alertNow(s+'bd',s,'broke below yesterday\'s low ₹'+f2(r.pl))}
 if(l[6]&&l[5]&&l[5]>l[6]*1.5)alertNow(s+'v',s,'volume surge: '+f2(l[5]/l[6],1)+'× the 5-day average')})}
 function marketOpen(){var n=ist(),d=n.getUTCDay(),m=n.getUTCHours()*60+n.getUTCMinutes();return d>0&&d<6&&m>=555&&m<=935}
