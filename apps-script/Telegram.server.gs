@@ -15,11 +15,17 @@ function installTelegramTrigger() {
   ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'tgPostReports') ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('tgPostReports').timeBased().everyMinutes(5).create();
 }
+/* NSE equity trading holidays 2026 (exchange circular; cross-checked on two sources). A holiday is treated exactly like a non-trading day: no 5-minute signals, no morning sequence, no client daily post - news only, every 30 minutes. KEEP IN SYNC with NSE_HOLIDAYS in pipeline/auto_reports.py. ADD NEXT YEAR'S LIST EACH DECEMBER. Weekend entries (15-Feb, 21-Mar, 15-Aug) need no entry: weekends are already non-trading. Muhurat session (Sun 08-Nov-2026, timings TBA) is NOT treated as trading. */
+var TG_HOLIDAYS = {
+  '2026-01-15': 1, '2026-01-26': 1, '2026-03-03': 1, '2026-03-26': 1, '2026-03-31': 1, '2026-04-03': 1, '2026-04-14': 1, '2026-05-01': 1,
+  '2026-05-28': 1, '2026-06-26': 1, '2026-09-14': 1, '2026-10-02': 1, '2026-10-20': 1, '2026-11-10': 1, '2026-11-24': 1, '2026-12-25': 1
+};
+function tgTradingDay_(ymd, dow) { return dow >= 1 && dow <= 5 && !TG_HOLIDAYS[ymd]; }
 function tgPostReports() {
   var pp = PropertiesService.getScriptProperties(); if (!pp.getProperty('TG_TOKEN') || !pp.getProperty('TG_CHAT')) return 0; // not configured yet - stay quiet
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
-  var ist0 = new Date(Date.now() + 19800000), dow0 = ist0.getUTCDay(), min0 = ist0.getUTCHours() * 60 + ist0.getUTCMinutes(), tradingDay = dow0 >= 1 && dow0 <= 5;
+  var ist0 = new Date(Date.now() + 19800000), dow0 = ist0.getUTCDay(), min0 = ist0.getUTCHours() * 60 + ist0.getUTCMinutes(), tradingDay = tgTradingDay_(today, dow0);
   var mq = {}; try { mq = JSON.parse(s.p.getProperty('TG_MQ') || '{}'); } catch (e) { } if (mq.d !== today) mq = { d: today, t: 0 };
   var morningDone = false;
   TG_IDS.forEach(function (id) {
@@ -49,7 +55,7 @@ function tgEsc_(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').re
 function tgNum_(v, d) { return Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
 function tgLive_(s) {
   var ist = new Date(Date.now() + 19800000), dow = ist.getUTCDay(), m = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-  var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16), wk = dow >= 1 && dow <= 5;
+  var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16), wk = tgTradingDay_(today, dow); // false on weekends AND NSE holidays
   var trading = wk && m >= 555 && m <= 930; // 09:15-15:30 IST
   /* trading hours: live news + live stock signals every 5 minutes. Outside trading hours: live news every 30 minutes (06:00-23:00 IST, every day), quiet overnight. */
   if (trading) { tgNews_(s); if (m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm); }
