@@ -112,6 +112,7 @@ var JCE = (function () {
     var sc = scoreDay(x, m); out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
     var abs = Math.abs(sc.S), dir = sc.S > 0 ? 1 : -1, atrPct = a / x.c * 100, why = out.reasons;
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
+    out.need = need;
     if (abs < need) why.push('confluence ' + abs.toFixed(1) + ' < ' + need.toFixed(1) + ' needed');
     if (isNum(x.adx) && x.adx < CFG.minAdx && abs < CFG.gradeAA) why.push('ADX ' + x.adx.toFixed(0) + ' — chopping');
     if (atrPct < CFG.minAtrPct) why.push('range too small (ATR ' + atrPct.toFixed(1) + '%)'); if (atrPct > CFG.maxAtrPct) why.push('too volatile (ATR ' + atrPct.toFixed(1) + '%)');
@@ -239,14 +240,27 @@ var JCE = (function () {
     return out;
   }
 
+  /* ---------- one compact row per stock for client dashboards (every scanned stock, trade or not) ---------- */
+  function boardRow(plan) {
+    var x = plan.ctx, S = plan.score || 0, abs = Math.abs(S), dir = S >= 0 ? 1 : -1, sd = plan.sides[0] || null, r2 = function (v) { return isNum(v) ? Math.round(v * 100) / 100 : null; };
+    var conv = Math.max(0, Math.min(100, Math.round(abs / CFG.gradeAA * 100))); if (!sd) conv = Math.min(conv, 49);
+    var why = plan.pts.filter(function (p) { return Math.sign(p.v) === dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 5).map(function (p) { return p.label + ': ' + p.txt; });
+    var pv = x.piv || {}, row = { c: r2(x.c), pc: r2(x.pc), S: Math.round(S * 10) / 10, need: Math.round((plan.need || CFG.minScore) * 10) / 10, b: sd ? sd.side : 'WAIT', lean: dir > 0 ? 'BUY' : 'SELL', g: plan.grade || '', conv: conv,
+      atr: r2(x.atr), rsi: r2(x.rsi), adx: r2(x.adx), e20: r2(x.e20), e50: r2(x.e50), e200: r2(x.e200), ph: r2(x.h), pl: r2(x.l), hi20: r2(x.hi20), lo20: r2(x.lo20), rv: r2(x.rv),
+      pv: { R2: r2(pv.R2), R1: r2(pv.R1), P: r2(pv.P), S1: r2(pv.S1), S2: r2(pv.S2) }, why: why };
+    if (sd) row.p = { e: r2(sd.entry), sl: r2(sd.sl), t1: r2(sd.t1), t2: r2(sd.t2), rr: r2(sd.rr1), t1w: sd.t1Why, t2w: sd.t2Why }; else row.no = plan.reasons[0] || 'no edge';
+    return row;
+  }
+
   /* ---------- the call book for one morning ---------- */
   function buildBook(inputs) {
     // inputs: { dateIso, stocks: [{sym, ex, daily:[...]}], nifty:[...], vix:[...], maxDay, maxInv }
-    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [];
+    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {};
     inputs.stocks.forEach(function (s) {
       var dd = (s.daily || []).filter(function (b) { return istDate(b.t) < today; }).map(function (b) { return Object.assign({ date: istDate(b.t) }, b); });
       if (dd.length < 80) { skipped.push({ sym: s.sym, why: 'only ' + dd.length + ' sessions of history' }); return; }
       var k = dd.length - 1, plan = dayPlanFor(dd, k, mkt);
+      if (isNum(plan.atr)) { try { board[s.sym] = boardRow(plan); } catch (e) { } }
       if (plan.sides.length) {
         var sd = plan.sides[0], m = plan.mkt;
         day.push({ type: 'DAY', sym: s.sym, ex: s.ex || 'NS', date: today, side: sd.side, entry: sd.entry, sl: sd.sl, t1: sd.t1, t2: sd.t2, rr1: sd.rr1, rr2: sd.rr2, t1Why: sd.t1Why, t2Why: sd.t2Why, risk: sd.risk, atr: plan.atr, score: Math.abs(plan.score), grade: plan.grade,
@@ -257,7 +271,7 @@ var JCE = (function () {
     });
     day.sort(function (a, b) { return b.score - a.score; }); inv.sort(function (a, b) { return b.score - a.score; });
     var keys = Object.keys(mkt).filter(function (d) { return d < today; }).sort(), m0 = keys.length ? mkt[keys[keys.length - 1]] : null;
-    return { day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
+    return { board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
   }
 
   return { CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };

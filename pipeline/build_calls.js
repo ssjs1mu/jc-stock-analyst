@@ -11,7 +11,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const JCE = require(path.join(ROOT, 'calls_engine.js'));
 const args = process.argv.slice(2), has = (f) => args.includes(f), val = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
-const FORCE = has('--force'), DRY = has('--dry');
+const FORCE = has('--force'), DRY = has('--dry'), BOARD_ONLY = has('--board-only');
 const istNow = () => new Date(Date.now() + 19800000);
 const today = val('--date') || istNow().toISOString().slice(0, 10);
 const dow = new Date(today + 'T00:00:00Z').getUTCDay();
@@ -60,11 +60,21 @@ async function viaBackend(syms) { // returns {sym: bars}
 }
 function addSessions(iso, n) { const d = new Date(iso + 'T00:00:00Z'); let c = 0; while (c < n) { d.setUTCDate(d.getUTCDate() + 1); const w = d.getUTCDay(); if (w !== 0 && w !== 6) c++; } return d.toISOString().slice(0, 10); }
 
+
+// Evidence for "will the opening move continue or reverse": Nifty gap behaviour over the bars we hold (descriptive, not a promise).
+function moodStats(nb) {
+  const b = (nb || []).filter((x) => x && x.o > 0 && x.c > 0); if (b.length < 120) return null;
+  const k = { up: [], dn: [], flat: [] };
+  for (let i = 1; i < b.length; i++) { const g = (b[i].o / b[i - 1].c - 1) * 100, intra = (b[i].c / b[i].o - 1) * 100; (g > 0.3 ? k.up : g < -0.3 ? k.dn : k.flat).push({ g, intra, cl: (b[i].c / b[i - 1].c - 1) * 100 }); }
+  const sum = (a, dirn) => ({ n: a.length, cont: a.length ? Math.round(100 * a.filter((x) => (dirn > 0 ? x.intra > 0 : dirn < 0 ? x.intra < 0 : Math.abs(x.intra) < 0.3)).length / a.length) : null, avgIntra: a.length ? +(a.reduce((m, x) => m + x.intra, 0) / a.length).toFixed(2) : null, closeUp: a.length ? Math.round(100 * a.filter((x) => x.cl > 0).length / a.length) : null });
+  return { sessions: b.length, gapUp: sum(k.up, 1), gapDown: sum(k.dn, -1), flat: sum(k.flat, 0), note: 'cont = % of sessions where the day kept moving in the gap direction after the open' };
+}
+
 (async () => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   if (dow === 0 || dow === 6) { console.log('Weekend — no call book.'); return; }
   let prev = null; try { prev = JSON.parse(fs.readFileSync(LATEST, 'utf8')); } catch (e) { /* none */ }
-  if (prev && prev.date === today && !FORCE) { console.log('Call book for ' + today + ' already built (' + prev.dayCalls + ' day, ' + prev.invCalls + ' investment). Nothing to do.'); return; }
+  if (prev && prev.date === today && !FORCE && !BOARD_ONLY) { console.log('Call book for ' + today + ' already built (' + prev.dayCalls + ' day, ' + prev.invCalls + ' investment). Nothing to do.'); return; }
 
   const uni = universe(), yf = uni.map(yfOf); console.log('Universe: ' + uni.length + ' symbols, date ' + today);
   const bars = {}, parts = []; for (let i = 0; i < yf.length; i += 25) parts.push(yf.slice(i, i + 25));
@@ -94,6 +104,11 @@ function addSessions(iso, n) { const d = new Date(iso + 'T00:00:00Z'); let c = 0
   const day = { generatedAt: now, source: 'github', scanned: stocks.length, missing: missing.length, dayCalls: book.day.length, invCalls: book.inv.length, noTrade: book.skipped.length, ctx: book.ctx };
   const doc = Object.assign({ date: today }, day, { calls: recs });
   console.log('Built: ' + day.dayCalls + ' day calls, ' + day.invCalls + ' investment calls, ' + day.noTrade + ' stocks with no edge. Regime: ' + (day.ctx ? day.ctx.regime : 'n/a'));
+  try { // per-stock board for client dashboards (generic market data — no client names or watchlists)
+    fs.writeFileSync(path.join(OUT_DIR, 'board.json'), JSON.stringify({ date: today, generatedAt: now, ctx: book.ctx, mood: moodStats(idx['^NSEI']), n: Object.keys(book.board || {}).length, rows: book.board || {} }));
+    console.log('Wrote data/calls/board.json (' + Object.keys(book.board || {}).length + ' stocks)');
+  } catch (e) { console.log('board.json not written: ' + e.message); }
+  if (BOARD_ONLY) { console.log('Board only — call book untouched.'); return; }
   if (DRY) { console.log('Dry run — not writing.'); console.log(recs.slice(0, 3).map((c) => c.sym + ' ' + c.side + ' ' + c.entry).join(' | ')); return; }
   fs.writeFileSync(LATEST, JSON.stringify(doc)); fs.writeFileSync(path.join(OUT_DIR, today + '.json'), JSON.stringify(doc));
   console.log('Wrote data/calls/latest.json');
