@@ -50,6 +50,20 @@ def main():
     else:
         print('::error::no constituents fetched'); sys.exit(1)
 
+def equity_list():
+    """All NSE EQ-series symbols -> data/nse_equity.json (candidates for the radar's conservative screen). Non-fatal."""
+    for u in ('https://archives.nseindia.com/content/equities/EQUITY_L.csv', 'https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv'):
+        try:
+            st, _, txt = get(u)
+            rows = list(csv.DictReader(io.StringIO(txt.lstrip('\ufeff'))))
+            syms = [(r.get('SYMBOL') or '').strip() for r in rows if (r.get(' SERIES') or r.get('SERIES') or '').strip() == 'EQ' and (r.get('SYMBOL') or '').strip()]
+            if len(syms) > 1000:
+                json.dump({'updated': datetime.datetime.utcnow().isoformat(timespec='seconds') + 'Z', 'source': u, 'syms': syms}, open('data/nse_equity.json', 'w'), separators=(',', ':'))
+                print(f'::notice::NSE EQ list {len(syms)} symbols'); return
+        except Exception as e:
+            print('::warning::EQUITY_L: ' + str(e)[:160])
+
+
 def extra():
     """Nifty Microcap 250 -> data/universe_extra.json (stocks outside the NSE-500 the radar also watches). Failure is non-fatal."""
     for f in ('ind_niftymicrocap250_list.csv',):
@@ -70,3 +84,4 @@ def extra():
 if __name__ == '__main__':
     main()
     extra()
+    equity_list()

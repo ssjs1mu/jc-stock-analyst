@@ -16,20 +16,43 @@
   const LS = 'jc_radar_v1', LSC = 'jc_radar_custom';
   const Core = window.JCRadarCore; /* detection rules live in radarcore.js (shared with the back-test) */
   const CFG = { minPx: 50, minAvgVol: 2e5, surgeChg: 2.5, surgePace: 3, burstPx: 1.5, burstVol: 0.1, burstMs: 8 * 60000, watchPace: 2.5, every: 60000, t1: 1.5, t2: 3, t3: 5, sl: 1.5 };
-  const R = { alerts: [], seen: {}, hist: {}, q: {}, busy: false, last: 0, n: 0, err: '', src: '', mute: false, timer: null, tries: 0, extra: [], custom: [], res: {}, resOk: false };
+  const R = { alerts: [], seen: {}, hist: {}, q: {}, busy: false, last: 0, n: 0, err: '', src: '', mute: false, timer: null, tries: 0, extra: [], micro: [], pool: null, poolAt: 0, poolMsg: '', mine: [], custom: [], res: {}, resOk: false };
   try { R.custom = JSON.parse(localStorage.getItem(LSC) || '[]').filter((x) => /^[A-Z0-9&-]{1,20}$/.test(x)); } catch (e) { }
 
   function load() { try { const c = JSON.parse(localStorage.getItem(LS) || 'null'); R.mute = !!(c && c.mute); if (c && c.d === istToday()) { R.alerts = c.alerts || []; R.seen = c.seen || {}; } else { R.alerts = []; R.seen = {}; } } catch (e) { } }
   function save() { try { localStorage.setItem(LS, JSON.stringify({ d: istToday(), alerts: R.alerts.slice(-80), seen: R.seen, mute: R.mute })); } catch (e) { } }
   /* universe = Nifty 100 + MidSmallCap 400 (bigfish.js) + radar_extra.json (always-scan list) + universe_extra.json (Nifty Microcap 250, filled by the weekly constituents job) + the stocks you add here */
-  function uni() { const seen = new Set(); return (window.jcUni ? window.jcUni() : []).concat(R.extra, R.custom).filter((x) => x && !seen.has(x) && seen.add(x)); }
+  const LSP = 'jc_radar_pool';
+  /* your own watchlists (all lists, incl. client lists) live only in this browser's storage; they are read here at run time and never leave the browser or go into the repo */
+  function mineSyms() { try { const j = JSON.parse(localStorage.getItem('jc_watchlists_v1') || 'null'), out = []; ((j && j.lists) || []).forEach((l) => (l.syms || []).forEach((x) => { x = String(x || '').toUpperCase().replace(/\.(NS|BO)$/, ''); if (/^[A-Z0-9&-]{1,20}$/.test(x)) out.push(x); })); return out.slice(0, 600); } catch (e) { return []; } }
+  /* universe = the 500 core list (bigfish.js, untouched) + radar_extra.json (hand list) + the screened pool (liquid, profitable, above 200-day, near highs) + your watchlists + the stocks you add here. Until a screen has run, the Microcap 250 (turnover gate only) stands in for the pool. */
+  function uni() { const seen = new Set(); R.mine = mineSyms(); return (window.jcUni ? window.jcUni() : []).concat(R.extra, R.pool ? R.pool.syms : R.micro, R.mine, R.custom).filter((x) => x && !seen.has(x) && seen.add(x)); }
   async function loadExtras() {
     try { const j = await (await fetch('data/radar_extra.json?h=' + Math.floor(Date.now() / 3600000))).json(); R.extra = R.extra.concat(j.always || []); } catch (e) { }
-    try { const j = await (await fetch('data/universe_extra.json?h=' + Math.floor(Date.now() / 3600000))).json(); R.extra = R.extra.concat(j.micro250 || []); } catch (e) { }
+    try { const j = await (await fetch('data/universe_extra.json?h=' + Math.floor(Date.now() / 3600000))).json(); R.micro = j.micro250 || []; } catch (e) { }
+    try { const j = await (await fetch('data/nse_equity.json?h=' + Math.floor(Date.now() / 3600000))).json(); R.tail = j.syms || []; } catch (e) { R.tail = []; }
+    try { const j = await (await fetch('data/radar_pool.json?h=' + Math.floor(Date.now() / 3600000))).json(); if (j && j.syms && j.syms.length) R.pool = { at: Date.parse(j.updated) || 0, syms: j.syms, src: 'repo' }; } catch (e) { }
+    try { const l = JSON.parse(localStorage.getItem(LSP) || 'null'); if (l && l.syms && l.syms.length && (!R.pool || l.at > R.pool.at)) R.pool = { at: l.at, syms: l.syms, src: 'this browser' }; } catch (e) { }
+    if (!R.pool || Date.now() - R.pool.at > 7 * 86400000) setTimeout(() => refreshPool(false), 25000);
     try { const j = await (await fetch('data/results.json?h=' + Math.floor(Date.now() / 3600000))).json(); const m = {}; const add = (sy, d) => { (m[sy] = m[sy] || []).push(d); }; Object.keys(j.hist || {}).forEach((k) => (j.hist[k] || []).forEach((d) => add(k, d))); Object.keys(j.upcoming || {}).forEach((k) => (j.upcoming[k] || []).forEach((u) => add(k, u.date))); R.res = m; R.resOk = true; } catch (e) { }
   }
   /* results catalyst: declared since the last session, due today or due tomorrow (calendar days) */
   function catOf(sym) { const ds = R.res[sym]; if (!ds) return null; const t0 = Date.parse(istToday() + 'T00:00:00Z'); let best = null; ds.forEach((d) => { const k = Math.round((Date.parse(d + 'T00:00:00Z') - t0) / 86400000); if (k >= -3 && k <= 1 && (best === null || Math.abs(k) < Math.abs(best.k))) best = { k, d }; }); if (!best) return null; return best.k < 0 ? 'results ' + best.d.slice(8) + '/' + best.d.slice(5, 7) + ' (declared)' : best.k === 0 ? 'results TODAY' : 'results tomorrow'; }
+  /* screen the small-cap candidates (Microcap 250 + the wider NSE list when available) — runs in this browser, about once a week; every rule must pass (radarcore.js eligible) */
+  async function refreshPool(manual) {
+    if (R.screening) return; const core = new Set(window.jcUni ? window.jcUni() : []); const seen = new Set(), cand = R.micro.concat(R.tail || []).filter((x) => x && !core.has(x) && !seen.has(x) && seen.add(x)); if (!cand.length) { R.poolMsg = 'no candidate list'; paint(); return; }
+    R.screening = true; R.poolMsg = 'screening ' + cand.length + ' stocks…'; paint();
+    try {
+      const st = {}; for (let i = 0; i < cand.length; i += 100) { const j = await be('action=qstat&symbols=' + encodeURIComponent(cand.slice(i, i + 100).map((x) => x + '.NS').join(',')), 60000); if (j && j.q) Object.keys(j.q).forEach((k) => { st[k.replace(/\.NS$/, '')] = j.q[k]; }); R.poolMsg = 'screening… ' + Math.min(i + 100, cand.length) + '/' + cand.length; }
+      if (Object.keys(st).length < cand.length * 0.2) throw new Error('too few quotes (' + Object.keys(st).length + ')');
+      const s1 = Object.keys(st).filter((k) => Core.eligible(st[k], null).ok), fu = {};
+      for (let i = 0; i < s1.length; i += 30) { try { const j = await be('action=qfund&symbols=' + encodeURIComponent(s1.slice(i, i + 30).map((x) => x + '.NS').join(',')), 60000); if (j && j.f) Object.keys(j.f).forEach((k) => { fu[k.replace(/\.NS$/, '')] = j.f[k]; }); } catch (e) { } }
+      const keep = s1.filter((k) => Core.eligible(st[k], fu[k] || null).ok).sort((p, q) => st[q][0] * (st[q][4] || 0) - st[p][0] * (st[p][4] || 0)).slice(0, 350); if (keep.length < 5) throw new Error('screen kept only ' + keep.length + ' — not applied');
+      R.pool = { at: Date.now(), syms: keep, src: 'this browser' }; try { localStorage.setItem(LSP, JSON.stringify({ at: R.pool.at, syms: keep })); } catch (e) { }
+      R.poolMsg = 'screened ' + cand.length + ' → ' + keep.length + ' kept';
+    } catch (e) { R.poolMsg = 'screen failed: ' + ((e && e.message) || e); }
+    R.screening = false; paint();
+  }
   async function be(qs, ms) { const u = getBackend(); if (!u) throw new Error('Data backend not connected'); return JSON.parse(await fetchWithTimeout(beUrl(u, qs), ms || 40000)); }
 
   /* ---------- data: one batched quote call per sweep (fallback: daily bars with today's partial candle) ---------- */
@@ -86,7 +109,7 @@
     const el = $('clRadar'); if (!el) return; if (document.activeElement && document.activeElement.id === 'rdAdd') return; const m = istMin(), live = istDow() >= 1 && istDow() <= 5 && m >= 555 && m <= 935;
     const al = R.alerts.slice().reverse(), perm = window.Notification ? Notification.permission : 'unsupported';
     el.innerHTML = `<section class="rd"><div class="rd-h"><div><h3>⚡ Early-Mover Radar ${al.filter((a) => Date.now() - a.t < 120000).length ? '<span class="rd-nw big">' + al.filter((a) => Date.now() - a.t < 120000).length + ' NEW</span>' : ''} <small>watches ~${uni().length} stocks every minute · pops up the moment a big move starts</small></h3><div class="rd-st">${live ? '<span class="g">● scanning</span>' : '<span>○ market closed — resumes 9:15 AM</span>'}${R.last ? ' · last sweep ' + hhmm(R.last) + ' · ' + R.n + ' quotes · ' + E(R.src) : ''}${R.busy ? ' · working…' : ''}</div></div><div class="rd-a"><button class="cl-btn" onclick="jcRadar.sweep(true)">⟳ Scan now</button><button class="cl-btn" onclick="jcRadar.mute()">${R.mute ? '🔇 Sound off' : '🔔 Sound on'}</button>${perm === 'default' ? '<button class="cl-btn" onclick="jcRadar.notify()">Enable desktop alerts</button>' : perm === 'granted' ? '<span class="rd-ok">desktop alerts on</span>' : ''}<button class="cl-btn" onclick="jcRadar.test()">Test popup</button></div></div>`
-      + `<div class="rd-add"><b>Also watch:</b> <input id="rdAdd" maxlength="20" placeholder="NSE symbol" onkeydown="if(event.key==='Enter')jcRadar.add(this.value)"><button class="cl-btn" onclick="jcRadar.add(document.getElementById('rdAdd').value)">＋ Add</button>${R.custom.map((x) => '<span class="rd-ch">' + E(x) + ' <a href="javascript:void(0)" onclick="jcRadar.drop(\'' + E(x) + '\')">×</a></span>').join('')}${R.extra.length ? '<small>+ ' + R.extra.length + ' extra small-caps from the radar list</small>' : '<small>microcap list not loaded yet — add any stock by hand</small>'}</div>`
+      + `<div class="rd-add"><b>Also watch:</b> <input id="rdAdd" maxlength="20" placeholder="NSE symbol" onkeydown="if(event.key==='Enter')jcRadar.add(this.value)"><button class="cl-btn" onclick="jcRadar.add(document.getElementById('rdAdd').value)">＋ Add</button>${R.custom.map((x) => '<span class="rd-ch">' + E(x) + ' <a href="javascript:void(0)" onclick="jcRadar.drop(\'' + E(x) + '\')">×</a></span>').join('')}<small>core ${(window.jcUni ? window.jcUni().length : 0)} · hand list ${R.extra.length} · screened small-caps ${R.pool ? R.pool.syms.length + ' (' + R.pool.src + ', ' + new Date(R.pool.at).toISOString().slice(0, 10) + ')' : 'pending — Microcap 250 until screened'} · your watchlists ${R.mine.length}</small> <a href="javascript:void(0)" onclick="jcRadar.screen()">${R.screening ? 'screening…' : 're-screen'}</a>${R.poolMsg ? ' <small>' + E(R.poolMsg) + '</small>' : ''}</div>`
       + (() => { const sy = uni().map((x) => [x, catOf(x)]).filter((x) => x[1]).sort((p, q) => (p[1] < q[1] ? 1 : -1)).slice(0, 14); return sy.length ? `<div class="rd-add"><b>Results in focus:</b> ${sy.map((x) => '<span class="rd-ch">' + E(x[0]) + ' <b>' + E(x[1]) + '</b></span>').join('')}<small>a result since the last session often means a gap and heavy volume at 9:15</small></div>` : ''; })()
       + (R.err ? `<div class="cl-err">${E(R.err)}</div>` : '')
       + `<div class="rd-k"><b>BREAKOUT</b> up ≥ 2.5 % on ≥ 3× normal volume pace, near the day high · <b>VOLUME BURST</b> +1.5 % within 8 minutes on a surge of volume · <b>OPENING RUSH</b> up ≥ 2 % on ≥ 6× volume pace before 10:15 · <b>HEADS-UP</b> volume ≥ 5× normal for a flat price (within ±1.3 %) between 9:40 and 2:00 — heavy trading with no move yet; levels only, no targets.</div>`
@@ -98,6 +121,7 @@
   window.jcRadar = {
     sweep: (f) => sweep(!!f), paint, state: R, status: statusOf,
     add: (x) => { x = String(x || '').trim().toUpperCase().replace(/\.NS$/, ''); if (!/^[A-Z0-9&-]{1,20}$/.test(x)) return; if (R.custom.indexOf(x) < 0) R.custom.push(x); try { localStorage.setItem(LSC, JSON.stringify(R.custom)); } catch (e) { } paint(); sweep(true); },
+    screen: () => refreshPool(true),
     drop: (x) => { R.custom = R.custom.filter((y) => y !== x); try { localStorage.setItem(LSC, JSON.stringify(R.custom)); } catch (e) { } paint(); },
     mute: () => { R.mute = !R.mute; save(); paint(); },
     notify: async () => { try { await Notification.requestPermission(); } catch (e) { } paint(); },
