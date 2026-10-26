@@ -11,7 +11,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const JCE = require(path.join(ROOT, 'calls_engine.js'));
 const args = process.argv.slice(2), has = (f) => args.includes(f), val = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
-const FORCE = has('--force'), DRY = has('--dry'), BOARD_ONLY = has('--board-only');
+const FORCE = has('--force'), DRY = has('--dry');
+let BOARD_ONLY = has('--board-only');
 const istNow = () => new Date(Date.now() + 19800000);
 const today = val('--date') || istNow().toISOString().slice(0, 10);
 const dow = new Date(today + 'T00:00:00Z').getUTCDay();
@@ -74,6 +75,10 @@ function moodStats(nb) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   if (dow === 0 || dow === 6) { console.log('Weekend — no call book.'); return; }
   let prev = null; try { prev = JSON.parse(fs.readFileSync(LATEST, 'utf8')); } catch (e) { /* none */ }
+  if (prev && prev.date === today && !FORCE && !BOARD_ONLY) { // call book is done; still make sure the client board exists for today
+    let bd = null; try { bd = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'board.json'), 'utf8')); } catch (e) { /* none */ }
+    if (!bd || bd.date !== today) { BOARD_ONLY = true; console.log('Call book is built; client board missing for ' + today + ' — building the board only.'); }
+  }
   if (prev && prev.date === today && !FORCE && !BOARD_ONLY) { console.log('Call book for ' + today + ' already built (' + prev.dayCalls + ' day, ' + prev.invCalls + ' investment). Nothing to do.'); return; }
 
   const uni = universe(), yf = uni.map(yfOf); console.log('Universe: ' + uni.length + ' symbols, date ' + today);
