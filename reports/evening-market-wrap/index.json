@@ -2,6 +2,14 @@
  "schedule_id": "evening-market-wrap",
  "runs": [
   {
+   "generated_at": "2026-10-27T00:28:17+05:30",
+   "date": "2026-10-27",
+   "status": "holiday",
+   "caption": "",
+   "note": "No NSE session today (last bar 2026-10-23).",
+   "files": []
+  },
+  {
    "generated_at": "2026-10-26T17:30:19+05:30",
    "date": "2026-10-26",
    "status": "ok",
@@ -100,5 +108,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-26T17:30:19+05:30"
+ "updated_at": "2026-10-27T00:28:17+05:30"
 }
