@@ -29,6 +29,7 @@ function doGet(e) {
     else if (p.action === 'in10y') out = in10y_();
     else if (p.action === 'pcr') out = pcrNifty_();
     else if (p.action === 'wl_load') out = wlLoad_();
+    else if (p.action === 'cl_get') out = clGet_(p.k);
     else if (p.action === 'calls_load') out = callsLoad_();
     else if (p.action === 'calls_build') out = callsBuild_(p.force === '1');
     else if (p.action === 'calls_reconcile') out = callsReconcile_();

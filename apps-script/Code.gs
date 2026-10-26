@@ -29,6 +29,7 @@ function doGet(e) {
     else if (p.action === 'in10y') out = in10y_();
     else if (p.action === 'pcr') out = pcrNifty_();
     else if (p.action === 'wl_load') out = wlLoad_();
+    else if (p.action === 'cl_get') out = clGet_(p.k);
     else if (p.action === 'calls_load') out = callsLoad_();
     else if (p.action === 'calls_build') out = callsBuild_(p.force === '1');
     else if (p.action === 'calls_reconcile') out = callsReconcile_();
@@ -477,6 +478,7 @@ var JCE = (function () {
     var sc = scoreDay(x, m); out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
     var abs = Math.abs(sc.S), dir = sc.S > 0 ? 1 : -1, atrPct = a / x.c * 100, why = out.reasons;
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
+    out.need = need;
     if (abs < need) why.push('confluence ' + abs.toFixed(1) + ' < ' + need.toFixed(1) + ' needed');
     if (isNum(x.adx) && x.adx < CFG.minAdx && abs < CFG.gradeAA) why.push('ADX ' + x.adx.toFixed(0) + ' — chopping');
     if (atrPct < CFG.minAtrPct) why.push('range too small (ATR ' + atrPct.toFixed(1) + '%)'); if (atrPct > CFG.maxAtrPct) why.push('too volatile (ATR ' + atrPct.toFixed(1) + '%)');
@@ -604,14 +606,27 @@ var JCE = (function () {
     return out;
   }
 
+  /* ---------- one compact row per stock for client dashboards (every scanned stock, trade or not) ---------- */
+  function boardRow(plan) {
+    var x = plan.ctx, S = plan.score || 0, abs = Math.abs(S), dir = S >= 0 ? 1 : -1, sd = plan.sides[0] || null, r2 = function (v) { return isNum(v) ? Math.round(v * 100) / 100 : null; };
+    var conv = Math.max(0, Math.min(100, Math.round(abs / CFG.gradeAA * 100))); if (!sd) conv = Math.min(conv, 49);
+    var why = plan.pts.filter(function (p) { return Math.sign(p.v) === dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 5).map(function (p) { return p.label + ': ' + p.txt; });
+    var pv = x.piv || {}, row = { c: r2(x.c), pc: r2(x.pc), S: Math.round(S * 10) / 10, need: Math.round((plan.need || CFG.minScore) * 10) / 10, b: sd ? sd.side : 'WAIT', lean: dir > 0 ? 'BUY' : 'SELL', g: plan.grade || '', conv: conv,
+      atr: r2(x.atr), rsi: r2(x.rsi), adx: r2(x.adx), e20: r2(x.e20), e50: r2(x.e50), e200: r2(x.e200), ph: r2(x.h), pl: r2(x.l), hi20: r2(x.hi20), lo20: r2(x.lo20), rv: r2(x.rv),
+      pv: { R2: r2(pv.R2), R1: r2(pv.R1), P: r2(pv.P), S1: r2(pv.S1), S2: r2(pv.S2) }, why: why };
+    if (sd) row.p = { e: r2(sd.entry), sl: r2(sd.sl), t1: r2(sd.t1), t2: r2(sd.t2), rr: r2(sd.rr1), t1w: sd.t1Why, t2w: sd.t2Why }; else row.no = plan.reasons[0] || 'no edge';
+    return row;
+  }
+
   /* ---------- the call book for one morning ---------- */
   function buildBook(inputs) {
     // inputs: { dateIso, stocks: [{sym, ex, daily:[...]}], nifty:[...], vix:[...], maxDay, maxInv }
-    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [];
+    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {};
     inputs.stocks.forEach(function (s) {
       var dd = (s.daily || []).filter(function (b) { return istDate(b.t) < today; }).map(function (b) { return Object.assign({ date: istDate(b.t) }, b); });
       if (dd.length < 80) { skipped.push({ sym: s.sym, why: 'only ' + dd.length + ' sessions of history' }); return; }
       var k = dd.length - 1, plan = dayPlanFor(dd, k, mkt);
+      if (isNum(plan.atr)) { try { board[s.sym] = boardRow(plan); } catch (e) { } }
       if (plan.sides.length) {
         var sd = plan.sides[0], m = plan.mkt;
         day.push({ type: 'DAY', sym: s.sym, ex: s.ex || 'NS', date: today, side: sd.side, entry: sd.entry, sl: sd.sl, t1: sd.t1, t2: sd.t2, rr1: sd.rr1, rr2: sd.rr2, t1Why: sd.t1Why, t2Why: sd.t2Why, risk: sd.risk, atr: plan.atr, score: Math.abs(plan.score), grade: plan.grade,
@@ -622,7 +637,7 @@ var JCE = (function () {
     });
     day.sort(function (a, b) { return b.score - a.score; }); inv.sort(function (a, b) { return b.score - a.score; });
     var keys = Object.keys(mkt).filter(function (d) { return d < today; }).sort(), m0 = keys.length ? mkt[keys[keys.length - 1]] : null;
-    return { day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
+    return { board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
   }
 
   return { CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };
@@ -794,6 +809,7 @@ function tgLive_(s) {
   var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16);
   if (m >= 480 && m <= 1260) tgNews_(s);
   if (dow >= 1 && dow <= 5 && m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm);
+  if (dow >= 1 && dow <= 5 && m >= 500 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
   if (dow >= 1 && dow <= 5) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
 }
 /* ---------- pre-market accumulation list (08:45-09:30) and 10 AM live confirmation (10:00-11:00) from data/accum.json ---------- */
@@ -884,4 +900,44 @@ function tgSignals_(s, m, today, hhmm) {
   s.p.setProperty('TG_SIG', JSON.stringify(seen));
   if (!lines.length) return;
   tgSend_(s, '📡 <b>Live stock signals</b> · ' + hhmm + ' IST\n\n' + lines.join('\n') + '\n\n<i>Rule-based scan of ~500 NSE stocks, delayed quotes. Not advice — levels are mechanical; no outcome is guaranteed.</i>');
+}
+
+
+/* ---------- client dashboards: private per-client link + pre-market Telegram message ----------
+   Clients live ONLY in Script properties (never in the public repo):
+     CL_CLIENTS  = JSON list, e.g. [{"name":"Rahul","chat":"123456789","list":"Rahul"}]   (list = the watchlist name in the terminal)
+     CL_MAP      = token -> {name, chat, list}   (made by clSetup(); the token is the client's private link key)
+   The client page asks cl_get with its token and gets back only that client's first name and symbols. */
+var CL_PAGE = 'https://ssjs1mu.github.io/jc-stock-analyst/c/';
+function clSetup() { // run from the editor after editing CL_CLIENTS; logs each client's private link
+  var p = PropertiesService.getScriptProperties(), list = JSON.parse(p.getProperty('CL_CLIENTS') || '[]'), map = {}, old = {};
+  try { old = JSON.parse(p.getProperty('CL_MAP') || '{}'); } catch (e) { }
+  var byChat = {}; Object.keys(old).forEach(function (t) { byChat[String(old[t].chat) + '|' + String(old[t].list).toLowerCase()] = t; });
+  list.forEach(function (c) {
+    var key = String(c.chat) + '|' + String(c.list || c.name).toLowerCase(), t = byChat[key];
+    if (!t) { t = Utilities.getUuid().replace(/-/g, '').slice(0, 24); }
+    map[t] = { name: String(c.name || '').slice(0, 30), chat: String(c.chat || ''), list: String(c.list || c.name || '') };
+    Logger.log(c.name + ' -> ' + CL_PAGE + '#' + t);
+  });
+  p.setProperty('CL_MAP', JSON.stringify(map)); Logger.log(Object.keys(map).length + ' client link(s) ready.');
+}
+function clGet_(k) {
+  k = String(k || ''); if (!/^[a-f0-9]{24}$/.test(k)) return JSON.stringify({ error: 'invalid link' });
+  var map = {}; try { map = JSON.parse(PropertiesService.getScriptProperties().getProperty('CL_MAP') || '{}'); } catch (e) { }
+  var c = map[k]; if (!c) return JSON.stringify({ error: 'link not recognised' });
+  var f = wlFile_(), syms = [];
+  if (f) { try { var d = JSON.parse(f.getBlob().getDataAsString()), L = (d.lists || []).filter(function (l) { return String(l.name).toLowerCase() === String(c.list).toLowerCase(); })[0]; if (L) syms = (L.syms || []).filter(function (x) { return !/\.BO$/.test(x); }).slice(0, 40); } catch (e) { } }
+  return JSON.stringify({ name: c.name, symbols: syms });
+}
+function tgClients_(s, today) { // once per day per client, 08:20-10:00 IST
+  var map = {}, sent = {}; try { map = JSON.parse(s.p.getProperty('CL_MAP') || '{}'); sent = JSON.parse(s.p.getProperty('TG_CL') || '{}'); } catch (e) { }
+  var changed = false;
+  Object.keys(map).forEach(function (t) {
+    var c = map[t]; if (!c.chat || sent[t] === today) return;
+    var url = CL_PAGE + '#' + t, txt = '\uD83D\uDE4F <b>Namaste ' + tgEsc_(c.name) + '</b>\nYour pre-market pulse is ready \u2014 world markets, today\u2019s outlook and your stocks with levels.\n<i>Educational information, not investment advice.</i>';
+    var kb = { inline_keyboard: [[{ text: '\uD83D\uDCF1 Open my dashboard', web_app: { url: url } }], [{ text: '\uD83C\uDF10 Open in browser', url: url }]] };
+    var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', reply_markup: JSON.stringify(kb) }, muteHttpExceptions: true });
+    if (r.getResponseCode() === 200) { sent[t] = today; changed = true; } else { Logger.log('client ' + c.name + ' ' + r.getContentText()); if (r.getResponseCode() === 403 || r.getResponseCode() === 400) { sent[t] = today; changed = true; } }
+  });
+  if (changed) s.p.setProperty('TG_CL', JSON.stringify(sent));
 }
