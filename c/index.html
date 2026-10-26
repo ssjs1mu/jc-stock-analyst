@@ -217,10 +217,10 @@ else if(r){if(p>r.ph*1.003&&r.lean==='BUY')alertNow(s+'bk',s,'broke above yester
 if(l[6]&&l[5]&&l[5]>l[6]*1.5)alertNow(s+'v',s,'volume surge: '+f2(l[5]/l[6],1)+'× the 5-day average')})}
 function marketOpen(){var n=ist(),d=n.getUTCDay(),m=n.getUTCHours()*60+n.getUTCMinutes();return d>0&&d<6&&m>=555&&m<=935}
 function poll(){if(!S.syms.length)return;fj(be('action=liveq&symbols='+encodeURIComponent(S.syms.map(function(s){return s+'.NS'}).join(','))),25000).then(function(j){if(!j||!j.ok)return;S.syms.forEach(function(s){if(j.q[s+'.NS'])S.live[s]=j.q[s+'.NS']});paintTiles();check()}).catch(function(){})}
-var pt=null;function startPoll(){poll();clearInterval(pt);pt=setInterval(function(){if(document.visibilityState==='visible'&&marketOpen())poll()},45000)}
+var pt=null;function startPoll(){poll();clearInterval(pt);pt=setInterval(function(){if(document.visibilityState==='visible'&&marketOpen())poll()},90000)}
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){poll();loadPulse()}});
 function altUi(){var ok=window.Notification&&Notification.permission==='granted';
-$('altBtn').innerHTML='<div class="mut" style="color:#9fb0d6">Live alerts run <b>while this page is open</b> (checked every 45 s in market hours). They fire on entry, targets, stop-loss, breakouts and volume surges. A closed phone is not alerted — keep the page open, or rely on the Telegram updates.</div>'+(window.Notification&&!ok?'<button class="btn" id="en">Enable phone notifications</button>':'')+(ok?'<div class="mut" style="color:#7dffb3">Notifications enabled ✓</div>':'');
+$('altBtn').innerHTML='<div class="mut" style="color:#9fb0d6">Live alerts run <b>while this page is open</b> (checked every 90 s in market hours). They fire on entry, targets, stop-loss, breakouts and volume surges. A closed phone is not alerted — keep the page open, or rely on the Telegram updates.</div>'+(window.Notification&&!ok?'<button class="btn" id="en">Enable phone notifications</button>':'')+(ok?'<div class="mut" style="color:#7dffb3">Notifications enabled ✓</div>':'');
 var b=$('en');if(b)b.onclick=function(){Notification.requestPermission().then(altUi)}}
 $('bell').onclick=function(){document.querySelector('.s5').scrollIntoView({behavior:'smooth'})};
 /* ---- boot ---- */

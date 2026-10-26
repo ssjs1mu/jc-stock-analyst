@@ -150,7 +150,9 @@
     await Promise.all(Array.from({ length: 6 }, run)); S.mode = be ? 'backend (per symbol)' : 'direct / proxy'; return out;
   }
 
-  function cadence(set, w) { // seconds between refreshes — tuned to stay far below Apps Script's free 20,000 URL-fetches/day (each symbol = 1 fetch)
+  const EMB = document.documentElement.classList.contains('embed'); /* client dashboard copy: refreshed 4x less often, no sector-estimate fan-out (keeps the free Apps Script quota for everyone) */
+  function cadence(set, w) { const v = cadenceRaw(set, w); return EMB ? Math.max(v * 4, 240) : v; }
+  function cadenceRaw(set, w) { // seconds between refreshes — tuned to stay far below Apps Script's free 20,000 URL-fetches/day (each symbol = 1 fetch)
     const active = w.ist.cls !== 'off';
     if (set.kind === 'in') return active ? 60 : 900;                 // 6 top tiles: the only minute-by-minute set
     if (set.kind === 'in2') return active ? 300 : 1800;              // sector indices
@@ -161,7 +163,7 @@
   /* Yahoo has no feed for some NSE sector indices: estimate their % change as the equal-weight average of the constituents' live change (marked "est.") */
   const IDXC = { 'NIFTY_CONSR_DURBL.NS': 'AMBER BATAINDIA BLUESTARCO CROMPTON DIXON HAVELLS KAJARIACER KALYANKJIL LGEINDIA PGEL THANGAMAYL TITAN VOLTAS WHIRLPOOL', 'NIFTY_HEALTHCARE.NS': 'ABBOTINDIA ALKEM APOLLOHOSP AUROPHARMA BIOCON CIPLA DIVISLAB DRREDDY FORTIS GLAND GLENMARK IPCALAB KIMS LAURUSLABS LUPIN MANKIND MAXHEALTH SUNPHARMA TORNTPHARM ZYDUSLIFE', 'NIFTY_IND_DEFENCE.NS': 'AXISCADES AEQUS APOLLO ASTRAMICRO BEML BDL BEL BHARATFORG CENTUM COCHINSHIP DATAPATTNS DYNAMATECH GRSE HAL MTARTECH MAZDOCK MIDHANI PARAS SIGMAADV SOLARINDS UNIMECH ZENTEC', 'NIFTY_IND_DIGITAL.NS': 'AFFLE BLS BHARTIARTL BHARTIHEXA BSOFT BBOX FIRSTCRY CARTRADE COFORGE CYIENT ETERNAL NYKAA FRACTAL HCLTECH HEXT ITI INDIAMART IRCTC NAUKRI INFY INTELLECT IKS KPITTECH LTTS LTM MEESHO MPHASIS NETWEB PAYTM OFSS POLICYBZR PERSISTENT PWL PINELABS RAILTEL SAGILITY STLTECH SWIGGY TBOTEK TATACOMM TCS TATAELXSI TATATECH TTML TECHM TEJASNET URBANCO IDEA WIPRO ZENSARTECH', 'NIFTY_MIDCAP_100.NS': '360ONE APLAPOLLO AUBANK ATGL ABCAPITAL APARINDS ASHOKLEY ASTRAL AUROPHARMA BANKINDIA MAHABANK BDL BHARATFORG BHEL GROWW BIOCON BLUESTARCO COCHINSHIP COFORGE COLPAL CONCOR DABUR DIXON EXIDEIND NYKAA FEDERALBNK FORTIS GVT&D GMRAIRPORT GLENMARK GODFRYPHLP GODREJPROP HAVELLS HEROMOTOCO HINDCOPPER HINDPETRO ICICIGI ICICIAMC IDFCFIRSTB INDIANB INDHOTEL IRCTC IREDA INDUSTOWER INDUSINDBK NAUKRI JSWENERGY JUBLFOOD KEI KALYANKJIL LTF LGEINDIA LICHSGFIN LAURUSLABS LENSKART LICI LODHA LUPIN MRF M&MFIN MANKIND MARICO MFSL MEESHO MOTILALOFS MPHASIS MCX NHPC NLCINDIA NMDC NATIONALUM OBEROIRLTY OIL PAYTM OFSS POLICYBZR PIIND PAGEIND PATANJALI PERSISTENT PHOENIXLTD PREMIERENE PRESTIGE RECLTD RADICO RVNL SBICARD SRF SAIL SUPREMEIND SUZLON SWIGGY TATACOMM TIINDIA UPL UNITDSPR VMM VOLTAS WAAREEENER YESBANK', 'NIFTY_OIL_AND_GAS.NS': 'ATGL AEGISLOG AEGISVOPAK BPCL CASTROLIND CHENNPETRO GAIL HINDPETRO IOC IGL MGL ONGC OIL PETRONET RELIANCE', 'NIFTY_PVT_BANK.NS': 'AXISBANK BANDHANBNK FEDERALBNK HDFCBANK ICICIBANK IDFCFIRSTB INDUSINDBK KOTAKBANK RBLBANK YESBANK' };
   async function deriveIdx(ms, w) {
-    const be = getBackend(); if (!be || S.estBusy || (S.estDue && ms < S.estDue)) return; S.estBusy = true;
+    if (EMB) return; const be = getBackend(); if (!be || S.estBusy || (S.estDue && ms < S.estDue)) return; S.estBusy = true;
     try {
       const miss = Object.keys(IDXC).filter((k) => !(S.q[k] && !S.q[k].est)); if (!miss.length) return;
       const syms = [...new Set(miss.flatMap((k) => IDXC[k].split(' ')))].map((x) => x + '.NS');
