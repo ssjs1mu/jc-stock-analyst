@@ -35,3 +35,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Scrip search from the client page (?embed=1&sym=) now loads a lean terminal: Joshi's Dashboard, radar, calls, Big Fish, manage, brief, TV probe, client tabs and other background modules are NOT loaded (index.html JC_LEAN), so the report costs only the stock's own data calls from the Apps Script quota. |
 
 | 2026-10-27 | [Claude] Scrip search order changed (terminal and client page): Quick summary first, then a 'Proceed with X-ray?' prompt, then X-ray, Intraday, Short term, Long term. |
+
+| 2026-10-27 | [Claude] Client page: instant Quick summary from today's board when a scrip is searched (heavy X-ray only after 'Proceed'); opening screen — tree logo (embedded 300px copy, 8 layers) rises from roots to crown and the screen changes when the report behind it has loaded ('jc-ready'); Alerts today coloured by importance (stop-loss red, target green, entry gold, breakout cyan, volume grey) with larger type. |

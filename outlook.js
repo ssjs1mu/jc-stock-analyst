@@ -79,6 +79,7 @@
     if (O.busy) return; O.busy = true;
     const [brief, det, news, mkt, enews, calls, board] = await Promise.all([loadRep('brief'), loadRep('det'), loadRep('news'), loadRep('mkt'), loadRep('enews'), jget('data/calls/latest.json').catch(() => null), jget('data/calls/board.json').catch(() => null)]);
     O.rep = { brief, det, news, mkt, enews }; O.calls = calls; O.board = board; O.loaded = true; O.busy = false; draw();
+    if (!window.__jcReady) { window.__jcReady = true; setTimeout(() => { try { window.dispatchEvent(new Event('jc-ready')); } catch (e) { } }, 120); }
   }
 
   /* ---------- pieces ---------- */
@@ -218,6 +219,24 @@
     m.innerHTML = `<div class="olBox"><div class="olHd"><h3>${T} — ${E(l ? l.name : '')} <small>${k.length} stock${k.length === 1 ? '' : 's'}</small></h3><button class="olClose" data-close="1">✕</button></div>${body}<div class="olSrc">Rule-based, from delayed data. Conv. = signal-agreement score, not a probability. Not investment advice.</div></div>`;
     m.className = 'on'; document.body.style.overflow = 'hidden'; pushLayer(domClosePop);
   }
+  /* client page: instant Quick summary from today's board (no heavy download), then the person chooses to proceed with the X-ray */
+  function quickPop(sym) {
+    const s = clean(sym), r = O.board && O.board.rows && O.board.rows[s], mm = moodOf(pack('morning')), md = mm ? mm.score : null;
+    let body;
+    if (!r) body = `<div class="olN"><b>${E(s)}</b> is not in today's scanned board, so there is no ready summary. The full X-ray analyses it live — it takes longer.</div>`;
+    else {
+      const chg = r.pc ? (r.c / r.pc - 1) * 100 : null, side = r.b === 'WAIT' ? (r.lean === 'BUY' || r.lean === 'SELL' ? 'Leaning ' + r.lean.toLowerCase() : 'Wait') : r.b, held = against({ side: r.b }, md);
+      const lv = r.p && r.b !== 'WAIT' ? [['Entry', r.p.e], ['Stop', r.p.sl], ['T1', r.p.t1], ['T2', r.p.t2]] : (r.pv ? [['Support', r.pv.S1], ['Pivot', r.pv.P], ['Resist.', r.pv.R1]] : []);
+      body = `<div class="olQ"><div class="olCh"><b class="olSym">${E(s)}</b><span class="olSide" style="${r.b === 'SELL' ? 'background:#c11d3d' : r.b === 'BUY' ? '' : 'background:#7a859e'}">${E(held ? 'WAIT' : side)}</span><span style="margin-left:auto;font-weight:800">₹${f2(r.c)} ${chg != null ? `<small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</span></div>
+        ${held ? `<div class="olMoodBar" style="--mc:${mm.col}">Against today's ${E(mm.label.toLowerCase())} market mood (${md}/100) — wait.</div>` : ''}
+        <div class="olLv4" style="grid-template-columns:repeat(${lv.length || 1},1fr)">${lv.map((x) => `<span>${x[0]}<b>${f2(x[1])}</b></span>`).join('')}</div>
+        <div class="olWhy">Conviction <b>${num(r.conv) ? Math.round(r.conv) : '—'}</b>/100${num(r.rsi) ? ` · RSI ${Math.round(r.rsi)}` : ''}${num(r.adx) ? ` · ADX ${Math.round(r.adx)}` : ''}</div>
+        ${(r.why || []).length ? `<div class="olWhy">${(r.why || []).slice(0, 3).map(E).join(' · ')}</div>` : ''}</div>`;
+    }
+    let m = $('olPop'); if (!m) { m = document.createElement('div'); m.id = 'olPop'; document.body.appendChild(m); }
+    m.innerHTML = `<div class="olBox"><div class="olHd"><h3>Quick summary</h3><button class="olClose" data-close="1">✕</button></div>${body}<div style="display:flex;gap:8px;margin-top:12px"><button class="olX" data-x="${E(s)}" style="flex:1;padding:10px;background:#14306e;color:#fff">Proceed with X-ray →</button><button class="olX" data-close="1" style="padding:10px">Not now</button></div><div class="olSrc">Rule-based, from delayed data. Not investment advice.</div></div>`;
+    m.className = 'on'; document.body.style.overflow = 'hidden'; pushLayer(domClosePop);
+  }
   const domClosePop = () => { const m = $('olPop'); if (m) m.className = ''; document.body.style.overflow = ''; };
   const popOpen = () => { const m = $('olPop'); return !!(m && m.className === 'on'); };
   const closePop = () => { if (popOpen()) popLayer(); };
@@ -241,7 +260,7 @@
     const inp = $('olSym'); const s = clean((inp && inp.value) || ''); if (!s) return; O.sym = s; O.gen = true; O.busyRep = true;
     const si = $('symbolInput'), ex = $('exchangeInput'); if (CL) { O.gen = false; } if (si) si.value = s; if (ex && $('olEx')) ex.value = $('olEx').value;
     const rp = $('olRep'); if (rp) rp.innerHTML = repStrip(true) + '<div class="olN">Building the full report in the background…</div>';
-    if (CL) { openX(s); O.busyRep = false; const r3 = $('olRep'); if (r3) r3.innerHTML = ''; return; }
+    if (CL) { quickPop(s); O.busyRep = false; const r3 = $('olRep'); if (r3) r3.innerHTML = ''; return; }
     const full = s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : '');
     try { if (typeof runAnalysis === 'function') await runAnalysis(); } catch (e) { }
     O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
