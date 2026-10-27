@@ -10,11 +10,19 @@
   const E = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const num = (v) => typeof v === 'number' && isFinite(v);
   const f2 = (v, d) => (num(v) ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }) : '—');
-  const CL = !!document.getElementById('dashFrame') && !document.getElementById('viewSel'), BASE = CL ? '../' : '', EMB = /[?&]embed=1/.test(location.search);
+  const CL = !!document.getElementById('toasts') && !document.getElementById('viewSel'), BASE = CL ? '../' : '', EMB = /[?&]embed=1/.test(location.search);
   const O = { rep: {}, calls: null, board: null, listId: null, loaded: false, busy: false, sym: '', err: '' };
   const IDS = { brief: 'morning-brief', det: 'morning-detailed', news: 'premarket-news', mkt: 'evening-market-wrap', enews: 'evening-news-wrap' };
   const pf = (s) => { const v = parseFloat(String(s).replace(/[,%+]/g, '')); return isFinite(v) ? v : null; };
-  const openX = (sym) => { if (!CL) { if (window.jcXray) window.jcXray(sym); return; } let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); } m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">✕ Close</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; };
+  const frmClose = () => { const m = document.getElementById('olFrm'); if (m) { m.className = ''; m.innerHTML = ''; } document.body.style.overflow = ''; };
+  const xrClose = () => { O.progClose = true; try { const b = [...document.querySelectorAll('#jcxr button')].find((x) => /Close/.test(x.innerText)); if (b) b.click(); } catch (e) { } O.progClose = false; O.xrLayer = false; };
+  const openX = (sym, viaPop) => {
+    const lay = (f) => (viaPop ? swapLayer(f) : pushLayer(f));
+    if (!CL) { if (window.jcXray) { window.jcXray(sym); O.xrLayer = true; lay(xrClose); } return; }
+    let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); }
+    m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">← Back</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; lay(frmClose);
+  };
+
   const clean = (s) => String(s || '').replace(/\.(NS|BO)$/i, '').toUpperCase();
 
   async function jget(url) { const r = await fetch(BASE + url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
@@ -35,6 +43,36 @@
   const para = (rep, re) => sec(rep, re).flatMap((s) => s.blocks.filter((b) => b.type === 'paragraph').map((b) => b.text)).join(' ');
   const pick = (rows, nm) => (rows || []).find((r) => r[0].toLowerCase().indexOf(nm.toLowerCase()) === 0);
   const arrow = (p) => (p == null ? '' : p > 0 ? '<b class="up">▲</b>' : p < 0 ? '<b class="dn">▼</b>' : '■');
+
+  /* ---------- market mood (same weights as the Joshi's Dashboard header) + India map ---------- */
+  const IMAP = { w: 89.1, d: "M33.0 12.4L33.5 12.7L34.6 12.9L34.3 13.3L34.4 13.6L34.2 13.7L35.1 14.6L34.6 15.2L34.2 15.0L33.6 15.4L33.4 15.7L33.1 15.8L32.5 15.4L32.4 14.9L31.4 15.2L31.6 16.2L32.5 17.1L32.2 17.7L32.7 18.2L32.3 18.5L32.5 18.7L32.5 19.2L33.0 19.3L33.4 18.7L33.6 18.8L34.4 20.1L35.0 20.4L35.8 20.3L36.9 21.1L36.8 21.6L38.0 22.0L39.3 22.8L38.9 22.8L37.4 24.2L37.4 24.7L36.9 25.4L37.0 26.1L36.6 26.4L36.4 27.2L37.2 27.9L37.7 28.1L37.7 27.8L37.9 27.8L39.0 28.5L39.8 28.8L40.2 29.5L40.5 29.4L41.8 30.5L42.4 30.3L43.5 31.0L44.3 31.0L44.6 31.6L45.7 31.8L46.2 32.1L46.5 31.7L47.9 32.1L47.8 31.8L48.7 31.6L49.2 32.0L50.2 32.2L50.3 33.1L50.8 33.2L52.2 34.1L53.2 33.7L53.8 34.6L54.4 34.4L55.2 34.5L56.5 35.1L57.5 34.6L57.7 35.2L58.3 35.4L58.6 35.1L59.2 35.3L60.0 35.0L60.4 35.3L60.9 34.1L60.3 32.9L60.5 31.6L60.9 30.7L60.7 30.2L62.2 29.6L62.8 29.9L63.0 30.4L62.6 31.5L63.1 32.2L62.6 32.7L62.9 32.9L63.0 33.4L63.1 33.3L63.7 33.8L64.5 33.7L65.2 33.9L65.3 34.2L65.9 34.2L66.8 34.0L67.5 33.6L68.6 34.0L70.4 34.0L70.7 33.6L71.0 33.9L72.0 33.7L72.1 33.9L72.2 33.6L72.7 33.6L72.4 32.8L72.8 32.3L72.4 31.7L71.7 31.7L71.3 31.5L71.4 30.7L71.2 30.5L72.3 30.9L73.2 30.4L73.4 30.7L73.7 30.4L74.2 30.5L74.7 30.0L74.4 29.8L74.5 29.5L76.1 28.9L76.1 28.6L76.5 28.0L76.9 27.8L78.3 27.7L78.5 27.2L79.6 26.6L79.4 26.2L80.3 25.7L80.9 26.2L82.7 26.6L83.0 26.5L83.2 25.9L83.7 26.0L83.9 25.6L85.0 25.5L85.3 25.9L85.6 25.8L85.6 26.1L85.1 26.4L85.2 26.9L85.7 26.6L85.9 26.7L86.4 27.7L86.1 27.7L85.5 28.6L85.7 28.7L86.7 28.5L87.5 28.9L87.9 28.8L88.6 29.3L88.5 29.7L88.7 30.0L88.6 30.3L88.3 30.3L87.2 31.3L87.2 31.8L87.9 32.9L87.2 32.7L86.7 32.0L85.0 32.4L82.8 34.2L81.9 34.5L81.7 34.9L81.7 35.5L82.0 36.3L81.5 36.7L81.6 37.3L80.4 38.5L80.2 39.1L80.6 39.3L80.7 39.7L79.4 41.9L78.9 43.5L77.7 43.0L76.9 43.1L76.6 42.7L76.4 42.8L76.8 44.0L76.6 45.8L76.3 46.2L75.9 46.2L76.0 46.6L75.7 47.3L76.0 48.7L75.9 48.9L75.6 48.9L75.4 49.5L75.2 49.5L75.1 49.7L74.5 49.0L74.2 49.6L74.0 47.2L73.6 46.5L73.3 44.0L73.1 44.1L72.9 43.9L72.5 44.2L72.2 43.9L72.3 44.6L71.7 45.4L71.9 46.0L71.2 46.4L70.7 45.4L70.6 46.0L70.4 45.9L70.3 45.1L69.9 44.2L70.1 43.3L70.6 42.7L71.2 42.7L71.4 42.3L71.6 42.5L71.7 42.2L72.1 42.5L72.2 41.9L72.8 41.7L73.2 40.1L73.6 40.3L73.9 40.0L72.6 39.1L71.4 39.3L70.2 39.1L67.5 39.3L65.9 38.8L65.9 36.5L65.4 35.8L65.1 36.0L65.3 36.2L65.1 36.6L64.4 36.5L63.8 36.0L63.6 35.2L63.2 35.1L63.1 35.2L63.5 35.7L62.4 35.6L62.6 35.4L62.4 35.1L61.6 34.7L61.6 34.5L61.4 35.0L61.8 35.0L61.9 35.3L60.9 36.0L60.7 37.0L61.2 37.2L62.0 38.1L62.7 38.1L62.9 38.7L63.4 38.8L63.2 39.2L61.7 39.1L61.4 40.1L61.0 39.9L60.7 40.0L60.8 40.2L60.5 40.9L60.7 41.4L61.8 42.0L62.6 42.1L62.5 42.5L62.6 43.2L62.1 43.5L62.0 44.1L62.6 44.7L62.7 44.7L62.5 45.4L63.3 45.6L62.9 46.3L63.3 46.7L63.2 47.7L63.7 49.0L63.6 49.7L63.1 49.6L63.5 50.0L63.7 50.8L63.1 50.6L63.0 50.3L63.0 50.7L62.8 50.7L62.9 50.5L62.8 50.9L62.5 50.9L62.5 50.0L62.7 49.5L62.5 49.3L62.7 49.1L62.5 49.2L62.5 49.7L62.3 49.7L62.4 48.8L62.1 51.0L61.9 51.0L61.9 49.7L61.8 50.7L61.6 50.8L61.4 50.4L61.3 50.8L61.2 50.2L61.3 50.9L61.2 51.0L60.8 49.6L61.1 49.3L61.0 49.0L60.4 48.7L60.1 48.1L60.3 48.7L60.8 48.9L60.9 49.2L59.9 50.4L58.0 51.0L57.1 51.7L56.9 52.5L57.3 53.4L57.0 53.5L57.3 53.6L57.2 53.8L57.5 53.8L56.6 54.4L56.5 54.8L56.8 54.7L56.5 55.1L56.6 55.0L55.9 55.4L55.6 56.0L54.8 55.6L55.5 56.1L55.2 56.3L52.8 57.1L52.6 57.0L53.1 56.9L53.1 56.4L52.7 56.4L52.2 56.7L51.7 57.7L52.0 57.5L52.1 57.1L52.5 57.0L52.5 57.3L52.2 57.3L52.3 57.4L53.1 57.0L51.9 57.7L50.7 58.9L50.6 58.8L50.6 59.2L49.6 60.5L49.1 60.8L49.4 60.7L48.7 61.6L46.7 62.8L46.3 63.5L46.0 63.5L46.2 63.6L45.9 63.7L46.0 63.9L43.4 65.4L43.0 66.0L43.2 66.3L43.4 66.1L43.2 67.2L41.6 68.0L40.5 67.8L40.0 68.0L39.7 69.2L39.3 69.6L39.3 69.8L39.0 69.5L38.9 69.0L38.7 70.0L38.6 69.4L38.3 69.4L37.1 70.0L36.4 72.0L36.7 73.7L36.8 73.7L36.8 74.4L36.4 74.9L36.7 74.8L37.2 77.4L36.7 76.5L36.7 76.8L36.5 76.6L36.4 76.8L36.6 77.2L37.2 77.4L37.2 78.2L36.8 80.3L35.8 82.0L35.5 83.5L35.7 84.1L35.3 84.4L35.7 84.2L35.8 87.6L35.1 87.5L35.5 87.8L34.9 87.6L35.0 87.5L34.1 87.8L33.9 88.1L34.1 88.5L33.2 89.7L33.0 90.3L33.4 90.9L34.3 90.8L34.6 91.3L34.1 91.0L33.2 91.0L31.4 91.5L30.8 92.3L30.7 92.7L30.9 92.6L30.5 93.0L30.6 93.5L30.4 93.9L28.9 94.8L28.1 94.7L27.2 93.9L25.8 92.1L26.2 91.8L25.7 92.0L25.1 90.3L24.9 88.8L25.2 89.6L25.1 89.1L25.2 89.2L25.2 90.2L25.7 90.1L25.4 90.0L25.4 89.1L24.9 88.3L24.9 88.6L24.7 88.3L24.9 87.8L24.6 87.9L23.4 84.1L22.1 82.3L22.3 82.3L22.3 82.2L22.1 82.2L22.1 81.9L22.0 82.2L21.7 82.0L20.6 79.4L21.0 79.2L20.6 79.3L20.2 77.6L20.1 76.8L20.3 76.7L20.2 76.5L20.1 76.7L19.6 75.5L19.4 74.8L19.7 74.8L19.4 74.6L19.2 73.9L19.4 74.0L19.2 73.7L19.0 73.9L19.1 73.6L19.0 73.6L18.9 73.2L18.4 73.0L18.8 72.7L18.5 72.8L17.9 72.1L18.0 71.8L17.8 71.2L17.5 71.0L18.0 71.1L17.5 70.9L17.7 70.6L17.4 70.6L17.3 70.4L17.6 70.2L17.3 70.3L17.1 69.9L16.5 68.9L16.6 68.4L16.5 68.7L16.0 67.4L16.2 67.4L16.1 67.1L16.2 67.1L16.0 67.0L15.7 64.8L15.9 64.9L15.5 64.0L15.7 63.9L15.5 63.8L15.1 62.5L15.2 62.3L15.1 62.3L14.9 61.8L14.9 61.6L15.3 61.9L15.3 61.7L14.8 61.4L14.8 60.8L15.1 61.0L14.7 60.3L14.9 59.8L15.1 60.2L15.0 59.7L14.8 59.6L15.3 59.2L15.1 59.3L15.0 58.8L14.6 59.6L14.4 59.5L14.6 59.1L14.5 58.3L15.0 58.3L15.3 58.6L14.4 58.0L14.4 57.7L14.7 57.5L14.3 57.5L14.3 56.7L14.1 56.9L14.0 56.5L14.9 53.6L14.8 53.2L14.6 53.3L14.8 52.8L14.4 52.7L14.6 52.6L14.5 52.3L14.2 52.5L14.2 52.2L13.9 52.4L14.3 52.1L13.9 51.9L13.9 51.7L14.0 51.6L13.8 51.5L14.3 51.3L13.8 51.4L14.6 50.7L15.5 50.3L13.7 50.6L13.8 50.0L14.3 49.5L13.7 49.8L13.6 49.6L13.8 48.9L14.3 49.0L14.9 48.6L13.8 48.6L13.5 48.8L13.3 48.7L13.3 48.3L13.1 48.7L12.5 48.6L13.0 48.8L13.0 49.3L12.6 49.6L12.4 49.5L12.4 49.7L12.2 49.7L12.6 49.8L12.6 50.0L12.3 49.8L12.4 50.0L12.1 50.0L12.1 50.2L12.6 50.2L13.0 50.7L12.4 51.7L12.4 52.1L9.5 53.5L8.3 53.7L6.2 52.3L2.9 48.6L3.2 47.9L3.2 48.2L3.6 48.2L3.7 48.6L4.5 48.4L4.6 48.1L4.9 48.4L5.2 47.9L5.4 48.1L6.0 47.7L6.6 47.7L7.2 46.6L7.6 46.3L7.6 45.9L7.2 46.0L7.2 46.4L6.4 46.3L6.4 46.5L5.5 46.7L5.2 47.1L4.8 47.0L2.6 46.2L2.0 45.7L1.9 45.4L1.7 45.4L1.8 45.2L1.6 44.9L1.3 44.8L1.5 44.6L1.3 44.5L1.2 44.6L1.2 44.2L1.5 44.2L1.4 44.1L2.5 43.4L1.3 43.9L1.0 44.3L0.4 44.3L0.8 44.1L0.5 43.8L0.8 43.2L2.2 43.1L2.3 41.9L2.5 42.2L2.7 42.0L2.9 42.2L4.7 42.1L5.2 42.4L6.0 42.5L6.3 42.0L7.3 41.7L7.7 41.6L7.8 42.1L8.3 42.2L9.3 41.7L9.0 41.5L8.9 41.1L9.3 40.8L8.6 39.2L8.0 38.4L8.0 37.5L6.8 37.4L6.2 36.5L6.5 34.8L5.5 34.6L4.5 34.1L4.6 32.8L7.1 29.9L7.7 29.9L8.2 30.8L8.6 30.9L11.7 30.1L11.8 29.5L12.5 28.8L13.2 27.5L14.9 26.6L15.8 25.0L16.2 23.7L18.0 22.8L17.7 22.2L18.3 21.7L19.1 20.5L20.1 19.9L19.7 19.6L20.0 18.7L19.6 17.9L19.8 17.5L20.6 16.9L22.0 16.5L22.2 16.1L21.2 15.4L20.2 15.4L20.0 15.0L20.1 14.2L19.9 14.5L19.2 14.4L17.9 13.6L17.5 13.6L17.0 13.3L16.8 12.4L17.0 11.9L16.8 11.6L16.9 10.7L16.3 9.2L16.4 8.7L17.0 8.6L17.3 7.9L18.2 7.6L18.5 6.8L17.3 6.5L17.2 6.0L17.4 5.5L16.0 5.2L15.5 4.8L15.6 4.5L15.4 4.3L14.5 4.4L13.6 4.2L13.9 3.9L13.7 3.6L13.9 3.1L15.1 2.4L15.4 1.9L15.3 1.6L16.4 1.5L17.8 1.6L17.8 1.4L17.3 1.0L18.2 1.3L20.1 0.5L20.8 1.0L21.4 0.7L22.2 0.9L22.4 1.6L23.3 1.6L24.1 2.5L26.3 3.4L26.7 4.4L28.6 5.0L28.8 5.6L30.5 5.4L31.0 4.9L32.2 4.4L33.1 4.3L33.6 4.4L34.1 4.0L35.4 4.6L36.3 4.4L36.6 5.0L37.1 5.2L37.2 5.6L36.4 8.2L35.8 8.3L35.3 8.7L35.4 9.1L34.8 9.0L34.9 9.7L34.4 10.4L32.9 10.5L33.3 11.6L32.9 11.7L33.0 12.4ZM78.3 98.3L78.2 99.0L78.0 99.2L77.8 98.6L77.6 98.4L77.5 98.3L77.5 97.8L78.0 97.6L78.3 98.3ZM77.7 97.2L77.4 97.5L77.3 97.3L77.6 96.9L77.7 97.2ZM76.8 95.3L76.9 95.5L76.6 95.5L76.6 95.4L76.4 95.3L76.5 95.1L76.8 95.3ZM77.2 95.1L77.2 95.4L77.0 95.1L77.2 95.1ZM77.1 95.0L77.0 95.1L77.1 94.9L76.9 94.9L76.9 94.6L77.1 94.4L77.1 95.0ZM15.3 94.1L15.2 94.3L15.3 94.1ZM75.9 94.3L76.0 94.4L75.8 94.4L75.7 94.2L75.8 94.0L75.9 94.3ZM77.3 93.3L77.3 93.7L77.3 93.3ZM74.9 91.1L74.9 91.5L74.7 91.4L74.6 91.2L74.8 91.0L74.9 91.1ZM74.3 86.1L74.1 86.9L73.6 86.9L73.7 86.7L73.6 86.1L73.8 85.8L74.1 85.7L74.3 86.1ZM74.5 84.0L74.6 84.1L74.4 84.2L74.3 84.0L74.4 83.7L74.6 83.9L74.5 84.0ZM73.3 83.4L73.3 83.6L73.2 83.6L73.1 83.4L73.3 83.4ZM75.6 82.2L75.7 82.4L75.4 82.2L75.4 82.1L75.5 82.0L75.6 82.2ZM75.8 81.5L75.8 81.8L75.7 81.7L75.7 81.5L75.8 81.5ZM74.7 78.9L74.6 79.5L74.5 79.3L74.5 79.0L74.7 78.9ZM75.7 77.9L75.6 78.6L75.4 78.7L75.4 78.6L75.3 78.6L75.4 78.9L75.2 78.9L75.1 79.1L75.4 79.3L75.5 80.4L75.3 80.7L75.0 80.7L75.2 81.0L75.1 81.1L75.2 81.4L74.8 81.8L74.9 82.0L74.7 82.1L74.7 82.5L74.8 82.3L74.9 82.5L74.8 83.0L74.5 83.3L74.6 83.3L74.8 83.1L74.7 83.6L74.6 83.7L74.5 83.6L74.4 83.4L74.4 83.3L74.2 83.0L74.2 82.6L74.1 82.5L74.2 82.3L74.3 82.5L74.5 81.4L74.7 81.3L74.7 81.5L74.9 81.4L74.8 81.2L74.9 81.1L74.7 80.9L74.7 80.1L74.8 79.9L74.7 79.5L74.9 79.3L75.0 78.8L75.0 77.8L75.4 77.1L75.5 76.9L75.7 77.1L75.7 77.5L75.4 77.7L75.7 77.9ZM75.6 76.7L75.5 76.7L75.6 76.7ZM17.0 88.3h.9v.9h-.9zM17.1 88.1h.9v.9h-.9zM14.0 86.8h.9v.9h-.9zM13.7 86.1h.9v.9h-.9zM17.1 85.9h.9v.9h-.9zM14.3 85.0h.9v.9h-.9zM15.1 83.7h.9v.9h-.9zM14.2 83.1h.9v.9h-.9zM12.6 85.8h.9v.9h-.9zM14.5 84.6h.9v.9h-.9z" };
+  const MSTOPS = [[0, '#7d0b20'], [20, '#ee6b73'], [20.01, '#d9501a'], [40, '#f8b27a'], [40.01, '#f4a65a'], [50, '#f2c21f'], [60, '#f6dd5a'], [60.01, '#d3ed95'], [80, '#7cc43c'], [80.01, '#62d48c'], [100, '#08753a']];
+  const hex2 = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  function moodColor(sc) { sc = Math.max(0, Math.min(100, sc)); for (let i = 1; i < MSTOPS.length; i++) { const a = MSTOPS[i - 1], b = MSTOPS[i]; if (sc <= b[0]) { const t = b[0] === a[0] ? 0 : (sc - a[0]) / (b[0] - a[0]), x = hex2(a[1]), y = hex2(b[1]); return '#' + x.map((v, k) => Math.round(v + (y[k] - v) * t).toString(16).padStart(2, '0')).join(''); } } return MSTOPS[MSTOPS.length - 1][1]; }
+  const moodLab = (sc) => (sc >= 80 ? 'VERY BULLISH' : sc >= 60 ? 'BULLISH' : sc >= 40 ? 'NEUTRAL' : sc >= 20 ? 'BEARISH' : 'VERY BEARISH');
+  function moodOf(k) { /* from the report's own numbers; the call book's pre-open mood wins when it is for the same day */
+    const cx = O.calls && O.calls.ctx; if (k && cx && num(cx.mood) && O.calls.date === (k.R && k.R.date)) return { score: cx.mood, label: cx.moodLabel || moodLab(cx.mood), col: moodColor(cx.mood), parts: [], src: 'call book' };
+    if (!k) return null; const P = [], cl = (v) => Math.max(-1, Math.min(1, v)), add = (n, v, w, t) => { if (v != null && isFinite(v)) P.push({ n, v: cl(v), w, t }); };
+    const nf = pick(k.ind, 'Nifty 50'), vx = pick(k.ind, 'India VIX'), g = [...(k.g || []), ...(k.a || [])].map((r) => pf(r[2])).filter((x) => x != null);
+    if (nf) add('Nifty 50', pf(nf[2]) / 1.2, 3, nf[2]); if (vx) { const vp = pf(vx[2]), lv = pf(vx[1]); add('India VIX', -vp / 8 + (lv < 13 ? 0.3 : lv > 20 ? -0.5 : 0), 1.8, vx[1]); }
+    if (g.length >= 3) { const a = g.reduce((x, y) => x + y, 0) / g.length; add('Global', a / 0.9, 2, (a >= 0 ? '+' : '') + a.toFixed(2) + '% avg'); }
+    const fx = pick(k.cm, 'USD/INR'), br = pick(k.cm, 'Brent'), tn = pick(k.cm, 'US 10');
+    if (fx) add('Rupee', -pf(fx[2]) / 0.4, 1, pf(fx[2]) > 0 ? 'weaker' : 'firmer'); if (br) add('Crude', -pf(br[2]) / 2.5, 0.8, br[2]); if (tn) add('US yields', -(pf(tn[1]) * pf(tn[2])) / 8, 0.7, tn[1] + '%');
+    const W = P.reduce((a, q) => a + q.w, 0); if (!W || P.length < 3) return null; const sc = Math.round(50 + 50 * P.reduce((a, q) => a + q.w * q.v, 0) / W);
+    return { score: sc, label: moodLab(sc), col: moodColor(sc), parts: P.slice().sort((a, b) => Math.abs(b.w * b.v) - Math.abs(a.w * a.v)).slice(0, 4), src: 'report' };
+  }
+  const indiaSvg = (col, id) => `<svg class="olMap" viewBox="0 0 ${IMAP.w} 100" aria-label="Map of India coloured by market mood"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs><path d="${IMAP.d}" fill="${col}"/><path d="${IMAP.d}" fill="url(#${id})" stroke="rgba(255,255,255,.8)" stroke-width=".35" stroke-linejoin="round"/></svg>`;
+  function gaugeSvg(sc) { const a = -90 + Math.max(0, Math.min(100, sc)) * 1.8, stops = [0, 20, 40, 50, 60, 80, 100].map((v) => `<stop offset="${v}%" stop-color="${moodColor(v)}"/>`).join('');
+    return `<svg class="olGauge" viewBox="0 0 200 112"><defs><linearGradient id="olGg" x1="0" x2="1">${stops}</linearGradient></defs><path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="url(#olGg)" stroke-width="16" stroke-linecap="round"/><g transform="rotate(${a} 100 100)"><path d="M100 100 L100 32" stroke="#14213d" stroke-width="3.2" stroke-linecap="round"/><circle cx="100" cy="100" r="7" fill="#14213d"/></g><text x="100" y="92" text-anchor="middle" font-size="26" font-weight="800" fill="#14213d" dy="-6">${Math.round(sc)}</text><text x="22" y="111" font-size="9" fill="#6a7694">0</text><text x="172" y="111" font-size="9" fill="#6a7694">100</text></svg>`; }
+  function moodPanel(k) { const m = moodOf(k); if (!m) return ''; return `<div class="olMood" style="--mc:${m.col}"><div class="olMoodMap">${indiaSvg(m.col, 'olMg' + Math.round(Math.random() * 1e4))}<small>MARKET MOOD</small></div><div class="olMoodG">${gaugeSvg(m.score)}<b style="color:${m.col}">${E(m.label)}</b><small>${m.score} / 100 · ${m.src === 'call book' ? 'pre-open read' : 'from today’s report'}</small></div>${m.parts.length ? `<div class="olMoodD">${m.parts.map((q) => `<span><i style="background:${q.v >= 0 ? '#12894b' : '#c11d3d'};width:${Math.round(Math.abs(q.v) * 100)}%"></i>${E(q.n)} <em>${E(String(q.t))}</em></span>`).join('')}</div>` : ''}</div>`; }
+
+  /* ---------- Back button: every pop-up / frame is a history layer, so Back closes the top layer instead of leaving the app ---------- */
+  const LAY = [];
+  function tgb() { try { const b = window.Telegram && Telegram.WebApp && Telegram.WebApp.BackButton; if (!b) return; if (!O.tgb) { O.tgb = 1; b.onClick(() => history.back()); } if (LAY.length) b.show(); else b.hide(); } catch (e) { } }
+  function pushLayer(close) { LAY.push(close); try { history.pushState({ olLayer: LAY.length }, ''); } catch (e) { } tgb(); }
+  function swapLayer(close) { if (LAY.length) { LAY[LAY.length - 1] = close; try { history.replaceState({ olLayer: LAY.length }, ''); } catch (e) { } } else pushLayer(close); }
+  function popLayer() { if (!LAY.length) return false; try { history.back(); } catch (e) { const f = LAY.pop(); try { f(); } catch (x) { } tgb(); } return true; }
+  window.addEventListener('popstate', () => { if (LAY.length) { const f = LAY.pop(); try { f(); } catch (e) { } tgb(); } });
   const cls = (p) => (p > 0 ? 'up' : p < 0 ? 'dn' : '');
 
   async function loadAll() {
@@ -45,7 +83,7 @@
 
   /* ---------- pieces ---------- */
   const tile = (nm, r, d) => { if (!r) return ''; const p = pf(r[2]); return `<div class="olT"><small>${E(nm)}</small><b>${E(r[1])}</b><span class="${cls(p)}">${arrow(p)} ${E(r[2])}</span></div>`; };
-  const mini = (title, rows) => rows && rows.length ? `<div class="olC"><h5>${E(title)}</h5>${rows.map((r) => { const p = pf(r[2]); return `<div class="olR"><span>${E(r[0])}</span><i>${E(r[1])}</i><u class="${cls(p)}">${arrow(p)} ${E(r[2])}</u></div>`; }).join('')}</div>` : '';
+  const mini = (title, rows) => rows && rows.length ? `<div class="olC"><h5>${E(title)}</h5>${rows.map((r) => { const p = pf(r[2]), w = p == null ? 0 : Math.min(100, Math.abs(p) / 3 * 100); return `<div class="olR"><span>${E(r[0])}</span><i>${E(r[1])}</i><u class="${cls(p)}">${arrow(p)} ${E(r[2])}</u><s class="olBar ${p >= 0 ? 'bu' : 'bd'}" style="width:${w.toFixed(0)}%"></s></div>`; }).join('')}</div>` : ''
   function worldRead(g, a, c, x) {
     const ps = (rows) => (rows || []).map((r) => pf(r[2])).filter((v) => v != null);
     const gp = ps(g), ap = ps(a), L = [];
@@ -84,6 +122,7 @@
     const t = new Date(R.at); const when = isNaN(t) ? R.date : t.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) + ' IST';
     return `<section class="olF dbl"><h3>${k.title} <small>${E(R.date)}</small></h3>
       <p class="olBias">${E(k.bias || 'Bias not available.')}</p>
+      ${moodPanel(k)}
       <div class="olTiles">${tile('Nifty 50', pick(ind, 'Nifty 50'))}${tile('Sensex', pick(ind, 'Sensex'))}${tile('Bank Nifty', pick(ind, 'Bank Nifty'))}${tile('Nifty 500', pick(ind, 'Nifty 500'))}${tile('India VIX', pick(ind, 'India VIX'))}</div>
       ${lv.length ? `<div class="olLv">${lv.map((r) => `<div><small>${E(r[0])}</small><span class="dn">Support ${E(r[1])}</span><span class="up">Resistance ${E(r[2])}</span></div>`).join('')}</div>` : ''}
       ${k.out.length ? `<div class="olBl"><b>Outlook</b>${k.out.map((x) => `<p>${E(x)}</p>`).join('')}</div>` : ''}
@@ -106,29 +145,43 @@
       ${heads.length ? `<ul class="olNews">${heads.map((h) => { const m = /^(.*?)\s*\[([^\]]+)\]\.?$/.exec(h); return `<li>${E(m ? m[1] : h)}${m ? ` <em>${E(m[2])}</em>` : ''}</li>`; }).join('')}</ul>` : '<div class="olN">No headlines published yet.</div>'}
       ${k.gain.length || k.lose.length ? `<div class="olGrid">${mini('Top gainers (Nifty 50)', k.gain)}${mini('Top losers', k.lose)}</div>` : ''}</section>`;
   }
-  const lvl = (c) => ['entry', 'sl', 't1', 't2'].map((k) => (num(c[k]) ? `<td>${f2(c[k], c[k] < 100 ? 2 : 1)}</td>` : '<td>—</td>')).join('');
-  function frame4() {
+  const lvl2 = (v) => (num(v) ? f2(v, v < 100 ? 2 : 1) : '—');
+  const against = (c, md) => md != null && ((c.side === 'BUY' && md <= 40) || (c.side === 'SELL' && md >= 60));
+  function ladder(c) {
+    const v = [c.sl, c.entry, c.t1, c.t2].filter(num); if (v.length < 3) return ''; const lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1, ps = (x) => ((x - lo) / r * 100), seg = (a, b, k) => `<i class="${k}" style="left:${Math.min(ps(a), ps(b)).toFixed(1)}%;width:${Math.abs(ps(a) - ps(b)).toFixed(1)}%"></i>`;
+    const dot = (x, t) => `<b style="left:${ps(x).toFixed(1)}%" title="${t}"></b>`;
+    return `<div class="olLad"><div class="olTr">${seg(c.sl, c.entry, 'rk')}${seg(c.entry, c.t2, 'gn')}${dot(c.sl, 'Stop')}${dot(c.entry, 'Entry')}${num(c.t1) ? dot(c.t1, 'T1') : ''}${dot(c.t2, 'T2')}</div></div>`;
+  }
+  function callCard(c) {
+    const buy = c.side === 'BUY', why = (c.why || []).slice(0, 2).join(' · ');
+    return `<div class="olCall ${buy ? 'cb' : 'cs'}"><div class="olCh"><b class="olSide">${buy ? '▲ BUY' : '▼ SELL'}</b><b class="olSym">${E(c.sym)}</b>${c.grade ? `<span class="olGr">${E(c.grade)}</span>` : ''}<button class="olX" data-x="${E(c.sym)}">X-ray</button></div>${ladder(c)}
+      <div class="olLv4"><span>Entry<b>${lvl2(c.entry)}</b></span><span class="dn">Stop<b>${lvl2(c.sl)}</b></span><span class="up">T1<b>${lvl2(c.t1)}</b></span><span class="up">T2<b>${lvl2(c.t2)}</b></span><span>R:R<b>${num(c.rr1) ? '1:' + c.rr1.toFixed(1) : '—'}</b></span></div>${why ? `<div class="olWhy">${E(why)}</div>` : ''}</div>`;
+  }
+  function frame4(k) {
     const C = O.calls; if (!C) return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS</h3><div class="olN">Calls file not available.</div></section>`;
-    const day = (C.calls || []).filter((c) => c.type === 'DAY'), inv = (C.calls || []).filter((c) => c.type !== 'DAY');
-    const tbl = (rows, k) => rows.length ? `<div class="olScroll"><table class="olTb"><thead><tr><th>Side</th><th>Stock</th><th>Entry</th><th>Stop</th><th>T1</th><th>T2</th><th>Grade</th><th></th></tr></thead><tbody>${rows.map((c) => `<tr><td><b class="${c.side === 'BUY' ? 'up' : 'dn'}">${E(c.side)}</b></td><td><b>${E(c.sym)}</b></td>${lvl(c)}<td>${E(c.grade || '')}</td><td><button class="olX" data-x="${E(c.sym)}">X-ray</button></td></tr>`).join('')}</tbody></table></div>` : `<div class="olN">No ${k} calls today — the rules found nothing that passed. Quiet days are normal.</div>`;
-    const cx = C.ctx || {};
-    return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS <small>${E(C.date || '')} · ${E(String(C.scanned || ''))} stocks scanned · market ${E(cx.regime || '—')}, VIX ${f2(cx.vix, 1)}</small></h3>
-      <h5 class="olH">Intraday (today only — square off the same day)</h5>${tbl(day, 'intraday')}
-      <h5 class="olH">Investment (positional / long-term)</h5>${tbl(inv, 'investment')}
-      <div class="olSrc">Rule-based levels from delayed data; a stop is part of every call. Not advice and not a guaranteed outcome.</div></section>`;
+    const m = moodOf(k || pack('morning')), md = m ? m.score : null, all = C.calls || [];
+    const keep = all.filter((c) => !against(c, md)), held = all.filter((c) => against(c, md));
+    const day = keep.filter((c) => c.type === 'DAY'), inv = keep.filter((c) => c.type !== 'DAY'), cx = C.ctx || {};
+    const grid = (rows, kind) => rows.length ? `<div class="olCalls">${rows.map(callCard).join('')}</div>` : `<div class="olN">No ${kind} call fits today’s mood and rules — staying out is a position too.</div>`;
+    const bn = m ? `<div class="olMoodBar" style="--mc:${m.col}"><b>Today’s mood: ${E(m.label)} ${m.score}/100</b> — calls are matched to it: ${md >= 60 ? 'sell calls are held back' : md <= 40 ? 'buy calls are held back' : 'both sides allowed, only the strongest set-ups'}${held.length ? ` (${held.length} held back: ${E(held.slice(0, 6).map((c) => c.sym).join(', '))}${held.length > 6 ? '…' : ''})` : ''}.</div>` : '';
+    return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS <small>${E(C.date || '')} · ${E(String(C.scanned || ''))} stocks scanned · Nifty trend ${E(cx.regime || '—')} · VIX ${f2(cx.vix, 1)}</small></h3>${bn}
+      <h5 class="olH">Intraday — today only, square off the same day</h5>${grid(day, 'intraday')}
+      <h5 class="olH">Investment — positional / long-term</h5>${grid(inv, 'investment')}
+      <div class="olSrc">Entry = trigger on a 5-minute close beyond the level; every call carries a stop. Rule-based levels from daily data — not advice, not a guaranteed outcome.</div></section>`;
   }
   /* ---------- watchlist Buy / Sell / Avoid ---------- */
   const lists = () => { if (O.custom) return [O.custom]; if (CL) { const j = window.jcc; return [{ id: 'me', name: 'My watchlist', syms: (j && j.S && j.S.syms) || [] }]; } try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
   function classify(list) {
     const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
-    const out = { BUY: [], SELL: [], AVOID: [] };
+    const out = { BUY: [], SELL: [], AVOID: [] }, mm = moodOf(pack('morning')), md = mm ? mm.score : null;
+    const put = (side, o) => { if (against({ side }, md)) out.AVOID.push(Object.assign(o, { why: 'Against today’s ' + mm.label.toLowerCase() + ' mood (' + md + '/100) — wait', tag: '' })); else out[side].push(o); };
     (list ? list.syms : []).forEach((s0) => {
       const s = clean(s0), r = B[s], c = calls[s];
-      if (c && (c.side === 'BUY' || c.side === 'SELL')) { out[c.side].push({ s, r, c, tag: c.type === 'DAY' ? 'Intraday call' : 'Investment call', conv: r ? r.conv : c.score }); return; }
+      if (c && (c.side === 'BUY' || c.side === 'SELL')) { put(c.side, { s, r, c, tag: c.type === 'DAY' ? 'Intraday call' : 'Investment call', conv: r ? r.conv : c.score }); return; }
       if (!r) { out.AVOID.push({ s, r: null, why: 'Not in the scanned list — no rule-based view' }); return; }
-      if (r.b === 'BUY' || r.b === 'SELL') out[r.b].push({ s, r, tag: 'Signal', conv: r.conv });
-      else if (r.lean === 'BUY' && r.conv >= 60) out.BUY.push({ s, r, tag: 'Leaning buy · wait for trigger', conv: r.conv });
-      else if (r.lean === 'SELL' && r.conv >= 60) out.SELL.push({ s, r, tag: 'Leaning sell · wait for trigger', conv: r.conv });
+      if (r.b === 'BUY' || r.b === 'SELL') put(r.b, { s, r, tag: 'Signal', conv: r.conv });
+      else if (r.lean === 'BUY' && r.conv >= 60) put('BUY', { s, r, tag: 'Leaning buy · wait for trigger', conv: r.conv });
+      else if (r.lean === 'SELL' && r.conv >= 60) put('SELL', { s, r, tag: 'Leaning sell · wait for trigger', conv: r.conv });
       else out.AVOID.push({ s, r, why: r.no || 'No clean set-up', conv: r.conv });
     });
     Object.values(out).forEach((a) => a.sort((x, y) => (y.conv || 0) - (x.conv || 0)));
@@ -153,9 +206,11 @@
     }).join('')}</tbody></table></div>` : `<div class="olN">No stocks in this group for the selected watchlist today.</div>`;
     let m = $('olPop'); if (!m) { m = document.createElement('div'); m.id = 'olPop'; document.body.appendChild(m); }
     m.innerHTML = `<div class="olBox"><div class="olHd"><h3>${T} — ${E(l ? l.name : '')} <small>${k.length} stock${k.length === 1 ? '' : 's'}</small></h3><button class="olClose" data-close="1">✕</button></div>${body}<div class="olSrc">Rule-based, from delayed data. Conv. = signal-agreement score, not a probability. Not investment advice.</div></div>`;
-    m.className = 'on'; document.body.style.overflow = 'hidden';
+    m.className = 'on'; document.body.style.overflow = 'hidden'; pushLayer(domClosePop);
   }
-  const closePop = () => { const m = $('olPop'); if (m) m.className = ''; document.body.style.overflow = ''; };
+  const domClosePop = () => { const m = $('olPop'); if (m) m.className = ''; document.body.style.overflow = ''; };
+  const popOpen = () => { const m = $('olPop'); return !!(m && m.className === 'on'); };
+  const closePop = () => { if (popOpen()) popLayer(); };
   /* ---------- scrip search → X-ray first, then the reports ---------- */
   function frame6() {
     return `<section class="olF"><h3>SCRIP SEARCH · X-RAY &amp; FULL REPORT</h3>
@@ -177,7 +232,7 @@
   function draw() {
     const p = $('pOutlook'); if (!p || (!CL && !p.classList.contains('active'))) return;
     const keep = $('olSym') ? $('olSym').value : O.sym; O.sym = keep || O.sym;
-    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? (() => { const k = pack('morning'); return frame1(k, 'morning') + frame2(k, 'morning') + frame3(k, 'morning'); })() + frame4() + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
+    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? (() => { const k = pack('morning'); return frame1(k, 'morning') + frame2(k, 'morning') + frame3(k, 'morning'); })() + frame4(pack('morning')) + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
       <div class="olLegal">Prepared from delayed market data and published morning reports with fixed, rule-based formulas. Research information for discussion with your adviser — not investment advice, not a recommendation, and no outcome is guaranteed.</div></div>`;
   }
   const css = () => `<style>
@@ -207,21 +262,34 @@
   .olBox{background:#fffdf6;border:3px double #D4AF37;border-radius:14px;max-width:880px;width:100%;max-height:88vh;overflow:auto;padding:14px 16px}.olHd{display:flex;justify-content:space-between;align-items:center}.olHd h3{margin:0;color:#8A6D1F}.olHd small{color:#52607f}.olClose{cursor:pointer;border:0;background:#14306e;color:#fff;border-radius:8px;padding:4px 10px;font-size:14px}
   #olBack{position:fixed;left:12px;bottom:12px;z-index:40;display:none;background:#14306e;color:#fff;border:2px solid #D4AF37;border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
   @media(max-width:640px){.olBtns{grid-template-columns:1fr 1fr 1fr}.olB b{font-size:20px}.olF{padding:10px 11px}}
+  .olMood{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:center;margin:8px 0 12px;padding:10px 12px;border-radius:14px;background:linear-gradient(135deg,#fff,#fff7dc);border:1px solid #ecd9a0}
+  .olMoodMap{text-align:center}.olMap{height:120px;width:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.18))}.olMoodMap small{display:block;font-size:10px;letter-spacing:.14em;color:#8A6D1F;font-weight:800;margin-top:2px}
+  .olMoodG{text-align:center}.olGauge{width:210px;max-width:100%}.olMoodG b{display:block;font-size:20px;letter-spacing:.06em;margin-top:-6px}.olMoodG small{color:#52607f}
+  .olMoodD{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}.olMoodD span{position:relative;background:#fff;border:1px solid #f0e6c4;border-radius:8px;padding:5px 8px 8px;font-weight:700;font-size:11.5px}.olMoodD span i{position:absolute;left:0;bottom:0;height:4px;border-radius:0 4px 4px 0;opacity:.85}.olMoodD em{font-style:normal;color:#52607f;font-weight:600;margin-left:4px}
+  .olR{position:relative}.olBar{position:absolute;left:0;bottom:0;height:2px;border-radius:2px;opacity:.55}.olBar.bu{background:#12894b}.olBar.bd{background:#c11d3d}
+  .olMoodBar{border-left:5px solid var(--mc,#D4AF37);background:#fff;border-radius:8px;padding:8px 12px;margin:6px 0 4px;font-size:12.5px;line-height:1.45}
+  .olCalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.olCall{background:#fff;border:1px solid #ecd9a0;border-top:4px solid #12894b;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px -12px rgba(0,0,0,.4)}.olCall.cs{border-top-color:#c11d3d}
+  .olCh{display:flex;align-items:center;gap:8px}.olSide{font-size:12px;padding:2px 8px;border-radius:99px;color:#fff;background:#12894b}.cs .olSide{background:#c11d3d}.olSym{font-size:16px;color:#14213d}.olGr{font-size:10.5px;font-weight:800;border:1px solid #D4AF37;color:#6b5314;border-radius:6px;padding:1px 6px;background:#fff8e6}.olCh .olX{margin-left:auto}
+  .olLad{margin:10px 2px 6px}.olTr{position:relative;height:8px;border-radius:6px;background:#eef1f8}.olTr i{position:absolute;top:0;height:100%}.olTr i.rk{background:#f4b6bf}.olTr i.gn{background:#a8e0bf}.olTr b{position:absolute;top:-3px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#14306e;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .olLv4{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}.olLv4 span{font-size:10px;color:#6a7694;background:#faf6e8;border-radius:8px;padding:4px 2px}.olLv4 b{display:block;font-size:12.5px;color:#14213d;font-variant-numeric:tabular-nums}.olLv4 .dn b{color:#c11d3d}.olLv4 .up b{color:#12894b}
+  .olWhy{margin-top:6px;font-size:11px;color:#52607f}
+  @media(max-width:520px){.olMood{grid-template-columns:1fr;justify-items:center}.olLv4{grid-template-columns:repeat(5,1fr)}.olLv4 b{font-size:11px}}
   </style>`;
   /* ---------- events ---------- */
   document.addEventListener('click', (e) => {
     const t = e.target, c = (q) => t.closest && t.closest(q);
-    if (c('[data-closefrm]')) { const m = $('olFrm'); if (m) { m.className = ''; m.innerHTML = ''; } document.body.style.overflow = ''; return; }
-    if (c('#olBack')) { showTab(O.home || 'pClient'); return; }
+    if (c('[data-closefrm]')) { popLayer(); return; }
+    if (c('#olBack')) { if (!popLayer()) showTab(O.home || 'pClient'); return; }
     if (c('[data-close]') || t.id === 'olPop') { closePop(); return; }
     const k = c('#pOutlook [data-k], #pClient [data-k]'); if (k) { popup(k.getAttribute('data-k')); return; }
-    const x = c('#pOutlook [data-x], #pClient [data-x], #olPop [data-x]'); if (x) { closePop(); openX(x.getAttribute('data-x')); return; }
-    const tb = c('#pOutlook [data-tab], #pClient [data-tab]'); if (tb) { O.fromOutlook = true; showTab(tb.getAttribute('data-tab')); return; }
+    const x = c('#pOutlook [data-x], #pClient [data-x], #olPop [data-x]'); if (x) { const vp = popOpen(); openX(x.getAttribute('data-x'), vp); if (vp) domClosePop(); return; }
+    const tb = c('#pOutlook [data-tab], #pClient [data-tab]'); if (tb) { O.fromOutlook = true; pushLayer(() => showTab(O.home || 'pClient')); showTab(tb.getAttribute('data-tab')); return; }
     if (c('#olGo')) { go(); return; }
     if (c('#olRef')) { O.loaded = false; O.busy = false; draw(); loadAll(); }
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'olList') { O.listId = e.target.value; draw(); } });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'olSym') go(); if (e.key === 'Escape') closePop(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'olSym') go(); if (e.key === 'Escape') popLayer(); });
+  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#jcxr button'); if (b && /Close/.test(b.innerText) && !O.progClose && O.xrLayer) { e.stopImmediatePropagation(); e.preventDefault(); popLayer(); } }, true);
   function init() {
     if (typeof showTab !== 'function' || !document.body) return false; if ($('olBack')) return true;
     const bk = document.createElement('button'); bk.id = 'olBack'; bk.textContent = '← Back to Client reports'; document.body.appendChild(bk);
@@ -249,6 +317,6 @@
     }, 300);
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
-  async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4() + '</div>'; }
+  async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4(k) + '</div>'; }
   window.jcOutlook = { reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
 })();
