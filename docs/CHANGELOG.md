@@ -47,3 +47,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client page live poll now also covers the symbols of today's calls, so every call card's CMP needle is live (not only the client's own watchlist).
 
 | 2026-10-27 | [Claude] Buy / Sell pop-ups now show the trading call per stock as a table: Call, CMP (live), Entry, Stop-loss, Target 1, Target 2, R:R, Status, Conviction (indicative pivot levels for stocks that only lean). |
+
+| 2026-10-27 | [Claude] Client reports: stocks of the selected watchlist can be added/removed in place (chips with ✕ + Add box). Terminal lists edit directly; a linked client's list is saved to the client record (needs the admin passcode unlocked) and mirrored in the terminal list; the cached report for that list is cleared. The client page itself stays read-only by design. |

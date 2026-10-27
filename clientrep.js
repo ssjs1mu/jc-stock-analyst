@@ -179,7 +179,7 @@
     const tm = (c) => new Date(c.t + 19800000).toISOString().slice(11, 16);
     const rows = L.map((l) => { const a = key('morning', l.id), b = key('closing', l.id); return `<tr><td><b>${E(l.name)}</b></td><td>${l.syms.length}</td><td>${l.linked ? (l.chat ? '✓ linked' : '<small style="color:#b3261e">no chat id</small>') : '<small style="color:#8a94ad">not linked</small>'}</td><td>${a ? `<button class="ghostBtn" data-cropen="morning|${E(l.id)}">Open ${tm(a)}</button>` : '<small>—</small>'}</td><td>${b ? `<button class="ghostBtn" data-cropen="closing|${E(l.id)}">Open ${tm(b)}</button>` : '<small>—</small>'}</td></tr>`; }).join('');
     const body = !L.length ? `<div class="note">No watchlist yet — add one below.</div>${addBox()}`
-      : `${addBox()}<div class="bar2"><label>Watchlist <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
+      : `${addBox()}${editBox(cur)}<div class="bar2"><label>Watchlist <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
         <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ALL clients</button>
         <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div>
         <table class="cl"><thead><tr><th>Watchlist / client</th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
@@ -192,6 +192,21 @@
     paintStatus();
     if (window.jcOutlook && open && kc && !window.jcOutlook.loaded()) window.jcOutlook.load().then(() => paint());
   }
+  /* add / remove stocks of the selected watchlist. Linked client: saved to the client's record (needs the admin passcode unlocked in Client dashboards) and mirrored in the terminal list. */
+  function editBox(l) {
+    if (!l) return '';
+    const chips = l.syms.map((x) => `<span class="crChip">${E(x.replace(/\.NS$/, ''))}<button data-crrm="${E(x)}" title="Remove ${E(x)}">✕</button></span>`).join('') || '<small>No stocks yet — add some below.</small>';
+    return `<div class="note" style="margin:8px 0"><style>.crChip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #b8c6e6;border-radius:99px;padding:2px 4px 2px 10px;margin:2px;font-weight:700;font-size:12px}.crChip button{border:0;background:#eef1f8;border-radius:50%;width:18px;height:18px;cursor:pointer;line-height:1;color:#b3261e}</style><b>Stocks in ${E(l.name)}</b> (${l.syms.length}) ${l.linked ? '<small>— linked client: changes are saved to the client record (admin passcode must be unlocked in Client dashboards)</small>' : ''}<div style="margin:6px 0">${chips}</div>
+      <div class="bar2" style="margin:4px 0"><input id="crAddSyms" class="sel" placeholder="Add stocks, comma separated e.g. TCS, INFY" style="flex:1;min-width:200px"><button class="goBtn" data-cradds="1">＋ Add</button><small id="crEditMsg" style="color:#8a6d1f"></small></div></div>`;
+  }
+  async function editSyms(listId, add, remove) {
+    const l = listsAll().find((x) => x.id === listId); if (!l) return 'Watchlist not found';
+    let next = l.syms.slice(); remove.forEach((r) => { next = next.filter((x) => x !== r); }); add.forEach((a) => { if (!next.includes(a)) next.push(a); });
+    if (l.linked && l.cid) { const C = window.jcClients; if (!C || !C.S.ok) return 'Locked — enter the admin passcode in Client dashboards (Telegram) first to change a client’s list.'; try { await C.api('cl_set', { id: l.cid, syms: next }); await C.reload(); } catch (e) { return 'Not saved: ' + ((e && e.message) || e); } }
+    try { wlEnsure(); const t = WL.store.lists.find((x) => x.id === listId); if (t) { let ts = t.syms.slice(); remove.forEach((r) => { ts = ts.filter((x) => x !== r); }); add.forEach((a) => { if (!ts.includes(a)) ts.push(a); }); if (!l.linked || add.length) { t.syms = ts; wlSave(); } else { t.syms = ts; wlSave(); } } } catch (e) { }
+    Object.keys(CACHE).forEach((k) => { if (k.endsWith('|' + listId)) delete CACHE[k]; }); saveC();
+    return '';
+  }
   function addBox() {
     return `<div class="bar2" style="background:#fff8e6;border:1px solid #D4AF37;border-radius:10px;padding:8px"><b>＋ Add watchlist</b><input id="crNewName" class="sel" placeholder="Name (e.g. Deepak A)" maxlength="30" style="width:170px"><input id="crNewSyms" class="sel" placeholder="Stocks, comma separated (optional)" style="flex:1;min-width:200px"><button class="goBtn" data-cradd="1">Add</button><small id="crAddMsg" style="color:#8a6d1f"></small></div>`;
   }
@@ -199,6 +214,8 @@
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q); if (!c('#pClient')) return;
     const r = c('[data-crrun]'); if (r) { const m = r.getAttribute('data-crrun'), ids = m === 'all' ? listsAll().map((l) => l.id) : [R.listId]; run(ids, m === 'all' ? R.mode : m); if (m !== 'all') R.mode = m; return; }
+    const rm = c('[data-crrm]'); if (rm) { editSyms(R.listId, [], [rm.getAttribute('data-crrm')]).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
+    if (c('[data-cradds]')) { const raw = ($('crAddSyms').value || '').split(/[\s,;]+/).map((x) => cleanSym(x, 'NS')).filter(Boolean); if (!raw.length) { $('crEditMsg').textContent = 'Type at least one stock.'; return; } editSyms(R.listId, raw, []).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     if (c('[data-cradd]')) { const n = ($('crNewName').value || '').trim().slice(0, 30), raw = ($('crNewSyms').value || '').split(/[\s,;]+/).map((x) => x.trim().toUpperCase()).filter(Boolean); if (!n) { $('crAddMsg').textContent = 'Type a name first.'; return; }
       try { wlEnsure(); const l = { id: 'l' + Date.now().toString(36), name: n, syms: [...new Set(raw.map((x) => cleanSym(x, 'NS')).filter(Boolean))] }; WL.store.lists.push(l); wlSave(); R.listId = l.id; R.msg = 'Added ' + n; try { if (typeof wlRenderBar === 'function' && $('wlBar')) wlRenderBar(); } catch (e2) { } paint(); } catch (e3) { $('crAddMsg').textContent = 'Could not add: ' + ((e3 && e3.message) || e3); }
       return; }
