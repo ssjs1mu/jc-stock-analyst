@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Joshi's Corner | Stock Analyst Terminal</title>
 <script src="intro.js?v=3"></script>
-<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("embed")</script>
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("embed");/* scrip report opened from the client page (?embed=1&sym=): load only the analysis engine — no dashboard, radar, calls, TV probe or other background fetches, so it costs almost no backend quota */window.JC_LEAN=/[?&]embed=1/.test(location.search)&&/[?&]sym=/.test(location.search)</script>
 <style>html.embed .topbar,html.embed .statusline,html.embed #errArea,html.embed #titlebar,html.embed details.datasec,html.embed .legal{display:none!important}html.embed .wrap{padding-top:4px}</style>
 <style id="appcss">
   :root{--ink:#14213d;--ink2:#52607f;--line:#dde3f0;--navy:#14306e;--green:#12894b;--red:#c11d3d;--amber:#b86e00;}
@@ -206,20 +206,20 @@
 <script src="calls_engine.js?v=2"></script>
 <script src="engine.js?v=17"></script>
 <script src="schedules.js?v=4"></script>
-<script src="dashboard.js?v=35"></script>
-<script src="fiidii.js?v=2"></script>
-<script src="calls.js?v=9"></script>
+<script>if(!window.JC_LEAN)document.write('<script src="dashboard.js?v=35"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="fiidii.js?v=2"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="calls.js?v=9"><\/script>')</script>
 <script src="xray.js?v=9"></script>
-<script src="bigfish.js?v=4"></script>
-<script src="radarcore.js?v=1"></script>
-<script src="radar.js?v=6"></script>
-<script src="manage.js?v=2"></script>
-<script src="brief.js?v=4"></script>
-<script src="clientrep.js?v=5"></script>
-<script src="clientdash.js?v=6"></script>
+<script>if(!window.JC_LEAN)document.write('<script src="bigfish.js?v=4"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="radarcore.js?v=1"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="radar.js?v=6"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="manage.js?v=2"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="brief.js?v=4"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="clientrep.js?v=5"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="clientdash.js?v=6"><\/script>')</script>
 <script src="outlook.js?v=6"></script>
-<script src="deliv.js?v=5"></script>
-<script src="kid.js?v=4"></script>
-<script src="dashsig.js?v=6"></script>
+<script>if(!window.JC_LEAN)document.write('<script src="deliv.js?v=5"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="kid.js?v=4"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="dashsig.js?v=6"><\/script>')</script>
 </body>
 </html>

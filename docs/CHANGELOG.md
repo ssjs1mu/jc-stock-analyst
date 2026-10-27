@@ -31,3 +31,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Mobile/client page now plays the same opening: 3D tree logo with rupee signs flying from the background to the front (intro.js made path-aware, old simple splash hidden). |
 
 | 2026-10-27 | [Claude] Expiry wording: last Tuesday (Nifty) / Thursday (Sensex) of a month shown as MONTHLY with the full date; the 📅 emoji (which many phones draw as '17 JUL') replaced by a calendar chip with the real date; auto_reports.py expiry_text fixed; client page refreshes reports every 2 min and on return to the page. |
+
+| 2026-10-27 | [Claude] Scrip search from the client page (?embed=1&sym=) now loads a lean terminal: Joshi's Dashboard, radar, calls, Big Fish, manage, brief, TV probe, client tabs and other background modules are NOT loaded (index.html JC_LEAN), so the report costs only the stock's own data calls from the Apps Script quota. |
