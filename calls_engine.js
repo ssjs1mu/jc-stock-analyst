@@ -112,7 +112,11 @@ var JCE = (function () {
     var sc = scoreDay(x, m); out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
     var abs = Math.abs(sc.S), dir = sc.S > 0 ? 1 : -1, atrPct = a / x.c * 100, why = out.reasons;
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
+    /* today's pre-open MOOD (global cues, crude, rupee, VIX, Nifty's last move): a call that fights it is held back; one that agrees needs a little less confluence */
+    var md = m && isNum(m.mood) ? m.mood : null;
+    if (md != null) { if ((dir > 0 && md <= 40) || (dir < 0 && md >= 60)) out.moodBlock = true; else if ((dir > 0 && md >= 60) || (dir < 0 && md <= 40)) need -= 0.5; }
     out.need = need;
+    if (out.moodBlock) why.push("against today's market mood (" + (m.moodLabel || '') + ' ' + md + '/100)');
     if (abs < need) why.push('confluence ' + abs.toFixed(1) + ' < ' + need.toFixed(1) + ' needed');
     if (isNum(x.adx) && x.adx < CFG.minAdx && abs < CFG.gradeAA) why.push('ADX ' + x.adx.toFixed(0) + ' — chopping');
     if (atrPct < CFG.minAtrPct) why.push('range too small (ATR ' + atrPct.toFixed(1) + '%)'); if (atrPct > CFG.maxAtrPct) why.push('too volatile (ATR ' + atrPct.toFixed(1) + '%)');
@@ -255,7 +259,8 @@ var JCE = (function () {
   /* ---------- the call book for one morning ---------- */
   function buildBook(inputs) {
     // inputs: { dateIso, stocks: [{sym, ex, daily:[...]}], nifty:[...], vix:[...], maxDay, maxInv }
-    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {};
+    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {}, held = [];
+    if (inputs.mood && isNum(inputs.mood.score)) { var mk0 = Object.keys(mkt).filter(function (d) { return d < today; }).sort(); if (mk0.length) { mkt[mk0[mk0.length - 1]].mood = inputs.mood.score; mkt[mk0[mk0.length - 1]].moodLabel = inputs.mood.label; } }
     inputs.stocks.forEach(function (s) {
       var dd = (s.daily || []).filter(function (b) { return istDate(b.t) < today; }).map(function (b) { return Object.assign({ date: istDate(b.t) }, b); });
       if (dd.length < 80) { skipped.push({ sym: s.sym, why: 'only ' + dd.length + ' sessions of history' }); return; }
@@ -265,13 +270,13 @@ var JCE = (function () {
         var sd = plan.sides[0], m = plan.mkt;
         day.push({ type: 'DAY', sym: s.sym, ex: s.ex || 'NS', date: today, side: sd.side, entry: sd.entry, sl: sd.sl, t1: sd.t1, t2: sd.t2, rr1: sd.rr1, rr2: sd.rr2, t1Why: sd.t1Why, t2Why: sd.t2Why, risk: sd.risk, atr: plan.atr, score: Math.abs(plan.score), grade: plan.grade,
           why: plan.pts.filter(function (p) { return Math.sign(p.v) === sd.dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 6).map(function (p) { return p.label + ': ' + p.txt; }), cmp0: plan.ref.c, regime: m ? m.bias : null });
-      } else skipped.push({ sym: s.sym, why: plan.reasons.join('; ') || 'no edge' });
+      } else { skipped.push({ sym: s.sym, why: plan.reasons.join('; ') || 'no edge' }); if (plan.moodBlock && held.length < 40) held.push({ sym: s.sym, side: plan.score > 0 ? 'BUY' : 'SELL', score: Math.round(Math.abs(plan.score) * 10) / 10 }); }
       var iv = investFor(dd, k, inputs.nifty, mkt);
       if (iv) inv.push(Object.assign(iv, { sym: s.sym, ex: s.ex || 'NS', date: today }));
     });
     day.sort(function (a, b) { return b.score - a.score; }); inv.sort(function (a, b) { return b.score - a.score; });
     var keys = Object.keys(mkt).filter(function (d) { return d < today; }).sort(), m0 = keys.length ? mkt[keys[keys.length - 1]] : null;
-    return { board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
+    return { held: held, board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg, mood: inputs.mood ? inputs.mood.score : null, moodLabel: inputs.mood ? inputs.mood.label : null } : null };
   }
 
   return { CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };

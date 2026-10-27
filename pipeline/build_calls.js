@@ -71,6 +71,28 @@ function moodStats(nb) {
   return { sessions: b.length, gapUp: sum(k.up, 1), gapDown: sum(k.dn, -1), flat: sum(k.flat, 0), note: 'cont = % of sessions where the day kept moving in the gap direction after the open' };
 }
 
+/* Pre-open market MOOD (0-100): same weights as the dashboard header's Market Mood, from what is known before the bell — Nifty's last move, India VIX, global indices,
+   rupee, crude, US yield. (Breadth and PCR need live data and are left out.) Used to hold back calls that fight the day's mood. */
+async function pct5(sym) {
+  for (const host of ['query1', 'query2']) {
+    try { const j = await getJSON('https://' + host + '.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym) + '?range=5d&interval=1d', 15000); const c = j.chart.result[0].indicators.quote[0].close.filter((v) => v != null); if (c.length >= 2) return { p: c[c.length - 1], pc: c[c.length - 2] }; } catch (e) { /* next host */ }
+  }
+  return null;
+}
+async function moodNow(idx) {
+  const cl = (v) => Math.max(-1, Math.min(1, v)), parts = [], add = (name, v, w) => { if (v != null && isFinite(v)) parts.push({ name, v: cl(v), w }); };
+  const lastTwo = (b) => (b && b.length > 1 ? { p: b[b.length - 1].c, pc: b[b.length - 2].c } : null), pc = (q) => (q && q.pc ? (q.p / q.pc - 1) * 100 : null);
+  const nf = pc(lastTwo(idx['^NSEI'])); add('Nifty 50', nf == null ? null : nf / 1.2, 3);
+  const vq = lastTwo(idx['^INDIAVIX']); if (vq) { const vp = pc(vq); add('India VIX', -vp / 8 + (vq.p < 13 ? 0.3 : vq.p > 20 ? -0.5 : 0), 1.8); }
+  const G = await Promise.all(['^N225', '^HSI', '^KS11', '^FTSE', '^GDAXI', '^FCHI', '^DJI', '^GSPC', '^IXIC'].map(pct5)), gl = G.map(pc).filter((x) => x != null);
+  if (gl.length >= 3) add('Global', gl.reduce((a, b) => a + b, 0) / gl.length / 0.9, 2);
+  const [fx, br, tn] = await Promise.all([pct5('USDINR=X'), pct5('BZ=F'), pct5('^TNX')]);
+  add('Rupee', fx ? -pc(fx) / 0.4 : null, 1); add('Crude', br ? -pc(br) / 2.5 : null, 0.8); if (tn) add('US yields', -((tn.p - tn.pc) * 100) / 8, 0.7);
+  const W = parts.reduce((a, p) => a + p.w, 0); if (!W || parts.length < 3) return null;
+  const score = Math.round(50 + 50 * parts.reduce((a, p) => a + p.w * p.v, 0) / W);
+  return { score, label: score >= 80 ? 'VERY BULLISH' : score >= 60 ? 'BULLISH' : score >= 40 ? 'NEUTRAL' : score >= 20 ? 'BEARISH' : 'VERY BEARISH', parts: parts.map((p) => p.name + ' ' + (p.v >= 0 ? '+' : '') + p.v.toFixed(2)) };
+}
+
 (async () => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   if (dow === 0 || dow === 6) { console.log('Weekend — no call book.'); return; }
@@ -102,11 +124,13 @@ function moodStats(nb) {
 
   const stocks = [], missing = [];
   uni.forEach((s, i) => { const b = bars[yf[i]]; if (b && b.length) stocks.push({ sym: s.replace(/\.BO$/, ''), ex: /\.BO$/.test(s) ? 'BO' : 'NS', daily: b }); else missing.push(s); });
-  const book = JCE.buildBook({ dateIso: today, stocks, nifty: idx['^NSEI'], vix: idx['^INDIAVIX'] || [], maxDay: 10, maxInv: 5 });
+  let mood = null; try { mood = await moodNow(idx); } catch (e) { /* no mood — calls fall back to the regime rules only */ }
+  console.log('Pre-open market mood: ' + (mood ? mood.score + ' ' + mood.label + ' (' + mood.parts.join(', ') + ')' : 'unavailable'));
+  const book = JCE.buildBook({ dateIso: today, stocks, nifty: idx['^NSEI'], vix: idx['^INDIAVIX'] || [], maxDay: 10, maxInv: 5, mood });
   const now = new Date().toISOString(), symKey = (c) => (c.ex === 'BO' ? c.sym + '.BO' : c.sym), recs = [];
   book.day.forEach((c) => { c.id = 'D-' + today + '-' + symKey(c); c.status = 'WAIT'; c.createdAt = now; c.lockedAt = now; c.src = 'github'; recs.push(c); });
   book.inv.forEach((c) => { c.id = 'I-' + today + '-' + symKey(c); c.status = 'WAIT'; c.createdAt = now; c.lockedAt = now; c.src = 'github'; c.expires = addSessions(c.refDate, c.tenureSessions); recs.push(c); });
-  const day = { generatedAt: now, source: 'github', scanned: stocks.length, missing: missing.length, dayCalls: book.day.length, invCalls: book.inv.length, noTrade: book.skipped.length, ctx: book.ctx };
+  const day = { generatedAt: now, source: 'github', scanned: stocks.length, missing: missing.length, dayCalls: book.day.length, invCalls: book.inv.length, noTrade: book.skipped.length, ctx: book.ctx, heldBack: book.held || [] };
   const doc = Object.assign({ date: today }, day, { calls: recs });
   console.log('Built: ' + day.dayCalls + ' day calls, ' + day.invCalls + ' investment calls, ' + day.noTrade + ' stocks with no edge. Regime: ' + (day.ctx ? day.ctx.regime : 'n/a'));
   try { // per-stock board for client dashboards (generic market data — no client names or watchlists)
