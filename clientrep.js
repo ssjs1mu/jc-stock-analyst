@@ -147,21 +147,25 @@
     cl.forEach((x) => { const id = x.listId || x.id; if (!seen.has(id)) out.push({ id, cid: x.id, name: x.name || x.listName, syms: (x.syms || []).slice(), chat: x.chat || '', linked: true }); });
     return out;
   };
+  const setP = (v) => { R.pct = Math.min(100, (R.base || 0) + (R.span == null ? 100 : R.span) * v / 100); };
   async function build(list, mode, quiet) {
     const syms = (list.syms || []).slice(); if (!syms.length) return null;
+    setP(2); R.stage = 'Reading market data'; paintStatus();
     let mkt = {}; try { mkt = (await wlMkt(false)) || {}; } catch (e) { }
+    setP(5);
     const out = [], q = syms.slice(); let n = 0;
-    const w = async () => { while (q.length) { const s = q.shift(); out.push(await analyse(s, mode, mkt)); n++; R.prog = `${list.name}: ${n}/${syms.length} stocks`; if (!quiet) paintStatus(); else await new Promise((r) => setTimeout(r, 2500)); } };
+    const w = async () => { while (q.length) { const s = q.shift(); out.push(await analyse(s, mode, mkt)); n++; setP(5 + 85 * n / syms.length); R.stage = 'Analysing stocks'; R.prog = `${list.name}: ${n}/${syms.length} stocks`; if (!quiet) paintStatus(); else await new Promise((r) => setTimeout(r, 2500)); } };
     await Promise.all(quiet ? [w()] : [w(), w(), w()]);
+    setP(92); R.stage = 'Adding the day’s outlook and calls'; paintStatus();
     let frames = ''; try { if (window.jcOutlook) frames = await window.jcOutlook.snapshot(mode); } catch (e) { }
     const html = reportHTML(list.name, list.name, out, mode, P.notes && P.notes[list.id], frames);
-    CACHE[istDay() + '|' + mode + '|' + list.id] = { t: Date.now(), html, n: out.length, bad: out.filter((r) => r.err).length }; saveC();
+    CACHE[istDay() + '|' + mode + '|' + list.id] = { t: Date.now(), html, n: out.length, bad: out.filter((r) => r.err).length }; saveC(); setP(100);
     return html;
   }
   async function run(listIds, mode, auto) {
-    if (R.busy) return; R.auto = !!auto; R.busy = true; R.mode = mode; R.msg = 'Building…'; paintStatus();
-    try { let last = null; for (const id of listIds) { const l = listsAll().find((x) => x.id === id); if (!l) continue; const h = await build(l, mode, R.auto); if (h) { last = id; } } R.msg = last ? 'Done ' + ist().toISOString().slice(11, 16) + ' IST' : 'Nothing to build — the list is empty.'; if (last) { R.cur = { id: last, mode }; } }
-    catch (e) { R.msg = 'Failed: ' + ((e && e.message) || e); } finally { R.busy = false; R.prog = ''; paint(); }
+    if (R.busy) return; R.auto = !!auto; R.busy = true; R.mode = mode; R.msg = 'Building…'; R.pct = 0; R.base = 0; R.span = 100; paintStatus();
+    try { let last = null; for (let li = 0; li < listIds.length; li++) { const id = listIds[li]; const l = listsAll().find((x) => x.id === id); if (!l) continue; R.base = 100 * li / listIds.length; R.span = 100 / listIds.length; const h = await build(l, mode, R.auto); if (h) { last = id; } } R.msg = last ? 'Done ' + ist().toISOString().slice(11, 16) + ' IST' : 'Nothing to build — the list is empty.'; if (last) { R.cur = { id: last, mode }; } }
+    catch (e) { R.msg = 'Failed: ' + ((e && e.message) || e); } finally { R.busy = false; R.prog = ''; R.pct = null; paint(); }
   }
   function openPrint(html) {
     const old = $('crFrame'); if (old) old.remove(); const f = document.createElement('iframe'); f.id = 'crFrame'; f.style.cssText = 'position:fixed;left:0;top:0;width:210mm;height:297mm;border:0;opacity:0;pointer-events:none;z-index:-1'; document.body.appendChild(f);
@@ -170,7 +174,13 @@
   }
 
   /* ---------- panel ---------- */
-  function paintStatus() { const el = $('crSt'); if (el) el.innerHTML = R.busy ? `⏳ ${E(R.prog || R.msg)}` : E(R.msg || ''); }
+  function paintStatus() {
+    const el = $('crSt'); if (el) el.innerHTML = R.busy ? `⏳ ${E(R.prog || R.msg)}` : E(R.msg || '');
+    const pg = $('crPg'); if (!pg) return;
+    if (!R.busy) { pg.innerHTML = ''; return; }
+    const v = Math.round(R.pct || 0);
+    pg.innerHTML = `<div style="background:#fffdf6;border:2px solid #D4AF37;border-radius:12px;padding:10px 14px;margin:8px 0"><div style="display:flex;justify-content:space-between;align-items:baseline;font-weight:700"><span>${E(R.stage || 'Building report')}${R.prog ? ' · ' + E(R.prog) : ''}</span><span style="font-size:22px;color:#14306e;font-variant-numeric:tabular-nums">${v}%</span></div><div style="height:10px;border-radius:6px;background:#e8ecf6;overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:${v}%;background:linear-gradient(90deg,#D4AF37,#f4dc8d);transition:width .3s"></i></div><small style="color:#52607f">Please wait — the report appears here when it reaches 100%.</small></div>`;
+  }
   function paint() {
     const el = $('pClient'); if (!el || !el.classList.contains('active')) return; const L = listsAll(), td = istDay(), open = isOpen();
     if (!R.listId || !L.find((l) => l.id === R.listId)) R.listId = L[0] && L[0].id;
@@ -181,7 +191,7 @@
     const body = !L.length ? `<div class="note">No watchlist yet — add one below.</div>${addBox()}`
       : `${addBox()}${editBox(cur)}<div class="bar2"><label>Watchlist <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
         <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ALL clients</button>
-        <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div>
+        <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div><div id="crPg"></div>
         <table class="cl"><thead><tr><th>Watchlist / client</th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
         ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span>${cur.cid ? `<button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button>` : '<small style="color:#8a94ad">Telegram sending needs a client link (Client dashboards below)</small>'}<button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
     el.innerHTML = `<style>${CSS}.crb{padding:10px 14px}.crb .bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.crb table.cl{width:100%;border-collapse:collapse;font-size:12.5px}.crb table.cl td,.crb table.cl th{border-bottom:1px solid #dfe5f2;padding:5px 6px;text-align:left}.crb .sel{padding:5px 8px;border:1px solid #b8c6e6;border-radius:8px}.crb .goBtn.on{box-shadow:0 0 0 2px #D4AF37}

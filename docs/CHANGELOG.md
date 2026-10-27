@@ -51,3 +51,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client reports: stocks of the selected watchlist can be added/removed in place (chips with ✕ + Add box). Terminal lists edit directly; a linked client's list is saved to the client record (needs the admin passcode unlocked) and mirrored in the terminal list; the cached report for that list is cleared. The client page itself stays read-only by design. |
 
 | 2026-10-27 | [Claude] Client reports: rename and delete a whole watchlist (rename also renames a linked client's record; deleting a linked list keeps the client record). |
+
+| 2026-10-27 | [Claude] Client reports: building a full report now shows a real % bar (market data 5%, per-stock analysis up to 90%, outlook/calls 92%, done 100%; multi-client builds count across clients) with the stage and stocks done/total. |
