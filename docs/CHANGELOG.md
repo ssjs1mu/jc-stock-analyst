@@ -37,3 +37,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Scrip search order changed (terminal and client page): Quick summary first, then a 'Proceed with X-ray?' prompt, then X-ray, Intraday, Short term, Long term. |
 
 | 2026-10-27 | [Claude] Client page: instant Quick summary from today's board when a scrip is searched (heavy X-ray only after 'Proceed'); opening screen — tree logo (embedded 300px copy, 8 layers) rises from roots to crown and the screen changes when the report behind it has loaded ('jc-ready'); Alerts today coloured by importance (stop-loss red, target green, entry gold, breakout cyan, volume grey) with larger type. |
+
+| 2026-10-27 | [Claude] Every processing screen shows an estimated % bar (window.jcProgress in xray.js: X-ray build, report preparation); flow is now: report ready → 'Open Quick summary?' → Quick summary tab asks 'Proceed with X-ray?'; from the client page the instant Quick summary goes straight to the X-ray (iframe go=xray) with the other reports building behind it; Back button label shortened to '← Back'. |

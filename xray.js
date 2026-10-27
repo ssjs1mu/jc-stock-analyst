@@ -313,11 +313,21 @@
     window.addEventListener('afterprint', done); setTimeout(() => window.print(), 80); setTimeout(done, 60000);
   }
   function close() { clearInterval(X.timer); X.timer = null; const o = $('jcxr'); if (o) o.classList.remove('on'); document.body.style.overflow = ''; }
+  /* shared progress meter: every "processing" screen shows an estimated % (eases to 92 %, jumps to 100 % when the data is in) */
+  window.jcProgress = function (host, label, floating) {
+    const id = 'jcp' + Math.round(Math.random() * 1e6), css = '<style>.jcp{background:#fffdf6;border:2px solid #D4AF37;border-radius:14px;padding:14px 16px;color:#14213d;font:600 14px system-ui,sans-serif;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)}.jcp-t{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.jcp-t span{font-size:22px;font-weight:800;color:#14306e;font-variant-numeric:tabular-nums}.jcp-b{height:10px;border-radius:6px;background:#e8ecf6;overflow:hidden;margin:10px 0 6px}.jcp-b i{display:block;height:100%;width:0;background:linear-gradient(90deg,#D4AF37,#f4dc8d);border-radius:6px;transition:width .3s}.jcp small{color:#52607f;font-weight:600}.jcpF{position:fixed;left:50%;top:18%;transform:translateX(-50%);width:min(92vw,420px);z-index:99998}</style>';
+    let box = host; if (floating) { box = document.createElement('div'); box.className = 'jcpF'; document.body.appendChild(box); }
+    box.innerHTML = css + '<div class="jcp" id="' + id + '"><div class="jcp-t"><b>' + E(label) + '</b><span>0%</span></div><div class="jcp-b"><i></i></div><small>Please wait — estimated progress, stays on this screen until ready.</small></div>';
+    const t0 = Date.now(); let p = 0; const set = (v) => { p = v; const r = document.getElementById(id); if (!r) return; r.querySelector('span').textContent = Math.round(v) + '%'; r.querySelector('i').style.width = v + '%'; };
+    const iv = setInterval(() => { set(Math.max(p, 92 * (1 - Math.exp(-(Date.now() - t0) / 8000)))); }, 250);
+    return { done() { clearInterval(iv); set(100); if (floating) setTimeout(() => box.remove(), 350); }, fail() { clearInterval(iv); if (floating) box.remove(); } };
+  };
   async function run(manual) {
     const tok = ++X.token, y = X.sym; if (!y) return;
-    if (!X.data || X.data.y !== y) $('xrB').innerHTML = '<div class="xr-ld">Fetching live data for ' + E(label(y)) + '…</div>';
-    try { const d = await load(y); if (tok !== X.token) return; X.data = d; $('xrT').textContent = (d.name || label(y)); $('xrS').textContent = y + (d.cur ? ' · ' + d.cur : ''); $('xrB').innerHTML = render(d); }
-    catch (e) { if (tok !== X.token) return; $('xrB').innerHTML = '<div class="xr-err">X-ray failed for ' + E(y) + ': ' + E((e && e.message) || e) + '</div>'; }
+    if (!X.data || X.data.y !== y) $('xrB').innerHTML = '';
+    const pg = (!X.data || X.data.y !== y) ? window.jcProgress($('xrB'), 'Building X-ray for ' + label(y), false) : null;
+    try { const d = await load(y); if (tok !== X.token) return; if (pg) pg.done(); X.data = d; $('xrT').textContent = (d.name || label(y)); $('xrS').textContent = y + (d.cur ? ' · ' + d.cur : ''); $('xrB').innerHTML = render(d); }
+    catch (e) { if (pg) pg.fail(); if (tok !== X.token) return; $('xrB').innerHTML = '<div class="xr-err">X-ray failed for ' + E(y) + ': ' + E((e && e.message) || e) + '</div>'; }
   }
   window.jcXrayApi = { load, trendData, norm };
   window.jcXray = function (sym) {

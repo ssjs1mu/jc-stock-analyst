@@ -20,7 +20,7 @@
     const lay = (f) => (viaPop ? swapLayer(f) : pushLayer(f));
     if (!CL) { if (window.jcXray) { window.jcXray(sym); O.xrLayer = true; lay(xrClose); } return; }
     let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); }
-    m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">← Back</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; lay(frmClose);
+    m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">← Back</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '&go=xray"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; lay(frmClose);
   };
 
   const clean = (s) => String(s || '').replace(/\.(NS|BO)$/i, '').toUpperCase();
@@ -248,10 +248,10 @@
       <div id="olRep">${O.sym && O.gen ? repStrip(O.busyRep) : ''}</div></section>`;
   }
   /* "Proceed with X-ray?" card shown after the Quick summary */
-  function proceedPrompt(sym, onYes) {
+  function proceedPrompt(sym, onYes, msg, yes) {
     const old = document.getElementById('olProceed'); if (old) old.remove();
     const d = document.createElement('div'); d.id = 'olProceed';
-    d.innerHTML = '<style>#olProceed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:55;width:min(94vw,440px);background:#fffdf6;border:2px solid #D4AF37;border-radius:14px;padding:12px 14px;box-shadow:0 14px 34px -10px rgba(0,0,0,.55);font:600 13px system-ui,sans-serif;color:#14213d}#olProceed div{display:flex;gap:8px;margin-top:10px}#olProceed button{flex:1;cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:10px;padding:9px;font-weight:800}#olProceed .y{background:#14306e;color:#fff}</style>Quick summary of <b>' + E(clean(sym)) + '</b> is ready. Proceed with the graphical X-ray?<div><button class="y" data-y="1">Yes — open X-ray</button><button data-n="1">Not now</button></div>';
+    d.innerHTML = '<style>#olProceed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:55;width:min(94vw,440px);background:#fffdf6;border:2px solid #D4AF37;border-radius:14px;padding:12px 14px;box-shadow:0 14px 34px -10px rgba(0,0,0,.55);font:600 13px system-ui,sans-serif;color:#14213d}#olProceed div{display:flex;gap:8px;margin-top:10px}#olProceed button{flex:1;cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:10px;padding:9px;font-weight:800}#olProceed .y{background:#14306e;color:#fff}</style>' + (msg || 'Proceed with the graphical X-ray of <b>' + E(clean(sym)) + '</b>?') + '<div><button class="y" data-y="1">' + (yes || 'Yes — open X-ray') + '</button><button data-n="1">Not now</button></div>';
     d.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; d.remove(); if (b.getAttribute('data-y')) onYes(); };
     document.body.appendChild(d);
   }
@@ -262,10 +262,13 @@
     const rp = $('olRep'); if (rp) rp.innerHTML = repStrip(true) + '<div class="olN">Building the full report in the background…</div>';
     if (CL) { quickPop(s); O.busyRep = false; const r3 = $('olRep'); if (r3) r3.innerHTML = ''; return; }
     const full = s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : '');
+    const pg = window.jcProgress ? window.jcProgress(null, 'Preparing the report for ' + clean(s), true) : null;
     try { if (typeof runAnalysis === 'function') await runAnalysis(); } catch (e) { }
-    O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
-    O.fromOutlook = true; pushLayer(() => { const q = document.getElementById('olProceed'); if (q) q.remove(); showTab(O.home || 'pClient'); }); showTab('pSummary');
-    proceedPrompt(full, () => openX(full));
+    if (pg) pg.done(); O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
+    proceedPrompt(full, () => {
+      O.fromOutlook = true; pushLayer(() => { const q = document.getElementById('olProceed'); if (q) q.remove(); showTab(O.home || 'pClient'); }); showTab('pSummary');
+      proceedPrompt(full, () => openX(full));
+    }, 'The report for <b>' + E(clean(s)) + '</b> is ready. Open the Quick summary?', 'Yes — Quick summary');
   }
   /* ---------- paint ---------- */
   function draw() {
@@ -332,7 +335,7 @@
   document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#jcxr button'); if (b && /Close/.test(b.innerText) && !O.progClose && O.xrLayer) { e.stopImmediatePropagation(); e.preventDefault(); popLayer(); } }, true);
   function init() {
     if (typeof showTab !== 'function' || !document.body) return false; if ($('olBack')) return true;
-    const bk = document.createElement('button'); bk.id = 'olBack'; bk.textContent = '← Back to Client reports'; document.body.appendChild(bk);
+    const bk = document.createElement('button'); bk.id = 'olBack'; bk.textContent = '← Back'; document.body.appendChild(bk);
     const orig = window.showTab; window.showTab = function (id) { orig(id); bk.style.display = O.fromOutlook && /^p(Summary|Intraday|Swing|Long)$/.test(id) ? 'block' : 'none'; if (!/^p(Summary|Intraday|Swing|Long)$/.test(id)) O.fromOutlook = false; };
     return true;
   }
@@ -347,13 +350,17 @@
   }
   /* embedded terminal opened by the client page with ?sym=: X-ray first, then report buttons */
   function initEmbedSym() {
-    const m = /[?&]sym=([A-Za-z0-9&._-]{1,20})/.exec(location.search); if (!m || !EMB) return;
-    const sym = m[1].toUpperCase(), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
+    const m = /[?&]sym=([^&#]{1,24})/.exec(location.search); if (!m || !EMB) return;
+    const sym = decodeURIComponent(m[1]).toUpperCase(), goX = /[?&]go=xray/.test(location.search), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
       $('symbolInput').value = sym.replace(/\.(NS|BO)$/, ''); if (/\.BO$/.test(sym) && $('exchangeInput')) $('exchangeInput').value = 'BO';
       const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><button data-t="pSummary" disabled>① Quick summary</button><button data-xr="' + sym + '" disabled>② X-ray</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
       document.body.insertBefore(bar, document.body.firstChild);
       bar.onclick = (e) => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.getAttribute('data-xr')) window.jcXray(sym); else showTab(b.getAttribute('data-t')); };
-      Promise.resolve(runAnalysis()).catch(() => { }).then(() => { bar.querySelectorAll('button').forEach((b) => { b.disabled = false; }); showTab('pSummary'); proceedPrompt(sym, () => window.jcXray(sym)); });
+      const pg = !goX && window.jcProgress ? window.jcProgress(null, 'Preparing the report for ' + sym.replace(/\.(NS|BO)$/, ''), true) : null;
+      if (goX) window.jcXray(sym); /* opened from the client page after its instant Quick summary: X-ray first, the other reports build behind it */
+      Promise.resolve(runAnalysis()).catch(() => { }).then(() => { if (pg) pg.done(); bar.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+        if (goX) { showTab('pSummary'); return; }
+        proceedPrompt(sym, () => { showTab('pSummary'); proceedPrompt(sym, () => window.jcXray(sym)); }, 'The report for <b>' + E(sym.replace(/\.(NS|BO)$/, '')) + '</b> is ready. Open the Quick summary?', 'Yes — Quick summary'); });
     }, 300);
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
