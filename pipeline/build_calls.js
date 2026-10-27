@@ -73,11 +73,17 @@ function moodStats(nb) {
 
 /* Pre-open market MOOD (0-100): same weights as the dashboard header's Market Mood, from what is known before the bell — Nifty's last move, India VIX, global indices,
    rupee, crude, US yield. (Breadth and PCR need live data and are left out.) Used to hold back calls that fight the day's mood. */
+let DASHQ = null; // one backend 'dash' call for every mood input (p, pc) — used when direct Yahoo access fails from the runner
+async function dashQ() {
+  if (DASHQ) return DASHQ; DASHQ = {}; if (!BACKEND) return DASHQ;
+  try { const j = await getJSON(BACKEND + '?action=dash&symbols=' + encodeURIComponent(['^N225', '^HSI', '^KS11', '^FTSE', '^GDAXI', '^FCHI', '^DJI', '^GSPC', '^IXIC', 'USDINR=X', 'BZ=F', '^TNX'].join(',')), 60000); (j.rows || []).forEach((r) => { if (r && r.p != null && r.pc) DASHQ[r.s] = { p: r.p, pc: r.pc }; }); } catch (e) { /* none */ }
+  return DASHQ;
+}
 async function pct5(sym) {
   for (const host of ['query1', 'query2']) {
     try { const j = await getJSON('https://' + host + '.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym) + '?range=5d&interval=1d', 15000); const c = j.chart.result[0].indicators.quote[0].close.filter((v) => v != null); if (c.length >= 2) return { p: c[c.length - 1], pc: c[c.length - 2] }; } catch (e) { /* next host */ }
   }
-  return null;
+  return (await dashQ())[sym] || null;
 }
 async function moodNow(idx) {
   const cl = (v) => Math.max(-1, Math.min(1, v)), parts = [], add = (name, v, w) => { if (v != null && isFinite(v)) parts.push({ name, v: cl(v), w }); };
