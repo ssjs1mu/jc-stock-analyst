@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Joshi's Corner | Stock Analyst Terminal</title>
 <script src="intro.js?v=4"></script>
-<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("embed");/* scrip report opened from the client page (?embed=1&sym=): load only the analysis engine — no dashboard, radar, calls, TV probe or other background fetches, so it costs almost no backend quota */window.JC_LEAN=/[?&]embed=1/.test(location.search)&&/[?&]sym=/.test(location.search)</script>
-<style>html.embed .topbar,html.embed .statusline,html.embed #errArea,html.embed #titlebar,html.embed details.datasec,html.embed .legal{display:none!important}html.embed .wrap{padding-top:4px}</style>
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("embed");/* scrip report opened from the client page (?embed=1&sym=): load only the analysis engine — no dashboard, radar, calls, TV probe or other background fetches, so it costs almost no backend quota */window.JC_LEAN=/[?&]embed=1/.test(location.search)&&/[?&]sym=/.test(location.search);if(window.JC_LEAN)document.documentElement.classList.add('lean')</script>
+<style>html.embed .topbar,html.embed .statusline,html.embed #errArea,html.embed #titlebar,html.embed details.datasec,html.embed .legal{display:none!important}html.embed .wrap{padding-top:4px}html.lean #errArea{display:block!important;margin:8px}</style>
 <style id="appcss">
   :root{--ink:#14213d;--ink2:#52607f;--line:#dde3f0;--navy:#14306e;--green:#12894b;--red:#c11d3d;--amber:#b86e00;}
   *{box-sizing:border-box;}
@@ -217,7 +217,7 @@
 <script>if(!window.JC_LEAN)document.write('<script src="brief.js?v=4"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="clientrep.js?v=8"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="clientdash.js?v=6"><\/script>')</script>
-<script src="outlook.js?v=14"></script>
+<script src="outlook.js?v=15"></script>
 <script>if(!window.JC_LEAN)document.write('<script src="deliv.js?v=5"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="kid.js?v=4"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="dashsig.js?v=6"><\/script>')</script>

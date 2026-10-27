@@ -55,3 +55,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client reports: building a full report now shows a real % bar (market data 5%, per-stock analysis up to 90%, outlook/calls 92%, done 100%; multi-client builds count across clients) with the stage and stocks done/total. |
 
 | 2026-10-27 | [Claude] Top-bar symbol search: Generate (and Enter) now opens the report in a NEW window (index.html?embed=1&win=1&sym=…): estimated-% progress bar, then the Quick summary first, with links on top for X-ray, Intraday, Short term, Long term. |
+
+| 2026-10-27 | [Claude] Report window/embed now shows errors (index.html html.lean #errArea) and a clear 'live data paused — Google daily limit' notice instead of a blank page. Observed 27-Oct ~20:00 IST: Apps Script urlfetch daily quota exhausted (backend returns 'Service invoked too many times for one day: urlfetch'); resets ~12:30–13:30 IST. |
