@@ -13,6 +13,12 @@
      "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-10-27.pdf",
      "type": "pdf",
      "bytes": 444577
+    },
+    {
+     "name": "JCGG_Morning_Updates_Brief_2026-10-27.json",
+     "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-10-27.json",
+     "type": "json",
+     "bytes": 3317
     }
    ]
   },

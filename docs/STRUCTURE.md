@@ -31,3 +31,9 @@ Edit the source parts, never `Code.gs` directly: `Code.base.gs` (routes, watchli
 - `data/radar_pool.json`: screened extras (seed: 207 of 1,875 on 26-Oct). Re-screen from the radar panel ("re-screen"); update the file by committing the new list.
 - `data/nse_equity.json` / `data/universe_extra.json`: candidate lists, written by the constituents job.
 - Core 499 (`bigfish.js`) is never altered. Client/own watchlists merge from browser localStorage only; never commit them.
+
+## Today's Outlook (added 2026-10-27) [Claude]
+- `outlook.js` renders view `pOutlook`. Inputs: `reports/{morning-brief,morning-detailed,premarket-news}/index.json` → latest run's `.json` (the report config the PDF was rendered from; written by `auto_reports.py`), `data/calls/latest.json` (calls), `data/calls/board.json` (per-stock board used for Buy/Sell/Avoid).
+- Frames map by section heading (e.g. "Today's Bias", "Key Levels", "Commodit…", "Headlines"). If a report's headings change in `auto_reports.py build()`, update the matchers in `outlook.js`.
+- Buy/Sell/Avoid: BUY/SELL = a call or board signal (or a lean with conviction ≥ 60, marked); AVOID = everything else, including symbols not in the board.
+- Search → `jcXray()` first, then `runAnalysis()`; the strip jumps to pSummary/pIntraday/pSwing/pLong with a floating "Back to Today's Outlook" button.

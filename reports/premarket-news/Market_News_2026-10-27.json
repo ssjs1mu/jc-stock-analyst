@@ -1,0 +1,95 @@
+{
+ "report_title": "premarket-news",
+ "report_date": "2026-10-27",
+ "seeded_from_pdf": true,
+ "sections": [
+  {
+   "heading": "Top Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Anthropic has filed for a Wall Street debut as AI momentum lifts broader markets [The Economic Times]",
+      "Asian equities surged as tech shares rallied following gains on Wall Street [CNBC TV18]",
+      "Jio Platforms IPO allotment status has been finalised for allotment checks on exchange and registrar websites [Livemint]",
+      "Falling crude oil prices helped boost sentiment for Indian equities after recent declines [INDIA New England News]",
+      "Market focus remains centered on upcoming technology sector earnings and Federal Reserve policy cues [marketscreener.com]",
+      "Domestic markets are expected to see volatile trading ahead of the monthly expiry [Goodreturns]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Global Cues",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,361.58",
+       "+0.28%"
+      ],
+      [
+       "S&P 500",
+       "7,676.77",
+       "+0.70%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,169.38",
+       "+0.82%"
+      ],
+      [
+       "FTSE 100",
+       "10,767.30",
+       "+0.72%"
+      ],
+      [
+       "DAX",
+       "25,410.84",
+       "+0.91%"
+      ],
+      [
+       "Nikkei 225",
+       "63,387.50",
+       "+1.93%"
+      ],
+      [
+       "Hang Seng",
+       "23,274.46",
+       "+0.27%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,699.11",
+       "+0.04%"
+      ],
+      [
+       "Kospi",
+       "5,719.45",
+       "+4.57%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Calendar",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today."
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -13,6 +13,12 @@
      "path": "reports/premarket-news/Market_News_2026-10-27.pdf",
      "type": "pdf",
      "bytes": 359098
+    },
+    {
+     "name": "Market_News_2026-10-27.json",
+     "path": "reports/premarket-news/Market_News_2026-10-27.json",
+     "type": "json",
+     "bytes": 1940
     }
    ]
   },

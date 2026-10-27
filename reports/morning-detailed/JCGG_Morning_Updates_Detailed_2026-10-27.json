@@ -1,0 +1,310 @@
+{
+ "report_title": "morning-detailed",
+ "report_date": "2026-10-27",
+ "seeded_from_pdf": true,
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Indian equity benchmarks logged gains in the previous session, with the Nifty 50 rising 0.68% to 22,753.20 and the Sensex advancing 0.66% to 73,606.75. Apollo Hospitals (+1.65%) and ONGC (+1.11%) led the Nifty 50 gainers, whereas Shriram Finance (-3.98%) and Adani Enterprises (-2.86%) were among the top losers. Lower crude oil prices provided support, though rising volatility reflected underlying market caution."
+    }
+   ]
+  },
+  {
+   "heading": "Global Markets Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,361.58",
+       "+0.28%"
+      ],
+      [
+       "S&P 500",
+       "7,676.77",
+       "+0.70%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,169.38",
+       "+0.82%"
+      ],
+      [
+       "FTSE 100",
+       "10,767.30",
+       "+0.72%"
+      ],
+      [
+       "DAX",
+       "25,410.84",
+       "+0.91%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nikkei 225",
+       "63,415.69",
+       "+1.97%"
+      ],
+      [
+       "Hang Seng",
+       "23,241.07",
+       "+0.13%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,697.48",
+       "-0.00%"
+      ],
+      [
+       "Kospi",
+       "5,706.84",
+       "+4.34%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Commodities, Currency & Bonds",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "109.88",
+       "-5.86%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "100.99",
+       "-2.21%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,029.70",
+       "+0.54%"
+      ],
+      [
+       "USD/INR",
+       "95.18",
+       "+0.25%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "102.07",
+       "+0.11%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "4.99",
+       "-0.04%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Indian Markets - Previous Session",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,753.20",
+       "+0.68%"
+      ],
+      [
+       "Sensex",
+       "73,606.75",
+       "+0.66%"
+      ],
+      [
+       "Bank Nifty",
+       "54,366.70",
+       "+0.15%"
+      ],
+      [
+       "Nifty 500",
+       "21,608.75",
+       "+0.85%"
+      ],
+      [
+       "India VIX",
+       "17.16",
+       "+1.78%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,509",
+       "22,875"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,265",
+       "22,997"
+      ]
+     ],
+     "trend": false
+    }
+   ]
+  },
+  {
+   "heading": "Outlook",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty pivot levels are positioned at 22,631, with resistance at 22,875 (R1) and 22,997 (R2), and support at 22,509 (S1) and 22,265 (S2). Crude oil saw a decline, with Brent crude falling 5.86% to US$109.88/bbl and WTI crude dropping 2.21% to US$100.99/bbl. Global market focus remains on upcoming U.S. Federal Reserve decisions and big tech earnings. Potential market volatility is anticipated ahead of the monthly expiry."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks in Focus (previous session)",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "APOLLOHOSP",
+       "7,730.00",
+       "+1.65%"
+      ],
+      [
+       "ONGC",
+       "227.50",
+       "+1.11%"
+      ],
+      [
+       "ASIANPAINT",
+       "2,307.00",
+       "+0.97%"
+      ],
+      [
+       "TCS",
+       "2,530.00",
+       "+0.92%"
+      ],
+      [
+       "ULTRACEMCO",
+       "11,050.00",
+       "+0.84%"
+      ],
+      [
+       "SHRIRAMFIN",
+       "865.00",
+       "-3.98%"
+      ],
+      [
+       "ADANIENT",
+       "2,477.00",
+       "-2.86%"
+      ],
+      [
+       "JSWSTEEL",
+       "1,185.50",
+       "-2.83%"
+      ],
+      [
+       "TATASTEEL",
+       "167.67",
+       "-2.70%"
+      ],
+      [
+       "ADANIPORTS",
+       "1,702.70",
+       "-2.70%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Anthropic has filed for a Wall Street debut to conduct its AI test [The Economic Times]",
+      "Asian stock markets rallied as AI enthusiasm lifted Wall Street ahead of Fed decisions and major tech earnings [CNBC TV18]",
+      "Allotment status for the Jio Platforms IPO has been finalised for investors to check online [Livemint]",
+      "Value buying helped Indian stock markets rebound, snapping a four-session losing streak [The Indian Awaaz]",
+      "Asian stocks tracked gains on Wall Street amid global market focus on upcoming Fed rate decisions [The Economic Times]",
+      "Indian equity markets are expected to remain volatile ahead of the monthly derivative expiry [Goodreturns]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today."
+     ]
+    }
+   ]
+  }
+ ]
+}

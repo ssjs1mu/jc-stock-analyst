@@ -1,0 +1,201 @@
+{
+ "report_title": "morning-brief",
+ "report_date": "2026-10-27",
+ "seeded_from_pdf": true,
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Indian equity benchmarks ended higher in the previous session, with the Nifty 50 closing up 0.68% at 22,753.20 and the Sensex gaining 0.66% to reach 73,606.75. APOLLOHOSP and ONGC led the top gainers on the Nifty, while SHRIRAMFIN and ADANIENT were among the primary laggards. Global equities traded mostly higher following AI-led gains on Wall Street ahead of key earnings and central bank decisions."
+    }
+   ]
+  },
+  {
+   "heading": "Global & Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,361.58",
+       "+0.28%"
+      ],
+      [
+       "S&P 500",
+       "7,676.77",
+       "+0.70%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,169.38",
+       "+0.82%"
+      ],
+      [
+       "FTSE 100",
+       "10,767.30",
+       "+0.72%"
+      ],
+      [
+       "DAX",
+       "25,410.84",
+       "+0.91%"
+      ],
+      [
+       "Nikkei 225",
+       "63,412.00",
+       "+1.97%"
+      ],
+      [
+       "Hang Seng",
+       "23,235.64",
+       "+0.10%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,694.09",
+       "-0.09%"
+      ],
+      [
+       "Kospi",
+       "5,709.53",
+       "+4.39%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Commodities & Currency",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "109.79",
+       "-5.94%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "100.93",
+       "-2.27%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,029.10",
+       "+0.53%"
+      ],
+      [
+       "USD/INR",
+       "95.18",
+       "+0.25%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "102.07",
+       "+0.11%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "4.99",
+       "-0.04%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "India VIX & Previous Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,753.20",
+       "+0.68%"
+      ],
+      [
+       "Sensex",
+       "73,606.75",
+       "+0.66%"
+      ],
+      [
+       "Bank Nifty",
+       "54,366.70",
+       "+0.15%"
+      ],
+      [
+       "Nifty 500",
+       "21,608.75",
+       "+0.85%"
+      ],
+      [
+       "India VIX",
+       "17.16",
+       "+1.78%"
+      ]
+     ],
+     "trend": true
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,509",
+       "22,875"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,265",
+       "22,997"
+      ]
+     ],
+     "trend": false
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today."
+     ]
+    }
+   ]
+  }
+ ]
+}

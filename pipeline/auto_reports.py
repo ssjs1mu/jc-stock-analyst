@@ -18,6 +18,7 @@ import argparse
 import concurrent.futures as cf
 import datetime as dt
 import json
+import shutil
 import os
 import re
 import subprocess
@@ -581,7 +582,10 @@ def main():
     if mock or a.dry:
         print("DRY/MOCK run: rendered", pdf, "(not published)")
         return
-    files = ["--file", pdf] + (["--file", png] if a.sid == "morning-pulse" else [])
+    # structured copy of the report (same content as the PDF) for the terminal's Today's Outlook page
+    js = pdf[:-4] + ".json"
+    shutil.copyfile(cj, js)
+    files = ["--file", pdf] + (["--file", png] if a.sid == "morning-pulse" else []) + ["--file", js]
     subprocess.check_call(pub + files + ["--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
 
 
