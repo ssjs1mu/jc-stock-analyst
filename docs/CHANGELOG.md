@@ -45,3 +45,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Call cards (intraday + investment): the risk/reward bar now has a needle at the current market price (live on the client page, last close elsewhere) with CMP label, zone (before entry / in profit / T1 / T2 / stop-loss zone) and % to T1 and to stop. |
 
 | 2026-10-27 | [Claude] Client page live poll now also covers the symbols of today's calls, so every call card's CMP needle is live (not only the client's own watchlist).
+
+| 2026-10-27 | [Claude] Buy / Sell pop-ups now show the trading call per stock as a table: Call, CMP (live), Entry, Stop-loss, Target 1, Target 2, R:R, Status, Conviction (indicative pivot levels for stocks that only lean). |
