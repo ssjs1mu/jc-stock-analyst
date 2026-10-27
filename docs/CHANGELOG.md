@@ -41,3 +41,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Every processing screen shows an estimated % bar (window.jcProgress in xray.js: X-ray build, report preparation); flow is now: report ready → 'Open Quick summary?' → Quick summary tab asks 'Proceed with X-ray?'; from the client page the instant Quick summary goes straight to the X-ray (iframe go=xray) with the other reports building behind it; Back button label shortened to '← Back'. |
 
 | 2026-10-27 | [Claude] Client page Buy/Sell/Avoid is LIVE: live prices (poll every 60 s in market hours and on every open/return) invalidate a call when stop-loss is touched / target 2 reached (moves to Avoid with the reason), mark 'trigger crossed / waiting / target 1 reached', and upgrade leaning stocks that break yesterday's high/low; pop-ups show the live price and a ● LIVE time stamp. |
+
+| 2026-10-27 | [Claude] Call cards (intraday + investment): the risk/reward bar now has a needle at the current market price (live on the client page, last close elsewhere) with CMP label, zone (before entry / in profit / T1 / T2 / stop-loss zone) and % to T1 and to stop. |

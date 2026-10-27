@@ -159,9 +159,19 @@
   const lvl2 = (v) => (num(v) ? f2(v, v < 100 ? 2 : 1) : '—');
   const against = (c, md) => md != null && ((c.side === 'BUY' && md <= 40) || (c.side === 'SELL' && md >= 60));
   function ladder(c) {
-    const v = [c.sl, c.entry, c.t1, c.t2].filter(num); if (v.length < 3) return ''; const lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1, ps = (x) => ((x - lo) / r * 100), seg = (a, b, k) => `<i class="${k}" style="left:${Math.min(ps(a), ps(b)).toFixed(1)}%;width:${Math.abs(ps(a) - ps(b)).toFixed(1)}%"></i>`;
-    const dot = (x, t) => `<b style="left:${ps(x).toFixed(1)}%" title="${t}"></b>`;
-    return `<div class="olLad"><div class="olTr">${seg(c.sl, c.entry, 'rk')}${seg(c.entry, c.t2, 'gn')}${dot(c.sl, 'Stop')}${dot(c.entry, 'Entry')}${num(c.t1) ? dot(c.t1, 'T1') : ''}${dot(c.t2, 'T2')}</div></div>`;
+    const lv = [c.sl, c.entry, c.t1, c.t2].filter(num); if (lv.length < 3) return '';
+    const L = O.live && O.live[clean(c.sym)], br = O.board && O.board.rows && O.board.rows[clean(c.sym)], px = L && num(L[0]) ? L[0] : (br && num(br.c) ? br.c : null), isLive = !!(L && num(L[0]));
+    const all = px != null ? lv.concat(px) : lv, mn = Math.min(...all), mx = Math.max(...all), pad = (mx - mn) * 0.04 || 1, lo = mn - pad, hi = mx + pad, r = hi - lo || 1, ps = (x) => ((x - lo) / r * 100), seg = (a, b, k) => `<i class="${k}" style="left:${Math.min(ps(a), ps(b)).toFixed(1)}%;width:${Math.abs(ps(a) - ps(b)).toFixed(1)}%"></i>`;
+    const dot = (x, t) => `<b style="left:${ps(x).toFixed(1)}%" title="${t}"></b>`, buy = c.side === 'BUY';
+    let nd = '', note = '';
+    if (px != null) {
+      const pos = ps(px), beyondSl = buy ? px <= c.sl : px >= c.sl, past2 = buy ? px >= c.t2 : px <= c.t2, past1 = num(c.t1) && (buy ? px >= c.t1 : px <= c.t1), inTrade = buy ? px >= c.entry : px <= c.entry;
+      const st = beyondSl ? 'Stop-loss zone' : past2 ? 'Target 2 reached' : past1 ? 'Target 1 reached' : inTrade ? 'In profit zone' : 'Before entry', col = beyondSl ? '#c11d3d' : past1 || past2 ? '#0a6b38' : inTrade ? '#12894b' : '#8A6D1F';
+      const al = pos < 14 ? 'l' : pos > 86 ? 'r' : 'c', dT = num(c.t1) ? (c.t1 / px - 1) * 100 : null, dS = (c.sl / px - 1) * 100;
+      nd = `<div class="olNd ${al}" style="left:${pos.toFixed(1)}%;--nc:${col}"><span>${isLive ? '● ' : ''}CMP ₹${f2(px)}</span><u></u></div>`;
+      note = `<div class="olNote" style="color:${col}"><b>${st}</b>${dT != null ? ` · ${dT >= 0 ? '+' : ''}${dT.toFixed(1)}% to T1` : ''} · ${dS >= 0 ? '+' : ''}${dS.toFixed(1)}% to stop${isLive ? '' : ' · last close'}</div>`;
+    }
+    return `<div class="olLad"><div class="olTr">${seg(c.sl, c.entry, 'rk')}${seg(c.entry, c.t2, 'gn')}${dot(c.sl, 'Stop')}${dot(c.entry, 'Entry')}${num(c.t1) ? dot(c.t1, 'T1') : ''}${dot(c.t2, 'T2')}${nd}</div>${note}</div>`;
   }
   function callCard(c) {
     const buy = c.side === 'BUY', why = (c.why || []).slice(0, 2).join(' · ');
@@ -329,7 +339,7 @@
   .olMoodBar{border-left:5px solid var(--mc,#D4AF37);background:#fff;border-radius:8px;padding:8px 12px;margin:6px 0 4px;font-size:12.5px;line-height:1.45}
   .olCalls{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}.olCall{background:#fff;border:1px solid #ecd9a0;border-top:4px solid #12894b;border-radius:12px;padding:10px 12px;box-shadow:0 6px 16px -12px rgba(0,0,0,.4)}.olCall.cs{border-top-color:#c11d3d}
   .olCh{display:flex;align-items:center;gap:8px}.olSide{font-size:12px;padding:2px 8px;border-radius:99px;color:#fff;background:#12894b}.cs .olSide{background:#c11d3d}.olSym{font-size:16px;color:#14213d}.olGr{font-size:10.5px;font-weight:800;border:1px solid #D4AF37;color:#6b5314;border-radius:6px;padding:1px 6px;background:#fff8e6}.olCh .olX{margin-left:auto}
-  .olLad{margin:10px 2px 6px}.olTr{position:relative;height:8px;border-radius:6px;background:#eef1f8}.olTr i{position:absolute;top:0;height:100%}.olTr i.rk{background:#f4b6bf}.olTr i.gn{background:#a8e0bf}.olTr b{position:absolute;top:-3px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#14306e;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .olLad{margin:30px 4px 6px}.olNd{position:absolute;top:-14px;height:28px;z-index:3;pointer-events:none}.olNd u{position:absolute;left:-1px;top:6px;width:3px;height:26px;border-radius:2px;background:var(--nc,#14213d);box-shadow:0 0 0 2px #fff,0 2px 6px rgba(0,0,0,.35);animation:olNp 1.8s ease-in-out infinite}.olNd span{position:absolute;bottom:26px;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:800;color:#fff;background:var(--nc,#14213d);border-radius:8px;padding:2px 7px}.olNd.l span{transform:translateX(-12px)}.olNd.r span{transform:translateX(calc(-100% + 12px))}@keyframes olNp{50%{opacity:.55}}.olNote{font-size:11px;margin-top:4px;font-weight:600}.olTr{position:relative;height:8px;border-radius:6px;background:#eef1f8}.olTr i{position:absolute;top:0;height:100%}.olTr i.rk{background:#f4b6bf}.olTr i.gn{background:#a8e0bf}.olTr b{position:absolute;top:-3px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#14306e;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
   .olLv4{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center}.olLv4 span{font-size:10px;color:#6a7694;background:#faf6e8;border-radius:8px;padding:4px 2px}.olLv4 b{display:block;font-size:12.5px;color:#14213d;font-variant-numeric:tabular-nums}.olLv4 .dn b{color:#c11d3d}.olLv4 .up b{color:#12894b}
   .olWhy{margin-top:6px;font-size:11px;color:#52607f}
   @media(max-width:520px){.olMood{grid-template-columns:1fr;justify-items:center}.olLv4{grid-template-columns:repeat(5,1fr)}.olLv4 b{font-size:11px}}
