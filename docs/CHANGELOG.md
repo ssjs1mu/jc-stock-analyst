@@ -27,3 +27,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client reports now lists terminal watchlists that are not linked to a client (with a hint to link them) — a watchlist appears in reports only once linked in Client dashboards. |
 
 | 2026-10-27 | [Claude] Client reports merged with watchlists: all terminal watchlists + linked clients listed in one selector/table, inline ＋ Add watchlist (name + stocks), Telegram send only for linked clients. Replaces the strict-lock rule at the owner's request (linked clients still use their stored list). |
+
+| 2026-10-27 | [Claude] Mobile/client page now plays the same opening: 3D tree logo with rupee signs flying from the background to the front (intro.js made path-aware, old simple splash hidden). |

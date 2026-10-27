@@ -4,6 +4,7 @@
 (function () {
   'use strict';
   if (/[?&]embed=1/.test(location.search)) return; /* embedded inside the client dashboard: no splash */
+  var BASE = (function () { try { var sc = document.currentScript; return sc && sc.src ? sc.src.replace(/intro\.js.*$/, '') : ''; } catch (e) { return ''; } })() || '';
   var d = document, root = d.documentElement, t0 = Date.now(), MIN = 3900, MAX = 9000, done = false;
   var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { }
   if (reduce) MIN = 900;
@@ -30,13 +31,13 @@
 
   var el = d.createElement('div'); el.id = 'jcIntro'; el.setAttribute('role', 'presentation');
   var layers = '', N = 16, i;
-  for (i = 0; i < N; i++) { var z = (i - (N - 1) / 2) * 1.6, shade = 0.55 + 0.45 * (i / (N - 1)); layers += '<img alt="" src="assets/jc-logo-3d.png" style="transform:translateZ(' + z.toFixed(1) + 'px);filter:brightness(' + shade.toFixed(2) + ')">'; }
+  for (i = 0; i < N; i++) { var z = (i - (N - 1) / 2) * 1.6, shade = 0.55 + 0.45 * (i / (N - 1)); layers += '<img alt="" src="' + BASE + 'assets/jc-logo-3d.png" style="transform:translateZ(' + z.toFixed(1) + 'px);filter:brightness(' + shade.toFixed(2) + ')">'; }
   var small = '';
   [[-34, -12, .0], [30, 8, .35], [-18, 20, .7], [40, -22, 1.0], [-44, 6, 1.2]].forEach(function (p, k) { small += '<span class="rup s" style="margin-left:' + p[0] + 'vmin;margin-top:' + p[1] + 'vmin;animation-delay:' + (0.9 + p[2]).toFixed(2) + 's">₹</span>'; });
   el.innerHTML = '<div class="stage"><div class="glow"></div><div class="floor"></div>' + small + '<div class="spin">' + layers + '</div><div class="rup" style="margin-left:-9vmin;margin-top:-15vmin">₹</div></div>' +
     '<div class="cap">Connecting People Thru Services</div><div class="bar"><i></i></div><div class="skip">tap to skip</div>';
   root.appendChild(el);
-  try { var pre = new Image(); pre.src = 'assets/jc-logo-3d.png'; } catch (e) { }
+  try { var pre = new Image(); pre.src = BASE + 'assets/jc-logo-3d.png'; } catch (e) { }
 
   function finish() {
     if (done) return; done = true; el.classList.add('out');
