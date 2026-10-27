@@ -96,7 +96,7 @@ var $=function(i){return document.getElementById(i)};
 var qs=new URLSearchParams(location.search),token=(location.hash||'').replace(/^#/,'').trim();if(!/^[a-f0-9]{24}$/.test(token))token='';if(!token&&/^[a-f0-9]{24}$/.test(qs.get('k')||''))token=qs.get('k');try{if(token)localStorage.setItem('jcc_tok',token);else token=localStorage.getItem('jcc_tok')||''}catch(e){}if(!/^[a-f0-9]{24}$/.test(token))token='';
 var DEMO=qs.get('demo')==='1'||(!token&&!qs.get('k'));
 
-var S={name:'',syms:[],board:null,q:{},live:{},fired:{},alog:[]};
+var S={name:'',syms:[],board:null,q:{},live:{},fired:{},alog:[]};window.jcc={S:S};
 function ist(){return new Date(Date.now()+19800000)}
 function todayIst(){return ist().toISOString().slice(0,10)}
 function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
@@ -236,5 +236,6 @@ setInterval(function(){try{var f=$('dashFrame'),d=f.contentDocument;if(d&&d.docu
 boot();
 })();
 </script>
+<script src="../outlook.js?v=3"></script>
 </body>
 </html>

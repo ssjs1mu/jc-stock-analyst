@@ -10,12 +10,14 @@
   const E = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const num = (v) => typeof v === 'number' && isFinite(v);
   const f2 = (v, d) => (num(v) ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }) : '—');
+  const CL = !!document.getElementById('dashFrame') && !document.getElementById('viewSel'), BASE = CL ? '../' : '', EMB = /[?&]embed=1/.test(location.search);
   const O = { rep: {}, calls: null, board: null, listId: null, loaded: false, busy: false, sym: '', err: '' };
   const IDS = { brief: 'morning-brief', det: 'morning-detailed', news: 'premarket-news', pulse: 'morning-pulse' };
   const pf = (s) => { const v = parseFloat(String(s).replace(/[,%+]/g, '')); return isFinite(v) ? v : null; };
+  const openX = (sym) => { if (!CL) { if (window.jcXray) window.jcXray(sym); return; } let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); } m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">✕ Close</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; };
   const clean = (s) => String(s || '').replace(/\.(NS|BO)$/i, '').toUpperCase();
 
-  async function jget(url) { const r = await fetch(url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
+  async function jget(url) { const r = await fetch(BASE + url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
   async function loadRep(key) {
     try {
       const ix = await jget('reports/' + IDS[key] + '/index.json'), runs = ix.runs || [];
@@ -24,7 +26,7 @@
       if (!run) return { holiday: hol };
       const f = run.files.find((x) => x.type === 'json'), pdf = run.files.find((x) => x.type === 'pdf');
       const cfg = await jget(f.path);
-      return { cfg, date: run.date, at: run.generated_at, pdf: pdf && pdf.path, holiday: hol };
+      return { cfg, date: run.date, at: run.generated_at, pdf: pdf && BASE + pdf.path, holiday: hol };
     } catch (e) { return null; }
   }
   const sec = (rep, re) => ((rep && rep.cfg && rep.cfg.sections) || []).filter((s) => re.test(s.heading));
@@ -105,7 +107,7 @@
       <div class="olSrc">Rule-based levels from delayed data; a stop is part of every call. Not advice and not a guaranteed outcome.</div></section>`;
   }
   /* ---------- watchlist Buy / Sell / Avoid ---------- */
-  const lists = () => { try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
+  const lists = () => { if (CL) { const j = window.jcc; return [{ id: 'me', name: 'My watchlist', syms: (j && j.S && j.S.syms) || [] }]; } try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
   function classify(list) {
     const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
     const out = { BUY: [], SELL: [], AVOID: [] };
@@ -122,7 +124,7 @@
     return out;
   }
   function frame5() {
-    const L = lists(); if (!O.listId || !L.find((l) => l.id === O.listId)) O.listId = (typeof WL !== 'undefined' && WL.store && WL.store.active) || (L[0] && L[0].id);
+    const L = lists(); if (!O.listId || !L.find((l) => l.id === O.listId)) O.listId = CL ? 'me' : (typeof WL !== 'undefined' && WL.store && WL.store.active) || (L[0] && L[0].id);
     const l = L.find((x) => x.id === O.listId), k = classify(l);
     return `<section class="olF"><h3>MY WATCHLIST — BUY · SELL · AVOID</h3>
       <div class="olSel"><label>Watchlist <select id="olList">${L.map((x) => `<option value="${E(x.id)}"${x.id === O.listId ? ' selected' : ''}>${E(x.name)} (${x.syms.length})</option>`).join('')}</select></label>
@@ -153,17 +155,18 @@
   const repStrip = (wait) => { const d = wait ? ' disabled title="Report still building…"' : ''; return `<div class="olStrip"><b>${E(O.sym)}</b> reports: <button data-x="${E(O.sym)}">① X-ray</button><button data-tab="pSummary"${d}>② Quick summary</button><button data-tab="pIntraday"${d}>③ Intraday</button><button data-tab="pSwing"${d}>④ Short term</button><button data-tab="pLong"${d}>⑤ Long term</button></div>`; };
   async function go() {
     const inp = $('olSym'); const s = clean((inp && inp.value) || ''); if (!s) return; O.sym = s; O.gen = true; O.busyRep = true;
-    const si = $('symbolInput'), ex = $('exchangeInput'); if (si) si.value = s; if (ex && $('olEx')) ex.value = $('olEx').value;
+    const si = $('symbolInput'), ex = $('exchangeInput'); if (CL) { O.gen = false; } if (si) si.value = s; if (ex && $('olEx')) ex.value = $('olEx').value;
     const rp = $('olRep'); if (rp) rp.innerHTML = repStrip(true) + '<div class="olN">Building the full report in the background…</div>';
-    if (window.jcXray) window.jcXray(s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : ''));
+    if (CL) { openX(s); O.busyRep = false; const r3 = $('olRep'); if (r3) r3.innerHTML = ''; return; }
+    openX(s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : ''));
     try { if (typeof runAnalysis === 'function') await runAnalysis(); } catch (e) { }
     O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
   }
   /* ---------- paint ---------- */
   function draw() {
-    const p = $('pOutlook'); if (!p || !p.classList.contains('active')) return;
+    const p = $('pOutlook'); if (!p || (!CL && !p.classList.contains('active'))) return;
     const keep = $('olSym') ? $('olSym').value : O.sym; O.sym = keep || O.sym;
-    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? frame1() + frame2() + frame3() + frame4() + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
+    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? frame1() + frame2() + frame3() + frame4() + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
       <div class="olLegal">Prepared from delayed market data and published morning reports with fixed, rule-based formulas. Research information for discussion with your adviser — not investment advice, not a recommendation, and no outcome is guaranteed.</div></div>`;
   }
   const css = () => `<style>
@@ -187,7 +190,8 @@
   .olB:hover,.olX:hover{filter:brightness(.95)}.olX{cursor:pointer;border:1px solid #D4AF37;background:#fff8e6;border-radius:8px;padding:3px 8px;font-weight:700;color:#6b5314}
   .olSearch{display:flex;gap:8px;flex-wrap:wrap}.olSearch input{flex:1;min-width:200px;padding:8px 10px;border:1px solid #D4AF37;border-radius:8px;font-size:14px}.olSearch select{padding:8px;border:1px solid #D4AF37;border-radius:8px}
   .olStrip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.olStrip button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 12px;font-weight:700}
-  .olLegal{font-size:10.5px;color:#6a7694;margin:10px 0 24px}
+  .olLegal{font-size:10.5px;color:#6a7694;margin:10px 0 24px}${CL ? '.olLegal{color:#9fb0d6}.olWrap{padding:0 12px}.olHdr{display:none}' : ''}
+  #olFrm{position:fixed;inset:0;z-index:70;background:#0b1c45;display:none;flex-direction:column}#olFrm.on{display:flex}.olFh{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;color:#e7cf86;border-bottom:2px solid #D4AF37}#olFrm iframe{flex:1;border:0;width:100%;background:#f1f4fa}
   #olPop{position:fixed;inset:0;z-index:60;background:rgba(10,20,45,.55);display:none;align-items:center;justify-content:center;padding:14px}#olPop.on{display:flex}
   .olBox{background:#fffdf6;border:3px double #D4AF37;border-radius:14px;max-width:880px;width:100%;max-height:88vh;overflow:auto;padding:14px 16px}.olHd{display:flex;justify-content:space-between;align-items:center}.olHd h3{margin:0;color:#8A6D1F}.olHd small{color:#52607f}.olClose{cursor:pointer;border:0;background:#14306e;color:#fff;border-radius:8px;padding:4px 10px;font-size:14px}
   #olBack{position:fixed;left:12px;bottom:12px;z-index:40;display:none;background:#14306e;color:#fff;border:2px solid #D4AF37;border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
@@ -196,10 +200,11 @@
   /* ---------- events ---------- */
   document.addEventListener('click', (e) => {
     const t = e.target, c = (q) => t.closest && t.closest(q);
+    if (c('[data-closefrm]')) { const m = $('olFrm'); if (m) { m.className = ''; m.innerHTML = ''; } document.body.style.overflow = ''; return; }
     if (c('#olBack')) { showTab('pOutlook'); return; }
     if (c('[data-close]') || t.id === 'olPop') { closePop(); return; }
     const k = c('#pOutlook [data-k]'); if (k) { popup(k.getAttribute('data-k')); return; }
-    const x = c('#pOutlook [data-x], #olPop [data-x]'); if (x) { if (window.jcXray) { if ($('olPop')) closePop(); window.jcXray(x.getAttribute('data-x')); } return; }
+    const x = c('#pOutlook [data-x], #olPop [data-x]'); if (x) { closePop(); openX(x.getAttribute('data-x')); return; }
     const tb = c('#pOutlook [data-tab]'); if (tb) { O.fromOutlook = true; showTab(tb.getAttribute('data-tab')); return; }
     if (c('#olGo')) { go(); return; }
     if (c('#olRef')) { O.loaded = false; O.busy = false; draw(); loadAll(); }
@@ -214,6 +219,26 @@
     const orig = window.showTab; window.showTab = function (id) { orig(id); bk.style.display = O.fromOutlook && /^p(Summary|Intraday|Swing|Long)$/.test(id) ? 'block' : 'none'; if (id === 'pOutlook') { O.fromOutlook = false; draw(); if (!O.loaded) loadAll(); } };
     return true;
   }
-  const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400);
+  function initClient() {
+    if ($('pOutlook')) return true; const err = $('err'); if (!err) return false;
+    const d = document.createElement('div'); d.id = 'pOutlook'; d.className = 'panel active'; err.parentNode.insertBefore(d, err.nextSibling);
+    const s4 = document.querySelector('section.s4'); if (s4) s4.style.display = 'none';
+    d.innerHTML = '<div class="olWrap"><div class="olN" style="margin:12px">Loading the morning reports…</div></div>'; loadAll(); setInterval(() => { if (document.visibilityState === 'visible') { O.loaded = true; loadAll(); } }, 600000);
+    /* repaint when the page learns the client's list (jcc.S.syms) */
+    let last = -1; setInterval(() => { const n = (window.jcc && window.jcc.S && window.jcc.S.board ? 1 : 0) * 1e4 + (window.jcc ? window.jcc.S.syms.length : 0); if (n !== last && O.loaded) { last = n; draw(); } }, 1200);
+    return true;
+  }
+  /* embedded terminal opened by the client page with ?sym=: X-ray first, then report buttons */
+  function initEmbedSym() {
+    const m = /[?&]sym=([A-Za-z0-9&._-]{1,20})/.exec(location.search); if (!m || !EMB) return;
+    const sym = m[1].toUpperCase(), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
+      $('symbolInput').value = sym.replace(/\.(NS|BO)$/, ''); if (/\.BO$/.test(sym) && $('exchangeInput')) $('exchangeInput').value = 'BO';
+      window.jcXray(sym); const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><button data-xr="' + sym + '">① X-ray</button><button data-t="pSummary" disabled>② Quick summary</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
+      document.body.insertBefore(bar, document.body.firstChild);
+      bar.onclick = (e) => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.getAttribute('data-xr')) window.jcXray(sym); else showTab(b.getAttribute('data-t')); };
+      Promise.resolve(runAnalysis()).catch(() => { }).then(() => { bar.querySelectorAll('button[data-t]').forEach((b) => { b.disabled = false; }); });
+    }, 300);
+  }
+  if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
   window.jcOutlook = { reload: () => { O.loaded = false; loadAll(); draw(); }, state: O };
 })();
