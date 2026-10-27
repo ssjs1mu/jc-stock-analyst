@@ -225,18 +225,28 @@
   function frame6() {
     return `<section class="olF"><h3>SCRIP SEARCH · X-RAY &amp; FULL REPORT</h3>
       <div class="olSearch"><input id="olSym" placeholder="Symbol e.g. RELIANCE, TFCILTD" value="${E(O.sym)}" autocomplete="off"><select id="olEx"><option value="NS">NSE</option><option value="BO">BSE</option></select><button class="olB go" id="olGo">Generate report</button></div>
-      <div class="olSrc">Opens the graphical X-ray first, then builds the Quick summary, Intraday, Short term and Long term reports.</div>
+      <div class="olSrc">Shows the Quick summary first, then asks whether to proceed with the graphical X-ray, followed by the Intraday, Short term and Long term reports.</div>
       <div id="olRep">${O.sym && O.gen ? repStrip(O.busyRep) : ''}</div></section>`;
   }
-  const repStrip = (wait) => { const d = wait ? ' disabled title="Report still building…"' : ''; return `<div class="olStrip"><b>${E(O.sym)}</b> reports: <button data-x="${E(O.sym)}">① X-ray</button><button data-tab="pSummary"${d}>② Quick summary</button><button data-tab="pIntraday"${d}>③ Intraday</button><button data-tab="pSwing"${d}>④ Short term</button><button data-tab="pLong"${d}>⑤ Long term</button></div>`; };
+  /* "Proceed with X-ray?" card shown after the Quick summary */
+  function proceedPrompt(sym, onYes) {
+    const old = document.getElementById('olProceed'); if (old) old.remove();
+    const d = document.createElement('div'); d.id = 'olProceed';
+    d.innerHTML = '<style>#olProceed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:55;width:min(94vw,440px);background:#fffdf6;border:2px solid #D4AF37;border-radius:14px;padding:12px 14px;box-shadow:0 14px 34px -10px rgba(0,0,0,.55);font:600 13px system-ui,sans-serif;color:#14213d}#olProceed div{display:flex;gap:8px;margin-top:10px}#olProceed button{flex:1;cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:10px;padding:9px;font-weight:800}#olProceed .y{background:#14306e;color:#fff}</style>Quick summary of <b>' + E(clean(sym)) + '</b> is ready. Proceed with the graphical X-ray?<div><button class="y" data-y="1">Yes — open X-ray</button><button data-n="1">Not now</button></div>';
+    d.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; d.remove(); if (b.getAttribute('data-y')) onYes(); };
+    document.body.appendChild(d);
+  }
+  const repStrip = (wait) => { const d = wait ? ' disabled title="Report still building…"' : ''; return `<div class="olStrip"><b>${E(O.sym)}</b> reports: <button data-tab="pSummary"${d}>① Quick summary</button><button data-x="${E(O.sym)}">② X-ray</button><button data-tab="pIntraday"${d}>③ Intraday</button><button data-tab="pSwing"${d}>④ Short term</button><button data-tab="pLong"${d}>⑤ Long term</button></div>`; };
   async function go() {
     const inp = $('olSym'); const s = clean((inp && inp.value) || ''); if (!s) return; O.sym = s; O.gen = true; O.busyRep = true;
     const si = $('symbolInput'), ex = $('exchangeInput'); if (CL) { O.gen = false; } if (si) si.value = s; if (ex && $('olEx')) ex.value = $('olEx').value;
     const rp = $('olRep'); if (rp) rp.innerHTML = repStrip(true) + '<div class="olN">Building the full report in the background…</div>';
     if (CL) { openX(s); O.busyRep = false; const r3 = $('olRep'); if (r3) r3.innerHTML = ''; return; }
-    openX(s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : ''));
+    const full = s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : '');
     try { if (typeof runAnalysis === 'function') await runAnalysis(); } catch (e) { }
     O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
+    O.fromOutlook = true; pushLayer(() => { const q = document.getElementById('olProceed'); if (q) q.remove(); showTab(O.home || 'pClient'); }); showTab('pSummary');
+    proceedPrompt(full, () => openX(full));
   }
   /* ---------- paint ---------- */
   function draw() {
@@ -321,10 +331,10 @@
     const m = /[?&]sym=([A-Za-z0-9&._-]{1,20})/.exec(location.search); if (!m || !EMB) return;
     const sym = m[1].toUpperCase(), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
       $('symbolInput').value = sym.replace(/\.(NS|BO)$/, ''); if (/\.BO$/.test(sym) && $('exchangeInput')) $('exchangeInput').value = 'BO';
-      window.jcXray(sym); const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><button data-xr="' + sym + '">① X-ray</button><button data-t="pSummary" disabled>② Quick summary</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
+      const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><button data-t="pSummary" disabled>① Quick summary</button><button data-xr="' + sym + '" disabled>② X-ray</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
       document.body.insertBefore(bar, document.body.firstChild);
       bar.onclick = (e) => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.getAttribute('data-xr')) window.jcXray(sym); else showTab(b.getAttribute('data-t')); };
-      Promise.resolve(runAnalysis()).catch(() => { }).then(() => { bar.querySelectorAll('button[data-t]').forEach((b) => { b.disabled = false; }); });
+      Promise.resolve(runAnalysis()).catch(() => { }).then(() => { bar.querySelectorAll('button').forEach((b) => { b.disabled = false; }); showTab('pSummary'); proceedPrompt(sym, () => window.jcXray(sym)); });
     }, 300);
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
