@@ -2,6 +2,21 @@
  "schedule_id": "premarket-news",
  "runs": [
   {
+   "generated_at": "2026-10-27T07:23:39+05:30",
+   "date": "2026-10-27",
+   "status": "ok",
+   "caption": "premarket-news 27 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "Market_News_2026-10-27.pdf",
+     "path": "reports/premarket-news/Market_News_2026-10-27.pdf",
+     "type": "pdf",
+     "bytes": 359098
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-26T07:30:01+05:30",
    "date": "2026-10-26",
    "status": "ok",
@@ -115,5 +130,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-26T07:30:01+05:30"
+ "updated_at": "2026-10-27T07:23:39+05:30"
 }
