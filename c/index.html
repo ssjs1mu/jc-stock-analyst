@@ -204,12 +204,12 @@ if(buy?p<=e.sl:p>=e.sl)alertNow(s+'sl',s,'Stop-loss ₹'+f2(e.sl)+' touched — 
 else if(r){if(p>r.ph*1.003&&r.lean==='BUY')alertNow(s+'bk',s,'broke above yesterday\'s high ₹'+f2(r.ph));if(p<r.pl*.997&&r.lean==='SELL')alertNow(s+'bd',s,'broke below yesterday\'s low ₹'+f2(r.pl))}
 if(l[6]&&l[5]&&l[5]>l[6]*1.5)alertNow(s+'v',s,'volume surge: '+f2(l[5]/l[6],1)+'× the 5-day average')})}
 function marketOpen(){var n=ist(),d=n.getUTCDay(),m=n.getUTCHours()*60+n.getUTCMinutes();return d>0&&d<6&&m>=555&&m<=935}
-function poll(){if(!S.syms.length)return;fj(be('action=liveq&symbols='+encodeURIComponent(S.syms.map(function(s){return s+'.NS'}).join(','))),25000).then(function(j){if(!j||!j.ok)return;S.syms.forEach(function(s){if(j.q[s+'.NS'])S.live[s]=j.q[s+'.NS']});paintTiles();check();livePill(1)}).catch(function(){livePill(0)})}
+function poll(){if(!S.syms.length)return;fj(be('action=liveq&symbols='+encodeURIComponent(S.syms.map(function(s){return s+'.NS'}).join(','))),25000).then(function(j){if(!j||!j.ok)return;S.syms.forEach(function(s){if(j.q[s+'.NS'])S.live[s]=j.q[s+'.NS']});paintTiles();check();try{window.jcOutlook&&window.jcOutlook.setLive(S.live)}catch(e){}livePill(1)}).catch(function(){livePill(0)})}
 function livePill(ok){var e=$('livePill');if(!e)return;var t=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});e.className='lp '+(ok?'on':'off');e.textContent=(ok?'LIVE · ':'RETRYING · ')+t}
-var pt=null;function startPoll(){poll();clearInterval(pt);pt=setInterval(function(){if(document.visibilityState==='visible'&&marketOpen())poll()},90000)}
+var pt=null;function startPoll(){poll();clearInterval(pt);pt=setInterval(function(){if(document.visibilityState==='visible'&&marketOpen())poll()},60000)}
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){poll()}});
 function altUi(){var ok=window.Notification&&Notification.permission==='granted';
-$('altBtn').innerHTML='<div class="mut" style="color:#9fb0d6">Live alerts run <b>while this page is open</b> (checked every 90 s in market hours). They fire on entry, targets, stop-loss, breakouts and volume surges. A closed phone is not alerted — keep the page open, or rely on the Telegram updates.</div>'+(window.Notification&&!ok?'<button class="btn" id="en">Enable phone notifications</button>':'')+(ok?'<div class="mut" style="color:#7dffb3">Notifications enabled ✓</div>':'');
+$('altBtn').innerHTML='<div class="mut" style="color:#9fb0d6">Live alerts run <b>while this page is open</b> (checked every minute in market hours). They fire on entry, targets, stop-loss, breakouts and volume surges. A closed phone is not alerted — keep the page open, or rely on the Telegram updates.</div>'+(window.Notification&&!ok?'<button class="btn" id="en">Enable phone notifications</button>':'')+(ok?'<div class="mut" style="color:#7dffb3">Notifications enabled ✓</div>':'');
 var b=$('en');if(b)b.onclick=function(){Notification.requestPermission().then(altUi)}}
 $('bell').onclick=function(){$('alog').scrollIntoView({behavior:'smooth'})};
 /* ---- boot ---- */
@@ -225,6 +225,6 @@ setInterval(function(){try{var f=$('dashFrame');if(!f)return;var d=f.contentDocu
 boot();
 })();
 </script>
-<script src="../outlook.js?v=9"></script>
+<script src="../outlook.js?v=10"></script>
 </body>
 </html>

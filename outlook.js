@@ -182,10 +182,26 @@
   }
   /* ---------- watchlist Buy / Sell / Avoid ---------- */
   const lists = () => { if (O.custom) return [O.custom]; if (CL) { const j = window.jcc; return [{ id: 'me', name: 'My watchlist', syms: (j && j.S && j.S.syms) || [] }]; } try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
+  /* LIVE overlay: today's live price (client page polls it) can invalidate or upgrade the morning view */
+  function liveAdj(s, r, c, side) {
+    const L = O.live && O.live[s]; if (!L || !num(L[0])) return null; const p = L[0], hi = num(L[3]) ? L[3] : p, lo = num(L[4]) ? L[4] : p;
+    const pl = c ? { e: c.entry, sl: c.sl, t1: c.t1, t2: c.t2 } : (r && r.p && r.b !== 'WAIT' ? r.p : null);
+    if (pl && (side === 'BUY' || side === 'SELL')) {
+      const buy = side === 'BUY', ent = buy ? hi >= pl.e : lo <= pl.e;
+      if (buy ? p <= pl.sl : p >= pl.sl) return { side: 'AVOID', why: 'LIVE: stop-loss ₹' + f2(pl.sl) + ' touched (now ₹' + f2(p) + ') — plan invalid', lp: p };
+      if (buy ? p >= pl.t2 : p <= pl.t2) return { side: 'AVOID', why: 'LIVE: target 2 ₹' + f2(pl.t2) + ' reached — no fresh entry', lp: p };
+      return { side, tag: 'LIVE · ' + (buy ? (p >= pl.t1 ? 'target 1 reached' : ent ? 'trigger crossed — in trade' : 'waiting for ₹' + f2(pl.e)) : (p <= pl.t1 ? 'target 1 reached' : ent ? 'trigger crossed — in trade' : 'waiting for ₹' + f2(pl.e))), lp: p };
+    }
+    if (r) {
+      if (r.lean === 'BUY' && num(r.ph) && p > r.ph * 1.003) return { side: 'BUY', tag: 'LIVE · broke above yesterday’s high ₹' + f2(r.ph), lp: p };
+      if (r.lean === 'SELL' && num(r.pl) && p < r.pl * 0.997) return { side: 'SELL', tag: 'LIVE · broke below yesterday’s low ₹' + f2(r.pl), lp: p };
+    }
+    return { lp: p };
+  }
   function classify(list) {
     const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
     const out = { BUY: [], SELL: [], AVOID: [] }, mm = moodOf(pack('morning')), md = mm ? mm.score : null;
-    const put = (side, o) => { if (against({ side }, md)) out.AVOID.push(Object.assign(o, { why: 'Against today’s ' + mm.label.toLowerCase() + ' mood (' + md + '/100) — wait', tag: '' })); else out[side].push(o); };
+    const put = (side, o) => { const a = liveAdj(o.s, o.r, o.c, side); if (a) { if (a.lp != null) o.lp = a.lp; if (a.tag) o.tag = a.tag; if (a.side === 'AVOID') { out.AVOID.push(Object.assign(o, { why: a.why, tag: '' })); return; } if (a.side) side = a.side; } if (against({ side }, md)) out.AVOID.push(Object.assign(o, { why: 'Against today’s ' + mm.label.toLowerCase() + ' mood (' + md + '/100) — wait', tag: '' })); else out[side].push(o); };
     (list ? list.syms : []).forEach((s0) => {
       const s = clean(s0), r = B[s], c = calls[s];
       if (c && (c.side === 'BUY' || c.side === 'SELL')) { put(c.side, { s, r, c, tag: c.type === 'DAY' ? 'Intraday call' : 'Investment call', conv: r ? r.conv : c.score }); return; }
@@ -193,7 +209,7 @@
       if (r.b === 'BUY' || r.b === 'SELL') put(r.b, { s, r, tag: 'Signal', conv: r.conv });
       else if (r.lean === 'BUY' && r.conv >= 60) put('BUY', { s, r, tag: 'Leaning buy · wait for trigger', conv: r.conv });
       else if (r.lean === 'SELL' && r.conv >= 60) put('SELL', { s, r, tag: 'Leaning sell · wait for trigger', conv: r.conv });
-      else out.AVOID.push({ s, r, why: r.no || 'No clean set-up', conv: r.conv });
+      else { const a = liveAdj(s, r, null, 'WAIT'); if (a && a.side && r.conv >= 50) put(a.side, { s, r, tag: a.tag, conv: r.conv, lp: a.lp }); else out.AVOID.push({ s, r, why: r.no || 'No clean set-up', conv: r.conv, lp: a && a.lp }); }
     });
     Object.values(out).forEach((a) => a.sort((x, y) => (y.conv || 0) - (x.conv || 0)));
     return out;
@@ -203,17 +219,17 @@
     const l = L.find((x) => x.id === O.listId), k = classify(l);
     return `<section class="olF"><h3>MY WATCHLIST — BUY · SELL · AVOID</h3>
       <div class="olSel"><label>Watchlist <select id="olList">${L.map((x) => `<option value="${E(x.id)}"${x.id === O.listId ? ' selected' : ''}>${E(x.name)} (${x.syms.length})</option>`).join('')}</select></label>
-        <small>${O.board ? 'Board as of ' + E(String(O.board.date || '')) : 'Board not loaded'}</small></div>
+        <small>${O.board ? 'Board as of ' + E(String(O.board.date || '')) : 'Board not loaded'}${O.liveAt ? ' · <b style="color:#12894b">● LIVE ' + new Date(O.liveAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) + '</b>' : ''}</small></div>
       <div class="olBtns"><button class="olB buy" data-k="BUY">BUY<b>${k.BUY.length}</b></button><button class="olB sell" data-k="SELL">SELL<b>${k.SELL.length}</b></button><button class="olB avoid" data-k="AVOID">AVOID<b>${k.AVOID.length}</b></button></div>
       <div class="olSrc">Tap a button to see the stocks from this watchlist. Buy / Sell = a rule-based signal or call (or a strong lean, marked); Avoid = no clean set-up today.</div></section>`;
   }
   function popup(kind) {
     const l = lists().find((x) => x.id === O.listId), k = classify(l)[kind], T = { BUY: 'Buy', SELL: 'Sell', AVOID: 'Avoid' }[kind];
     const body = k.length ? `<div class="olScroll"><table class="olTb"><thead><tr><th>Stock</th><th>Price</th><th>Why / levels</th><th>Conv.</th><th></th></tr></thead><tbody>${k.map((x) => {
-      const r = x.r, c = x.c, chg = r && r.pc ? (r.c / r.pc - 1) * 100 : null;
+      const r = x.r, c = x.c, px = num(x.lp) ? x.lp : (r ? r.c : null), chg = r && r.pc && px != null ? (px / r.pc - 1) * 100 : null;
       const lv = c ? `Entry ${f2(c.entry)} · Stop ${f2(c.sl)} · T1 ${f2(c.t1)} · T2 ${f2(c.t2)}` : (r && r.pv && kind !== 'AVOID' ? `Support ${f2(r.pv.S1)} · Resistance ${f2(r.pv.R1)}` : '');
       const why = x.why || ((c && c.why) || (r && r.why) || []).slice(0, 2).join(' · ');
-      return `<tr><td><b>${E(x.s)}</b><br><small>${E(x.tag || '')}</small></td><td>${r ? f2(r.c) : '—'}${chg != null ? `<br><small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</td><td><small>${E(lv)}${lv && why ? '<br>' : ''}${E(why)}</small></td><td>${num(x.conv) ? Math.round(x.conv) : '—'}</td><td><button class="olX" data-x="${E(x.s)}">X-ray</button></td></tr>`;
+      return `<tr><td><b>${E(x.s)}</b><br><small>${E(x.tag || '')}</small></td><td>${px != null ? f2(px) : '—'}${num(x.lp) ? '<br><small style="color:#12894b;font-weight:800">● live</small>' : ''}${chg != null ? `<br><small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</td><td><small>${E(lv)}${lv && why ? '<br>' : ''}${E(why)}</small></td><td>${num(x.conv) ? Math.round(x.conv) : '—'}</td><td><button class="olX" data-x="${E(x.s)}">X-ray</button></td></tr>`;
     }).join('')}</tbody></table></div>` : `<div class="olN">No stocks in this group for the selected watchlist today.</div>`;
     let m = $('olPop'); if (!m) { m = document.createElement('div'); m.id = 'olPop'; document.body.appendChild(m); }
     m.innerHTML = `<div class="olBox"><div class="olHd"><h3>${T} — ${E(l ? l.name : '')} <small>${k.length} stock${k.length === 1 ? '' : 's'}</small></h3><button class="olClose" data-close="1">✕</button></div>${body}<div class="olSrc">Rule-based, from delayed data. Conv. = signal-agreement score, not a probability. Not investment advice.</div></div>`;
@@ -365,5 +381,5 @@
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
   async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4(k) + '</div>'; }
-  window.jcOutlook = { reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
+  window.jcOutlook = { setLive: (m) => { O.live = m; O.liveAt = Date.now(); if (O.loaded) draw(); }, reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
 })();
