@@ -30,7 +30,7 @@
       const st = await api('adm_status'); S.locked = !!st.locked; S.ok = false;
       if (S.locked && admKey()) { try { const j = await api('cl_list'); S.clients = j.clients || []; S.trash = j.trash || 0; S.ok = true; await autoSync(); } catch (e) { if (/passcode/.test(e.message)) { S.err = 'That passcode was not accepted.'; } else throw e; } }
     } catch (e) { S.err = e.message || 'failed'; if (/unknown action/.test(S.err)) S.err = 'The data backend is the old version — redeploy Code.gs.'; }
-    S.busy = false; draw();
+    S.busy = false; draw(); try { window.dispatchEvent(new Event('jc-clients')); } catch (e) { }
   }
   /* additive only: new stocks in a terminal watchlist are copied to its linked client; nothing is ever removed this way */
   async function autoSync() {
@@ -94,5 +94,6 @@
   function mount() {
     const p = $('pClient'); if (!p) return; if (!$('cdBox')) { const d = document.createElement('div'); d.id = 'cdBox'; d.className = 'crb'; p.appendChild(d); draw(); if (!S.synced && p.classList.contains('active')) { S.synced = true; load(); } }
   }
+  window.jcClients = { S, api, send: (id) => api('cl_send', { id }), reload: () => load() };
   setInterval(mount, 1500); /* cheap: clientrep repaints #pClient and wipes the box, so it is re-added and redrawn from state */
 })();

@@ -12,7 +12,7 @@
   const f2 = (v, d) => (num(v) ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }) : '—');
   const CL = !!document.getElementById('dashFrame') && !document.getElementById('viewSel'), BASE = CL ? '../' : '', EMB = /[?&]embed=1/.test(location.search);
   const O = { rep: {}, calls: null, board: null, listId: null, loaded: false, busy: false, sym: '', err: '' };
-  const IDS = { brief: 'morning-brief', det: 'morning-detailed', news: 'premarket-news', pulse: 'morning-pulse' };
+  const IDS = { brief: 'morning-brief', det: 'morning-detailed', news: 'premarket-news', mkt: 'evening-market-wrap', enews: 'evening-news-wrap' };
   const pf = (s) => { const v = parseFloat(String(s).replace(/[,%+]/g, '')); return isFinite(v) ? v : null; };
   const openX = (sym) => { if (!CL) { if (window.jcXray) window.jcXray(sym); return; } let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); } m.innerHTML = '<div class="olFh"><b>' + E(clean(sym)) + ' · X-ray &amp; reports</b><button class="olClose" data-closefrm="1">✕ Close</button></div><iframe title="X-ray" src="../?embed=1&sym=' + encodeURIComponent(clean(sym)) + '"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; };
   const clean = (s) => String(s || '').replace(/\.(NS|BO)$/i, '').toUpperCase();
@@ -39,8 +39,8 @@
 
   async function loadAll() {
     if (O.busy) return; O.busy = true;
-    const [brief, det, news, calls, board] = await Promise.all([loadRep('brief'), loadRep('det'), loadRep('news'), jget('data/calls/latest.json').catch(() => null), jget('data/calls/board.json').catch(() => null)]);
-    O.rep = { brief, det, news }; O.calls = calls; O.board = board; O.loaded = true; O.busy = false; draw();
+    const [brief, det, news, mkt, enews, calls, board] = await Promise.all([loadRep('brief'), loadRep('det'), loadRep('news'), loadRep('mkt'), loadRep('enews'), jget('data/calls/latest.json').catch(() => null), jget('data/calls/board.json').catch(() => null)]);
+    O.rep = { brief, det, news, mkt, enews }; O.calls = calls; O.board = board; O.loaded = true; O.busy = false; draw();
   }
 
   /* ---------- pieces ---------- */
@@ -59,41 +59,52 @@
     if (y10) L.push(`US 10-yr yield ${E(y10[1])}%.`);
     return L.join(' ');
   }
-  function frame1() {
-    const b = O.rep.brief, d = O.rep.det, n = O.rep.news, R = b || d;
-    if (!R || !R.cfg) return `<section class="olF dbl"><h3>OUTLOOK FOR THE DAY</h3><div class="olN">The morning report has not been published yet${O.rep.brief && O.rep.brief.holiday ? ' — ' + E(O.rep.brief.holiday.note) : ''}. It appears here automatically after the 07:30–08:30 IST build.</div></section>`;
-    const ind = tabs(R, /India VIX|Indian Markets/)[0] || [];
-    const lv = tabs(R, /Key Levels/)[0] || [];
-    const out = bul(d, /^Outlook/).filter((x) => x.length > 25), al = [...bul(R, /Alerts/), ...bul(n, /Calendar/)].filter((x, i, a) => a.indexOf(x) === i && x.length > 3);
-    const t = new Date(R.at); const when = isNaN(t) ? R.date : t.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) + ' IST';
-    return `<section class="olF dbl"><h3>OUTLOOK FOR THE DAY <small>${E(R.date)}</small></h3>
-      <p class="olBias">${E(para(R, /Bias/) || 'Bias not available.')}</p>
-      <div class="olTiles">${tile('Nifty 50', pick(ind, 'Nifty 50'))}${tile('Sensex', pick(ind, 'Sensex'))}${tile('Bank Nifty', pick(ind, 'Bank Nifty'))}${tile('Nifty 500', pick(ind, 'Nifty 500'))}${tile('India VIX', pick(ind, 'India VIX'))}</div>
-      ${lv.length ? `<div class="olLv">${lv.map((r) => `<div><small>${E(r[0])}</small><span class="dn">Support ${E(r[1])}</span><span class="up">Resistance ${E(r[2])}</span></div>`).join('')}</div>` : ''}
-      ${out.length ? `<div class="olBl"><b>Outlook</b>${out.map((x) => `<p>${E(x)}</p>`).join('')}</div>` : ''}
-      ${al.length ? `<div class="olAl">${al.map((x) => `<span>📅 ${E(x)}</span>`).join('')}</div>` : ''}
-      <div class="olSrc">From the Morning Updates report · built ${E(when)}${R.date !== new Date(Date.now() + 19800000).toISOString().slice(0, 10) ? ' · <b>not today’s report yet</b>' : ''} ${R.pdf ? `· <a href="${E(R.pdf)}" target="_blank" rel="noopener">open PDF</a>` : ''}</div></section>`;
-  }
-  function frame2() {
-    const d = O.rep.det, b = O.rep.brief, n = O.rep.news, R = d || b;
-    if (!R || !R.cfg) return `<section class="olF"><h3>WORLD · COMMODITIES · CURRENCY · BONDS</h3><div class="olN">Waiting for the morning report.</div></section>`;
+  /* one normalised "pack" per mode: morning = morning reports, closing = evening wrap reports */
+  function pack(mode) {
+    const r = O.rep;
+    if (mode === 'closing') {
+      const m = r.mkt, n = r.enews; if (!m || !m.cfg) return null;
+      const g9 = tabs(m, /Global Market/)[0] || [], sf = tabs(m, /Stocks in Focus/);
+      return { title: 'CLOSING OUTLOOK', R: m, ind: tabs(m, /Indian Market/)[0] || [], lv: tabs(m, /Near-Term/)[0] || [], out: bul(m, /Near-Term/).filter((x) => x.length > 25),
+        al: [...bul(m, /Next Session/), ...bul(n, /Calendar/)], bias: para(m, /Close in Brief/), g: g9.slice(0, 5), a: g9.slice(5), cm: tabs(m, /Currenc|Commodit/)[0] || [],
+        heads: [...bul(n, /Headlines/), ...bul(n, /What to Watch/)], gain: (sf[0] || []).slice(0, 5), lose: (sf[1] || []).slice(0, 5), src: 'Evening Market Wrap' };
+    }
+    const b = r.brief, d = r.det, n = r.news, R = b || d; if (!R || !R.cfg) return null;
     let g = tabs(R, /^Global/)[0], a = tabs(R, /^Asian/)[0];
     if (!g || !a) { const all = tabs(R, /Global & Asian|Overnight Global/)[0] || tabs(n, /Overnight Global/)[0] || []; g = g || all.slice(0, 5); a = a || all.slice(5); }
-    const cm = tabs(R, /Commodit/)[0] || [];
-    const c = cm.filter((r) => /Brent|WTI|Gold|Silver|crude/i.test(r[0])), x = cm.filter((r) => !/Brent|WTI|Gold|Silver|crude/i.test(r[0]));
+    const sf = tabs(d, /Stocks in Focus/)[0] || [];
+    return { title: 'OUTLOOK FOR THE DAY', R, ind: tabs(R, /India VIX|Indian Markets/)[0] || [], lv: tabs(R, /Key Levels/)[0] || [], out: bul(d, /^Outlook/).filter((x) => x.length > 25),
+      al: [...bul(R, /Alerts/), ...bul(n, /Calendar/)], bias: para(R, /Bias/), g, a, cm: tabs(R, /Commodit/)[0] || [], heads: [...bul(n, /Headlines/), ...bul(d, /^Headlines/)],
+      gain: sf.filter((x) => pf(x[2]) > 0).slice(0, 5), lose: sf.filter((x) => pf(x[2]) < 0).slice(0, 5), src: 'Morning Updates' };
+  }
+  const nodata = (mode, h) => `<section class="olF${h === 1 ? ' dbl' : ''}"><h3>${h === 1 ? (mode === 'closing' ? 'CLOSING OUTLOOK' : 'OUTLOOK FOR THE DAY') : h === 2 ? 'WORLD · COMMODITIES · CURRENCY · BONDS' : 'IMPORTANT NEWS'}</h3><div class="olN">${mode === 'closing' ? 'The evening wrap is built after 17:43 IST on trading days and appears here automatically.' : 'The morning report has not been published yet — it appears here automatically after the 07:30–08:30 IST build.'}</div></section>`;
+  function frame1(k, mode) {
+    if (!k) return nodata(mode, 1);
+    const R = k.R, al = k.al.filter((x, i, a) => a.indexOf(x) === i && x.length > 3), ind = k.ind, lv = k.lv;
+    const t = new Date(R.at); const when = isNaN(t) ? R.date : t.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' }) + ' IST';
+    return `<section class="olF dbl"><h3>${k.title} <small>${E(R.date)}</small></h3>
+      <p class="olBias">${E(k.bias || 'Bias not available.')}</p>
+      <div class="olTiles">${tile('Nifty 50', pick(ind, 'Nifty 50'))}${tile('Sensex', pick(ind, 'Sensex'))}${tile('Bank Nifty', pick(ind, 'Bank Nifty'))}${tile('Nifty 500', pick(ind, 'Nifty 500'))}${tile('India VIX', pick(ind, 'India VIX'))}</div>
+      ${lv.length ? `<div class="olLv">${lv.map((r) => `<div><small>${E(r[0])}</small><span class="dn">Support ${E(r[1])}</span><span class="up">Resistance ${E(r[2])}</span></div>`).join('')}</div>` : ''}
+      ${k.out.length ? `<div class="olBl"><b>Outlook</b>${k.out.map((x) => `<p>${E(x)}</p>`).join('')}</div>` : ''}
+      ${al.length ? `<div class="olAl">${al.map((x) => `<span>📅 ${E(x)}</span>`).join('')}</div>` : ''}
+      <div class="olSrc">From the ${E(k.src)} report · built ${E(when)}${R.date !== new Date(Date.now() + 19800000).toISOString().slice(0, 10) ? ' · <b>not today’s report yet</b>' : ''} ${R.pdf ? `· <a href="${E(R.pdf)}" target="_blank" rel="noopener">open PDF</a>` : ''}</div></section>`;
+  }
+  function frame2(k, mode) {
+    if (!k) return nodata(mode, 2);
+    const cm = k.cm, c = cm.filter((r) => /Brent|WTI|Gold|Silver|crude/i.test(r[0])), x = cm.filter((r) => !/Brent|WTI|Gold|Silver|crude/i.test(r[0]));
     const cur = x.filter((r) => /USD|INR|Dollar|DXY/i.test(r[0])), bond = x.filter((r) => /yield|10-yr|bond/i.test(r[0]));
-    return `<section class="olF"><h3>WORLD · COMMODITIES · CURRENCY · BONDS <small>outlook for the day</small></h3>
-      <p class="olBias sm">${worldRead(g, a, c, x)}</p>
-      <div class="olGrid">${mini('US & Europe', g)}${mini('Asia', a)}${mini('Commodities', c)}${mini('Currency', cur)}${mini('Bonds', bond)}</div>
+    return `<section class="olF"><h3>WORLD · COMMODITIES · CURRENCY · BONDS <small>${mode === 'closing' ? 'how the day closed' : 'outlook for the day'}</small></h3>
+      <p class="olBias sm">${worldRead(k.g, k.a, c, x)}</p>
+      <div class="olGrid">${mini('US & Europe', k.g)}${mini('Asia', k.a)}${mini('Commodities', c)}${mini('Currency', cur)}${mini('Bonds', bond)}</div>
       <div class="olSrc">GIFT Nifty and MCX are not available to the free data pipeline.</div></section>`;
   }
-  function frame3() {
-    const d = O.rep.det, n = O.rep.news;
-    const heads = [...bul(n, /Headlines/), ...bul(d, /^Headlines/)].map((x) => x.trim()).filter((x, i, a) => x.length > 20 && a.findIndex((y) => y.slice(0, 40) === x.slice(0, 40)) === i).slice(0, 8);
-    const sf = (tabs(d, /Stocks in Focus/)[0] || []), gain = sf.filter((r) => pf(r[2]) > 0).slice(0, 5), lose = sf.filter((r) => pf(r[2]) < 0).slice(0, 5);
-    return `<section class="olF"><h3>IMPORTANT NEWS <small>from the pre-market news &amp; morning reports</small></h3>
+  function frame3(k, mode) {
+    if (!k) return nodata(mode, 3);
+    const heads = k.heads.map((x) => x.trim()).filter((x, i, a) => x.length > 20 && a.findIndex((y) => y.slice(0, 40) === x.slice(0, 40)) === i).slice(0, 8);
+    return `<section class="olF"><h3>IMPORTANT NEWS <small>from the ${mode === 'closing' ? 'evening' : 'pre-market news &amp; morning'} reports</small></h3>
       ${heads.length ? `<ul class="olNews">${heads.map((h) => { const m = /^(.*?)\s*\[([^\]]+)\]\.?$/.exec(h); return `<li>${E(m ? m[1] : h)}${m ? ` <em>${E(m[2])}</em>` : ''}</li>`; }).join('')}</ul>` : '<div class="olN">No headlines published yet.</div>'}
-      ${sf.length ? `<div class="olGrid">${mini('Top gainers (Nifty 50, prev. session)', gain)}${mini('Top losers', lose)}</div>` : ''}</section>`;
+      ${k.gain.length || k.lose.length ? `<div class="olGrid">${mini('Top gainers (Nifty 50)', k.gain)}${mini('Top losers', k.lose)}</div>` : ''}</section>`;
   }
   const lvl = (c) => ['entry', 'sl', 't1', 't2'].map((k) => (num(c[k]) ? `<td>${f2(c[k], c[k] < 100 ? 2 : 1)}</td>` : '<td>—</td>')).join('');
   function frame4() {
@@ -107,7 +118,7 @@
       <div class="olSrc">Rule-based levels from delayed data; a stop is part of every call. Not advice and not a guaranteed outcome.</div></section>`;
   }
   /* ---------- watchlist Buy / Sell / Avoid ---------- */
-  const lists = () => { if (CL) { const j = window.jcc; return [{ id: 'me', name: 'My watchlist', syms: (j && j.S && j.S.syms) || [] }]; } try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
+  const lists = () => { if (O.custom) return [O.custom]; if (CL) { const j = window.jcc; return [{ id: 'me', name: 'My watchlist', syms: (j && j.S && j.S.syms) || [] }]; } try { wlEnsure(); return WL.store.lists || []; } catch (e) { return []; } };
   function classify(list) {
     const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
     const out = { BUY: [], SELL: [], AVOID: [] };
@@ -124,7 +135,7 @@
     return out;
   }
   function frame5() {
-    const L = lists(); if (!O.listId || !L.find((l) => l.id === O.listId)) O.listId = CL ? 'me' : (typeof WL !== 'undefined' && WL.store && WL.store.active) || (L[0] && L[0].id);
+    const L = lists(); if (!O.listId || !L.find((l) => l.id === O.listId)) O.listId = O.custom ? O.custom.id : CL ? 'me' : (typeof WL !== 'undefined' && WL.store && WL.store.active) || (L[0] && L[0].id);
     const l = L.find((x) => x.id === O.listId), k = classify(l);
     return `<section class="olF"><h3>MY WATCHLIST — BUY · SELL · AVOID</h3>
       <div class="olSel"><label>Watchlist <select id="olList">${L.map((x) => `<option value="${E(x.id)}"${x.id === O.listId ? ' selected' : ''}>${E(x.name)} (${x.syms.length})</option>`).join('')}</select></label>
@@ -166,7 +177,7 @@
   function draw() {
     const p = $('pOutlook'); if (!p || (!CL && !p.classList.contains('active'))) return;
     const keep = $('olSym') ? $('olSym').value : O.sym; O.sym = keep || O.sym;
-    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? frame1() + frame2() + frame3() + frame4() + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
+    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? (() => { const k = pack('morning'); return frame1(k, 'morning') + frame2(k, 'morning') + frame3(k, 'morning'); })() + frame4() + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
       <div class="olLegal">Prepared from delayed market data and published morning reports with fixed, rule-based formulas. Research information for discussion with your adviser — not investment advice, not a recommendation, and no outcome is guaranteed.</div></div>`;
   }
   const css = () => `<style>
@@ -201,22 +212,20 @@
   document.addEventListener('click', (e) => {
     const t = e.target, c = (q) => t.closest && t.closest(q);
     if (c('[data-closefrm]')) { const m = $('olFrm'); if (m) { m.className = ''; m.innerHTML = ''; } document.body.style.overflow = ''; return; }
-    if (c('#olBack')) { showTab('pOutlook'); return; }
+    if (c('#olBack')) { showTab(O.home || 'pClient'); return; }
     if (c('[data-close]') || t.id === 'olPop') { closePop(); return; }
-    const k = c('#pOutlook [data-k]'); if (k) { popup(k.getAttribute('data-k')); return; }
-    const x = c('#pOutlook [data-x], #olPop [data-x]'); if (x) { closePop(); openX(x.getAttribute('data-x')); return; }
-    const tb = c('#pOutlook [data-tab]'); if (tb) { O.fromOutlook = true; showTab(tb.getAttribute('data-tab')); return; }
+    const k = c('#pOutlook [data-k], #pClient [data-k]'); if (k) { popup(k.getAttribute('data-k')); return; }
+    const x = c('#pOutlook [data-x], #pClient [data-x], #olPop [data-x]'); if (x) { closePop(); openX(x.getAttribute('data-x')); return; }
+    const tb = c('#pOutlook [data-tab], #pClient [data-tab]'); if (tb) { O.fromOutlook = true; showTab(tb.getAttribute('data-tab')); return; }
     if (c('#olGo')) { go(); return; }
     if (c('#olRef')) { O.loaded = false; O.busy = false; draw(); loadAll(); }
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'olList') { O.listId = e.target.value; draw(); } });
   document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'olSym') go(); if (e.key === 'Escape') closePop(); });
   function init() {
-    const sel = $('viewSel'), anchor = document.querySelector('details.datasec'); if (!sel || !anchor || $('pOutlook') || typeof showTab !== 'function') return false;
-    const o = document.createElement('option'); o.value = 'pOutlook'; o.textContent = '🌅 Today’s Outlook (client)'; const g = sel.querySelector('optgroup'); (g || sel).insertBefore(o, g ? g.firstChild : sel.firstChild);
-    const p = document.createElement('div'); p.className = 'panel'; p.id = 'pOutlook'; p.innerHTML = '<div class="note">Loading…</div>'; anchor.parentNode.insertBefore(p, anchor);
-    const bk = document.createElement('button'); bk.id = 'olBack'; bk.textContent = '← Back to Today’s Outlook'; document.body.appendChild(bk);
-    const orig = window.showTab; window.showTab = function (id) { orig(id); bk.style.display = O.fromOutlook && /^p(Summary|Intraday|Swing|Long)$/.test(id) ? 'block' : 'none'; if (id === 'pOutlook') { O.fromOutlook = false; draw(); if (!O.loaded) loadAll(); } };
+    if (typeof showTab !== 'function' || !document.body) return false; if ($('olBack')) return true;
+    const bk = document.createElement('button'); bk.id = 'olBack'; bk.textContent = '← Back to Client reports'; document.body.appendChild(bk);
+    const orig = window.showTab; window.showTab = function (id) { orig(id); bk.style.display = O.fromOutlook && /^p(Summary|Intraday|Swing|Long)$/.test(id) ? 'block' : 'none'; if (!/^p(Summary|Intraday|Swing|Long)$/.test(id)) O.fromOutlook = false; };
     return true;
   }
   function initClient() {
@@ -240,5 +249,6 @@
     }, 300);
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
-  window.jcOutlook = { reload: () => { O.loaded = false; loadAll(); draw(); }, state: O };
+  async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4() + '</div>'; }
+  window.jcOutlook = { reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
 })();
