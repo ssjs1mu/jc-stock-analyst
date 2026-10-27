@@ -148,16 +148,16 @@
     return `<section class="olF"><h3>SCRIP SEARCH · X-RAY &amp; FULL REPORT</h3>
       <div class="olSearch"><input id="olSym" placeholder="Symbol e.g. RELIANCE, TFCILTD" value="${E(O.sym)}" autocomplete="off"><select id="olEx"><option value="NS">NSE</option><option value="BO">BSE</option></select><button class="olB go" id="olGo">Generate report</button></div>
       <div class="olSrc">Opens the graphical X-ray first, then builds the Quick summary, Intraday, Short term and Long term reports.</div>
-      <div id="olRep">${O.sym && O.gen ? repStrip() : ''}</div></section>`;
+      <div id="olRep">${O.sym && O.gen ? repStrip(O.busyRep) : ''}</div></section>`;
   }
-  const repStrip = () => `<div class="olStrip"><b>${E(O.sym)}</b> reports: <button data-x="${E(O.sym)}">① X-ray</button><button data-tab="pSummary">② Quick summary</button><button data-tab="pIntraday">③ Intraday</button><button data-tab="pSwing">④ Short term</button><button data-tab="pLong">⑤ Long term</button></div>`;
+  const repStrip = (wait) => { const d = wait ? ' disabled title="Report still building…"' : ''; return `<div class="olStrip"><b>${E(O.sym)}</b> reports: <button data-x="${E(O.sym)}">① X-ray</button><button data-tab="pSummary"${d}>② Quick summary</button><button data-tab="pIntraday"${d}>③ Intraday</button><button data-tab="pSwing"${d}>④ Short term</button><button data-tab="pLong"${d}>⑤ Long term</button></div>`; };
   async function go() {
-    const inp = $('olSym'); const s = clean((inp && inp.value) || ''); if (!s) return; O.sym = s; O.gen = true;
+    const inp = $('olSym'); const s = clean((inp && inp.value) || ''); if (!s) return; O.sym = s; O.gen = true; O.busyRep = true;
     const si = $('symbolInput'), ex = $('exchangeInput'); if (si) si.value = s; if (ex && $('olEx')) ex.value = $('olEx').value;
-    const rp = $('olRep'); if (rp) rp.innerHTML = repStrip() + '<div class="olN">Building the full report in the background…</div>';
+    const rp = $('olRep'); if (rp) rp.innerHTML = repStrip(true) + '<div class="olN">Building the full report in the background…</div>';
     if (window.jcXray) window.jcXray(s + ($('olEx') && $('olEx').value === 'BO' ? '.BO' : ''));
     try { if (typeof runAnalysis === 'function') await runAnalysis(); } catch (e) { }
-    const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
+    O.busyRep = false; const r2 = $('olRep'); if (r2) r2.innerHTML = repStrip();
   }
   /* ---------- paint ---------- */
   function draw() {
