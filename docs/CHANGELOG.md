@@ -25,3 +25,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client report: India-map market mood + gauge + driver chips; new call cards (risk/reward ladder); calls matched to mood (engine holds back calls against mood, graded headwind in neutral, backend dash fallback in CI; client-side filter too); Back button steps one layer (history layers + Telegram BackButton); old "Today's outlook" and "Joshi's Dashboard" sections removed from c/index.html; live-alerts pill, toasts stay 25 s (tap to dismiss). |
 
 | 2026-10-27 | [Claude] Client reports now lists terminal watchlists that are not linked to a client (with a hint to link them) — a watchlist appears in reports only once linked in Client dashboards. |
+
+| 2026-10-27 | [Claude] Client reports merged with watchlists: all terminal watchlists + linked clients listed in one selector/table, inline ＋ Add watchlist (name + stocks), Telegram send only for linked clients. Replaces the strict-lock rule at the owner's request (linked clients still use their stored list). |

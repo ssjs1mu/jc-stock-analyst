@@ -138,8 +138,15 @@
   /* ---------- building ---------- */
   /* STRICTLY LOCKED: client reports use only the stock list saved on the client record (Drive, behind the admin passcode). Terminal watchlists are never used here. */
   const CDs = () => (window.jcClients && window.jcClients.S) || null;
-  const isOpen = () => { const c = CDs(); return !!(c && c.ok); };
-  const listsAll = () => { const c = CDs(); return c && c.ok ? (c.clients || []).map((x) => ({ id: x.listId || x.id, cid: x.id, name: x.name || x.listName, syms: (x.syms || []).slice(), chat: x.chat || '' })) : []; };
+  const isOpen = () => true;
+  /* MERGED: every terminal watchlist + every linked client. A linked client keeps its own stored (backed-up) stock list; an unlinked watchlist uses the terminal list and can be reported on screen but not sent on Telegram until linked in Client dashboards. */
+  const listsAll = () => {
+    const c = CDs(), cl = c && c.ok ? (c.clients || []) : [], out = [], seen = new Set();
+    let T = []; try { if (typeof wlEnsure === 'function') wlEnsure(); T = (typeof WL !== 'undefined' && WL.store && WL.store.lists) || []; } catch (e) { }
+    T.forEach((l) => { const x = cl.find((k) => k.listId === l.id); seen.add(l.id); out.push({ id: l.id, cid: x ? x.id : '', name: (x && x.name) || l.name, syms: ((x && x.syms) || l.syms || []).slice(), chat: x ? x.chat || '' : '', linked: !!x }); });
+    cl.forEach((x) => { const id = x.listId || x.id; if (!seen.has(id)) out.push({ id, cid: x.id, name: x.name || x.listName, syms: (x.syms || []).slice(), chat: x.chat || '', linked: true }); });
+    return out;
+  };
   async function build(list, mode, quiet) {
     const syms = (list.syms || []).slice(); if (!syms.length) return null;
     let mkt = {}; try { mkt = (await wlMkt(false)) || {}; } catch (e) { }
@@ -170,27 +177,31 @@
     const key = (m, id) => CACHE[td + '|' + m + '|' + id], cur = L.find((l) => l.id === R.listId), kc = cur ? key(R.mode, cur.id) : null;
     if (cur && window.jcOutlook) window.jcOutlook.setList({ id: cur.id, name: cur.name, syms: cur.syms }); else if (window.jcOutlook) window.jcOutlook.setList(null);
     const tm = (c) => new Date(c.t + 19800000).toISOString().slice(11, 16);
-    const rows = L.map((l) => { const a = key('morning', l.id), b = key('closing', l.id); return `<tr><td><b>${E(l.name)}</b></td><td>${l.syms.length}</td><td>${l.chat ? '✓ linked' : '<small style="color:#b3261e">no chat id</small>'}</td><td>${a ? `<button class="ghostBtn" data-cropen="morning|${E(l.id)}">Open ${tm(a)}</button>` : '<small>—</small>'}</td><td>${b ? `<button class="ghostBtn" data-cropen="closing|${E(l.id)}">Open ${tm(b)}</button>` : '<small>—</small>'}</td></tr>`; }).join('');
-    const body = !open ? `<div class="note">🔒 <b>Client reports are locked to each client’s saved watchlist.</b> Enter the admin passcode in <b>Client dashboards (Telegram)</b> just below — your linked clients and their locked stock lists then appear here. Terminal watchlists are never used for client reports.</div>`
-      : !L.length ? `<div class="note">No client is linked yet. Link a watchlist to a client in <b>Client dashboards (Telegram)</b> below; its stock list is then locked and used here.</div>`
-      : `<div class="bar2"><label>Client <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
+    const rows = L.map((l) => { const a = key('morning', l.id), b = key('closing', l.id); return `<tr><td><b>${E(l.name)}</b></td><td>${l.syms.length}</td><td>${l.linked ? (l.chat ? '✓ linked' : '<small style="color:#b3261e">no chat id</small>') : '<small style="color:#8a94ad">not linked</small>'}</td><td>${a ? `<button class="ghostBtn" data-cropen="morning|${E(l.id)}">Open ${tm(a)}</button>` : '<small>—</small>'}</td><td>${b ? `<button class="ghostBtn" data-cropen="closing|${E(l.id)}">Open ${tm(b)}</button>` : '<small>—</small>'}</td></tr>`; }).join('');
+    const body = !L.length ? `<div class="note">No watchlist yet — add one below.</div>${addBox()}`
+      : `${addBox()}<div class="bar2"><label>Watchlist <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
         <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ALL clients</button>
         <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div>
-        ${(() => { const u = (window.jcClients && window.jcClients.unlinked && window.jcClients.unlinked()) || []; return u.length ? `<div class="note" style="font-size:12px">⚠ Not shown here because not linked to a client yet: ${u.map((x) => '<b>' + E(x.name) + '</b> (' + x.n + ')').join(', ')}. Open <b>Client dashboards (Telegram)</b> below, pick the Telegram chat and press <b>Link client</b> — it then appears in this list.</div>` : ''; })()}
-        <table class="cl"><thead><tr><th>Client (locked list)</th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
-        ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span><button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button><button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
+        <table class="cl"><thead><tr><th>Watchlist / client</th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
+        ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span>${cur.cid ? `<button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button>` : '<small style="color:#8a94ad">Telegram sending needs a client link (Client dashboards below)</small>'}<button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
     el.innerHTML = `<style>${CSS}.crb{padding:10px 14px}.crb .bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.crb table.cl{width:100%;border-collapse:collapse;font-size:12.5px}.crb table.cl td,.crb table.cl th{border-bottom:1px solid #dfe5f2;padding:5px 6px;text-align:left}.crb .sel{padding:5px 8px;border:1px solid #b8c6e6;border-radius:8px}.crb .goBtn.on{box-shadow:0 0 0 2px #D4AF37}
       .crb .pre{border:2px solid #D4AF37;border-radius:14px;margin-top:10px;overflow:hidden;background:#fffdf6}</style>
-      <div class="crb"><h2 style="margin:0 0 4px;color:#8A6D1F">📋 Client Reports <small style="font-weight:600;color:#5a6a8e">— Morning Update and Closing Bell, one locked client list at a time</small></h2>
-      <div style="font-size:12px;color:#34456a">Each report opens with the day’s outlook drawn from the scheduled morning / evening reports, then the client’s Buy · Sell · Avoid view and stock-by-stock reports. The stock list comes only from the client’s locked record (Drive, passcode-protected) and is delivered through Telegram — client names and lists never go to the public repository.</div>
+      <div class="crb"><h2 style="margin:0 0 4px;color:#8A6D1F">📋 Client Reports <small style="font-weight:600;color:#5a6a8e">— Morning Update and Closing Bell, one watchlist at a time</small></h2>
+      <div style="font-size:12px;color:#34456a">Each report opens with the day’s outlook drawn from the scheduled morning / evening reports, then the client’s Buy · Sell · Avoid view and stock-by-stock reports. All your watchlists are listed here; a watchlist linked to a client uses that client’s saved, backed-up stock list and can be sent on Telegram. Names and lists never go to the public repository.</div>
       ${body}</div>`;
     paintStatus();
     if (window.jcOutlook && open && kc && !window.jcOutlook.loaded()) window.jcOutlook.load().then(() => paint());
+  }
+  function addBox() {
+    return `<div class="bar2" style="background:#fff8e6;border:1px solid #D4AF37;border-radius:10px;padding:8px"><b>＋ Add watchlist</b><input id="crNewName" class="sel" placeholder="Name (e.g. Deepak A)" maxlength="30" style="width:170px"><input id="crNewSyms" class="sel" placeholder="Stocks, comma separated (optional)" style="flex:1;min-width:200px"><button class="goBtn" data-cradd="1">Add</button><small id="crAddMsg" style="color:#8a6d1f"></small></div>`;
   }
   window.addEventListener('jc-clients', () => paint());
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q); if (!c('#pClient')) return;
     const r = c('[data-crrun]'); if (r) { const m = r.getAttribute('data-crrun'), ids = m === 'all' ? listsAll().map((l) => l.id) : [R.listId]; run(ids, m === 'all' ? R.mode : m); if (m !== 'all') R.mode = m; return; }
+    if (c('[data-cradd]')) { const n = ($('crNewName').value || '').trim().slice(0, 30), raw = ($('crNewSyms').value || '').split(/[\s,;]+/).map((x) => x.trim().toUpperCase()).filter(Boolean); if (!n) { $('crAddMsg').textContent = 'Type a name first.'; return; }
+      try { wlEnsure(); const l = { id: 'l' + Date.now().toString(36), name: n, syms: [...new Set(raw.map((x) => cleanSym(x, 'NS')).filter(Boolean))] }; WL.store.lists.push(l); wlSave(); R.listId = l.id; R.msg = 'Added ' + n; try { if (typeof wlRenderBar === 'function' && $('wlBar')) wlRenderBar(); } catch (e2) { } paint(); } catch (e3) { $('crAddMsg').textContent = 'Could not add: ' + ((e3 && e3.message) || e3); }
+      return; }
     const o = c('[data-cropen]'); if (o) { const [m, id] = o.getAttribute('data-cropen').split('|'); R.mode = m; R.listId = id; paint(); return; }
     const tg = c('[data-crtg]'); if (tg) { (async () => { R.msg = 'Sending…'; paintStatus(); try { const j = await window.jcClients.send(tg.getAttribute('data-crtg')); R.msg = j && j.ok ? 'Dashboard sent on Telegram ✓' : 'Telegram said: ' + ((j && j.msg) || 'failed') + ' — the client must open the bot and press Start first'; } catch (e) { R.msg = 'Not sent: ' + ((e && e.message) || e); } paintStatus(); })(); return; }
     if (c('[data-crprint]')) { const kc = CACHE[istDay() + '|' + R.mode + '|' + R.listId]; if (kc) openPrint(kc.html); }
