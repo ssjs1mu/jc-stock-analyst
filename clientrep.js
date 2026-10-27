@@ -196,8 +196,21 @@
   function editBox(l) {
     if (!l) return '';
     const chips = l.syms.map((x) => `<span class="crChip">${E(x.replace(/\.NS$/, ''))}<button data-crrm="${E(x)}" title="Remove ${E(x)}">✕</button></span>`).join('') || '<small>No stocks yet — add some below.</small>';
-    return `<div class="note" style="margin:8px 0"><style>.crChip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #b8c6e6;border-radius:99px;padding:2px 4px 2px 10px;margin:2px;font-weight:700;font-size:12px}.crChip button{border:0;background:#eef1f8;border-radius:50%;width:18px;height:18px;cursor:pointer;line-height:1;color:#b3261e}</style><b>Stocks in ${E(l.name)}</b> (${l.syms.length}) ${l.linked ? '<small>— linked client: changes are saved to the client record (admin passcode must be unlocked in Client dashboards)</small>' : ''}<div style="margin:6px 0">${chips}</div>
+    return `<div class="note" style="margin:8px 0"><style>.crChip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #b8c6e6;border-radius:99px;padding:2px 4px 2px 10px;margin:2px;font-weight:700;font-size:12px}.crChip button{border:0;background:#eef1f8;border-radius:50%;width:18px;height:18px;cursor:pointer;line-height:1;color:#b3261e}</style><b>Stocks in ${E(l.name)}</b> (${l.syms.length}) <button class="ghostBtn" data-crren="1">✎ Rename</button><button class="ghostBtn" data-crdel="1" style="color:#b3261e">🗑 Delete watchlist</button> ${l.linked ? '<small>— linked client: changes are saved to the client record (admin passcode must be unlocked in Client dashboards)</small>' : ''}<div style="margin:6px 0">${chips}</div>
       <div class="bar2" style="margin:4px 0"><input id="crAddSyms" class="sel" placeholder="Add stocks, comma separated e.g. TCS, INFY" style="flex:1;min-width:200px"><button class="goBtn" data-cradds="1">＋ Add</button><small id="crEditMsg" style="color:#8a6d1f"></small></div></div>`;
+  }
+  async function renameList(listId) {
+    const l = listsAll().find((x) => x.id === listId); if (!l) return ''; const n = (prompt('New name for this watchlist', l.name) || '').trim().slice(0, 30); if (!n || n === l.name) return '';
+    if (l.linked && l.cid) { const C = window.jcClients; if (!C || !C.S.ok) return 'Locked — enter the admin passcode in Client dashboards (Telegram) first to rename a client.'; try { await C.api('cl_set', { id: l.cid, name: n }); await C.reload(); } catch (e) { return 'Not saved: ' + ((e && e.message) || e); } }
+    try { wlEnsure(); const t = WL.store.lists.find((x) => x.id === listId); if (t) { t.name = n; wlSave(); if (typeof wlRenderBar === 'function' && $('wlBar')) wlRenderBar(); } } catch (e) { } return '';
+  }
+  async function deleteList(listId) {
+    const l = listsAll().find((x) => x.id === listId); if (!l) return ''; wlEnsure();
+    const inTerm = WL.store.lists.some((x) => x.id === listId);
+    if (inTerm && WL.store.lists.length < 2) return 'Keep at least one watchlist — add another before deleting this one.';
+    if (!confirm('Delete watchlist “' + l.name + '” (' + l.syms.length + ' stocks)?' + (l.linked ? '\n\nIt is linked to a client: the client record, link and stored stocks are NOT deleted (remove the client in Client dashboards if needed).' : ''))) return '';
+    if (inTerm) { WL.store.lists = WL.store.lists.filter((x) => x.id !== listId); if (WL.store.active === listId) WL.store.active = WL.store.lists[0].id; wlSave(); try { if (typeof wlRenderBar === 'function' && $('wlBar')) { wlRenderBar(); wlRenderBody(); } } catch (e) { } }
+    Object.keys(CACHE).forEach((k) => { if (k.endsWith('|' + listId)) delete CACHE[k]; }); saveC(); R.listId = null; return '';
   }
   async function editSyms(listId, add, remove) {
     const l = listsAll().find((x) => x.id === listId); if (!l) return 'Watchlist not found';
@@ -214,6 +227,8 @@
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q); if (!c('#pClient')) return;
     const r = c('[data-crrun]'); if (r) { const m = r.getAttribute('data-crrun'), ids = m === 'all' ? listsAll().map((l) => l.id) : [R.listId]; run(ids, m === 'all' ? R.mode : m); if (m !== 'all') R.mode = m; return; }
+    if (c('[data-crren]')) { renameList(R.listId).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
+    if (c('[data-crdel]')) { deleteList(R.listId).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     const rm = c('[data-crrm]'); if (rm) { editSyms(R.listId, [], [rm.getAttribute('data-crrm')]).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     if (c('[data-cradds]')) { const raw = ($('crAddSyms').value || '').split(/[\s,;]+/).map((x) => cleanSym(x, 'NS')).filter(Boolean); if (!raw.length) { $('crEditMsg').textContent = 'Type at least one stock.'; return; } editSyms(R.listId, raw, []).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     if (c('[data-cradd]')) { const n = ($('crNewName').value || '').trim().slice(0, 30), raw = ($('crNewSyms').value || '').split(/[\s,;]+/).map((x) => x.trim().toUpperCase()).filter(Boolean); if (!n) { $('crAddMsg').textContent = 'Type a name first.'; return; }
