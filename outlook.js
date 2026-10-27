@@ -391,5 +391,5 @@
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
   async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4(k) + '</div>'; }
-  window.jcOutlook = { setLive: (m) => { O.live = m; O.liveAt = Date.now(); if (O.loaded) draw(); }, reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
+  window.jcOutlook = { callSyms: () => ((O.calls && O.calls.calls) || []).map((c) => clean(c.sym)).slice(0, 30), setLive: (m) => { O.live = m; O.liveAt = Date.now(); if (O.loaded) draw(); }, reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
 })();

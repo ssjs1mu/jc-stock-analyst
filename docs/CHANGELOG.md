@@ -43,3 +43,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client page Buy/Sell/Avoid is LIVE: live prices (poll every 60 s in market hours and on every open/return) invalidate a call when stop-loss is touched / target 2 reached (moves to Avoid with the reason), mark 'trigger crossed / waiting / target 1 reached', and upgrade leaning stocks that break yesterday's high/low; pop-ups show the live price and a ● LIVE time stamp. |
 
 | 2026-10-27 | [Claude] Call cards (intraday + investment): the risk/reward bar now has a needle at the current market price (live on the client page, last close elsewhere) with CMP label, zone (before entry / in profit / T1 / T2 / stop-loss zone) and % to T1 and to stop. |
+
+| 2026-10-27 | [Claude] Client page live poll now also covers the symbols of today's calls, so every call card's CMP needle is live (not only the client's own watchlist).
