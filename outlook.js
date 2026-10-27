@@ -385,19 +385,26 @@
   /* embedded terminal opened by the client page with ?sym=: X-ray first, then report buttons */
   function initEmbedSym() {
     const m = /[?&]sym=([^&#]{1,24})/.exec(location.search); if (!m || !EMB) return;
-    const sym = decodeURIComponent(m[1]).toUpperCase(), goX = /[?&]go=xray/.test(location.search), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
+    const sym = decodeURIComponent(m[1]).toUpperCase(), goX = /[?&]go=xray/.test(location.search), isWin = /[?&]win=1/.test(location.search), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
       $('symbolInput').value = sym.replace(/\.(NS|BO)$/, ''); if (/\.BO$/.test(sym) && $('exchangeInput')) $('exchangeInput').value = 'BO';
-      const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><button data-t="pSummary" disabled>① Quick summary</button><button data-xr="' + sym + '" disabled>② X-ray</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
+      const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><b style="align-self:center;margin-right:6px">' + sym.replace(/\.(NS|BO)$/, '') + '</b><button data-t="pSummary" disabled>① Quick summary</button><button data-xr="' + sym + '" disabled>② X-ray</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
       document.body.insertBefore(bar, document.body.firstChild);
       bar.onclick = (e) => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.getAttribute('data-xr')) window.jcXray(sym); else showTab(b.getAttribute('data-t')); };
       const pg = !goX && window.jcProgress ? window.jcProgress(null, 'Preparing the report for ' + sym.replace(/\.(NS|BO)$/, ''), true) : null;
       if (goX) window.jcXray(sym); /* opened from the client page after its instant Quick summary: X-ray first, the other reports build behind it */
       Promise.resolve(runAnalysis()).catch(() => { }).then(() => { if (pg) pg.done(); bar.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+        if (isWin) { showTab('pSummary'); try { document.title = sym.replace(/\.(NS|BO)$/, '') + ' — Joshi’s Corner report'; } catch (e) { } return; }
         if (goX) { showTab('pSummary'); return; }
         proceedPrompt(sym, () => { showTab('pSummary'); proceedPrompt(sym, () => window.jcXray(sym)); }, 'The report for <b>' + E(sym.replace(/\.(NS|BO)$/, '')) + '</b> is ready. Open the Quick summary?', 'Yes — Quick summary'); });
     }, 300);
   }
   if (CL) { const t1 = setInterval(() => { if (initClient()) clearInterval(t1); }, 300); } else { const t0 = setInterval(() => { if (init()) clearInterval(t0); }, 400); initEmbedSym(); }
   async function snapshot(mode) { if (!O.loaded) await loadAll(); else if (O.busy) { for (let i = 0; i < 40 && O.busy; i++) await new Promise((r) => setTimeout(r, 250)); } const k = pack(mode); return css() + '<div class="olWrap">' + frame1(k, mode) + frame2(k, mode) + frame3(k, mode) + frame4(k) + '</div>'; }
+  /* top-bar Generate: open the report in its own window — progress %, Quick summary first, links to X-ray / Intraday / Short term / Long term on top */
+  window.genReport = function () {
+    const si = $('symbolInput'), ex = $('exchangeInput'), sym = clean((si && si.value) || ''); if (!sym) { alert('Enter a symbol first.'); return; }
+    const u = new URL('./', location.href).href + '?embed=1&win=1&sym=' + encodeURIComponent(sym + (ex && ex.value === 'BO' ? '.BO' : ''));
+    const w = window.open(u, '_blank'); if (!w && typeof runAnalysis === 'function') runAnalysis();
+  };
   window.jcOutlook = { callSyms: () => ((O.calls && O.calls.calls) || []).map((c) => clean(c.sym)).slice(0, 30), setLive: (m) => { O.live = m; O.liveAt = Date.now(); if (O.loaded) draw(); }, reload: () => { O.loaded = false; loadAll(); draw(); }, state: O, snapshot, css, setList: (c) => { O.custom = c; O.listId = c && c.id; }, buttons: () => css() + frame5(), search: () => css() + frame6(), loaded: () => O.loaded, load: loadAll };
 })();

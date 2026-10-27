@@ -1698,7 +1698,7 @@ if (IS_BROWSER) {
   const tick = () => { const now = new Date(); $('clockTime').textContent = now.toLocaleTimeString('en-IN', { hour12: true }); $('clockDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }); };
   setInterval(tick, 1000); tick(); setInterval(wlTick, 60000);
   document.addEventListener('DOMContentLoaded', () => {
-    $('symbolInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') runAnalysis(); });
+    $('symbolInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') (window.genReport || runAnalysis)(); });
     $('viewSel').addEventListener('change', (e) => showTab(e.target.value));
     $('upBody').innerHTML = htmlUpcoming(null); refreshChips(); showTab('pSummary');
     const be = $('backendInput'); be.value = getBackend();

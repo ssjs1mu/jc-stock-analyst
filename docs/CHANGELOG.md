@@ -53,3 +53,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client reports: rename and delete a whole watchlist (rename also renames a linked client's record; deleting a linked list keeps the client record). |
 
 | 2026-10-27 | [Claude] Client reports: building a full report now shows a real % bar (market data 5%, per-stock analysis up to 90%, outlook/calls 92%, done 100%; multi-client builds count across clients) with the stage and stocks done/total. |
+
+| 2026-10-27 | [Claude] Top-bar symbol search: Generate (and Enter) now opens the report in a NEW window (index.html?embed=1&win=1&sym=…): estimated-% progress bar, then the Quick summary first, with links on top for X-ray, Intraday, Short term, Long term. |
