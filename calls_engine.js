@@ -114,7 +114,7 @@ var JCE = (function () {
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
     /* today's pre-open MOOD (global cues, crude, rupee, VIX, Nifty's last move): a call that fights it is held back; one that agrees needs a little less confluence */
     var md = m && isNum(m.mood) ? m.mood : null;
-    if (md != null) { if ((dir > 0 && md <= 40) || (dir < 0 && md >= 60)) out.moodBlock = true; else if ((dir > 0 && md >= 60) || (dir < 0 && md <= 40)) need -= 0.5; }
+    if (md != null) { if ((dir > 0 && md <= 40) || (dir < 0 && md >= 60)) out.moodBlock = true; else if ((dir > 0 && md >= 60) || (dir < 0 && md <= 40)) need -= 0.5; else if (dir < 0 && md > 50) need += (md - 50) / 10; else if (dir > 0 && md < 50) need += (50 - md) / 10; }
     out.need = need;
     if (out.moodBlock) why.push("against today's market mood (" + (m.moodLabel || '') + ' ' + md + '/100)');
     if (abs < need) why.push('confluence ' + abs.toFixed(1) + ' < ' + need.toFixed(1) + ' needed');
