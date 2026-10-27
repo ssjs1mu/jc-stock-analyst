@@ -94,6 +94,6 @@
   function mount() {
     const p = $('pClient'); if (!p) return; if (!$('cdBox')) { const d = document.createElement('div'); d.id = 'cdBox'; d.className = 'crb'; p.appendChild(d); draw(); if (!S.synced && p.classList.contains('active')) { S.synced = true; load(); } }
   }
-  window.jcClients = { S, api, send: (id) => api('cl_send', { id }), reload: () => load() };
+  window.jcClients = { S, api, send: (id) => api('cl_send', { id }), reload: () => load(), unlinked: () => lists().filter((l) => !S.clients.some((c) => c.listId === l.id)).map((l) => ({ id: l.id, name: l.name, n: (l.syms || []).length })) };
   setInterval(mount, 1500); /* cheap: clientrep repaints #pClient and wipes the box, so it is re-added and redrawn from state */
 })();
