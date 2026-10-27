@@ -21,3 +21,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 
 ## Yearly chores
 - **Each December:** add next year's NSE holidays to BOTH `NSE_HOLIDAYS` in `pipeline/auto_reports.py` and `TG_HOLIDAYS` in `apps-script/Telegram.server.gs`; rebuild Code.gs; deploy new version.
+
+| 2026-10-27 | [Claude] Client report: India-map market mood + gauge + driver chips; new call cards (risk/reward ladder); calls matched to mood (engine holds back calls against mood, graded headwind in neutral, backend dash fallback in CI; client-side filter too); Back button steps one layer (history layers + Telegram BackButton); old "Today's outlook" and "Joshi's Dashboard" sections removed from c/index.html; live-alerts pill, toasts stay 25 s (tap to dismiss). |
