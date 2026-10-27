@@ -29,3 +29,5 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Client reports merged with watchlists: all terminal watchlists + linked clients listed in one selector/table, inline ＋ Add watchlist (name + stocks), Telegram send only for linked clients. Replaces the strict-lock rule at the owner's request (linked clients still use their stored list). |
 
 | 2026-10-27 | [Claude] Mobile/client page now plays the same opening: 3D tree logo with rupee signs flying from the background to the front (intro.js made path-aware, old simple splash hidden). |
+
+| 2026-10-27 | [Claude] Expiry wording: last Tuesday (Nifty) / Thursday (Sensex) of a month shown as MONTHLY with the full date; the 📅 emoji (which many phones draw as '17 JUL') replaced by a calendar chip with the real date; auto_reports.py expiry_text fixed; client page refreshes reports every 2 min and on return to the page. |

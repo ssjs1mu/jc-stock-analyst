@@ -161,17 +161,24 @@ def _expiry_on_or_after(d, wd):
     return x
 
 
+def _is_monthly(x, wd):
+    """The last Tuesday (Nifty) / Thursday (Sensex) of a month is the MONTHLY expiry (a holiday-moved expiry is judged by its nominal weekday)."""
+    nom = x + dt.timedelta(days=(wd - x.weekday()) % 7)
+    return (nom + dt.timedelta(days=7)).month != nom.month
+
+
 def expiry_text(d):
-    """SEBI mapping: Nifty weekly = Tuesday, Sensex weekly = Thursday; an exchange holiday moves expiry to the previous trading day."""
+    """SEBI mapping: Nifty weekly = Tuesday, Sensex weekly = Thursday; the last of the month is the MONTHLY expiry; an exchange holiday moves expiry to the previous trading day."""
     nf, sx = _expiry_on_or_after(d, 1), _expiry_on_or_after(d, 3)
+    kind = lambda x, wd: "MONTHLY" if _is_monthly(x, wd) else "weekly"
     out = []
     if nf == d:
-        out.append("Nifty weekly expiry today%s." % ("" if d.weekday() == 1 else " (moved from Tuesday's holiday)"))
+        out.append("Nifty %s expiry today (%s)%s." % (kind(nf, 1), d.strftime("%a %d %b %Y"), "" if d.weekday() == 1 else " (moved from Tuesday's holiday)"))
     if sx == d:
-        out.append("Sensex weekly expiry today%s." % ("" if d.weekday() == 3 else " (moved from Thursday's holiday)"))
+        out.append("Sensex %s expiry today (%s)%s." % (kind(sx, 3), d.strftime("%a %d %b %Y"), "" if d.weekday() == 3 else " (moved from Thursday's holiday)"))
     if not out:
-        out.append("Next Nifty weekly expiry: %s %s; next Sensex weekly expiry: %s %s."
-                   % (nf.strftime("%A"), nf.strftime("%d %b"), sx.strftime("%A"), sx.strftime("%d %b")))
+        out.append("Next Nifty %s expiry: %s; next Sensex %s expiry: %s."
+                   % (kind(nf, 1), nf.strftime("%a %d %b %Y"), kind(sx, 3), sx.strftime("%a %d %b %Y")))
     return " ".join(out)
 
 

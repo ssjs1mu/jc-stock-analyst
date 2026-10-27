@@ -116,6 +116,16 @@
       gain: sf.filter((x) => pf(x[2]) > 0).slice(0, 5), lose: sf.filter((x) => pf(x[2]) < 0).slice(0, 5), src: 'Morning Updates' };
   }
   const nodata = (mode, h) => `<section class="olF${h === 1 ? ' dbl' : ''}"><h3>${h === 1 ? (mode === 'closing' ? 'CLOSING OUTLOOK' : 'OUTLOOK FOR THE DAY') : h === 2 ? 'WORLD · COMMODITIES · CURRENCY · BONDS' : 'IMPORTANT NEWS'}</h3><div class="olN">${mode === 'closing' ? 'The evening wrap is built after 17:43 IST on trading days and appears here automatically.' : 'The morning report has not been published yet — it appears here automatically after the 07:30–08:30 IST build.'}</div></section>`;
+  /* F&O expiry wording: Nifty = Tuesday, Sensex = Thursday; the LAST one of a month is the MONTHLY expiry. Rewrites the stored sentence and gives a real date. */
+  const lastOfMonth = (d) => new Date(d.getTime() + 7 * 864e5).getUTCMonth() !== d.getUTCMonth();
+  const dfmt = (d) => d.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  function expFix(x, iso) {
+    const base = new Date(iso + 'T00:00:00Z'); if (isNaN(base) || !/expiry/i.test(x)) return { t: x, d: null };
+    let d = null, y = x.replace(/\b(Nifty|Sensex) weekly expiry today( \(moved[^)]*\))?\.?/gi, (m, idx, mv) => { const wd = /nifty/i.test(idx) ? 2 : 4, nom = new Date(base.getTime() + ((wd - base.getUTCDay() + 7) % 7) * 864e5), mo = lastOfMonth(nom); d = base; return idx + (mo ? ' MONTHLY' : ' weekly') + ' expiry today (' + dfmt(base) + ')' + (mv || '') + '.'; });
+    y = y.replace(/(Next )?(Nifty|Sensex) weekly expiry: (\w+) (\d{2}) (\w{3})( \d{4})?/gi, (m, nx, idx, wk, dd, mm) => { const dt = new Date(Date.parse(dd + ' ' + mm + ' ' + base.getUTCFullYear() + ' 00:00:00 UTC')); if (isNaN(dt)) return m; if (dt < base) dt.setUTCFullYear(dt.getUTCFullYear() + 1); if (!d) d = dt; return (nx || '') + idx + (lastOfMonth(dt) ? ' MONTHLY' : ' weekly') + ' expiry: ' + dfmt(dt); });
+    return { t: y, d: d || base };
+  }
+  const dateChip = (d) => `<i class="olDt"><u>${d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase()}</u><b>${d.getUTCDate()}</b></i>`;
   function frame1(k, mode) {
     if (!k) return nodata(mode, 1);
     const R = k.R, al = k.al.filter((x, i, a) => a.indexOf(x) === i && x.length > 3), ind = k.ind, lv = k.lv;
@@ -126,7 +136,7 @@
       <div class="olTiles">${tile('Nifty 50', pick(ind, 'Nifty 50'))}${tile('Sensex', pick(ind, 'Sensex'))}${tile('Bank Nifty', pick(ind, 'Bank Nifty'))}${tile('Nifty 500', pick(ind, 'Nifty 500'))}${tile('India VIX', pick(ind, 'India VIX'))}</div>
       ${lv.length ? `<div class="olLv">${lv.map((r) => `<div><small>${E(r[0])}</small><span class="dn">Support ${E(r[1])}</span><span class="up">Resistance ${E(r[2])}</span></div>`).join('')}</div>` : ''}
       ${k.out.length ? `<div class="olBl"><b>Outlook</b>${k.out.map((x) => `<p>${E(x)}</p>`).join('')}</div>` : ''}
-      ${al.length ? `<div class="olAl">${al.map((x) => `<span>📅 ${E(x)}</span>`).join('')}</div>` : ''}
+      ${al.length ? `<div class="olAl">${al.map((x) => { const e = expFix(x, R.date); const dd = e.d || new Date(R.date + 'T00:00:00Z'); return `<span>${isNaN(dd) ? '📅' : dateChip(dd)} ${E(e.t)}</span>`; }).join('')}</div>` : ''}
       <div class="olSrc">From the ${E(k.src)} report · built ${E(when)}${R.date !== new Date(Date.now() + 19800000).toISOString().slice(0, 10) ? ' · <b>not today’s report yet</b>' : ''} ${R.pdf ? `· <a href="${E(R.pdf)}" target="_blank" rel="noopener">open PDF</a>` : ''}</div></section>`;
   }
   function frame2(k, mode) {
@@ -244,7 +254,7 @@
   .olTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.olT{background:#fff;border:1px solid #ecd9a0;border-radius:10px;padding:8px 10px}.olT small{display:block;color:#8A6D1F;font-weight:700}.olT b{font-size:16px;display:block}
   .up{color:#12894b}.dn{color:#c11d3d}b.up,b.dn{font-weight:800}
   .olLv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}.olLv div{background:#fff;border:1px dashed #D4AF37;border-radius:10px;padding:6px 10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.olLv small{font-weight:700;color:#14306e;min-width:70px}
-  .olBl p{margin:4px 0;font-size:12.5px;line-height:1.45}.olAl{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.olAl span{background:#fff;border:1px solid #ecd9a0;border-radius:99px;padding:3px 10px;font-weight:600}
+  .olBl p{margin:4px 0;font-size:12.5px;line-height:1.45}.olAl{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.olAl span{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #ecd9a0;border-radius:99px;padding:3px 10px;font-weight:600}
   .olGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:8px}.olC{background:#fff;border:1px solid #ecd9a0;border-radius:10px;padding:8px 10px}.olC h5{margin:0 0 4px;color:#8A6D1F;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
   .olR{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:3px 0;border-top:1px solid #f3ead0}.olR:first-of-type{border-top:0}.olR i{font-style:normal;font-variant-numeric:tabular-nums}.olR u{text-decoration:none;font-weight:700;min-width:74px;text-align:right}
   .olNews{margin:4px 0 6px;padding-left:18px}.olNews li{margin:5px 0;line-height:1.4}.olNews em{color:#8A6D1F;font-style:normal;font-size:11px;border:1px solid #ecd9a0;border-radius:99px;padding:0 7px;margin-left:4px}
@@ -262,6 +272,7 @@
   .olBox{background:#fffdf6;border:3px double #D4AF37;border-radius:14px;max-width:880px;width:100%;max-height:88vh;overflow:auto;padding:14px 16px}.olHd{display:flex;justify-content:space-between;align-items:center}.olHd h3{margin:0;color:#8A6D1F}.olHd small{color:#52607f}.olClose{cursor:pointer;border:0;background:#14306e;color:#fff;border-radius:8px;padding:4px 10px;font-size:14px}
   #olBack{position:fixed;left:12px;bottom:12px;z-index:40;display:none;background:#14306e;color:#fff;border:2px solid #D4AF37;border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
   @media(max-width:640px){.olBtns{grid-template-columns:1fr 1fr 1fr}.olB b{font-size:20px}.olF{padding:10px 11px}}
+  .olDt{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:30px;height:32px;border-radius:6px;border:1.5px solid #c7d2e3;background:#fff;overflow:hidden;font-style:normal;flex:none}.olDt u{display:block;width:100%;background:#f2711c;color:#fff;font-size:8px;font-weight:800;text-decoration:none;text-align:center;line-height:11px}.olDt b{font-size:14px;line-height:19px;color:#14213d}
   .olMood{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:center;margin:8px 0 12px;padding:10px 12px;border-radius:14px;background:linear-gradient(135deg,#fff,#fff7dc);border:1px solid #ecd9a0}
   .olMoodMap{text-align:center}.olMap{height:120px;width:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.18))}.olMoodMap small{display:block;font-size:10px;letter-spacing:.14em;color:#8A6D1F;font-weight:800;margin-top:2px}
   .olMoodG{text-align:center}.olGauge{width:210px;max-width:100%}.olMoodG b{display:block;font-size:20px;letter-spacing:.06em;margin-top:-6px}.olMoodG small{color:#52607f}
@@ -300,7 +311,7 @@
     if ($('pOutlook')) return true; const err = $('err'); if (!err) return false;
     const d = document.createElement('div'); d.id = 'pOutlook'; d.className = 'panel active'; err.parentNode.insertBefore(d, err.nextSibling);
     const s4 = document.querySelector('section.s4'); if (s4) s4.style.display = 'none';
-    d.innerHTML = '<div class="olWrap"><div class="olN" style="margin:12px">Loading the morning reports…</div></div>'; loadAll(); setInterval(() => { if (document.visibilityState === 'visible') { O.loaded = true; loadAll(); } }, 600000);
+    d.innerHTML = '<div class="olWrap"><div class="olN" style="margin:12px">Loading the morning reports…</div></div>'; loadAll(); setInterval(() => { if (document.visibilityState === 'visible') { O.loaded = true; loadAll(); } }, 120000); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { O.loaded = true; loadAll(); } });
     /* repaint when the page learns the client's list (jcc.S.syms) */
     let last = -1; setInterval(() => { const n = (window.jcc && window.jcc.S && window.jcc.S.board ? 1 : 0) * 1e4 + (window.jcc ? window.jcc.S.syms.length : 0); if (n !== last && O.loaded) { last = n; draw(); } }, 1200);
     return true;
