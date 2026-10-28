@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-10-28T21:14:20+05:30",
+   "date": "2026-10-28",
+   "status": "ok",
+   "caption": "x",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-28.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-28.pdf",
+     "type": "pdf",
+     "bytes": 8430
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-28T21:12:52+05:30",
    "date": "2026-10-28",
    "status": "ok",
@@ -100,5 +115,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-28T21:12:52+05:30"
+ "updated_at": "2026-10-28T21:14:20+05:30"
 }
