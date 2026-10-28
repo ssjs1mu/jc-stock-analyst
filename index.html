@@ -161,6 +161,7 @@
       <input id="symbolInput" type="text" placeholder="Symbol e.g. RELIANCE" autocomplete="off">
       <select id="exchangeInput"><option value="NS">NSE</option><option value="BO">BSE</option></select>
       <button class="goBtn" id="goBtn" onclick="(window.genReport||runAnalysis)()">Generate</button>
+      <button class="goBtn" id="deepBtn" type="button" title="Deep research: 15–90 day scans, levels, cycles, news, astro and a 3-session forecast with backtest" onclick="window.open('deep/?sym='+encodeURIComponent((document.getElementById('symbolInput').value||'').trim())+'&ex='+document.getElementById('exchangeInput').value,'_blank')" style="background:#7a4a00">🔬 Deep</button>
       <label>View
         <select id="viewSel">
           <optgroup label="Live analysis">

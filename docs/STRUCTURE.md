@@ -43,3 +43,5 @@ Edit the source parts, never `Code.gs` directly: `Code.base.gs` (routes, watchli
 
 ## Client page update (27 Oct)
 c/index.html: old s2 outlook and dashboard iframe removed (hidden #outlook stub kept). outlook.js detects the client page by #toasts. Mood panel (.olMood) uses the dashboard India map; call cards (.olCall); layer stack (pushLayer/popLayer). Live pill #livePill updated by poll().
+
+- `deep.js` (pure analysis core, Node-testable: `JCDeep.analyse({sym,bars,deliv,intra,news,astronomy})`) and `deep/index.html` (page: fetch layer backend→direct→proxies, static `data/ohlc.json`/`delivery.json` fallback, renderer). Linked from the terminal top bar (🔬 Deep). Astro lib loaded from jsdelivr `astronomy-engine@2.1.19`.

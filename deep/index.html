@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deep Research — Joshi's Corner</title>
+<style>
+:root{--ink:#14213d;--ink2:#52607f;--line:#dde3f0;--navy:#14306e;--green:#12894b;--red:#c11d3d;--amber:#b86e00;--gold:#b8860b;--bg:#f1f4fa;--card:#fff}
+*{box-sizing:border-box}html,body{margin:0}
+body{font:13px/1.45 'Segoe UI',-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto;padding:8px 12px 40px}
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mark{font-family:'Brush Script MT','Segoe Script',cursive;font-size:24px;color:#7a4a00}
+.top input,.top select{background:#f4f6fd;border:1px solid #c3cde6;border-radius:8px;padding:7px 9px;font-size:13px;outline:none;color:var(--ink)}
+.top input{width:150px;text-transform:uppercase}
+button{border:0;border-radius:8px;padding:8px 13px;font-weight:700;font-size:13px;cursor:pointer;background:var(--navy);color:#fff}
+button.ghost{background:#e8edf9;color:var(--navy)}button:disabled{opacity:.5;cursor:wait}
+h1{font-size:15px;margin:0 6px 0 0;color:var(--navy)}
+.sp{flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 8px 22px -18px rgba(20,48,110,.5)}
+.card h2{margin:0 0 6px;font-size:14px;color:var(--navy);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card h2 small{font-weight:600;color:var(--ink2);font-size:11px}
+.gold{border:2px solid var(--gold);background:linear-gradient(180deg,#fffdf5,#fff)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{padding:5px 7px;border-bottom:1px solid #edf0f7;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}th{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em}
+.scroll{overflow-x:auto}
+.up{color:var(--green);font-weight:700}.dn{color:var(--red);font-weight:700}.mut{color:var(--ink2)}.amb{color:var(--amber);font-weight:700}
+.note{background:#f7f9fe;border-left:3px solid #9db0e0;padding:7px 10px;border-radius:6px;color:var(--ink2);font-size:12px;margin:6px 0}
+.warn{background:#fff7e8;border-left-color:#e0a030}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;background:#e8edf9;color:var(--navy)}
+.pill.g{background:#e0f5ea;color:var(--green)}.pill.r{background:#fde6ea;color:var(--red)}.pill.a{background:#fff0d6;color:var(--amber)}
+.big{font-size:20px;font-weight:800}
+.bar{height:16px;border-radius:9px;background:#e6ebf7;overflow:hidden;position:relative}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#2a54c6,#5b86f0);transition:width .35s}
+#prog{position:fixed;left:0;right:0;top:0;z-index:50;display:none;background:rgba(255,255,255,.96);padding:10px 14px;border-bottom:1px solid var(--line)}
+#prog b{color:var(--navy)}
+a{color:#1f4fb5}.news a{text-decoration:none}
+ul.t{margin:4px 0 0 16px;padding:0}
+.rng{position:relative;height:10px;background:#e6ebf7;border-radius:6px;margin:3px 0}.rng i{position:absolute;top:0;bottom:0;border-radius:6px;background:#9db6ee}.rng u{position:absolute;top:-3px;width:3px;height:16px;background:var(--navy);border-radius:2px}
+.lv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #edf0f7}
+@media print{.top,#prog{display:none}.card{break-inside:avoid;box-shadow:none}}
+</style></head><body>
+<div id="prog"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><b id="progT">Starting…</b><span id="progP">0%</span></div><div class="bar"><i id="progB" style="width:0"></i></div></div>
+<div class="wrap">
+  <div class="top">
+    <span class="mark">Joshi's Corner</span><h1>🔬 Deep Research</h1>
+    <input id="sym" placeholder="Symbol e.g. RELIANCE" autocomplete="off">
+    <select id="ex"><option value="NS">NSE</option><option value="BO">BSE</option></select>
+    <button id="go">Run deep scan</button>
+    <button class="ghost" onclick="window.print()">⬇ PDF</button>
+    <span class="sp"></span><a href="../" style="font-weight:700">← Terminal</a>
+  </div>
+  <div id="out"><div class="card"><h2>What this does</h2>
+    <div>Enter a symbol, choose the exchange and press <b>Run deep scan</b>. It automatically scans the last <b>15 · 30 · 45 · 60 · 75 · 90</b> sessions, builds intraday and delivery levels, finds the common days and repeating moves, matches the big moves with news, tests an astro (Moon) angle, and forecasts the <b>next 3 sessions</b> — today's close, then each next open and close with a minimum–maximum range — together with a walk-forward backtest that shows how well the method really worked on days it had not seen.</div>
+    <div class="note warn">Honest framing: markets are noisy. Where the backtest shows no edge, the page says so and shows a wide range around "no change" instead of a precise-looking number. Research aid, not advice or a guarantee.</div></div></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script src="../deep.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+const $=(id)=>document.getElementById(id);
+const esc=(s)=>String(s==null?'':s).replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const BACKEND='https://script.google.com/macros/s/AKfycbzMp82oHzLzKpaE0LrnUqEGGot7jqSw9e9VA1QhJNOPV35vOIYcfIChFL5PCDuD2Ahi5Q/exec';
+const PROXIES=[(u)=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),(u)=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)];
+function backend(){try{return localStorage.getItem('jc_backend_url')||BACKEND}catch(e){return BACKEND}}
+function quotaOut(){try{return Date.now()<(+localStorage.getItem('jc_be_quota_v1')||0)}catch(e){return false}}
+function quotaMark(){try{localStorage.setItem('jc_be_quota_v1',String(Date.now()+30*60000))}catch(e){}}
+async function tget(u,ms){const c=new AbortController(),id=setTimeout(()=>c.abort(),ms);try{const r=await fetch(u,{cache:'no-store',signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.text()}finally{clearTimeout(id)}}
+/* backend (unless today's quota is used up) → direct + public proxies in parallel */
+async function getData(url,kind,ok){
+  const parse=(t)=>{const o=kind==='json'?JSON.parse(t):t;if(ok&&!ok(o))throw new Error('unusable');return o};
+  const be=backend();
+  if(be&&!quotaOut()){try{const t=await tget(be+(be.includes('?')?'&':'?')+'action=fetch&url='+encodeURIComponent(url),20000);if(t.length<400&&/Service invoked too many times/i.test(t)){quotaMark();throw new Error('quota')}return parse(t)}catch(e){}}
+  const alts=[url].concat(PROXIES.map((p)=>p(url)));
+  return await Promise.any(alts.map(async(u)=>parse(await tget(u,9000))));
+}
+function setP(p,t){$('prog').style.display='block';$('progB').style.width=Math.min(100,p)+'%';$('progP').textContent=Math.round(Math.min(100,p))+'%';if(t)$('progT').textContent=t}
+function doneP(){setTimeout(()=>{$('prog').style.display='none'},500)}
+
+function yBars(j){const r=j.chart.result[0],ts=r.timestamp||[],q=r.indicators.quote[0]||{},out=[];for(let i=0;i<ts.length;i++){if(q.close[i]==null)continue;out.push({t:ts[i],o:q.open[i],h:q.high[i],l:q.low[i],c:q.close[i],v:q.volume[i]||0})}return{bars:out,meta:r.meta||{}}}
+const yurl=(s,range,iv)=>'https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(s)+'?range='+range+'&interval='+iv+'&includePrePost=false';
+let STATIC=null;
+async function staticData(){ if(STATIC) return STATIC; const [o,d]=await Promise.all([fetch('../data/ohlc.json').then(r=>r.json()),fetch('../data/delivery.json').then(r=>r.json())]); STATIC={o:o.d,d:d.d}; return STATIC; }
+function fromStatic(S,raw){const days=Object.keys(S.o).sort(),bars=[],dv=[];days.forEach((d)=>{const r=S.o[d][raw];const q=S.d[d]&&S.d[d][raw];if(r)bars.push({date:d,o:r[0],h:r[1],l:r[2],c:r[3],v:q?q[1]:0});if(q)dv.push({date:d,del:q[0],traded:q[1]})});return{bars,deliv:dv}}
+
+async function run(){
+  const raw=$('sym').value.trim().toUpperCase().replace(/\.(NS|BO)$/,''),ex=$('ex').value;
+  if(!raw){$('sym').focus();return}
+  $('go').disabled=true;setP(2,'Fetching daily history…');
+  const ysym=raw.charAt(0)==='^'?raw:raw+'.'+ex, notes=[];let bars=null,meta={},deliv=[],intra=null,news=[],source='';
+  try{
+    // 1) daily bars: ~2 years live, else NSE's own saved bars
+    try{const j=await getData(yurl(ysym,'2y','1d'),'json',(j)=>j&&j.chart&&j.chart.result&&j.chart.result[0]&&j.chart.result[0].timestamp);const r=yBars(j);bars=r.bars;meta=r.meta;source='Yahoo daily (2y)'}catch(e){notes.push('Live daily data was unreachable — using the saved NSE bars (≈10 months).')}
+    setP(22,'Reading NSE delivery history…');
+    if(ex==='NS'||!bars){try{const S=await staticData();const f=fromStatic(S,raw);deliv=f.deliv;if(!bars&&f.bars.length>=60){bars=f.bars;source='NSE saved bars ('+f.bars.length+' sessions)'}else if(f.bars.length&&bars){/* keep Yahoo bars */}}catch(e){notes.push('Saved NSE files could not be read.')}}
+    if(!bars||bars.length<60){throw new Error('Could not get at least 60 daily sessions for '+raw+'. Check the symbol/exchange'+(ex==='BO'?' (BSE needs live data)':'')+' and retry.')}
+    setP(36,'Scanning intraday (15-minute) sessions…');
+    try{const j=await getData(yurl(ysym,'60d','15m'),'json',(j)=>j&&j.chart&&j.chart.result&&j.chart.result[0]&&j.chart.result[0].timestamp);intra=yBars(j).bars}catch(e){notes.push('Intraday bars were unreachable — intraday time-of-day levels are skipped.')}
+    setP(50,'Reading news around the big moves…');
+    try{const nm=(meta.longName||meta.shortName||raw).replace(/\b(LIMITED|LTD\.?)\b/ig,'').trim();const u='https://news.google.com/rss/search?q='+encodeURIComponent('"'+nm+'" stock when:90d')+'&hl=en-IN&gl=IN&ceid=IN:en';const t=await getData(u,'text',(t)=>/<item>/.test(t));const xml=new DOMParser().parseFromString(t,'text/xml');news=Array.from(xml.querySelectorAll('item')).map((it)=>({title:(it.querySelector('title')||{}).textContent||'',link:(it.querySelector('link')||{}).textContent||'#',date:(it.querySelector('pubDate')||{}).textContent||''}))}catch(e){notes.push('News feed was unreachable — news cover is skipped.')}
+    setP(62,'Running the 15–90 day scans, cycles and the backtest…');
+    await new Promise((r)=>setTimeout(r,60));
+    const res=JCDeep.analyse({sym:raw,bars,deliv,intra,news,astronomy:window.Astronomy||null,source,now:new Date()});
+    setP(94,'Drawing the report…');
+    if(!res.ok)throw new Error(res.error);
+    res.name=meta.longName||meta.shortName||raw;res.notes=notes;res.exchange=ex==='BO'?'BSE':'NSE';
+    $('out').innerHTML=render(res);setP(100,'Done');doneP();
+    try{history.replaceState(null,'','?sym='+encodeURIComponent(raw)+'&ex='+ex)}catch(e){}
+  }catch(e){$('out').innerHTML='<div class="card"><h2>Could not finish</h2><div class="note warn">'+esc(e.message||e)+'</div></div>';doneP()}
+  $('go').disabled=false;
+}
+
+/* ---------- rendering ---------- */
+const f2=(x,d=2)=>x==null||!isFinite(x)?'—':Number(x).toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d});
+const P=(x,d=2)=>x==null||!isFinite(x)?'—':(x>=0?'+':'')+(x*100).toFixed(d)+'%';
+const cls=(x)=>x>0?'up':x<0?'dn':'mut';
+const dshort=(iso)=>{const d=new Date(iso+'T00:00:00Z');return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getUTCDay()]+' '+d.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()]};
+const rs=(x)=>'₹'+f2(x);
+function bandBar(lo,mid,hi,xlo,xhi){const a=xlo,b=xhi,w=b-a||1,pos=(v)=>((v-a)/w*100).toFixed(1);return '<div class="rng"><i style="left:'+pos(lo)+'%;width:'+(pos(hi)-pos(lo)).toFixed(1)+'%"></i><u style="left:'+pos(mid)+'%"></u></div>'}
+
+function render(r){
+  const fc=r.forecast,R=fc.R,last=fc.base,h=[];
+  const ph=r.phase==='open'?'market open':r.phase==='pre'?'before the open':'market closed';
+  h.push('<div class="card gold"><h2>'+esc(r.name)+' <span class="pill">'+esc(r.sym)+' · '+r.exchange+'</span><small>last close '+rs(last)+' ('+dshort(r.asOf)+') · '+ph+' · '+r.bars+' sessions from '+r.first+' · '+esc(r.source)+'</small></h2>');
+  (r.notes||[]).forEach((n)=>h.push('<div class="note warn">'+esc(n)+'</div>'));
+  h.push(forecastHtml(r));h.push('</div>');
+  h.push(backtestHtml(r));
+  h.push(levelsHtml(r));
+  h.push(windowsHtml(r));
+  h.push('<div class="grid2">'+daysHtml(r)+cycleHtml(r)+'</div>');
+  h.push(newsHtml(r));
+  h.push(astroHtml(r));
+  h.push(methodHtml(r));
+  return h.join('');
+}
+function forecastHtml(r){
+  const fc=r.forecast,R=fc.R,d=fc.dates,h=[];
+  const sess=['Session 1','Session 2','Session 3'];
+  const isToday=d[0]===r.today&&r.phase!=='closed';
+  const tagA=isToday?'Today':'Next session';
+  h.push('<div class="big">Next 3 sessions — what to expect</div>');
+  // headline sentences
+  const c1=r.forecast.liveAdj||{mid:R.C1.mid,lo:R.C1.lo,hi:R.C1.hi,xlo:R.C1.xlo,xhi:R.C1.xhi};
+  h.push('<div style="margin:6px 0 8px;font-size:14px"><b>'+tagA+' ('+dshort(d[0])+')</b>: closing around <b>'+rs(c1.mid)+'</b>, most likely between <b>'+rs(c1.lo)+'</b> and <b>'+rs(c1.hi)+'</b> <span class="mut">(extreme '+rs(c1.xlo)+' – '+rs(c1.xhi)+')</span>'+(r.forecast.liveAdj?' <span class="mut">· live price '+rs(r.forecast.liveAdj.price)+' used</span>':'')+'.</div>');
+  h.push('<div class="scroll"><table><tr><th>Session</th><th>Opens around</th><th>Open range (80%)</th><th>Closes around</th><th>Close range (80%)</th><th>Extreme range (96%)</th><th>P(close &gt; last close)</th></tr>');
+  [1,2,3].forEach((k,i)=>{const o=R['O'+k],c=R['C'+k];h.push('<tr><td><b>'+dshort(d[i])+'</b></td><td><b>'+rs(o.mid)+'</b> <span class="'+cls(o.chg)+'">'+P(o.chg)+'</span></td><td>'+rs(o.lo)+' – '+rs(o.hi)+'</td><td><b>'+rs(c.mid)+'</b> <span class="'+cls(c.chg)+'">'+P(c.chg)+'</span></td><td>'+rs(c.lo)+' – '+rs(c.hi)+'</td><td class="mut">'+rs(c.xlo)+' – '+rs(c.xhi)+'</td><td>'+(c.pUp==null?'—':Math.round(c.pUp*100)+'%')+'</td></tr>')});
+  h.push('</table></div>');
+  h.push('<div class="note">Min–Max reading: in the backtest, the real close stayed inside the "80%" range on about <b>'+covText(r)+'</b> of unseen days. Range widens with each day because uncertainty compounds.</div>');
+  // scenario chain
+  h.push('<div style="margin-top:8px"><b>If today/the first session closes…</b> <span class="mut">(then next open → close, and the day after)</span></div><div class="scroll"><table><tr><th>First close</th><th>Then opens around</th><th>…closes around</th><th>Day after: opens around</th><th>…closes around</th></tr>');
+  fc.scen.forEach((s)=>{h.push('<tr><td><b>'+s.name+'</b> '+rs(s.c1)+'</td><td>'+rs(s.o2.mid)+' <span class="mut">('+rs(s.o2.lo)+' – '+rs(s.o2.hi)+')</span></td><td>'+rs(s.c2.mid)+' <span class="mut">('+rs(s.c2.lo)+' – '+rs(s.c2.hi)+')</span></td><td>'+rs(s.o3.mid)+' <span class="mut">('+rs(s.o3.lo)+' – '+rs(s.o3.hi)+')</span></td><td>'+rs(s.c3.mid)+' <span class="mut">('+rs(s.c3.lo)+' – '+rs(s.c3.hi)+')</span></td></tr>')});
+  h.push('</table></div>');
+  const used=['C1','C2','C3','O1','O2','O3'].filter((k)=>fc.ev[k].used!=='naive');
+  h.push('<div class="note '+(used.length?'':'warn')+'">'+(used.length?'The backtest found a real, small edge for: '+used.map((k)=>(k[0]==='C'?'close ':'open ')+'session '+k[1]+' ('+fc.ev[k].used+')').join(', ')+'. Those centres use the model; the others stay at "no change" because the model did not beat it on unseen days.':'<b>The backtest found no method that beats "price stays where it is" on days it had not seen</b> — so the centres above equal the last close and the information is in the <b>ranges</b> (volatility-scaled, calibrated on this stock\'s own history) and in the levels below. That is the honest result for most liquid stocks.')+'</div>');
+  if(r.forecast.astroTilt&&r.forecast.astroTilt.length)h.push('<div class="note">Astro results that survived the multiple-testing check: '+r.forecast.astroTilt.map((a)=>esc(a.label)).join(', ')+' (see the astro section).</div>');
+  // levels to watch
+  const L=r.levels,sl=(a)=>a.map((x)=>'<div class="lv"><span><b>'+rs(x.price)+'</b> <span class="mut">'+esc(x.what)+'</span></span><span class="mut">strength '+x.score+'</span></div>').join('')||'<div class="mut">none found</div>';
+  h.push('<div class="grid2" style="margin-top:8px"><div><b class="up">Resistance to watch (above '+rs(L.ref)+')</b>'+sl(L.above)+'</div><div><b class="dn">Support to watch (below)</b>'+sl(L.below)+'</div></div>');
+  return h.join('');
+}
+function covText(r){const v=['C1','C2','C3','O1','O2','O3'].map((k)=>r.forecast.ev[k].coverage80).filter((x)=>x!=null&&isFinite(x));return v.length?Math.round(Math.min.apply(null,v)*100)+'–'+Math.round(Math.max.apply(null,v)*100)+'%':'n/a'}
+function backtestHtml(r){
+  const ev=r.forecast.ev,names={C1:'Close · session 1',C2:'Close · session 2',C3:'Close · session 3',O1:'Open · session 1',O2:'Open · session 2',O3:'Open · session 3'},rows=Object.keys(names).map((k)=>{const e=ev[k];return '<tr><td>'+names[k]+'</td><td>'+e.nSel+' / '+e.nHold+'</td><td>'+(e.chosen||'—')+'</td><td class="'+(e.edge>0.01?'up':'mut')+'">'+(e.edge==null?'—':(e.edge*100).toFixed(1)+'%')+'</td><td>'+(e.hit==null?'—':Math.round(e.hit*100)+'% (n '+e.hitN+')')+'</td><td>'+(e.coverage80==null?'—':Math.round(e.coverage80*100)+'%')+'</td><td><b>'+(e.used==='naive'?'no change':e.used)+'</b></td></tr>'}).join('');
+  return '<div class="card"><h2>🧪 Backtest scoreboard <small>walk-forward: at every test day the models saw only the past</small></h2><div class="scroll"><table><tr><th>Target</th><th>Days: pick / test</th><th>Best on pick half</th><th>Edge vs "no change" on test half</th><th>Direction hit (test)</th><th>80% band coverage (test)</th><th>Used</th></tr>'+rows+'</table></div><div class="note">Models tried: no-change, ridge regression on momentum/position/volatility features, nearest-look-alike days, and their blend. The model is <b>picked on the first half of the test span and scored on the second half it never influenced</b>. It is used only if it beats "no change" there (edge &gt; 0) with a hit rate above 50%. Bands are the 10th–90th (80%) and 2nd–98th (96%) percentiles of the model\'s own past errors, scaled by current volatility (EWMA).</div></div>';
+}
+function levelsHtml(r){
+  const I=r.intraday,D=r.delivery,L=r.levels,h=['<div class="card"><h2>📍 Intraday, delivery &amp; technical levels</h2>'];
+  const pv=L.pivots;h.push('<div class="scroll"><table><tr><th>Pivot (prev day)</th><th>S2</th><th>S1</th><th>Pivot</th><th>R1</th><th>R2</th></tr><tr><td>Classic</td><td class="dn">'+f2(pv.S2)+'</td><td class="dn">'+f2(pv.S1)+'</td><td><b>'+f2(pv.P)+'</b></td><td class="up">'+f2(pv.R1)+'</td><td class="up">'+f2(pv.R2)+'</td></tr></table></div>');
+  h.push('<div class="grid2"><div><b>Intraday behaviour</b> '+(I?'<span class="mut">('+I.sessions+' sessions, 15-min)</span>':'')+(I?'<div class="scroll"><table><tr><th>Window</th><th>Day-high set</th><th>Day-low set</th><th>Avg bar range</th><th>Volume</th></tr>'+I.buckets.map((b)=>'<tr><td>'+b.k+'</td><td>'+Math.round(b.hiPct*100)+'%</td><td>'+Math.round(b.loPct*100)+'%</td><td>'+(b.rangePct*100).toFixed(2)+'%</td><td>'+Math.round(b.volShare*100)+'%</td></tr>').join('')+'</table></div><div class="mut" style="margin-top:4px">Opening range (first 30 min) averages '+(I.or.avgRange*100).toFixed(2)+'% of price; the day closed above it on '+Math.round(I.or.closeAbove*100)+'% and below it on '+Math.round(I.or.closeBelow*100)+'% of sessions. 10-session volume POC <b>'+f2(I.poc)+'</b>, value area '+f2(I.vaL)+' – '+f2(I.vaH)+'. Last session VWAP '+f2(I.last.vwap)+'.</div>':'<div class="note">Intraday bars were not available.</div>')+'</div>');
+  h.push('<div><b>Delivery</b>'+(D?'<div class="mut">Latest delivery <b>'+D.last.p.toFixed(1)+'%</b> ('+dshort(D.last.date)+') · last-5 avg '+D.avg5.toFixed(1)+'% · last-30 avg '+D.avg30.toFixed(1)+'%.<br>On the top-20% delivery days ('+D.highDays.n+' days) the next day closed up '+(D.highDays.nextUp==null?'—':Math.round(D.highDays.nextUp*100)+'%')+' of the time.</div>':'<div class="note">Delivery data is not available for this symbol.</div>')+'<div class="mut" style="margin-top:6px">Delivery-weighted average prices (price where real investors accumulated) are in the window table below and are part of the level strengths above.</div></div></div></div>');
+  return h.join('');
+}
+function windowsHtml(r){
+  const w=r.windows.filter((x)=>!x.short),dir=w.filter((x)=>x.ret>0).length;
+  const row=(lab,fn)=>'<tr><td>'+lab+'</td>'+w.map((x)=>'<td>'+fn(x)+'</td>').join('')+'</tr>';
+  return '<div class="card"><h2>🗓 15 · 30 · 45 · 60 · 75 · 90-session scan <small>'+dir+' of '+w.length+' windows are net up</small></h2><div class="scroll"><table><tr><th></th>'+w.map((x)=>'<th>'+x.N+'d</th>').join('')+'</tr>'+
+  row('Return',(x)=>'<span class="'+cls(x.ret)+'">'+P(x.ret)+'</span>')+row('High / Low',(x)=>f2(x.hi,0)+' / '+f2(x.lo,0))+row('Position in range',(x)=>Math.round(x.pos*100)+'%')+row('Avg daily move',(x)=>(x.avgAbs*100).toFixed(2)+'%')+row('Avg day range',(x)=>(x.avgRange*100).toFixed(2)+'%')+row('Avg open gap',(x)=>(x.gap*100).toFixed(2)+'%')+row('Up days',(x)=>Math.round(x.upPct*100)+'%')+row('Max drawdown',(x)=>'<span class="dn">'+P(x.mdd,1)+'</span>')+row('Best day',(x)=>'<span class="up">'+P(x.bestDay.r,1)+'</span> <span class="mut">'+x.bestDay.date.slice(5)+'</span>')+row('Worst day',(x)=>'<span class="dn">'+P(x.worstDay.r,1)+'</span> <span class="mut">'+x.worstDay.date.slice(5)+'</span>')+row('VWAP',(x)=>x.vwap?f2(x.vwap):'—')+row('Delivery-VWAP',(x)=>x.dvwap?f2(x.dvwap):'—')+row('Avg delivery %',(x)=>x.delPct==null?'—':x.delPct.toFixed(1)+'%')+'</table></div></div>';
+}
+function daysHtml(r){
+  const wk=r.weekday,pt=r.patterns,tb=(a)=>'<table><tr><th>Day</th><th>n</th><th>Avg</th><th>Up %</th><th>Avg move</th><th>Range</th></tr>'+a.map((x)=>'<tr><td>'+x.day+'</td><td>'+x.n+'</td><td class="'+cls(x.mean)+'">'+P(x.mean)+'</td><td>'+Math.round(x.win*100)+'%</td><td>'+(x.avgAbs*100).toFixed(2)+'%</td><td>'+(x.range*100).toFixed(2)+'%</td></tr>').join('')+'</table>';
+  const sig=wk.all.filter((x)=>Math.abs(x.t)>2.6),big=pt.afterBigUp,bd=pt.afterBigDown;
+  return '<div class="card"><h2>📅 Common days &amp; repeating moves</h2><b>Last 90 sessions</b><div class="scroll">'+tb(wk.d90)+'</div><b>Whole history ('+wk.all.reduce((s,x)=>s+x.n,0)+' sessions)</b><div class="scroll">'+tb(wk.all)+'</div>'+
+  '<div class="note">'+(sig.length?'Weekday effect strong enough to notice (|t|&gt;2.6, 5 days tested): '+sig.map((x)=>x.day).join(', ')+'.':'No weekday stands out after allowing for 5 days being tested — treat the table as the stock\'s rhythm of <i>size</i> (range), not a direction edge.')+'</div>'+
+  '<b>Repeating pattern</b><div class="mut">Last two sessions were <b>'+pt.current.replace(/U/g,'Up ').replace(/D/g,'Down ').replace(/F/g,'Flat ')+'</b>. In this stock\'s history that pattern ('+pt.now.n+' times) was followed by an up day '+(pt.now.upPct==null?'—':Math.round(pt.now.upPct*100)+'%')+' of the time. After a big up day (&gt;1.5σ, n '+big.n+') next day was up '+Math.round(big.upPct*100)+'%; after a big down day (n '+bd.n+') it was up '+Math.round(bd.upPct*100)+'%.</div></div>';
+}
+function cycleHtml(r){
+  const c=r.cycle;if(!c.ok)return '<div class="card"><h2>🔁 Cycle of the move</h2><div class="note">'+esc(c.note)+'</div></div>';
+  return '<div class="card"><h2>🔁 Cycle of the move</h2><div>Strongest rhythm found: <b>~'+c.period+' sessions</b> ('+Math.round(c.share*100)+'% of the swing energy). Shuffle test p = <b>'+c.p.toFixed(2)+'</b> → <span class="pill '+(c.significant?'g':'a')+'">'+(c.significant?'statistically real':'NOT distinguishable from noise')+'</span></div><div class="mut" style="margin-top:6px">Swing highs came every ~'+(c.swingHighGap?c.swingHighGap.toFixed(0):'—')+' sessions and swing lows every ~'+(c.swingLowGap?c.swingLowGap.toFixed(0):'—')+' sessions (last 120 sessions). Last swing high was '+(c.sinceHigh==null?'—':c.sinceHigh)+' sessions ago, last swing low '+(c.sinceLow==null?'—':c.sinceLow)+' ago. Fitted wave now sits in the '+c.phaseNow+', '+c.turning+'.</div><div class="note">'+(c.significant?'The cycle passed the shuffle test, so it is worth watching — it is still not used to shift the forecast centre.':'Because the shuffle test says a wave this strong appears often by chance, the cycle is shown for information only.')+'</div></div>';
+}
+function newsHtml(r){
+  const n=r.news,h=['<div class="card news"><h2>📰 News cover for the big moves <small>8 biggest moves of the last 90 sessions</small></h2>'];
+  if(!n.available){h.push('<div class="note warn">News feed was not available, so moves could not be matched with headlines.</div></div>');return h.join('')}
+  h.push('<div class="mut">'+n.covered+' of '+n.total+' big-move days have a headline within a day. Feed holds '+n.nItems+' items back to '+n.oldest+' (older moves may simply be outside the feed).</div><div class="scroll"><table><tr><th>Date</th><th>Move</th><th style="text-align:left">Headlines around it</th></tr>');
+  n.rows.forEach((x)=>h.push('<tr><td>'+dshort(x.date)+'</td><td class="'+cls(x.r)+'">'+P(x.r)+'</td><td style="text-align:left;white-space:normal">'+(x.news.length?x.news.map((a)=>'<div><span class="pill">'+esc(a.topic)+'</span> '+esc(a.tone)+' <a target="_blank" rel="noopener" href="'+esc(a.link)+'">'+esc(a.title)+'</a> <span class="mut">'+esc(a.source)+' · '+a.date.slice(5)+'</span></div>').join(''):'<span class="mut">no headline found — move may be flow-driven (block/bulk deal, index rebalancing, sector move)</span>')+'</td></tr>'));
+  h.push('</table></div>');
+  if(n.recent.length)h.push('<b>Latest headlines</b><ul class="t">'+n.recent.map((a)=>'<li><span class="pill">'+esc(a.topic)+'</span> '+esc(a.tone)+' <a target="_blank" rel="noopener" href="'+esc(a.link)+'">'+esc(a.title)+'</a> <span class="mut">'+esc(a.source)+' · '+a.date.slice(5)+'</span></li>').join('')+'</ul>');
+  h.push('<div class="note">Headlines explain <i>why</i> a move may have happened; the forecast does not use them. The topic tag is a keyword guess, not a judgement.</div></div>');return h.join('');
+}
+function astroHtml(r){
+  const a=r.astro;if(!a.available)return '<div class="card"><h2>✨ Astro lab</h2><div class="note warn">'+esc(a.note||'Astronomy library did not load (needs internet access to the CDN).')+'</div></div>';
+  const surv=a.survivors;const top=(tg,lab)=>'<b>'+lab+'</b><div class="scroll"><table><tr><th>Moon / planet condition</th><th>Days</th><th>Avg</th><th>t</th><th>Adj. p</th></tr>'+a.results[tg].top.map((x)=>'<tr><td>'+esc(x.label)+'</td><td>'+x.n+'</td><td>'+(x.mean>=0?'+':'')+x.mean.toFixed(2)+'σ</td><td>'+x.t.toFixed(1)+'</td><td class="'+(x.padj<0.05?'up':'mut')+'">'+x.padj.toFixed(2)+'</td></tr>').join('')+'</table></div>';
+  const fut=a.future.map((d)=>'<tr><td><b>'+dshort(d.date)+'</b></td><td style="text-align:left;white-space:normal">'+d.tags.map((t)=>{const s=(t.ret&&t.ret.padj<0.05)||(t.vol&&t.vol.padj<0.05);return '<span class="pill '+(s?'g':'')+'" title="'+(t.ret?'n '+t.ret.n+', avg return '+t.ret.mean.toFixed(2)+'σ, adj p '+t.ret.padj.toFixed(2):'')+'">'+esc(t.label)+'</span> '}).join('')+'</td></tr>').join('');
+  return '<div class="card"><h2>✨ Astro lab <small>Moon position (sidereal, Lahiri), tithi, nakshatra, phase, Mercury retrograde, Moon aspects to 5 planets</small></h2>'+
+  '<div>Tested <b>'+a.tests+'</b> astro conditions against this stock\'s '+a.days+' sessions (daily return and size of move) with a 1,000-shuffle test that corrects for running so many tests at once. <b>Result: '+(surv.length?'<span class="up">'+surv.length+' condition(s) survived</span>':'<span class="amb">none survived</span>')+'.</b></div>'+
+  (surv.length?'<ul class="t">'+surv.map((s)=>'<li>'+esc(s.label)+' — '+(s.target==='ret'?'return':'size of move')+' avg '+(s.mean>=0?'+':'')+s.mean.toFixed(2)+'σ over '+s.n+' days (adj p '+s.padj.toFixed(3)+')</li>').join('')+'</ul>':'')+
+  '<div class="grid2" style="margin-top:6px"><div>'+top('ret','Closest to significant — daily return')+'</div><div>'+top('vol','Closest to significant — size of move')+'</div></div>'+
+  '<b>Sky for the next 3 sessions</b> <span class="mut">(green = survived the test)</span><div class="scroll"><table>'+fut+'</table></div>'+
+  '<div class="note '+(surv.length?'':'warn')+'">'+(surv.length?'Survivors can be real or one-in-twenty luck; they are shown, not blindly traded. They only nudge the forecast if the backtest also confirms them.':'With this many tests, a few conditions always look striking by chance (the "t" column) — the adjusted p-value says whether they beat that chance. For this stock the Moon/planet angle gives <b>no usable edge</b>, so it does not move the forecast. This is a result, not a failure: it saves you from trading on a coincidence.')+'</div></div>';
+}
+function methodHtml(r){
+  return '<div class="card"><h2>ℹ️ Method &amp; limits</h2><ul class="t"><li><b>Data:</b> '+esc(r.source)+(r.intraday?' + 15-minute bars':'')+(r.delivery?' + NSE delivery':'')+'. Forecast base = last completed close.</li><li><b>Volatility:</b> EWMA (λ=0.94) of daily log returns; every target is expressed in units of that volatility so quiet and wild periods are comparable.</li><li><b>Ranges:</b> empirical percentiles of the model\'s own out-of-sample errors — not a bell-curve assumption.</li><li><b>Not modelled:</b> results/news released after the data, circuit limits, index events, block deals, global gaps. A surprise can break any range.</li><li>Past behaviour, backtests and astro tests describe history. Nothing here is a guaranteed outcome or personal advice.</li></ul></div>';
+}
+$('go').onclick=run;$('sym').addEventListener('keydown',(e)=>{if(e.key==='Enter')run()});
+const q=new URLSearchParams(location.search);if(q.get('sym')){$('sym').value=q.get('sym');if(q.get('ex')==='BO')$('ex').value='BO';setTimeout(run,50)}else $('sym').focus();
+window.__deepRender=render;
+})();
+</script></body></html>
