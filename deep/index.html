@@ -35,7 +35,8 @@ a{color:#1f4fb5}.news a{text-decoration:none}
 ul.t{margin:4px 0 0 16px;padding:0}
 .rng{position:relative;height:10px;background:#e6ebf7;border-radius:6px;margin:3px 0}.rng i{position:absolute;top:0;bottom:0;border-radius:6px;background:#9db6ee}.rng u{position:absolute;top:-3px;width:3px;height:16px;background:var(--navy);border-radius:2px}
 .lv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #edf0f7}
-@media print{.top,#prog{display:none}.card{break-inside:avoid;box-shadow:none}}
+details.fold{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}details.fold>summary{cursor:pointer;padding:10px 14px;font-weight:700;color:var(--navy);font-size:13.5px}details.fold>.card{border:0;box-shadow:none;margin:0;padding-top:0}details.fold .note{display:none}
+@media print{details.fold{display:block}details.fold>summary{display:none}.top,#prog{display:none}.card{break-inside:avoid;box-shadow:none}}
 </style></head><body>
 <div id="prog"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><b id="progT">Starting…</b><span id="progP">0%</span></div><div class="bar"><i id="progB" style="width:0"></i></div></div>
 <div class="wrap">
@@ -47,12 +48,10 @@ ul.t{margin:4px 0 0 16px;padding:0}
     <button class="ghost" onclick="window.print()">⬇ PDF</button>
     <span class="sp"></span><a href="../" style="font-weight:700">← Terminal</a>
   </div>
-  <div id="out"><div class="card"><h2>What this does</h2>
-    <div>Enter a symbol, choose the exchange and press <b>Run deep scan</b>. It automatically scans the last <b>15 · 30 · 45 · 60 · 75 · 90</b> sessions, builds intraday and delivery levels, finds the common days and repeating moves, matches the big moves with news, tests an astro (Moon) angle, and forecasts the <b>next 3 sessions</b> — today's close, then each next open and close with a minimum–maximum range — together with a walk-forward backtest that shows how well the method really worked on days it had not seen.</div>
-    <div class="note warn">Honest framing: markets are noisy. Where the backtest shows no edge, the page says so and shows a wide range around "no change" instead of a precise-looking number. Research aid, not advice or a guarantee.</div></div></div>
+  <div id="out"><div class="card mut">Enter a symbol, pick the exchange and press <b>Run deep scan</b>.</div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-<script src="../deep.js?v=3"></script>
+<script src="../deep.js?v=5"></script>
 <script>
 (function(){
 'use strict';
@@ -118,7 +117,7 @@ async function run(){
     try{history.replaceState(null,'','?sym='+encodeURIComponent(raw)+'&ex='+ex)}catch(e){}
     $('go').disabled=false;
     // astro lab runs after the main report is already on screen
-    setTimeout(()=>{try{if(window.Astronomy){res.astro=JCDeep.astroLabFor(window.Astronomy,res);const el=document.getElementById('astroCard');if(el)el.outerHTML=astroHtml(res)}}catch(e){}},50);
+    setTimeout(()=>{try{if(window.Astronomy){res.astro=JCDeep.astroLabFor(window.Astronomy,res);const el=document.getElementById('astroSlot');if(el)el.innerHTML=fold('✨ Astro lab',astroHtml(res))}}catch(e){}},50);
   }catch(e){$('out').innerHTML='<div class="card"><h2>Could not finish</h2><div class="note warn">'+esc(e.message||e)+'</div></div>';doneP();$('go').disabled=false}
 }
 
@@ -130,22 +129,23 @@ const dshort=(iso)=>{const d=new Date(iso+'T00:00:00Z');return ['Sun','Mon','Tue
 const rs=(x)=>'₹'+f2(x);
 function bandBar(lo,mid,hi,xlo,xhi){const a=xlo,b=xhi,w=b-a||1,pos=(v)=>((v-a)/w*100).toFixed(1);return '<div class="rng"><i style="left:'+pos(lo)+'%;width:'+(pos(hi)-pos(lo)).toFixed(1)+'%"></i><u style="left:'+pos(mid)+'%"></u></div>'}
 
+function fold(t,html){return '<details class="fold"><summary>'+t+'</summary>'+html.replace(/<h2>.*?<\/h2>/,'')+'</details>'}
 function render(r){
-  const fc=r.forecast,R=fc.R,last=fc.base,h=[];
+  const fc=r.forecast,h=[];
   const ph=r.phase==='open'?'market open':r.phase==='pre'?'before the open':'market closed';
-  h.push('<div class="card gold"><h2>'+esc(r.name)+' <span class="pill">'+esc(r.sym)+' · '+r.exchange+'</span><small>last close '+rs(last)+' ('+dshort(r.asOf)+') · '+ph+' · '+r.bars+' sessions from '+r.first+' · '+esc(r.source)+'</small></h2>');
-  (r.notes||[]).forEach((n)=>h.push('<div class="note warn">'+esc(n)+'</div>'));
-  h.push('<div class="mut" style="font-size:11px">'+esc(r.diag||'')+'</div>');h.push(chartHtml(r));h.push(forecastHtml(r));h.push('</div>');
-  h.push(planHtml(r));h.push(backtestHtml(r));
-  h.push(levelsHtml(r));
-  h.push(windowsHtml(r));
-  h.push('<div class="grid2">'+daysHtml(r)+cycleHtml(r)+'</div>');
-  h.push(newsHtml(r));
-  h.push(astroHtml(r));
-  h.push(methodHtml(r));
+  h.push('<div class="card gold"><h2>'+esc(r.name)+' <span class="pill">'+esc(r.sym)+' · '+r.exchange+'</span><small>last close '+rs(fc.base)+' ('+dshort(r.asOf)+') · '+ph+'</small></h2>');
+  const warn=(r.notes||[]).filter((n)=>/^⚠/.test(n));warn.forEach((n)=>h.push('<div class="note warn">'+esc(n)+'</div>'));
+  h.push(chartHtml(r));h.push(forecastHtml(r));h.push('</div>');
+  h.push(planHtml(r));
+  h.push(fold('📍 Levels — intraday, delivery, technical',levelsHtml(r)));
+  h.push(fold('🗓 15 · 30 · 45 · 60 · 75 · 90-session scan',windowsHtml(r)));
+  h.push(fold('📅 Common days · 🔁 move cycle','<div class="grid2">'+daysHtml(r)+cycleHtml(r)+'</div>'));
+  h.push(fold('📰 News behind the big moves',newsHtml(r)));
+  h.push('<div id="astroSlot">'+fold('✨ Astro lab',astroHtml(r))+'</div>');
+  h.push(fold('🧪 Backtest — how reliable is this',backtestHtml(r)));
+  h.push('<div class="mut" style="font-size:11px;margin:8px 2px">'+esc(r.source||'')+(r.notes&&r.notes.length?' · '+esc(r.notes.filter((n)=>!/^⚠/.test(n)).join(' ')):'')+' · '+esc(r.diag||'')+' · Research aid, not advice or a guarantee.</div>');
   return h.join('');
 }
-
 function chartHtml(r){
   const fc=r.forecast,R=fc.R,rec=r.recent.slice(-22),W=1060,H=380,pl=54,pr=92,pt=14,pb=34,nH=rec.length,nF=3,slots=nH+nF*2+1;
   const live=fc.liveAdj?fc.liveAdj.price:(r.live?r.live.price:null);
@@ -174,28 +174,26 @@ function chartHtml(r){
   if(live){s.push('<line x1="'+pl+'" x2="'+(W-pr+8)+'" y1="'+Y(live)+'" y2="'+Y(live)+'" stroke="#b86e00" stroke-width="1.6"/><text x="'+(W-pr+10)+'" y="'+(Y(live)-4)+'" font-size="10.5" fill="#b86e00" font-weight="700">LIVE '+live.toFixed(1)+'</text>')}
   s.push('<text x="'+x0+'" y="'+(H-pb+14)+'" font-size="10" fill="#52607f" text-anchor="middle">'+dshort(r.asOf).slice(0,6)+'</text>');
   s.push('<text x="'+(pl+4)+'" y="'+(H-6)+'" font-size="10" fill="#52607f">last 22 sessions · projection →</text></svg>');
-  return '<div style="margin:6px 0 4px"><b>Projection chart</b> <span class="mut">— dark band = 80% likely range, light band = 96% extreme range; lines = path if the first session closes weak / base / strong; boxes = projected open→close; dashed = resistance (red) / support (green)</span></div>'+s.join('');
+  return '<div style="margin:6px 0 4px"><b>Projection</b> <span class="mut">dark band 80% range · light band 96% · lines: weak / base / strong first close</span></div>'+s.join('');
 }
 function forecastHtml(r){
   const fc=r.forecast,R=fc.R,d=fc.dates,h=[];
   const sess=['Session 1','Session 2','Session 3'];
   const isToday=d[0]===r.today&&r.phase!=='closed';
   const tagA=isToday?'Today':'Next session';
-  h.push('<div class="big">Next 3 sessions — what to expect</div>');
+  h.push('<div class="big">Next 3 sessions</div>');
   // headline sentences
   const c1=r.forecast.liveAdj||{mid:R.C1.mid,lo:R.C1.lo,hi:R.C1.hi,xlo:R.C1.xlo,xhi:R.C1.xhi};
   h.push('<div style="margin:6px 0 8px;font-size:14px"><b>'+tagA+' ('+dshort(d[0])+')</b>: closing around <b>'+rs(c1.mid)+'</b>, most likely between <b>'+rs(c1.lo)+'</b> and <b>'+rs(c1.hi)+'</b> <span class="mut">(extreme '+rs(c1.xlo)+' – '+rs(c1.xhi)+')</span>'+(r.forecast.liveAdj?' <span class="mut">· live price '+rs(r.forecast.liveAdj.price)+' used</span>':'')+'.</div>');
   h.push('<div class="scroll"><table><tr><th>Session</th><th>Opens around</th><th>Open range (80%)</th><th>Closes around</th><th>Close range (80%)</th><th>Extreme range (96%)</th><th>P(close &gt; last close)</th></tr>');
   [1,2,3].forEach((k,i)=>{const o=R['O'+k],c=R['C'+k];h.push('<tr><td><b>'+dshort(d[i])+'</b></td><td><b>'+rs(o.mid)+'</b> <span class="'+cls(o.chg)+'">'+P(o.chg)+'</span></td><td>'+rs(o.lo)+' – '+rs(o.hi)+'</td><td><b>'+rs(c.mid)+'</b> <span class="'+cls(c.chg)+'">'+P(c.chg)+'</span></td><td>'+rs(c.lo)+' – '+rs(c.hi)+'</td><td class="mut">'+rs(c.xlo)+' – '+rs(c.xhi)+'</td><td>'+(c.pUp==null?'—':Math.round(c.pUp*100)+'%')+'</td></tr>')});
   h.push('</table></div>');
-  h.push('<div class="note">Min–Max reading: in the backtest, the real close stayed inside the "80%" range on about <b>'+covText(r)+'</b> of unseen days. Range widens with each day because uncertainty compounds.</div>');
   // scenario chain
   h.push('<div style="margin-top:8px"><b>If today/the first session closes…</b> <span class="mut">(then next open → close, and the day after)</span></div><div class="scroll"><table><tr><th>First close</th><th>Then opens around</th><th>…closes around</th><th>Day after: opens around</th><th>…closes around</th></tr>');
   fc.scen.forEach((s)=>{h.push('<tr><td><b>'+s.name+'</b> '+rs(s.c1)+'</td><td>'+rs(s.o2.mid)+' <span class="mut">('+rs(s.o2.lo)+' – '+rs(s.o2.hi)+')</span></td><td>'+rs(s.c2.mid)+' <span class="mut">('+rs(s.c2.lo)+' – '+rs(s.c2.hi)+')</span></td><td>'+rs(s.o3.mid)+' <span class="mut">('+rs(s.o3.lo)+' – '+rs(s.o3.hi)+')</span></td><td>'+rs(s.c3.mid)+' <span class="mut">('+rs(s.c3.lo)+' – '+rs(s.c3.hi)+')</span></td></tr>')});
   h.push('</table></div>');
   const used=['C1','C2','C3','O1','O2','O3'].filter((k)=>fc.ev[k].used!=='naive');
-  h.push('<div class="note '+(used.length?'':'warn')+'">'+(used.length?'The backtest found a real, small edge for: '+used.map((k)=>(k[0]==='C'?'close ':'open ')+'session '+k[1]+' ('+fc.ev[k].used+')').join(', ')+'. Those centres use the model; the others stay at "no change" because the model did not beat it on unseen days.':'<b>The backtest found no method that beats "price stays where it is" on days it had not seen</b> — so the centres above equal the last close and the information is in the <b>ranges</b> (volatility-scaled, calibrated on this stock\'s own history) and in the levels below. That is the honest result for most liquid stocks.')+'</div>');
-  if(r.forecast.astroTilt&&r.forecast.astroTilt.length)h.push('<div class="note">Astro results that survived the multiple-testing check: '+r.forecast.astroTilt.map((a)=>esc(a.label)).join(', ')+' (see the astro section).</div>');
+  h.push('<div class="mut" style="font-size:11.5px;margin-top:4px">'+(used.length?'Model edge confirmed in backtest for: '+used.map((k)=>(k[0]==='C'?'close ':'open ')+'S'+k[1]).join(', ')+'.':'Backtest: no method beat "no change" on unseen days, so centres equal the last close — the ranges and levels carry the information.')+'</div>');
   // levels to watch
   const L=r.levels,sl=(a)=>a.map((x)=>'<div class="lv"><span><b>'+rs(x.price)+'</b> <span class="mut">'+esc(x.what)+'</span></span><span class="mut">strength '+x.score+'</span></div>').join('')||'<div class="mut">none found</div>';
   h.push('<div class="grid2" style="margin-top:8px"><div><b class="up">Resistance to watch (above '+rs(L.ref)+')</b>'+sl(L.above)+'</div><div><b class="dn">Support to watch (below)</b>'+sl(L.below)+'</div></div>');
@@ -204,7 +202,7 @@ function forecastHtml(r){
 function covText(r){const v=['C1','C2','C3','O1','O2','O3'].map((k)=>r.forecast.ev[k].coverage80).filter((x)=>x!=null&&isFinite(x));return v.length?Math.round(Math.min.apply(null,v)*100)+'–'+Math.round(Math.max.apply(null,v)*100)+'%':'n/a'}
 function planHtml(r){
   const p=r.plan,rr=(x)=>x>=1.5?'up':x>=1?'amb':'dn',row=(lab,c,o)=>o?'<tr><td><b class="'+c+'">'+lab+'</b> <span class="mut">'+esc(o.why)+'</span></td><td>'+rs(o.zone[0])+' – '+rs(o.zone[1])+'</td><td class="dn">'+rs(o.stop)+'</td><td>'+rs(o.t1)+'</td><td>'+rs(o.t2)+'</td><td class="'+rr(o.rr)+'">'+o.rr.toFixed(1)+' : 1</td></tr>':'';
-  return '<div class="card"><h2>🎯 Conditional trade plan <small>built from this stock\'s own support/resistance clusters and calibrated ranges — a plan for each side, not a prediction</small></h2><div class="scroll"><table><tr><th>Setup</th><th>Entry zone</th><th>Stop</th><th>Target 1</th><th>Target 2</th><th>Reward : risk</th></tr>'+row('Buy the dip','up',p.buy)+row('Sell the rally','dn',p.sell)+'</table></div><div class="note">Act only if price actually reaches the zone and holds/rejects there; skip when reward:risk is below 1.5. Level strength and the delivery-VWAP tags above show where real positions sit.</div></div>';
+  return '<div class="card"><h2>🎯 Conditional trade plan </h2><div class="scroll"><table><tr><th>Setup</th><th>Entry zone</th><th>Stop</th><th>Target 1</th><th>Target 2</th><th>Reward : risk</th></tr>'+row('Buy the dip','up',p.buy)+row('Sell the rally','dn',p.sell)+'</table></div></div>';
 }
 function backtestHtml(r){
   const ev=r.forecast.ev,names={C1:'Close · session 1',C2:'Close · session 2',C3:'Close · session 3',O1:'Open · session 1',O2:'Open · session 2',O3:'Open · session 3'},rows=Object.keys(names).map((k)=>{const e=ev[k];return '<tr><td>'+names[k]+'</td><td>'+e.nSel+' / '+e.nHold+'</td><td>'+(e.chosen||'—')+'</td><td class="'+(e.edge>0.01?'up':'mut')+'">'+(e.edge==null?'—':(e.edge*100).toFixed(1)+'%')+'</td><td>'+(e.hit==null?'—':Math.round(e.hit*100)+'% (n '+e.hitN+')')+'</td><td>'+(e.coverage80==null?'—':Math.round(e.coverage80*100)+'%')+'</td><td><b>'+(e.used==='naive'?'no change':e.used)+'</b></td></tr>'}).join('');
