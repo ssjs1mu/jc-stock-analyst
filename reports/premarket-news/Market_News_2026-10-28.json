@@ -1,0 +1,104 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "28 Oct 2026",
+ "report_time": "07:21 IST",
+ "generated_line": "Generated: 28 Oct 2026, 07:21 IST",
+ "as_of_note": "Auto-generated at 07:21 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "Market News",
+ "sections": [
+  {
+   "heading": "Top Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Jio Platforms is scheduled for its IPO listing today on the NSE and BSE [Livemint].",
+      "Asian equity markets advanced on resurgent AI optimism and broad tech sector gains [Bloomberg.com].",
+      "South Korea's Kospi surged following strong SK Hynix earnings results [NDTV Profit].",
+      "US stock futures and technology firms gained ahead of major corporate earnings and the Fed decision [Yahoo Finance].",
+      "Gift Nifty signals a flat start for domestic markets as investors await the Fed decision [HDFC Sky].",
+      "The International Monetary Fund recommended India use the rupee as its primary defense buffer [The Economic Times]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Global Cues",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,377.57",
+       "+0.03%"
+      ],
+      [
+       "S&P 500",
+       "7,722.60",
+       "+0.60%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,477.81",
+       "+1.18%"
+      ],
+      [
+       "FTSE 100",
+       "10,686.50",
+       "-0.75%"
+      ],
+      [
+       "DAX",
+       "25,590.77",
+       "+0.71%"
+      ],
+      [
+       "Nikkei 225",
+       "64,144.60",
+       "+1.38%"
+      ],
+      [
+       "Hang Seng",
+       "23,132.31",
+       "+0.39%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,665.10",
+       "+0.46%"
+      ],
+      [
+       "Kospi",
+       "5,955.78",
+       "+5.63%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Calendar",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex MONTHLY expiry: Thu 29 Oct 2026."
+     ]
+    }
+   ]
+  }
+ ]
+}
