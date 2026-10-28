@@ -1,0 +1,368 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "28 Oct 2026",
+ "report_time": "07:22 IST",
+ "generated_line": "Generated: 28 Oct 2026, 07:22 IST",
+ "as_of_note": "Auto-generated at 07:22 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Indian headline equity indices ended essentially flat in the previous session, with the Nifty 50 closing at 22,749.75 and the Sensex at 73,598.67. Sectoral weakness was visible in Bank Nifty, which fell 0.72% to 53,974.90, even as the broader Nifty 500 managed a 0.58% gain. The market setup sits near the pivot level of 22,739 following mixed contributions from index constituents. Meanwhile, crude prices declined, with Brent falling 4.21% to settle at $110.94 per barrel."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Global Markets Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,377.57",
+       "+0.03%"
+      ],
+      [
+       "S&P 500",
+       "7,722.60",
+       "+0.60%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,477.81",
+       "+1.18%"
+      ],
+      [
+       "FTSE 100",
+       "10,686.50",
+       "-0.75%"
+      ],
+      [
+       "DAX",
+       "25,590.77",
+       "+0.71%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nikkei 225",
+       "64,129.58",
+       "+1.36%"
+      ],
+      [
+       "Hang Seng",
+       "23,099.52",
+       "+0.25%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,660.27",
+       "+0.33%"
+      ],
+      [
+       "Kospi",
+       "5,962.04",
+       "+5.74%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Commodities, Currency & Bonds",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Item",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "110.94",
+       "-4.21%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "101.13",
+       "-0.62%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,069.70",
+       "+0.78%"
+      ],
+      [
+       "USD/INR",
+       "95.11",
+       "-0.09%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "102.41",
+       "+0.09%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "4.99",
+       "+0.14%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Indian Markets - Previous Session",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Close",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,749.75",
+       "-0.02%"
+      ],
+      [
+       "Sensex",
+       "73,598.67",
+       "-0.01%"
+      ],
+      [
+       "Bank Nifty",
+       "53,974.90",
+       "-0.72%"
+      ],
+      [
+       "Nifty 500",
+       "21,734.90",
+       "+0.58%"
+      ],
+      [
+       "India VIX",
+       "16.40",
+       "-4.43%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,648",
+       "22,841"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,546",
+       "22,932"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  },
+  {
+   "heading": "Outlook",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty pivot resistance levels are positioned at 22,841 (R1) and 22,932 (R2).",
+      "Key support levels for the benchmark stand at 22,648 (S1) and 22,546 (S2) below the 22,739 pivot.",
+      "Bank Nifty remains a focal point after slipping 0.72% to 53,974.90.",
+      "Global commodity and yield levels to track include Brent crude at $110.94 and the US 10-year yield at 4.99%."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks in Focus (previous session)",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Top gainers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "TATACONSUM",
+       "1,000.00",
+       "+6.78%"
+      ],
+      [
+       "JSWSTEEL",
+       "1,260.00",
+       "+6.28%"
+      ],
+      [
+       "DIVISLAB",
+       "9,505.50",
+       "+5.03%"
+      ],
+      [
+       "BHARTIARTL",
+       "1,978.80",
+       "+3.20%"
+      ],
+      [
+       "BAJAJ-AUTO",
+       "10,390.00",
+       "+3.17%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    {
+     "type": "table",
+     "headers": [
+      "Top losers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "ASIANPAINT",
+       "2,277.00",
+       "-1.94%"
+      ],
+      [
+       "COALINDIA",
+       "398.00",
+       "-1.73%"
+      ],
+      [
+       "SBIN",
+       "945.10",
+       "-1.63%"
+      ],
+      [
+       "TCS",
+       "2,496.90",
+       "-1.50%"
+      ],
+      [
+       "WIPRO",
+       "187.00",
+       "-1.16%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Asian equities advanced amid resurgent optimism around artificial intelligence and strong earnings from SK Hynix (NDTV Profit).",
+      "Jio Platforms is scheduled to list its shares on the NSE and BSE today (Livemint).",
+      "US stock futures gained while crude oil prices fell following comments from Iran (Bloomberg.com).",
+      "Global financial markets remained watchful ahead of major technology earnings and the upcoming Federal Reserve decision (RTTNews).",
+      "The IMF stated that India should let the rupee act as its first line of defence (The Economic Times).",
+      "Gift Nifty pointed to a flat opening for domestic indices amid impending monetary policy announcements (HDFC Sky)."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex MONTHLY expiry: Thu 29 Oct 2026."
+     ]
+    }
+   ]
+  }
+ ]
+}
