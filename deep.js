@@ -41,7 +41,8 @@
     let live = null, phase = 'closed';
     if (isTrading(today)) { if (mins < 555) phase = 'pre'; else if (mins < 930) phase = 'open'; }
     if (a.length && a[a.length - 1].date === today && phase === 'open') { live = { price: a[a.length - 1].c, open: a[a.length - 1].o, high: a[a.length - 1].h, low: a[a.length - 1].l }; a = a.slice(0, -1); }
-    return { bars: a, live, today, phase, minsLeft: phase === 'open' ? 930 - mins : 0 };
+    let exp = today; if (!(isTrading(today) && mins >= 945)) { exp = addDays(today, -1); while (!isTrading(exp)) exp = addDays(exp, -1); }
+    return { bars: a, live, today, phase, minsLeft: phase === 'open' ? 930 - mins : 0, expected: exp };
   }
 
   /* ---------- series with volatility + features ---------- */
@@ -325,6 +326,7 @@
   /* ---------- main ---------- */
   function analyse(inp) {
     const now = inp.now || new Date(), pp = prep(inp.bars, now);
+    if (!pp.live && pp.phase === 'open' && isNum(inp.livePrice)) pp.live = { price: inp.livePrice };
     if (pp.bars.length < 60) return { ok: false, error: 'Only ' + pp.bars.length + ' daily bars are available — need at least 60 for a deep scan.' };
     const S = mkSeries(pp.bars), deliv = inp.deliv || [], win = scanWindows(pp.bars, deliv), istats = intradayStats(inp.intra), lastClose = pp.live ? pp.live.price : S.c[S.n - 1];
     const lv = levels(pp.bars, win, istats && istats.levels, deliv, lastClose), wk90 = weekdayStats(S, 90), wkAll = weekdayStats(S, Math.min(S.n, 480)), pat = patterns(S), cyc = cycles(S, 7), dates = sessionDates(pp);
@@ -332,7 +334,7 @@
     const fc = forecast(S, pp, astro), news = newsCover(S, inp.news, 90);
     // delivery summary
     let dl = null; if (deliv.length > 20) { const p = deliv.filter((d) => d.traded > 0).map((d) => ({ date: d.date, p: d.del / d.traded * 100 })), l5 = p.slice(-5), l30 = p.slice(-30); const dm = new Map(p.map((x) => [x.date, x.p])), rr = [], pr2 = []; for (let i = 1; i < pp.bars.length - 1; i++) { const a = dm.get(pp.bars[i].date); if (a !== undefined) { pr2.push(a); rr.push(S.r[i + 1] / S.sig[i]); } } const thr = quant(pr2, 0.8), hi = rr.filter((_, i) => pr2[i] >= thr); dl = { last: p[p.length - 1], avg5: mean(l5.map((x) => x.p)), avg30: mean(l30.map((x) => x.p)), highDays: { n: hi.length, nextMeanZ: mean(hi), nextUp: hi.length ? hi.filter((v) => v > 0).length / hi.length : null } }; }
-    return { ok: true, sym: inp.sym, asOf: pp.bars[S.n - 1].date, today: pp.today, phase: pp.phase, live: pp.live, bars: S.n, first: pp.bars[0].date, windows: win, levels: lv, intraday: istats, weekday: { d90: wk90, all: wkAll }, patterns: pat, cycle: cyc, news, astro, forecast: fc, delivery: dl, source: inp.source || '' };
+    return { ok: true, _S: S, sessions: dates, expected: pp.expected, stale: pp.bars[S.n - 1].date < pp.expected, recent: pp.bars.slice(-40), sym: inp.sym, asOf: pp.bars[S.n - 1].date, today: pp.today, phase: pp.phase, live: pp.live, bars: S.n, first: pp.bars[0].date, windows: win, levels: lv, intraday: istats, weekday: { d90: wk90, all: wkAll }, patterns: pat, cycle: cyc, news, astro, forecast: fc, delivery: dl, source: inp.source || '' };
   }
-  return { analyse, prep, mkSeries, evaluate, walkForward, astroTags, astroLab, scanWindows, levels, intradayStats, weekdayStats, patterns, cycles, newsCover, isTrading, nextTrading, WIN, HOL };
+  return { analyse, prep, astroLabFor: (A, res) => astroLab(A, res._S, res.sessions, 11), mkSeries, evaluate, walkForward, astroTags, astroLab, scanWindows, levels, intradayStats, weekdayStats, patterns, cycles, newsCover, isTrading, nextTrading, WIN, HOL };
 });
