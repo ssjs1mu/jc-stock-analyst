@@ -36,7 +36,7 @@
     const m = new Map();
     (bars || []).forEach((b) => { if (!b || !isNum(b.c) || b.c <= 0) return; const d = b.date || istDate(b.t); m.set(d, { date: d, o: isNum(b.o) && b.o > 0 ? b.o : b.c, h: isNum(b.h) && b.h > 0 ? b.h : b.c, l: isNum(b.l) && b.l > 0 ? b.l : b.c, c: b.c, v: isNum(b.v) ? b.v : 0 }); });
     let a = Array.from(m.values()).sort((x, y) => (x.date < y.date ? -1 : 1));
-    a.forEach((b) => { b.h = Math.max(b.h, b.o, b.c); b.l = Math.min(b.l, b.o, b.c); });
+    a.forEach((b) => { b.h = Math.max(b.h, b.o, b.c); b.l = Math.min(b.l, b.o, b.c); const lb = Math.min(b.o, b.c) * 0.94, hb = Math.max(b.o, b.c) * 1.06; if (b.l < lb) b.l = lb; if (b.h > hb) b.h = hb; }); // single-tick glitches (wick >6% beyond the body) would distort ranges and levels
     const ist = new Date((now || new Date()).getTime() + 19800000), today = ist.toISOString().slice(0, 10), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
     let live = null, phase = 'closed';
     if (isTrading(today)) { if (mins < 555) phase = 'pre'; else if (mins < 930) phase = 'open'; }
