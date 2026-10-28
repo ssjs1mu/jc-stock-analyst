@@ -51,7 +51,7 @@ details.fold{background:var(--card);border:1px solid var(--line);border-radius:1
   <div id="out"><div class="card mut">Enter a symbol, pick the exchange and press <b>Run deep scan</b>.</div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-<script src="../deep.js?v=5"></script>
+<script src="../deep.js?v=6"></script>
 <script>
 (function(){
 'use strict';
@@ -68,8 +68,8 @@ async function getData(url,kind,ok){
   const parse=(t)=>{const o=kind==='json'?JSON.parse(t):t;if(ok&&!ok(o))throw new Error('unusable');return o};
   const bust=url+(url.includes('?')?'&':'?')+'_=' +Date.now(), be=backend(), routes=[];
   if(be&&!quotaOut())routes.push(async()=>{const t=await tget(be+(be.includes('?')?'&':'?')+'action=fetch&url='+encodeURIComponent(url),12000);if(t.length<400&&/Service invoked too many times/i.test(t)){quotaMark();throw new Error('quota')}return parse(t)});
-  routes.push(async()=>parse(await tget(bust,7000)));
-  PROXIES.forEach((p)=>routes.push(async()=>parse(await tget(p(bust),8000))));
+  routes.push(async()=>parse(await tget(bust,4000)));
+  PROXIES.forEach((p)=>routes.push(async()=>parse(await tget(p(bust),5000))));
   return await Promise.any(routes.map((f)=>f()));   // fastest good answer wins
 }
 function setP(p,t){$('prog').style.display='block';$('progB').style.width=Math.min(100,p)+'%';$('progP').textContent=Math.round(Math.min(100,p))+'%';if(t)$('progT').textContent=t}
@@ -132,7 +132,7 @@ function bandBar(lo,mid,hi,xlo,xhi){const a=xlo,b=xhi,w=b-a||1,pos=(v)=>((v-a)/w
 function fold(t,html){return '<details class="fold"><summary>'+t+'</summary>'+html.replace(/<h2>.*?<\/h2>/,'')+'</details>'}
 function render(r){
   const fc=r.forecast,h=[];
-  const ph=r.phase==='open'?'market open':r.phase==='pre'?'before the open':'market closed';
+  const ph=r.phase==='open'?(r.live?'market open':'market open · live price unavailable'):r.phase==='pre'?'before the open':'market closed';
   h.push('<div class="card gold"><h2>'+esc(r.name)+' <span class="pill">'+esc(r.sym)+' · '+r.exchange+'</span><small>last close '+rs(fc.base)+' ('+dshort(r.asOf)+') · '+ph+'</small></h2>');
   const warn=(r.notes||[]).filter((n)=>/^⚠/.test(n));warn.forEach((n)=>h.push('<div class="note warn">'+esc(n)+'</div>'));
   h.push(chartHtml(r));h.push(forecastHtml(r));h.push('</div>');
