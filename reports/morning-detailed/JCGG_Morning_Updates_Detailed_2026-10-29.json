@@ -1,0 +1,368 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "29 Oct 2026",
+ "report_time": "14:31 IST",
+ "generated_line": "Generated: 29 Oct 2026, 14:31 IST",
+ "as_of_note": "Auto-generated at 14:31 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Indian equity benchmarks ended higher in the previous session, with the Nifty 50 rising 1.04% to close at 22,935.80 and the Sensex gaining 0.96% to 73,945.54. Top gainers like Adani Ports, Adani Enterprises, and Kotak Bank helped drive the upward move. The market rally coincided with the US Federal Reserve's decision to keep interest rates unchanged. Additionally, the Bank Nifty and Nifty 500 indices posted solid gains of 1.14% and 0.90% respectively."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Global Markets Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,475.10",
+       "+0.19%"
+      ],
+      [
+       "S&P 500",
+       "7,743.98",
+       "+0.28%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,549.85",
+       "+0.27%"
+      ],
+      [
+       "FTSE 100",
+       "10,740.20",
+       "+0.43%"
+      ],
+      [
+       "DAX",
+       "25,811.62",
+       "+0.42%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nikkei 225",
+       "64,659.47",
+       "+1.10%"
+      ],
+      [
+       "Hang Seng",
+       "22,958.65",
+       "-0.59%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,651.43",
+       "-0.82%"
+      ],
+      [
+       "Kospi",
+       "5,937.66",
+       "-1.24%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Commodities, Currency & Bonds",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Item",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "110.74",
+       "-3.97%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "101.66",
+       "-1.09%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,033.40",
+       "-0.45%"
+      ],
+      [
+       "USD/INR",
+       "95.24",
+       "+0.07%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "102.26",
+       "+0.07%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "5.05",
+       "+1.04%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Indian Markets - Previous Session",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Close",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,935.80",
+       "+1.04%"
+      ],
+      [
+       "Sensex",
+       "73,945.54",
+       "+0.96%"
+      ],
+      [
+       "Bank Nifty",
+       "54,887.55",
+       "+1.14%"
+      ],
+      [
+       "Nifty 500",
+       "21,923.90",
+       "+0.90%"
+      ],
+      [
+       "India VIX",
+       "15.22",
+       "-6.32%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,744",
+       "23,040"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,553",
+       "23,144"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  },
+  {
+   "heading": "Outlook",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty pivot level is established at 22,848.",
+      "Resistance levels on the upside are placed at 23,040 (R1) and 23,144 (R2).",
+      "Support levels on the downside are marked at 22,744 (S1) and 22,553 (S2).",
+      "US 10-year yield increased to 5.05%, while Brent crude declined 3.97% to US$110.74/bbl."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks in Focus (previous session)",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Top gainers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "ADANIPORTS",
+       "1,868.90",
+       "+6.11%"
+      ],
+      [
+       "ADANIENT",
+       "2,620.30",
+       "+5.67%"
+      ],
+      [
+       "KOTAKBANK",
+       "458.70",
+       "+4.25%"
+      ],
+      [
+       "POWERGRID",
+       "261.45",
+       "+4.00%"
+      ],
+      [
+       "WIPRO",
+       "189.93",
+       "+2.94%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    {
+     "type": "table",
+     "headers": [
+      "Top losers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "HEROMOTOCO",
+       "5,125.00",
+       "-3.71%"
+      ],
+      [
+       "TRENT",
+       "2,863.90",
+       "-1.72%"
+      ],
+      [
+       "MARUTI",
+       "11,412.00",
+       "-1.44%"
+      ],
+      [
+       "SBILIFE",
+       "1,644.00",
+       "-1.36%"
+      ],
+      [
+       "ASIANPAINT",
+       "2,256.50",
+       "-1.23%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Adani Ports shares jumped over 5% after reporting an 18% increase in Q2 profit [Free Press Journal].",
+      "Indian equity markets surged after the US Federal Reserve kept interest rates steady [The Sunday Guardian].",
+      "Jefferies initiated coverage on NSE with a 'Buy' rating due to growth levers and easing regulatory pressure [Business Standard].",
+      "Chinese equities fell as a tech selloff deepened despite the US Fed rate pause [The Economic Times].",
+      "Alphabet shares dropped after missing profit expectations due to an advertising slowdown [The Economic Times].",
+      "The Indian rupee gained 11 paise against the US dollar following the Fed policy announcement [The Times of India]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex MONTHLY expiry today (Thu 29 Oct 2026)."
+     ]
+    }
+   ]
+  }
+ ]
+}
