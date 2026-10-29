@@ -2,6 +2,14 @@
  "schedule_id": "evening-news-wrap",
  "runs": [
   {
+   "generated_at": "2026-10-30T00:27:10+05:30",
+   "date": "2026-10-30",
+   "status": "holiday",
+   "caption": "",
+   "note": "No NSE session today (last bar 2026-10-28).",
+   "files": []
+  },
+  {
    "generated_at": "2026-10-29T00:19:24+05:30",
    "date": "2026-10-29",
    "status": "holiday",
@@ -124,5 +132,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-29T00:19:24+05:30"
+ "updated_at": "2026-10-30T00:27:10+05:30"
 }
