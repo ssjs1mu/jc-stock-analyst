@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-10-29T21:24:11+05:30",
+   "date": "2026-10-29",
+   "status": "ok",
+   "caption": "Circuit Watch - 29 Oct 2026 session: Sensex +1.24%, Nifty +1.05%; Equitas SFB hits 20% lower circuit, small-cap upper-circuit names flagged",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-29.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-29.pdf",
+     "type": "pdf",
+     "bytes": 10075
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-28T21:14:56+05:30",
    "date": "2026-10-28",
    "status": "ok",
@@ -130,5 +145,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-28T21:14:56+05:30"
+ "updated_at": "2026-10-29T21:24:11+05:30"
 }
