@@ -1,0 +1,162 @@
+{
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (29 Oct 2026)",
+ "headline": "Indian Markets Rally As Nifty Tops 22,900",
+ "bias_text": "Indian equity benchmarks logged solid gains in the last session, with the Nifty 50 advancing 1.09% to 22,946.70 and the Sensex rising 1.18% to 74,113.11. Buying was strong across key sectors, supported by Bank Nifty which gained 1.18% alongside top single-stock performances in Adani Ports and Adani Enterprises. Lower crude oil prices and the US Federal Reserve keeping interest rates unchanged provided additional relief to domestic market sentiment.",
+ "spark": [
+  22555.75,
+  22776.099609375,
+  22603.05078125,
+  22231.80078125,
+  22520.44921875,
+  22363.349609375,
+  22721.94921875,
+  22622.69921875,
+  22997.349609375,
+  23146.150390625,
+  22888.94921875,
+  22811.349609375,
+  22687.650390625,
+  22600.0,
+  22753.19921875,
+  22749.75,
+  22698.849609375,
+  22939.099609375
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.7400000095367432,
+  "headline": "India VIX 15.20 (-6.46%)",
+  "text": "India VIX declined by 6.46% to 15.20, indicating reduced market volatility during the session. The USD/INR pair edged up by 0.06% to settle at 95.24."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "22,946.70",
+   "pct": "+1.09%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "110.22",
+   "pct": "-4.42%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "4,038.70",
+   "pct": "-0.32%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "15.20",
+   "pct": "-6.46%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "95.238",
+   "pct": "+0.06%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "5.05",
+   "pct": "+1.04%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "52,475.10",
+   "pct": "+0.19%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,743.98",
+   "pct": "+0.28%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "26,549.85",
+   "pct": "+0.27%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,738.16",
+   "pct": "+0.41%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "25,900.43",
+   "pct": "+0.76%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "64,659.47",
+   "pct": "+1.10%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "22,958.65",
+   "pct": "-0.59%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,651.43",
+   "pct": "-0.82%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "5,937.66",
+   "pct": "-1.24%"
+  }
+ ],
+ "asia": {
+  "head": "Asian Markets Mixed On Tech",
+  "text": "Asian markets traded mixed as Japan's Nikkei 225 rose 1.10%, while China's Shanghai Composite dropped 0.82% and Hong Kong's Hang Seng fell 0.59% amid a tech selloff. US markets logged modest gains following the Fed's decision to hold interest rates, with the S&P 500 up 0.28%. Meanwhile, European indices like the DAX and FTSE 100 also closed higher by 0.76% and 0.41% respectively."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "22,552 - 22,749",
+   "r": "23,052 - 23,157",
+   "note": "A sustained move above 23,052 opens up 23,157; a slide below 22,749 would expose 22,552."
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "53,713 - 54,310",
+   "r": "55,240 - 55,575",
+   "note": "A sustained move above 55,240 opens up 55,575; a slide below 54,310 would expose 53,713."
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Latest Headlines",
+   "icon": "list",
+   "text": "Adani Ports shares jumped over 5% after the company reported an 18% increase in Q2 profit [Free | Indian equities rallied sharply as the US Federal Reserve decided to keep interest rates unchan"
+  },
+  {
+   "title": "Biggest Movers (Nifty 50)",
+   "icon": "chart",
+   "text": "Top Nifty 50 gainers: ADANIPORTS +5.80%, ADANIENT +5.25%, KOTAKBANK +3.98%. Top losers: HEROMOTOCO -4.05%, TRENT -1.65%, MARUTI -1.18%."
+  },
+  {
+   "title": "F&O Expiry Schedule Note",
+   "icon": "cal",
+   "text": "Sensex MONTHLY expiry today (Thu 29 Oct 2026). Bank Nifty has monthly expiry only (last Tuesday)."
+  }
+ ],
+ "footnote": "Auto-generated 15:02 IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: Gemini | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session.",
+ "disclaimer": "Not investment advice. Markets carry risk."
+}
