@@ -1,0 +1,230 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "29 Oct 2026",
+ "report_time": "14:23 IST",
+ "generated_line": "Generated: 29 Oct 2026, 14:23 IST",
+ "as_of_note": "Auto-generated at 14:23 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary templated from the numbers only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "JCGG - Morning Updates (Brief)",
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Nifty 50 at 22,901.25 (+0.89%) and Sensex at 73,942.92 (+0.95%) in the latest session; Bank Nifty 54,785.65 (+0.95%), India VIX 15.23 (-6.28%). Brent crude 110.60 (-4.09%), gold 4,036.00 (-0.39%), USD/INR 95.30 (+0.13%). Global cues: Dow 52,475.10 (+0.19%), Nasdaq 26,549.85 (+0.27%), Nikkei 64,659.47 (+1.10%)."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Global & Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,475.10",
+       "+0.19%"
+      ],
+      [
+       "S&P 500",
+       "7,743.98",
+       "+0.28%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,549.85",
+       "+0.27%"
+      ],
+      [
+       "FTSE 100",
+       "10,749.99",
+       "+0.52%"
+      ],
+      [
+       "DAX",
+       "25,837.29",
+       "+0.52%"
+      ],
+      [
+       "Nikkei 225",
+       "64,659.47",
+       "+1.10%"
+      ],
+      [
+       "Hang Seng",
+       "22,958.65",
+       "-0.59%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,651.43",
+       "-0.82%"
+      ],
+      [
+       "Kospi",
+       "5,937.66",
+       "-1.24%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Commodities & Currency",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Item",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "110.60",
+       "-4.09%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "101.54",
+       "-1.21%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,036.00",
+       "-0.39%"
+      ],
+      [
+       "USD/INR",
+       "95.30",
+       "+0.13%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "102.26",
+       "+0.07%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "5.05",
+       "+1.04%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "India VIX & Previous Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Close",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,901.25",
+       "+0.89%"
+      ],
+      [
+       "Sensex",
+       "73,942.92",
+       "+0.95%"
+      ],
+      [
+       "Bank Nifty",
+       "54,785.65",
+       "+0.95%"
+      ],
+      [
+       "Nifty 500",
+       "21,894.30",
+       "+0.77%"
+      ],
+      [
+       "India VIX",
+       "15.23",
+       "-6.28%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,736",
+       "22,988"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,570",
+       "23,074"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex MONTHLY expiry today (Thu 29 Oct 2026)."
+     ]
+    }
+   ]
+  }
+ ]
+}
