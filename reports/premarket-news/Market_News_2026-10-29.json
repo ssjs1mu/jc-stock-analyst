@@ -1,0 +1,104 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "29 Oct 2026",
+ "report_time": "13:55 IST",
+ "generated_line": "Generated: 29 Oct 2026, 13:55 IST",
+ "as_of_note": "Auto-generated at 13:55 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "Market News",
+ "sections": [
+  {
+   "heading": "Top Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Indian markets rallied with Sensex rising over 600 points and Nifty approaching 22,900 as investors added \u20b93 lakh crore following the Federal Reserve's rate pause [Free Press Journal].",
+      "Adani Ports shares gained over 5% to lead benchmark gainers after reporting an 18% rise in Q2 profit [Free Press Journal].",
+      "Jefferies initiated coverage on NSE with a 'Buy' rating, citing growth levers and easing regulatory pressure [The Economic Times].",
+      "Chinese stocks declined as a technology selloff intensified despite the Fed holding interest rates [The Economic Times].",
+      "London equities were positioned to advance after the Fed decided to keep benchmark rates unchanged [Share Talk].",
+      "The Indian rupee gained 11 paise to 95.17 against the US dollar following the Fed policy decision [The Times of India]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Global Cues",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,475.10",
+       "+0.19%"
+      ],
+      [
+       "S&P 500",
+       "7,743.98",
+       "+0.28%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,549.85",
+       "+0.27%"
+      ],
+      [
+       "FTSE 100",
+       "10,723.75",
+       "+0.27%"
+      ],
+      [
+       "DAX",
+       "25,778.02",
+       "+0.29%"
+      ],
+      [
+       "Nikkei 225",
+       "64,659.47",
+       "+1.10%"
+      ],
+      [
+       "Hang Seng",
+       "22,958.65",
+       "-0.59%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,651.43",
+       "-0.82%"
+      ],
+      [
+       "Kospi",
+       "5,937.66",
+       "-1.24%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Calendar",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex MONTHLY expiry today (Thu 29 Oct 2026)."
+     ]
+    }
+   ]
+  }
+ ]
+}
