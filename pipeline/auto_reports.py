@@ -454,9 +454,9 @@ def session_story(qs, flows, br, up_n, dn_n):
     if flows:
         L.append("Latest institutional data (%s): FII/FPI net %+.0f Cr, DII net %+.0f Cr." % (flows["date"], flows["fii"], flows["dii"]))
     rev = ""
-    if lo_p <= -0.3 and cp >= 0.3:
+    if lo_p <= -0.1 and cp >= 0.35:
         rev = "bull"
-    elif hi_p >= 0.3 and cp <= -0.3:
+    elif hi_p >= 0.1 and cp <= -0.35:
         rev = "bear"
     return L, rev, lo_p, hi_p
 
