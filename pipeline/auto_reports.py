@@ -548,6 +548,10 @@ def main():
     a = ap.parse_args()
     mock = os.environ.get("AUTO_MOCK") == "1"
     now = dt.datetime.now(IST)
+    if a.sid.startswith("evening") and now.hour < 6 and not a.force:
+        # GitHub's cron can run an evening job hours late, after IST midnight. That run belongs to the PREVIOUS day:
+        # without this it recorded a bogus 'holiday' for the new date ("No NSE session today (last bar ...)").
+        now = (now - dt.timedelta(days=1)).replace(hour=23, minute=59)
     if now.weekday() >= 5 and not a.force:
         print("Weekend; nothing to do.")
         return
