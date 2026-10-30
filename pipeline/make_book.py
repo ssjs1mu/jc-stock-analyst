@@ -93,10 +93,10 @@ def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise"):
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,%s,#0d0a18 70%%);"
             "font-family:Inter,Arial,sans-serif;color:#f4efe0;display:flex;align-items:center;gap:46px;padding:0 70px;overflow:hidden}"
             ".th{height:520px;aspect-ratio:1080/1800;border-radius:14px;border:3px solid #E2B84A;box-shadow:0 20px 50px #000a;transform:rotate(-3deg)}"
-            ".b{font-family:%s;font-size:78px;font-weight:700;color:#E2B84A}.t{font-size:34px;font-weight:700;margin-top:4px}"
+            ".b{font-family:%s;font-size:78px;font-weight:700;color:#E2B84A}.t{font-size:44px;font-weight:800;margin-top:4px;line-height:1.2}"
             ".h{font-size:40px;font-weight:800;line-height:1.15;margin-top:26px}.p{display:inline-block;margin-top:24px;background:%s;color:#fff;padding:9px 22px;border-radius:22px;font-weight:800;font-size:24px}"
             ".go{margin-top:26px;font-size:26px;color:#E2B84A;font-weight:700}</style></head><body>"
-            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>%s for %s</div>"
+            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>%s<br><span style='font-weight:600;color:#efe9d6;font-size:32px'>for %s</span></div>"
             "<div class='h'>%s</div><span class='p'>%s</span><div class='go'>Tap to open the booklet &rarr;</div></div></body></html>"
             % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(name), html.escape(date_txt), html.escape(headline[:90]), word))
     from playwright.sync_api import sync_playwright
@@ -125,7 +125,7 @@ def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise"):
 def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
-    dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%d %b %Y")
+    dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%A, %d %B %Y")
     name = "Evening Breeze" if kind == "evening" else "Morning Sunrise"
     title = "Joshi's Corner - %s for %s" % (name, dtxt)
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
