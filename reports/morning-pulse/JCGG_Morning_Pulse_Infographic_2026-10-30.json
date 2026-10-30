@@ -5,11 +5,11 @@
   "mood": {
    "key": "bull",
    "label": "Positive start likely",
-   "sub": "Indicative Nifty opening zone 23,094 - 23,163"
+   "sub": "Indicative Nifty opening zone 23,032 - 23,101"
   },
   "label": "Positive start likely",
-  "zone": "23,094 - 23,163",
-  "headline": "Positive start likely - Nifty zone 23,094 - 23,163",
+  "zone": "23,032 - 23,101",
+  "headline": "Positive start likely - Nifty zone 23,032 - 23,101",
   "open_text": "Wall Street weak, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
   "yday": null,
   "spark": [
@@ -30,47 +30,47 @@
    22749.75,
    22698.849609375,
    22936.75,
-   23036.44921875
+   23003.94921875
   ],
-  "proj": 23128.3,
+  "proj": 23066.1,
   "snapshot": [
    {
     "name": "Nifty 50",
     "sub": "prev close",
-    "level": "23,036.15",
-    "pct": "+0.43%"
+    "level": "23,003.95",
+    "pct": "+0.29%"
    },
    {
     "name": "Sensex",
     "sub": "prev close",
-    "level": "74,586.40",
-    "pct": "+0.59%"
+    "level": "74,487.24",
+    "pct": "+0.45%"
    },
    {
     "name": "Bank Nifty",
     "sub": "prev close",
-    "level": "54,688.35",
-    "pct": "-0.40%"
+    "level": "54,591.90",
+    "pct": "-0.58%"
    },
    {
     "name": "Nifty 500",
     "sub": "prev close",
-    "level": "21,895.40",
-    "pct": "-0.21%"
+    "level": "21,872.55",
+    "pct": "-0.31%"
    }
   ],
   "levels": [
    {
     "name": "Nifty 50",
-    "s": "22,807 - 22,921",
-    "r": "23,134 - 23,233",
-    "note": "A sustained move above 23,134 opens up 23,233; a slide below 22,921 would expose 22,807."
+    "s": "22,796 - 22,900",
+    "r": "23,113 - 23,222",
+    "note": "A sustained move above 23,113 opens up 23,222; a slide below 22,900 would expose 22,796."
    },
    {
     "name": "Bank Nifty",
-    "s": "54,291 - 54,490",
-    "r": "54,978 - 55,267",
-    "note": "A sustained move above 54,978 opens up 55,267; a slide below 54,490 would expose 54,291."
+    "s": "54,259 - 54,426",
+    "r": "54,913 - 55,235",
+    "note": "A sustained move above 54,913 opens up 55,235; a slide below 54,426 would expose 54,259."
    }
   ],
   "bench": [
@@ -95,14 +95,14 @@
    {
     "name": "FTSE 100",
     "code": "UK",
-    "level": "10,722.10",
-    "pct": "+0.26%"
+    "level": "10,753.78",
+    "pct": "+0.30%"
    },
    {
     "name": "DAX",
     "code": "DE",
-    "level": "26,039.68",
-    "pct": "+1.31%"
+    "level": "25,946.44",
+    "pct": "-0.36%"
    },
    {
     "name": "Nikkei 225",
@@ -113,8 +113,8 @@
    {
     "name": "Hang Seng",
     "code": "HK",
-    "level": "23,310.32",
-    "pct": "+1.53%"
+    "level": "23,294.42",
+    "pct": "+1.46%"
    },
    {
     "name": "Shanghai Composite",
@@ -132,28 +132,28 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "112.99",
-    "pct": "-1.65%"
+    "level": "112.66",
+    "pct": "-1.93%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "103.93",
-    "pct": "+1.89%"
+    "level": "103.68",
+    "pct": "+1.65%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,993.60",
-    "pct": "-0.94%"
+    "level": "3,998.30",
+    "pct": "-0.82%"
    },
    {
     "name": "USD / INR",
-    "level": "95.043",
-    "pct": "-0.18%"
+    "level": "95.062",
+    "pct": "-0.15%"
    },
    {
     "name": "Dollar index",
-    "level": "101.71",
-    "pct": "-0.32%"
+    "level": "101.69",
+    "pct": "-0.35%"
    },
    {
     "name": "US 10-yr yield %",
@@ -162,10 +162,10 @@
    }
   ],
   "vix": {
-   "level": "15.40",
-   "pct": "+1.88%",
-   "gauge": 0.7297500133514404,
-   "text": "India VIX 15.40 (+1.88%); USD/INR 95.04 (-0.18%); US 10-yr yield 4.99 (-1.11%). India VIX rose 1.9% - hedging demand up."
+   "level": "15.42",
+   "pct": "+1.97%",
+   "gauge": 0.7291250228881836,
+   "text": "India VIX 15.42 (+1.97%); USD/INR 95.06 (-0.15%); US 10-yr yield 4.99 (-1.11%). India VIX rose 2.0% - hedging demand up."
   },
   "events": [
    "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
@@ -188,6 +188,11 @@
     "Reaction to earnings at the open"
    ],
    [
+    "TRENT",
+    "In the news",
+    "IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; NIFTY trad"
+   ],
+   [
     "COALINDIA",
     "In the news",
     "Sensex Today Live: Sensex, Nifty Trade Higher; Trent, IndiGo Gain, Coal India Shares Fall"
@@ -196,11 +201,6 @@
     "ADANIPORTS",
     "In the news",
     "Breakout stocks: Adani Ports, Nykaa, Saregama on radar; analyst tells why"
-   ],
-   [
-    "TRENT",
-    "In the news",
-    "Indian Stock Market: Sensex, Nifty Rally on IT Stocks, Trent"
    ],
    [
     "DALBHARAT",
@@ -214,14 +214,14 @@
    ]
   ],
   "headlines": [
+   "Sensex zooms 1,500 pts in 2 days, Nifty tops 23K: Why are bulls in charge?",
+   "IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; NIFTY trades above 23K",
    "Why Stock Market Is Rallying? Nifty Reclaims 23,100, Sensex Surges 500 Points; Three Reasons Why",
    "Developments in the international financial and monetary markets on the morning of October 30th.",
    "Stocktwits Passport Portfolio: SPY, DIA Edge Higher In October, Beating QQQ And Asian Stocks Amid Tech Volatility",
    "Sensex, Nifty Open Marginally Higher as Rising Crude Prices Weigh on Sentiment",
    "Sensex Today Live: Sensex, Nifty Trade Higher; Trent, IndiGo Gain, Coal India Shares Fall",
-   "Sensex, Nifty open flat as crude oil prices remain elevated; IT stocks gain",
-   "Global Market: ECB may pause rate hikes after December amid growth risks",
-   "BSE IT index set to report 2nd sharpest monthly rally in over two decades"
+   "Ather Energy Share Price Today, Ather Energy Stock Price Live NSE/BSE Updates"
   ],
   "calls": {
    "buy": [
@@ -389,116 +389,116 @@
    ]
   },
   "gift": {
-   "last": "23,127.5",
-   "pct": "+0.30%",
-   "premium": "+91 pts",
-   "vs": "+0.40%",
-   "asof": "30 Oct 13:30"
+   "last": "23,065.5",
+   "pct": "+0.03%",
+   "premium": "+62 pts",
+   "vs": "+0.27%",
+   "asof": "30 Oct 14:00"
   },
   "gainers": [
    [
     "TRENT",
-    "3,037.00",
-    "+6.13%"
+    "3,031.70",
+    "+5.94%"
    ],
    [
     "WIPRO",
-    "196.90",
-    "+3.58%"
-   ],
-   [
-    "SUNPHARMA",
-    "1,802.40",
-    "+2.55%"
+    "197.08",
+    "+3.67%"
    ],
    [
     "HCLTECH",
-    "1,438.40",
-    "+2.46%"
+    "1,441.30",
+    "+2.66%"
    ],
    [
     "INFY",
-    "1,174.05",
-    "+2.40%"
+    "1,175.00",
+    "+2.49%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,798.10",
+    "+2.31%"
    ]
   ],
   "losers": [
    [
     "INDUSINDBK",
-    "841.70",
-    "-3.03%"
+    "843.75",
+    "-2.79%"
    ],
    [
     "ADANIPORTS",
-    "1,837.30",
-    "-1.85%"
+    "1,835.10",
+    "-1.97%"
    ],
    [
     "BPCL",
-    "284.25",
-    "-1.71%"
-   ],
-   [
-    "COALINDIA",
-    "387.35",
-    "-1.46%"
+    "283.80",
+    "-1.87%"
    ],
    [
     "SHRIRAMFIN",
-    "829.00",
-    "-1.44%"
+    "827.45",
+    "-1.62%"
+   ],
+   [
+    "COALINDIA",
+    "387.10",
+    "-1.53%"
    ]
   ],
   "shock": [
    [
     "TRENT",
-    "3,037.00",
-    "3.0x avg vol",
-    "+6.13%"
+    "3,031.70",
+    "3.2x avg vol",
+    "+5.94%"
    ],
    [
     "COALINDIA",
-    "387.35",
-    "2.7x avg vol",
-    "-1.46%"
+    "387.10",
+    "2.8x avg vol",
+    "-1.53%"
    ]
   ],
   "pivots": [
    {
     "name": "Nifty 50",
     "vals": [
-     "22,807",
-     "22,921",
-     "23,020",
-     "23,134",
-     "23,233"
+     "22,796",
+     "22,900",
+     "23,009",
+     "23,113",
+     "23,222"
     ]
    },
    {
     "name": "Bank Nifty",
     "vals": [
-     "54,291",
-     "54,490",
-     "54,779",
-     "54,978",
-     "55,267"
+     "54,259",
+     "54,426",
+     "54,747",
+     "54,913",
+     "55,235"
     ]
    }
   ],
-  "est": 0.4
+  "est": 0.27
  },
  "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (30 Oct 2026)",
- "headline": "Positive start likely - Nifty zone 23,094 - 23,163",
- "bias_text": "GIFT Nifty 23,127.5 (+91 pts, +0.40% vs Nifty's last close). US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%. Opening call anchored on GIFT Nifty.",
+ "headline": "Positive start likely - Nifty zone 23,032 - 23,101",
+ "bias_text": "GIFT Nifty 23,065.5 (+62 pts, +0.27% vs Nifty's last close). US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%. Opening call anchored on GIFT Nifty.",
  "open_text": "Wall Street weak, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
- "proj": 23128.3,
+ "proj": 23066.1,
  "proj_label": "Today (est.)",
  "mood": {
   "key": "bull",
   "label": "Positive start likely",
-  "sub": "Indicative Nifty opening zone 23,094 - 23,163"
+  "sub": "Indicative Nifty opening zone 23,032 - 23,101"
  },
- "mood_score": 0.4,
+ "mood_score": 0.27,
  "spark": [
   22776.099609375,
   22603.05078125,
@@ -517,44 +517,44 @@
   22749.75,
   22698.849609375,
   22936.75,
-  23036.44921875
+  23003.94921875
  ],
  "spark_label": "Nifty 50 daily closes, last 18 sessions",
  "vix": {
-  "gauge": 0.7297500133514404,
-  "headline": "India VIX 15.40 (+1.88%)",
-  "text": "India VIX 15.40 (+1.88%); USD/INR 95.04 (-0.18%); US 10-yr yield 4.99 (-1.11%). India VIX rose 1.9% - hedging demand up."
+  "gauge": 0.7291250228881836,
+  "headline": "India VIX 15.42 (+1.97%)",
+  "text": "India VIX 15.42 (+1.97%); USD/INR 95.06 (-0.15%); US 10-yr yield 4.99 (-1.11%). India VIX rose 2.0% - hedging demand up."
  },
  "tiles": [
   {
    "name": "Nifty 50",
    "sub": "prev close",
-   "value": "23,036.15",
-   "pct": "+0.43%"
+   "value": "23,003.95",
+   "pct": "+0.29%"
   },
   {
    "name": "Brent Crude",
    "sub": "US$/bbl",
-   "value": "112.99",
-   "pct": "-1.65%"
+   "value": "112.66",
+   "pct": "-1.93%"
   },
   {
    "name": "Gold Spot",
    "sub": "US$/oz",
-   "value": "3,993.60",
-   "pct": "-0.94%"
+   "value": "3,998.30",
+   "pct": "-0.82%"
   },
   {
    "name": "India VIX",
    "sub": "close",
-   "value": "15.40",
-   "pct": "+1.88%"
+   "value": "15.42",
+   "pct": "+1.97%"
   },
   {
    "name": "USD/INR",
    "sub": "latest",
-   "value": "95.043",
-   "pct": "-0.18%"
+   "value": "95.062",
+   "pct": "-0.15%"
   },
   {
    "name": "US 10-yr",
@@ -585,14 +585,14 @@
   {
    "name": "FTSE 100",
    "code": "UK",
-   "level": "10,722.10",
-   "pct": "+0.26%"
+   "level": "10,753.78",
+   "pct": "+0.30%"
   },
   {
    "name": "DAX",
    "code": "DE",
-   "level": "26,039.68",
-   "pct": "+1.31%"
+   "level": "25,946.44",
+   "pct": "-0.36%"
   },
   {
    "name": "Nikkei 225",
@@ -603,8 +603,8 @@
   {
    "name": "Hang Seng",
    "code": "HK",
-   "level": "23,310.32",
-   "pct": "+1.53%"
+   "level": "23,294.42",
+   "pct": "+1.46%"
   },
   {
    "name": "Shanghai Composite",
@@ -621,20 +621,20 @@
  ],
  "asia": {
   "head": "Asia & Global Cues",
-  "text": "Latest closes: Nikkei 63,290.11 (-2.12%), Hang Seng 23,310.32 (+1.53%), Shanghai 3,599.02 (-1.44%), Kospi 5,730.74 (-3.48%). Wall Street: Dow 52,342.56 (-0.25%), S&P 500 7,720.39 (-0.30%), Nasdaq 26,184.72 (-1.38%)."
+  "text": "Latest closes: Nikkei 63,290.11 (-2.12%), Hang Seng 23,294.42 (+1.46%), Shanghai 3,599.02 (-1.44%), Kospi 5,730.74 (-3.48%). Wall Street: Dow 52,342.56 (-0.25%), S&P 500 7,720.39 (-0.30%), Nasdaq 26,184.72 (-1.38%)."
  },
  "levels": [
   {
    "name": "Nifty 50",
-   "s": "22,807 - 22,921",
-   "r": "23,134 - 23,233",
-   "note": "A sustained move above 23,134 opens up 23,233; a slide below 22,921 would expose 22,807."
+   "s": "22,796 - 22,900",
+   "r": "23,113 - 23,222",
+   "note": "A sustained move above 23,113 opens up 23,222; a slide below 22,900 would expose 22,796."
   },
   {
    "name": "Bank Nifty",
-   "s": "54,291 - 54,490",
-   "r": "54,978 - 55,267",
-   "note": "A sustained move above 54,978 opens up 55,267; a slide below 54,490 would expose 54,291."
+   "s": "54,259 - 54,426",
+   "r": "54,913 - 55,235",
+   "note": "A sustained move above 54,913 opens up 55,235; a slide below 54,426 would expose 54,259."
   }
  ],
  "bottom": [
@@ -646,41 +646,41 @@
   {
    "title": "Stocks to Watch",
    "icon": "chart",
-   "text": "BEL (Results today); RELIANCE (Results today); SUNPHARMA (Results today); COALINDIA (In the news); ADANIPORTS (In the news); TRENT (In the news)"
+   "text": "BEL (Results today); RELIANCE (Results today); SUNPHARMA (Results today); TRENT (In the news); COALINDIA (In the news); ADANIPORTS (In the news)"
   },
   {
    "title": "Headlines to Track",
    "icon": "list",
-   "text": "Why Stock Market Is Rallying? Nifty Reclaims 23,100, Sensex Surges 500 Points; T | Developments in the international financial and monetary markets on the morning "
+   "text": "Sensex zooms 1,500 pts in 2 days, Nifty tops 23K: Why are bulls in charge? | IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; "
   }
  ],
  "movers": {
   "up": [
    {
     "sym": "TRENT",
-    "pct": "+6.13%"
+    "pct": "+5.94%"
    },
    {
     "sym": "WIPRO",
-    "pct": "+3.58%"
+    "pct": "+3.67%"
    },
    {
-    "sym": "SUNPHARMA",
-    "pct": "+2.55%"
+    "sym": "HCLTECH",
+    "pct": "+2.66%"
    }
   ],
   "dn": [
    {
     "sym": "INDUSINDBK",
-    "pct": "-3.03%"
+    "pct": "-2.79%"
    },
    {
     "sym": "ADANIPORTS",
-    "pct": "-1.85%"
+    "pct": "-1.97%"
    },
    {
     "sym": "BPCL",
-    "pct": "-1.71%"
+    "pct": "-1.87%"
    }
   ]
  },
