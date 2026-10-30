@@ -403,11 +403,15 @@ def mood_photo(sc):
     key = ("bull_roar" if sc > 1.0 else "bull_calm" if sc > 0.35 else "bear_roar" if sc < -1.0 else "bear_calm" if sc < -0.35
            else ("bull_over_bear" if sc >= 0 else "bear_over_bull"))
     d = os.path.join(HERE, "branding", "mood")
-    for ext in (".jpg", ".jpeg", ".png", ".webp"):
-        f = os.path.join(d, key + ext)
-        if os.path.exists(f):
-            mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[ext[1:]]
-            return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
+    import datetime as _dt
+    alt = _dt.date.today().toordinal() % 2  # two pictures per mood, rotated daily
+    names = [key + "_2", key] if alt else [key, key + "_2"]
+    for nm in names:
+        for ext in (".jpg", ".jpeg", ".png", ".webp"):
+            f = os.path.join(d, nm + ext)
+            if os.path.exists(f):
+                mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[ext[1:]]
+                return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
     return None
 
 

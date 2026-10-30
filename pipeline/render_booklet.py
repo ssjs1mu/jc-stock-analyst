@@ -166,19 +166,22 @@ def eve_cover(b):
 
 
 def p1(b, p, total, ph):
-    bg = ('<div style="position:absolute;inset:0;background:linear-gradient(180deg,%s00 0%%,%s 100%%),url(%s) center/cover;opacity:.55"></div>' % (p["base"], p["base"], ph)) if ph else ""
-    spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if b.get("spark") else ""
-    inner = ('<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center">%s%s'
-             '<img src="%s" style="width:360px;border-radius:26px;border:3px solid %s;box-shadow:0 24px 70px #000a;position:relative">'
-             '<div class="brand" style="font-size:118px;position:relative">%s</div>'
+    # hero picture fills the top band at full width (16:9, nothing cropped), fading into the page colour
+    hero = ('<div style="position:absolute;left:0;top:0;width:1080px;height:640px;background:url(%s) center/cover"></div>'
+            '<div style="position:absolute;left:0;top:0;width:1080px;height:640px;background:linear-gradient(180deg,%s55 0%%,%s00 22%%,%s00 55%%,%s 100%%)"></div>' % (ph, p["base"], p["base"], p["base"], p["base"])) if ph else ""
+    spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if (b.get("spark") and not ph) else ""
+    top = 560 if ph else 120
+    inner = ('<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:18px;text-align:center;padding-top:%dpx">%s%s'
+             '<img src="%s" style="width:230px;border-radius:22px;border:3px solid %s;box-shadow:0 20px 60px #000c;position:relative">'
+             '<div class="brand" style="font-size:104px;position:relative;line-height:1.05">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">%s</div>'
+             '<div style="font-size:70px;font-weight:900;line-height:1.04;position:relative;text-shadow:0 4px 24px #000a">%s</div>'
              '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">for %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
-             '<div style="font-size:36px;font-weight:800;position:relative;max-width:900px">%s</div>'
-             '<div style="font-size:24px;opacity:.75;position:relative">Tap the page to turn &rarr;</div></div>'
-             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening<br>Breeze" if b.get("edition") == "evening" else "Morning<br>Sunrise",
+             '<div style="font-size:34px;font-weight:800;position:relative;max-width:920px">%s</div>'
+             '<div style="font-size:24px;opacity:.75;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
+             % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening<br>Breeze" if b.get("edition") == "evening" else "Morning<br>Sunrise",
                 e(b["date_txt"]), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
