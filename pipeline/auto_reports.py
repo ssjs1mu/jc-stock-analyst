@@ -554,7 +554,7 @@ def build(sid, qs, heads, now):
             {"title": "Events Today", "icon": "cal", "text": " ".join(evs)[:260]},
             {"title": "Stocks to Watch", "icon": "chart", "text": "; ".join("%s (%s)" % (r[0], r[1]) for r in wl[:6]) or "No specific triggers flagged for the open."},
             {"title": "Headlines to Track", "icon": "list", "text": " | ".join(short(x) for x in headl[:2])}]
-        open_text = (ov["headline"].split(": ", 1)[1].capitalize() + ". " if ": " in ov["headline"] else "") + \
+        open_text = ((lambda t: t[0].upper() + t[1:])(ov["headline"].split(": ", 1)[1]) + ". " if ": " in ov["headline"] else "") + \
                     (("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "") + "Indicative view from overnight cues; GIFT Nifty is not used."
         try:
             proj = round(float(n["last"]) * (1 + ov["est"] / 100), 1)
@@ -562,7 +562,33 @@ def build(sid, qs, heads, now):
             proj = None
         bias_open = "%s%sIndicative view from overnight cues; GIFT Nifty is not used." % (
             (" ".join(ov["drivers"][:2]) + " ") if ov["drivers"] else "", ("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "")
-        return {"title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
+        def _q(k, d=2):
+            q = qs.get(k)
+            return (f2(q["last"], d), pct(q["pct"])) if q else ("n/a", "n/a")
+        snapshot = []
+        for nm, k in (("Nifty 50", "^NSEI"), ("Sensex", "^BSESN"), ("Bank Nifty", "^NSEBANK"), ("Nifty 500", "^CRSLDX")):
+            if qs.get(k):
+                lv_, pc_ = _q(k)
+                snapshot.append({"name": nm, "sub": "prev close", "level": lv_, "pct": pc_})
+        short_nm = {"Brent crude (US$/bbl)": "Brent crude US$/bbl", "WTI crude (US$/bbl)": "WTI crude US$/bbl", "Gold (US$/oz, Comex)": "Gold US$/oz",
+                    "USD/INR": "USD / INR", "Dollar index (DXY)": "Dollar index", "US 10-yr yield (%)": "US 10-yr yield %"}
+        cmd_t = []
+        for nm_, k in CMDTY.items():
+            lv_, pc_ = _q(k, 3 if k == "USDINR=X" else 2)
+            cmd_t.append({"name": short_nm.get(nm_, nm_), "level": lv_, "pct": pc_})
+        calls_t = []
+        try:
+            cj_ = json.load(open(os.path.join(ROOT, "data", "calls", "latest.json")))
+            if cj_.get("date") == now.date().isoformat():
+                for x in sorted([x for x in cj_.get("calls", []) if x.get("type") == "DAY"], key=lambda z: -z.get("score", 0))[:4]:
+                    calls_t.append({"sym": x["sym"], "side": x["side"], "entry": f2(x["entry"]), "sl": f2(x["sl"]), "t1": f2(x["t1"]), "grade": x.get("grade", "")})
+        except Exception:
+            pass
+        book = {"date_txt": now.strftime("%d %b %Y"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
+                "open_text": open_text, "yday": ov["yday"], "spark": spark_vals, "proj": proj, "snapshot": snapshot, "levels": levels,
+                "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vix["pct"]) if vix else "n/a", "gauge": gfrac, "text": vtxt},
+                "events": evs, "watch": wl, "headlines": [short(x) for x in headl[:5]], "calls": calls_t}
+        return {"book": book, "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
                 "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"],
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
                 "vix": {"gauge": gfrac, "headline": "India VIX %s (%s)" % (f2(vv), pct(vix["pct"]) if vix else "n/a"), "text": vtxt},
@@ -646,8 +672,8 @@ def main():
     mpng = os.path.join(a.out, "JCGG_Morning_Pulse_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
     if a.sid == "morning-pulse":
         subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--png", png, "--pdf", pdf])
-        try:   # 2-page portrait 1080x1350 version for phones / Instagram / Facebook / WhatsApp
-            subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--mobile", mpng])
+        try:   # 4-page opening booklet, portrait 1080x1350, for phones / Instagram / Facebook / WhatsApp
+            subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng])
         except Exception as ex:
             print("mobile render failed:", ex)
     else:
