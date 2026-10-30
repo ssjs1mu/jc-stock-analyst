@@ -4,7 +4,7 @@
 Writes static pages so WhatsApp / Facebook / Instagram show a rich preview card (image + title) instead of a bare link:
   morning/index.html          always the latest booklet   -> https://ssjs1mu.github.io/jc-stock-analyst/morning/
   morning/<date>/index.html   the same booklet, archived
-  morning/og.png (+ <date>/og.png)  1200x630 preview card
+  morning/og.jpg (+ <date>/og.jpg)  1200x630 preview card
 Any number of pages works: pass more PNGs and they turn like a book.
 """
 import html
@@ -28,15 +28,17 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Joshi's Corner">
 <meta property="og:title" content="%(title)s"><meta property="og:description" content="%(desc)s">
 <meta property="og:url" content="%(url)s"><meta property="og:image" content="%(og)s">
+<meta property="og:image:secure_url" content="%(og)s"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:alt" content="%(title)s">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="%(og)s">
 <style>%(font)s
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140 0%%,#0d0a18 70%%);color:#f4efe0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
-.top{position:fixed;left:0;right:0;top:0;height:54px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:50}
+.top{position:fixed;left:0;right:0;top:0;height:44px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:50}
 .top .b{font-family:%(script)s;font-size:30px;font-weight:700;color:#E2B84A;text-shadow:0 0 1px #F6DC8A}
-.stage{position:fixed;left:0;right:0;top:54px;bottom:64px;display:flex;align-items:center;justify-content:center;perspective:2200px}
-.book{position:relative;width:min(94vw,calc((100vh - 130px)*0.8));width:min(94vw,calc((100dvh - 130px)*0.8));aspect-ratio:1080/1350;filter:drop-shadow(0 18px 38px rgba(0,0,0,.6))}
+.stage{position:fixed;left:0;right:0;top:44px;bottom:60px;display:flex;align-items:flex-start;justify-content:center;perspective:2200px}
+@media (max-width:700px){.stage{top:40px;bottom:56px;align-items:center}.book{width:min(100vw,calc((100dvh - 100px)*0.6)) !important;border-radius:0}.leaf,.leaf img,.leaf .shade{border-radius:0}.bar button{padding:10px 14px;white-space:nowrap}.top{height:40px}.top .b{font-size:26px}.bar{height:56px}.hint{display:none}}
+.book{position:relative;width:min(94vw,calc((100vh - 130px)*0.6));width:min(94vw,calc((100dvh - 130px)*0.6));aspect-ratio:1080/1800;filter:drop-shadow(0 18px 38px rgba(0,0,0,.6))}
 .leaf{position:absolute;inset:0;transform-origin:left center;transition:transform 2.1s cubic-bezier(.37,.02,.2,1);transform-style:preserve-3d;cursor:pointer;border-radius:4px 10px 10px 4px}
 .leaf img{position:absolute;inset:0;width:100%%;height:100%%;border-radius:4px 10px 10px 4px;backface-visibility:hidden;object-fit:cover;background:#fff}
 .leaf .back{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;border-radius:10px 4px 4px 10px;background:linear-gradient(90deg,#d8cfb4,#efe8d4)}
@@ -90,7 +92,7 @@ def _og(path, date_txt, headline, mood, thumb_abs):
     acc, bg, word = MOODS.get(mood, MOODS["neutral"])
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,%s,#0d0a18 70%%);"
             "font-family:Inter,Arial,sans-serif;color:#f4efe0;display:flex;align-items:center;gap:46px;padding:0 70px;overflow:hidden}"
-            ".th{height:520px;aspect-ratio:1080/1350;border-radius:14px;border:3px solid #E2B84A;box-shadow:0 20px 50px #000a;transform:rotate(-3deg)}"
+            ".th{height:520px;aspect-ratio:1080/1800;border-radius:14px;border:3px solid #E2B84A;box-shadow:0 20px 50px #000a;transform:rotate(-3deg)}"
             ".b{font-family:%s;font-size:78px;font-weight:700;color:#E2B84A}.t{font-size:34px;font-weight:700;margin-top:4px}"
             ".h{font-size:40px;font-weight:800;line-height:1.15;margin-top:26px}.p{display:inline-block;margin-top:24px;background:%s;color:#fff;padding:9px 22px;border-radius:22px;font-weight:800;font-size:24px}"
             ".go{margin-top:26px;font-size:26px;color:#E2B84A;font-weight:700}</style></head><body>"
@@ -106,8 +108,18 @@ def _og(path, date_txt, headline, mood, thumb_abs):
             pg.wait_for_load_state("networkidle", timeout=5000)
         except Exception:
             pass
-        pg.screenshot(path=path)
+        tmp = path + ".png"
+        pg.screenshot(path=tmp)
         b.close()
+    from PIL import Image
+    im = Image.open(tmp).convert("RGB")
+    q = 86
+    while True:  # WhatsApp shows the card reliably when the image is under ~300 KB
+        im.save(path, "JPEG", quality=q, optimize=True)
+        if os.path.getsize(path) < 250000 or q <= 55:
+            break
+        q -= 6
+    os.remove(tmp)
 
 
 def build(date, pages, headline="", mood="neutral", caption=""):
@@ -124,9 +136,9 @@ def build(date, pages, headline="", mood="neutral", caption=""):
         leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div><div class="shade"></div></div>'
                          % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
         url = BASE + "morning/" + sub
-        og_path = os.path.join(folder, "og.png")
+        og_path = os.path.join(folder, "og.jpg")
         _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])))
-        doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.png", font=brand.font_css(),
+        doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
                           script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title))
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)

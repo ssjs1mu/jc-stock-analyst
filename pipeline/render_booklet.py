@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Morning Market Opening Booklet: 4 phone pages (1080x1350) in smoky mood-coloured gradients, no cartoons.
+"""Morning Market Opening Booklet: 4 phone pages (1080x1800) in smoky mood-coloured gradients, no cartoons.
   1 Cover (tree logo, brand, report title, date, expected opening)
   2 Opening summary (snapshots, estimated-today chart, key technical levels)
   3 Global markets, commodities, currency, volatility
@@ -15,7 +15,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import brand  # noqa: E402
 
-W, H = 1080, 1350
+W, H = 1080, 1800
 e = lambda s: html.escape(str(s if s is not None else ""))
 
 PAL = {  # smoky mood palettes: base, three smoke hues, accent (chips/lines), up, down
