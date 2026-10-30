@@ -459,10 +459,53 @@ def build_eve(qs, heads, now):
     gfrac = 0.5 if vv is None else min(1, max(0, 1 - (vv - 10) / 20))
     vtxt = cm.get("vol_text") or "India VIX %s." % _q("^INDIAVIX")[0]
     headl = list(dict.fromkeys(cut(clean_head(x), 130) for x in cm["news"] if x)) or ["No fresh headlines could be fetched."]
+    # expected next-session opening (GIFT Nifty leads when available)
+    gift = None
+    if not os.environ.get("AUTO_MOCK"):
+        try:
+            gift = GIFT.fetch(float(qs["^NSEI"]["last"]))
+        except Exception as ex:
+            print("gift:", ex)
+    pv_ = pivots(qs.get("^NSEI"))
+    ov = OR.opening_view(qs, pv_, gift)
+    gtxt = None
+    if gift:
+        gtxt = {"last": f2(gift["last"], 1), "pct": ("%+.2f%%" % gift["pct"]) if gift.get("pct") is not None else "", "premium": "%+.0f pts" % gift.get("premium", 0),
+                "vs": "%+.2f%%" % gift.get("vs_pct", 0), "asof": gift["asof"].strftime("%d %b %H:%M") if gift.get("asof") else ""}
+    nxt_txt = nxt.strftime("%A, %d %B %Y")
+    opening = {"label": ov["label"], "zone": ov["zone"], "headline": ov["headline"], "drivers": ov.get("drivers", [])[:5], "next": nxt_txt, "mood": ov["mood"], "gift": gtxt,
+               "anchored": bool(gift)}
+    # volatility movers: widest intraday swings (high-low as % of last) among Nifty 50 stocks
+    swings = []
+    for s_ in NIFTY50:
+        q_ = qs.get(s_ + ".NS")
+        try:
+            if q_ and q_["hi"] and q_["lo"] and q_["last"]:
+                swings.append((s_, q_, (q_["hi"] - q_["lo"]) / q_["last"] * 100))
+        except Exception:
+            pass
+    swings.sort(key=lambda x: -x[2])
+    vol_movers = [[s_, f2(q_["last"]), "%.1f%%" % r_, pct(q_["pct"])] for s_, q_, r_ in swings[:6]]
+    # price + volume together: a real move (>= 1%) on above-average volume
+    pv_up, pv_dn = [], []
+    for s_ in NIFTY50:
+        q_ = qs.get(s_ + ".NS")
+        try:
+            if q_ and q_["avgvol"]:
+                ratio = q_["vol"] / q_["avgvol"]
+                if ratio >= 1.2 and q_["pct"] >= 1.0:
+                    pv_up.append((s_, q_, ratio))
+                elif ratio >= 1.2 and q_["pct"] <= -1.0:
+                    pv_dn.append((s_, q_, ratio))
+        except Exception:
+            pass
+    pv_up.sort(key=lambda x: -x[2]); pv_dn.sort(key=lambda x: -x[2])
+    pvrow = lambda L: [[s_, f2(q_["last"]), "%.1fx vol" % r_, pct(q_["pct"])] for s_, q_, r_ in L[:4]]
     book = {"edition": "evening", "date_txt": now.strftime("%d %b %Y"), "date_iso": now.strftime("%Y-%m-%d"), "mood": mood, "label": label, "headline": head,
             "summary": summary, "snapshot": snapshot, "spark": spark_vals, "flows": flows, "breadth": {"up": up_n, "dn": dn_n}, "levels": levels, "events": events,
             "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vx["pct"]) if vx else "n/a", "gauge": gfrac, "text": vtxt},
-            "headlines": headl, "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True)}
+            "headlines": headl, "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True),
+            "opening": opening, "vol_movers": vol_movers, "pv_up": pvrow(pv_up), "pv_dn": pvrow(pv_dn), "asof": now.strftime("%I:%M %p IST")}
     return {"book": book, "title": "Evening Breeze (%s)" % now.strftime("%d %b %Y"), "headline": head, "mood": mood, "mood_score": npc * 1.4,
             "edition": "evening", "disclaimer": brand.SHORT_DISCLAIMER}
 
