@@ -119,6 +119,19 @@ THEMES = {
         dict(name="Teal Copper", bg="linear-gradient(135deg,#06262b,#0b4b52 55%,#0a353c)", ink="#effffd", mut="#9bd0cd", card="rgba(255,255,255,.07)", cardb="rgba(255,160,100,.38)", acc="#ffa566", acc2="#5eead4", up="#5eead4", dn="#ff8a80", upbg="rgba(94,234,212,.16)", dnbg="rgba(255,138,128,.17)", top="#041a1e", topink="#ffa566", panel="rgba(0,0,0,.28)", deco="stripes", bars=["#14b8a6", "#f97316", "#0ea5e9", "#f59e0b", "#10b981", "#fb923c", "#06b6d4", "#d97706", "#22c55e"]),
     ],
 }
+
+THEMES["bull"] += [
+    dict(name="Neon Lime", bg="linear-gradient(135deg,#050b05,#0c2410 55%,#0a1a0c)", ink="#f3fff0", mut="#a8d8a0", card="rgba(190,255,60,.07)", cardb="rgba(190,255,60,.55)", acc="#b6ff2e", acc2="#00f5d4", up="#7dff6a", dn="#ff5d8f", upbg="rgba(125,255,106,.16)", dnbg="rgba(255,93,143,.18)", top="#020602", topink="#b6ff2e", panel="rgba(0,0,0,.40)", deco="glow", bars=["#76e600", "#00e5c0", "#c6f600", "#00d084", "#a3ff12", "#14f1d9", "#5be300", "#00bfa5", "#d4ff3a"]),
+    dict(name="Electric Blue", bg="linear-gradient(135deg,#02102e,#0437a8 55%,#062a7a)", ink="#f0f6ff", mut="#a9c4f5", card="rgba(255,255,255,.08)", cardb="rgba(0,229,255,.55)", acc="#00e5ff", acc2="#ffe14d", up="#5dffb0", dn="#ff7a9c", upbg="rgba(93,255,176,.16)", dnbg="rgba(255,122,156,.18)", top="#010a20", topink="#00e5ff", panel="rgba(0,6,30,.45)", deco="glow", bars=["#1e6bff", "#00c2ff", "#6a5cff", "#00e0c6", "#2f8bff", "#8a6bff", "#00a8ff", "#3dd9ff", "#4f7dff"]),
+]
+THEMES["bear"] += [
+    dict(name="Purple Haze", bg="linear-gradient(135deg,#150528,#3b0f6b 55%,#26094a)", ink="#fbf3ff", mut="#d0a8f0", card="rgba(255,255,255,.08)", cardb="rgba(255,70,220,.55)", acc="#ff4de0", acc2="#ffd84d", up="#6bffc4", dn="#ff6f91", upbg="rgba(107,255,196,.15)", dnbg="rgba(255,111,145,.20)", top="#0d0220", topink="#ff4de0", panel="rgba(10,0,30,.45)", deco="glow", bars=["#a21cff", "#ff2bd6", "#6d28d9", "#ff5fa2", "#c026d3", "#7c3aed", "#f43f9e", "#9333ea", "#e11d9b"]),
+    dict(name="Neon Magenta", bg="linear-gradient(135deg,#1a0212,#52052f 55%,#33031f)", ink="#fff0f8", mut="#f0a3cc", card="rgba(255,255,255,.07)", cardb="rgba(0,255,230,.50)", acc="#00ffe0", acc2="#ff3db2", up="#6bffc4", dn="#ff5fa2", upbg="rgba(107,255,196,.15)", dnbg="rgba(255,95,162,.20)", top="#100008", topink="#00ffe0", panel="rgba(0,0,0,.38)", deco="stripes", bars=["#ff1f9c", "#00e5cc", "#d6006f", "#00c8b4", "#ff4db8", "#00f0d6", "#b80062", "#12d8c0", "#ff7ad0"]),
+]
+THEMES["neutral"] += [
+    dict(name="Electric Violet", bg="linear-gradient(135deg,#0b0630,#2a12a0 55%,#1b0d78)", ink="#f4f1ff", mut="#b9aef5", card="rgba(255,255,255,.08)", cardb="rgba(120,255,240,.50)", acc="#7dfff0", acc2="#ff9bf0", up="#6bffc4", dn="#ff7a9c", upbg="rgba(107,255,196,.16)", dnbg="rgba(255,122,156,.18)", top="#060320", topink="#7dfff0", panel="rgba(5,0,40,.45)", deco="glow", bars=["#5b3dff", "#00d8c8", "#8a4dff", "#ff6bd8", "#3d6bff", "#b36bff", "#00bfe8", "#d44dff", "#2fd6ff"]),
+    dict(name="Cyber Cyan", bg="linear-gradient(135deg,#02161a,#05424d 55%,#032d36)", ink="#effffe", mut="#97d9e0", card="rgba(255,255,255,.07)", cardb="rgba(255,60,200,.50)", acc="#2dffe8", acc2="#ff3cc8", up="#5dffb0", dn="#ff6f91", upbg="rgba(93,255,176,.16)", dnbg="rgba(255,111,145,.19)", top="#010c0f", topink="#2dffe8", panel="rgba(0,0,0,.38)", deco="rings", bars=["#00d9c0", "#ff2bb8", "#00a8c8", "#ff6bd0", "#00f0d0", "#c020a0", "#00b8e0", "#ff4dc4", "#14e8c8"]),
+]
 LAYOUTS = ["board", "hero", "magazine"]
 
 
@@ -304,7 +317,7 @@ p{font-size:21px;line-height:1.36;color:var(--ink);opacity:.92}
 .big{font-weight:800;line-height:1.1}
 .up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
 .top{background:var(--top);color:var(--topink);display:flex;align-items:center;gap:22px;padding:0 40px;border-bottom:3px solid var(--acc)}
-.top img{height:70px}
+.top img{height:70px}.art{margin-left:auto;display:flex;align-items:center;gap:14px}.mvs{display:flex;flex-direction:column;gap:5px}.mv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1.5px solid var(--cardb);border-radius:999px;padding:2px 12px 2px 3px;font-size:16px;color:var(--topink)}.mv i{width:26px;height:26px;border-radius:50%%;color:#111;font-style:normal;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.mv em{font-style:normal;font-weight:800}
 .panel{background:var(--panel);border:2px solid var(--cardb);border-radius:26px;padding:20px 24px}
 .card{background:var(--card);border:2px solid var(--cardb);border-radius:22px;padding:18px 22px}
 .tiles{display:grid;gap:8px 14px;margin-top:6px}
@@ -335,12 +348,63 @@ def title_size(s):
     return 48 if n <= 58 else (42 if n <= 70 else 36)
 
 
+def bull_svg(c1, c2, size=84):
+    return ('<svg viewBox="0 0 100 100" width="%d" height="%d"><path d="M10 22c2 14 10 22 22 24l4-10c-8-2-14-6-26-14z" fill="%s"/><path d="M90 22c-2 14-10 22-22 24l-4-10c8-2 14-6 26-14z" fill="%s"/>'
+            '<path d="M28 40c0-8 10-14 22-14s22 6 22 14l-3 26c-2 10-10 18-19 18s-17-8-19-18z" fill="%s"/><ellipse cx="50" cy="72" rx="17" ry="12" fill="rgba(255,255,255,.28)"/>'
+            '<circle cx="42" cy="72" r="3" fill="#222"/><circle cx="58" cy="72" r="3" fill="#222"/><circle cx="40" cy="50" r="4" fill="#fff"/><circle cx="60" cy="50" r="4" fill="#fff"/><circle cx="41" cy="51" r="2" fill="#222"/><circle cx="59" cy="51" r="2" fill="#222"/>'
+            '<path d="M44 36l6 5 6-5" stroke="%s" stroke-width="3" fill="none" stroke-linecap="round"/></svg>' % (size, size, c1, c1, c2, c1))
+
+
+def bear_svg(c1, c2, size=84):
+    return ('<svg viewBox="0 0 100 100" width="%d" height="%d"><circle cx="24" cy="26" r="13" fill="%s"/><circle cx="76" cy="26" r="13" fill="%s"/><circle cx="24" cy="26" r="6" fill="rgba(255,255,255,.35)"/><circle cx="76" cy="26" r="6" fill="rgba(255,255,255,.35)"/>'
+            '<ellipse cx="50" cy="55" rx="34" ry="32" fill="%s"/><ellipse cx="50" cy="68" rx="15" ry="11" fill="rgba(255,255,255,.32)"/><ellipse cx="50" cy="63" rx="6" ry="4.5" fill="#222"/>'
+            '<circle cx="37" cy="48" r="4" fill="#fff"/><circle cx="63" cy="48" r="4" fill="#fff"/><circle cx="38" cy="49" r="2" fill="#222"/><circle cx="62" cy="49" r="2" fill="#222"/>'
+            '<path d="M44 74q6 4 12 0" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>' % (size, size, c1, c1, c2))
+
+
+def parse_movers(c):
+    m = c.get("movers")
+    if m:
+        return m
+    import re as _re
+    txt = ""
+    for b in c.get("bottom", []):
+        if "Movers" in str(b.get("title", "")):
+            txt = str(b.get("text", ""))
+    up, dn = [], []
+    if "Top losers" in txt:
+        a, b = txt.split("Top losers", 1)
+        up = [dict(sym=x, pct=y) for x, y in _re.findall(r"([A-Z&\-]{2,20})\s+([+-]?\d+\.?\d*%)", a)]
+        dn = [dict(sym=x, pct=y) for x, y in _re.findall(r"([A-Z&\-]{2,20})\s+([+-]?\d+\.?\d*%)", b)]
+    return {"up": up[:3], "dn": dn[:3]}
+
+
+def mover_pill(m, kind, t):
+    sym = str(m["sym"]).replace(".NS", "")
+    col = t["up"] if kind == "up" else t["dn"]
+    mono = sym[:2].upper()
+    return ('<span class="mv"><i style="background:%s">%s</i><b>%s</b><em style="color:%s">%s %s</em></span>'
+            % (col, e(mono), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(chg_txt(m["pct"]).replace("+", "").replace("-", ""))))
+
+
+def top_art(c, t, mood):
+    mv = parse_movers(c)
+    art = {"bull": bull_svg(t["up"], t["acc"]), "bear": bear_svg(t["dn"], t["acc"]),
+           "neutral": bull_svg(t["up"], t["acc"], 76) + bear_svg(t["dn"], t["acc"], 76)}[mood]
+    pills = ""
+    if mv.get("up"):
+        pills += mover_pill(mv["up"][0], "up", t)
+    if mv.get("dn"):
+        pills += mover_pill(mv["dn"][0], "dn", t)
+    return '<div class="art"><div class="mvs">%s</div>%s</div>' % (pills, art)
+
+
 def build_html(c, force_layout=None, force_theme=None):
     mood, sc, lay, t = pick_design(c, force_layout, force_theme)
     mood_word = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
     v = c["vix"]
     vg = v.get("gauge", .5)
-    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1></div>' % (logo(), title_size(c["title"]), e(c["title"]))
+    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood))
     foot = '<div class="foot" style="grid-area:foot"><span>%s</span><span>%s</span></div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "")))
     sp = spark2(c.get("spark", []), t, h=(150 if lay == 'magazine' else 230))
     spl = '<div style="font-size:15px;color:var(--mut)">%s</div>' % e(c.get("spark_label", ""))

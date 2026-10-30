@@ -541,6 +541,7 @@ def build(sid, qs, heads, now):
                 "asia": {"head": cm.get("asia_head") or "Asia & Global Cues",
                          "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
                 "levels": levels, "bottom": bottom,
+                "movers": {"up": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in gain[:3]], "dn": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in lose[:3]]},
                 "footnote": "Auto-generated %s IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: %s | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session."
                             % (TM, "rule-based" if cm["by"] == "template" else cm["by"].title()),
                 "disclaimer": "Not investment advice. Markets carry risk."}
