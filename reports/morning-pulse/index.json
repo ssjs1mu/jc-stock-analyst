@@ -2,6 +2,69 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-10-30T16:35:41+05:30",
+   "date": "2026-10-30",
+   "status": "ok",
+   "caption": "Morning Pulse 30 Oct",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.pdf",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.pdf",
+     "type": "pdf",
+     "bytes": 828866
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.png",
+     "type": "png",
+     "bytes": 738915
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_1.png",
+     "type": "png",
+     "bytes": 1214487
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_2.png",
+     "type": "png",
+     "bytes": 675626
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_3.png",
+     "type": "png",
+     "bytes": 853723
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_4.png",
+     "type": "png",
+     "bytes": 854926
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_5.png",
+     "type": "png",
+     "bytes": 662498
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-10-30_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-10-30_6.png",
+     "type": "png",
+     "bytes": 1464517
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.json",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.json",
+     "type": "json",
+     "bytes": 14369
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T16:28:37+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -1030,5 +1093,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T16:28:37+05:30"
+ "updated_at": "2026-10-30T16:35:41+05:30"
 }

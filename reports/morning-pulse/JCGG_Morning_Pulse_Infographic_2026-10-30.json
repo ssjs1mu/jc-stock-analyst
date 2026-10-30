@@ -95,14 +95,14 @@
    {
     "name": "FTSE 100",
     "code": "UK",
-    "level": "10,743.84",
-    "pct": "+0.20%"
+    "level": "10,747.83",
+    "pct": "+0.24%"
    },
    {
     "name": "DAX",
     "code": "DE",
-    "level": "25,888.40",
-    "pct": "-0.58%"
+    "level": "25,890.91",
+    "pct": "-0.57%"
    },
    {
     "name": "Nikkei 225",
@@ -132,18 +132,18 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "113.50",
-    "pct": "-1.20%"
+    "level": "113.61",
+    "pct": "-1.11%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "104.12",
-    "pct": "+2.08%"
+    "level": "104.25",
+    "pct": "+2.21%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,987.00",
-    "pct": "-1.10%"
+    "level": "3,986.30",
+    "pct": "-1.12%"
    },
    {
     "name": "USD / INR",
@@ -152,8 +152,8 @@
    },
    {
     "name": "Dollar index",
-    "level": "101.65",
-    "pct": "-0.38%"
+    "level": "101.64",
+    "pct": "-0.39%"
    },
    {
     "name": "US 10-yr yield %",
@@ -188,14 +188,14 @@
     "Reaction to earnings at the open"
    ],
    [
+    "NESTLEIND",
+    "In the news",
+    "Market wrap: Shriram Finance, Nestle India, Trent, InterGlobe top gainers and losers on Ni"
+   ],
+   [
     "TRENT",
     "In the news",
     "IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; NIFTY trad"
-   ],
-   [
-    "INFY",
-    "In the news",
-    "Infosys Share Price Today, Infosys Stock Price Live NSE/BSE Updates"
    ],
    [
     "COALINDIA",
@@ -214,14 +214,14 @@
    ]
   ],
   "headlines": [
+   "Market wrap: Shriram Finance, Nestle India, Trent, InterGlobe top gainers and losers on Nifty and Sensex on Friday",
+   "Sensex, Nifty Rise; IT & Pharma Lift Markets as Midcaps Slide",
    "Indian Shares Snap Two-Month Losing Streak, Nifty And Sensex Gain In October",
    "Indian rupee gains 33 paise to close at 94.93 against US dollar",
    "Rupee rises 33 paise to close at 94.93 against US dollar",
+   "Business News",
    "Tech Sell-Off Visits Asian Stock Markets",
-   "Closing Bell: Sensex Gains 300 Points, Nifty Reclaims 23,000 Mark as IT Stocks a Lead Rally",
-   "Sensex rises 308 points, Nifty above 23,000 even as broader markets crash. Will D-Street bulls extend reco",
-   "Sensex, Nifty extend gains for 2nd day as IT, pharma stocks lead rally",
-   "Markets reverse last week's losses; Nifty crosses 23,000, pharma jumps 7% weekly"
+   "Closing Bell: Sensex Gains 300 Points, Nifty Reclaims 23,000 Mark as IT Stocks a Lead Rally"
   ],
   "calls": {
    "buy": [
@@ -393,7 +393,7 @@
    "pct": "+0.11%",
    "premium": "+30 pts",
    "vs": "+0.13%",
-   "asof": "30 Oct 16:15"
+   "asof": "30 Oct 16:30"
   },
   "gainers": [
    [
@@ -547,14 +547,14 @@
   {
    "name": "Brent Crude",
    "sub": "US$/bbl",
-   "value": "113.50",
-   "pct": "-1.20%"
+   "value": "113.61",
+   "pct": "-1.11%"
   },
   {
    "name": "Gold Spot",
    "sub": "US$/oz",
-   "value": "3,987.00",
-   "pct": "-1.10%"
+   "value": "3,986.30",
+   "pct": "-1.12%"
   },
   {
    "name": "India VIX",
@@ -597,14 +597,14 @@
   {
    "name": "FTSE 100",
    "code": "UK",
-   "level": "10,743.84",
-   "pct": "+0.20%"
+   "level": "10,747.83",
+   "pct": "+0.24%"
   },
   {
    "name": "DAX",
    "code": "DE",
-   "level": "25,888.40",
-   "pct": "-0.58%"
+   "level": "25,890.91",
+   "pct": "-0.57%"
   },
   {
    "name": "Nikkei 225",
@@ -658,12 +658,12 @@
   {
    "title": "Stocks to Watch",
    "icon": "chart",
-   "text": "BEL (Results today); RELIANCE (Results today); SUNPHARMA (Results today); TRENT (In the news); INFY (In the news); COALINDIA (In the news)"
+   "text": "BEL (Results today); RELIANCE (Results today); SUNPHARMA (Results today); NESTLEIND (In the news); TRENT (In the news); COALINDIA (In the news)"
   },
   {
    "title": "Headlines to Track",
    "icon": "list",
-   "text": "Indian Shares Snap Two-Month Losing Streak, Nifty And Sensex Gain In October | Indian rupee gains 33 paise to close at 94.93 against US dollar"
+   "text": "Market wrap: Shriram Finance, Nestle India, Trent, InterGlobe top gainers and lo | Sensex, Nifty Rise; IT & Pharma Lift Markets as Midcaps Slide"
   }
  ],
  "movers": {
