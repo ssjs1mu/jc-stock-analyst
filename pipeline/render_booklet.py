@@ -508,7 +508,7 @@ def e_open(b, p, total):
     if dd is None:
         ddt = line("Economic calendar could not be fetched at build time.")
     elif not dd:
-        ddt = line("No major scheduled releases listed for this session.")
+        ddt = line("No high-impact releases are listed in the economic-calendar feed for this session.")
     else:
         ddt = "".join(line("<b>%s IST</b> &middot; %s &middot; %s%s%s" % (e(x["t"]), e(x["ccy"]), e(x["title"]), (" (forecast %s)" % e(x["fc"])) if x["fc"] else "", " &#9733;" if x["hi"] else "")) for x in dd[:7])
     nxtbox = ('<h2 class="s">Corporate actions on %s</h2><div class="card">%s%s</div>'

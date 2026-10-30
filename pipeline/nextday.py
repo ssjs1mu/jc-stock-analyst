@@ -76,19 +76,50 @@ def data_due(d):
     return out if ok else None
 
 
-def pcr_nifty():
-    """Put-call ratio by open interest for the nearest Nifty expiry (NSE option chain). None if unavailable."""
-    j = _get("https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY")
+def _pcr_nse():
+    op = _op()
+    op.addheaders = [h for h in op.addheaders if h[0] != "Referer"] + [("Referer", "https://www.nseindia.com/option-chain")]
     try:
-        rec = j["records"]
-        ex = rec["expiryDates"][0]
-        ce = pe = 0
-        for r in rec["data"]:
-            if r.get("expiryDate") == ex:
-                ce += (r.get("CE") or {}).get("openInterest", 0)
-                pe += (r.get("PE") or {}).get("openInterest", 0)
-        if ce > 0:
-            return {"pcr": pe / ce, "expiry": ex, "ts": rec.get("timestamp", "")}
-    except Exception as ex_:
-        print("pcr:", ex_)
+        op.open("https://www.nseindia.com/option-chain", timeout=30).read()
+    except Exception as ex:
+        print("pcr warm:", ex)
+    j = _get("https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY")
+    rec = j["records"]
+    ex = rec["expiryDates"][0]
+    ce = pe = 0
+    for r in rec["data"]:
+        if r.get("expiryDate") == ex:
+            ce += (r.get("CE") or {}).get("openInterest", 0)
+            pe += (r.get("PE") or {}).get("openInterest", 0)
+    if ce <= 0:
+        raise ValueError("empty chain")
+    return {"pcr": pe / ce, "expiry": ex, "ts": rec.get("timestamp", ""), "src": "NSE"}
+
+
+def _pcr_upstox():
+    import re, urllib.request
+    rq = urllib.request.Request("https://upstox.com/option-chain/nifty/", headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36", "Accept": "text/html"})
+    h = urllib.request.urlopen(rq, timeout=30).read().decode("utf-8", "replace")
+    ce = pe = n = 0
+    for row in re.findall(r"<tr[\s\S]*?</tr>", h):
+        t = [re.sub(r"<[^>]+>", "", x).replace(",", "").strip() for x in re.findall(r"<td[^>]*>([\s\S]*?)</td>", row)]
+        if len(t) >= 19:
+            try:
+                a, b = float(t[6]), float(t[12])
+            except ValueError:
+                continue
+            ce += a; pe += b; n += 1
+    if n < 20 or not ce:
+        raise ValueError("table not found")
+    m = re.search(r">\s*(\d{1,2} [A-Z][a-z]{2})\s*<", h)
+    return {"pcr": pe / ce, "expiry": m.group(1) if m else "nearest", "ts": "", "src": "Upstox"}
+
+
+def pcr_nifty():
+    """Put-call ratio by open interest, nearest Nifty expiry. NSE option chain first, Upstox's public chain second. None if both fail."""
+    for fn in (_pcr_nse, _pcr_upstox):
+        try:
+            return fn()
+        except Exception as ex_:
+            print("pcr %s:" % fn.__name__, ex_)
     return None
