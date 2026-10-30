@@ -176,12 +176,12 @@ def p1(b, p, total, ph):
              '<div class="brand" style="font-size:104px;position:relative;line-height:1.05">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:70px;font-weight:900;line-height:1.04;position:relative;text-shadow:0 4px 24px #000a">%s</div>'
-             '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">for %s</div>'
+             '<div style="font-size:84px;font-weight:900;line-height:1.04;white-space:nowrap;position:relative;text-shadow:0 4px 24px #000a">%s</div>'
+             '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative;text-align:center;width:100%%">for %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:34px;font-weight:800;position:relative;max-width:920px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
-             % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening<br>Breeze" if b.get("edition") == "evening" else "Morning<br>Sunrise",
+             % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening Breeze" if b.get("edition") == "evening" else "Morning Sunrise",
                 e(b["date_txt"]), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
