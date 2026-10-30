@@ -76,9 +76,28 @@ def main():
     with open(idx_path, "w") as f:
         json.dump(idx, f, indent=1)
 
+    book_added = False
+    if a.schedule_id == "morning-pulse" and a.status == "ok":
+        pages = sorted(x["path"] for x in files if "_Mobile_" in x["name"] and x["type"] == "png")
+        if pages:
+            try:   # booklet page (flip-book) + preview card, so a shared link shows as a picture card
+                sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+                import make_book
+                head, mood = "", "neutral"
+                for src in a.file:
+                    if src.endswith(".json"):
+                        cj = json.load(open(src))
+                        head = cj.get("headline", "")
+                        mood = (cj.get("mood") or {}).get("key", "neutral")
+                make_book.build(entry["date"], pages, head, mood)
+                book_added = True
+            except Exception as ex:
+                print("booklet not built:", ex)
     git("config", "user.name", "Joshi's Corner scheduler", check=False)
     git("config", "user.email", "joshiscorner.group@gmail.com", check=False)
     git("add", f"reports/{a.schedule_id}")
+    if book_added:
+        git("add", "morning")
     msg = f"report: {a.schedule_id} {entry['date']} ({a.status})"
     git("commit", "-m", msg)
     branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
