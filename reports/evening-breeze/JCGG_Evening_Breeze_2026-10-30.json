@@ -10,7 +10,7 @@
   },
   "label": "Positive close",
   "headline": "Nifty gains 0.51%, Banks lag",
-  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.12%, USD/INR 94.950. 28 of 50 Nifty stocks advanced and 21 declined.",
+  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.08%, USD/INR 94.950. 28 of 50 Nifty stocks advanced and 21 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
@@ -105,14 +105,14 @@
    {
     "name": "FTSE 100",
     "code": "",
-    "level": "10,744.86",
-    "pct": "+0.21%"
+    "level": "10,748.56",
+    "pct": "+0.25%"
    },
    {
     "name": "DAX",
     "code": "",
-    "level": "25,888.60",
-    "pct": "-0.58%"
+    "level": "25,892.34",
+    "pct": "-0.57%"
    },
    {
     "name": "Nikkei 225",
@@ -142,18 +142,18 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "113.59",
-    "pct": "-1.12%"
+    "level": "113.64",
+    "pct": "-1.08%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "104.17",
-    "pct": "+2.13%"
+    "level": "104.27",
+    "pct": "+2.23%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,985.60",
-    "pct": "-1.14%"
+    "level": "3,986.50",
+    "pct": "-1.11%"
    },
    {
     "name": "USD / INR",
@@ -162,7 +162,7 @@
    },
    {
     "name": "Dollar index",
-    "level": "101.65",
+    "level": "101.64",
     "pct": "-0.39%"
    },
    {
@@ -178,14 +178,14 @@
    "text": "India VIX 15.30."
   },
   "headlines": [
+   "Market wrap: Shriram Finance, Nestle India, Trent, InterGlobe top gainers and losers on Nifty and Sensex on Friday",
+   "Sensex, Nifty Rise; IT & Pharma Lift Markets as Midcaps Slide",
    "Indian Shares Snap Two-Month Losing Streak, Nifty And Sensex Gain In October",
    "Indian rupee gains 33 paise to close at 94.93 against US dollar",
    "Rupee rises 33 paise to close at 94.93 against US dollar",
+   "Business News",
    "Tech Sell-Off Visits Asian Stock Markets",
-   "Closing Bell: Sensex Gains 300 Points, Nifty Reclaims 23,000 Mark as IT Stocks a Lead Rally",
-   "Sensex rises 308 points, Nifty above 23,000 even as broader markets crash. Will D-Street bulls extend reco",
-   "Sensex, Nifty extend gains for 2nd day as IT, pharma stocks lead rally",
-   "Markets reverse last week's losses; Nifty crosses 23,000, pharma jumps 7% weekly"
+   "Closing Bell: Sensex Gains 300 Points, Nifty Reclaims 23,000 Mark as IT Stocks a Lead Rally"
   ],
   "gainers": [
    [
@@ -266,7 +266,107 @@
     "1.9x avg vol",
     "-1.18%"
    ]
-  ]
+  ],
+  "opening": {
+   "label": "Flat to marginally mixed start",
+   "zone": "23,048 - 23,118",
+   "headline": "Flat to marginally mixed start: Wall Street weak, Asia negative, crude easing",
+   "drivers": [
+    "GIFT Nifty 23,083.5 (+30 pts, +0.13% vs Nifty's last close).",
+    "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%.",
+    "Asia this morning: Nikkei -2.12%, Hang Seng +1.46%, Kospi -3.48%.",
+    "Currency, crude and volatility: Brent 113.64 (-1.08%); USD/INR 94.950 (-0.27%); India VIX 15.30 (+1.21%)."
+   ],
+   "next": "Monday, 02 November 2026",
+   "mood": "neutral",
+   "gift": {
+    "last": "23,083.5",
+    "pct": "+0.11%",
+    "premium": "+30 pts",
+    "vs": "+0.13%",
+    "asof": "30 Oct 16:30"
+   },
+   "anchored": true
+  },
+  "vol_movers": [
+   [
+    "SUNPHARMA",
+    "1,777.70",
+    "5.0%",
+    "+0.95%"
+   ],
+   [
+    "COALINDIA",
+    "389.00",
+    "4.5%",
+    "-1.04%"
+   ],
+   [
+    "INDUSINDBK",
+    "838.00",
+    "3.8%",
+    "-3.46%"
+   ],
+   [
+    "WIPRO",
+    "198.31",
+    "3.8%",
+    "+4.32%"
+   ],
+   [
+    "ASIANPAINT",
+    "2,320.00",
+    "3.3%",
+    "+0.78%"
+   ],
+   [
+    "APOLLOHOSP",
+    "8,448.00",
+    "3.2%",
+    "+3.02%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "TRENT",
+    "3,017.30",
+    "3.9x vol",
+    "+5.44%"
+   ],
+   [
+    "NTPC",
+    "316.25",
+    "1.8x vol",
+    "+1.85%"
+   ],
+   [
+    "DIVISLAB",
+    "9,780.00",
+    "1.7x vol",
+    "+1.20%"
+   ],
+   [
+    "POWERGRID",
+    "265.00",
+    "1.5x vol",
+    "+1.92%"
+   ]
+  ],
+  "pv_dn": [
+   [
+    "COALINDIA",
+    "389.00",
+    "3.4x vol",
+    "-1.04%"
+   ],
+   [
+    "ADANIPORTS",
+    "1,850.00",
+    "1.9x vol",
+    "-1.18%"
+   ]
+  ],
+  "asof": "04:34 PM IST"
  },
  "title": "Evening Breeze (30 Oct 2026)",
  "headline": "Nifty gains 0.51%, Banks lag",
