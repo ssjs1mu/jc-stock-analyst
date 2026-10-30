@@ -1,187 +1,237 @@
 {
  "report_subtitle": "Joshi's Corner",
  "report_date": "30 Oct 2026",
- "report_time": "09:02 IST",
- "generated_line": "Generated: 30 Oct 2026, 09:02 IST",
- "as_of_note": "Auto-generated at 09:02 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
- "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_time": "11:06 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "neutral",
+  "label": "Flat to marginally mixed start",
+  "sub": "Indicative Nifty opening zone 22,885 - 23,000"
+ },
  "report_title": "JCGG - Morning Updates (Brief)",
  "sections": [
   {
-   "heading": "Today's Bias in Brief",
+   "heading": "Opening Outlook",
    "blocks": [
     {
      "type": "paragraph",
-     "text": "Indian equity benchmark indices ended significantly higher in the previous session, with the Nifty 50 closing at 22,936.75 (+1.05%) and the Sensex jumping 1.24% to 74,151.04. Gains were driven by banking and IT stocks alongside easing crude prices and lower US bond yields. The Bank Nifty advanced 1.18% to 54,909.65, while the Nifty 500 rose 0.99% to 21,941.50. However, global market trends remain cautious due to tech sector selloffs and spending concerns in AI."
+     "text": "Flat to marginally mixed start: Wall Street weak, Asia negative, crude easing. Expected Nifty opening zone: 22,885 - 23,000 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%.",
+      "Asia this morning: Nikkei -2.20%, Hang Seng +1.64%, Kospi -3.69%.",
+      "Currency, crude and volatility: Brent 111.88 (-2.61%); USD/INR 95.265 (+0.06%); India VIX 15.45 (+2.20%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty closed within 0.3% of its resistance pivot (23,034), so that level decides the early direction."
+    },
+    {
+     "type": "note",
+     "text": "Indicative opening view only: built from overnight US, Asian and European cues, crude, rupee and volatility. Actual opening can differ with domestic news and GIFT Nifty."
     }
    ],
    "style": "framed"
   },
   {
-   "heading": "Global & Asian Markets",
+   "heading": "Stocks to Watch",
    "blocks": [
     {
      "type": "table",
      "headers": [
-      "Index",
-      "Level",
-      "% Chg"
+      "Stock",
+      "Trigger",
+      "What to watch"
      ],
      "rows": [
       [
-       "Dow Jones",
-       "52,342.56",
-       "-0.25%"
+       "BEL",
+       "Results today",
+       "Reaction to earnings at the open"
       ],
       [
-       "S&P 500",
-       "7,720.39",
-       "-0.30%"
+       "RELIANCE",
+       "Results today",
+       "Reaction to earnings at the open"
       ],
       [
-       "Nasdaq Composite",
-       "26,184.72",
-       "-1.38%"
+       "SUNPHARMA",
+       "Results today",
+       "Reaction to earnings at the open"
       ],
       [
-       "FTSE 100",
-       "10,722.10",
-       "+0.26%"
+       "ADANIPORTS",
+       "In the news",
+       "Breakout stocks: Adani Ports, Nykaa, Saregama on radar; analyst tells why"
       ],
       [
-       "DAX",
-       "26,039.68",
-       "+1.31%"
+       "TRENT",
+       "In the news",
+       "Indian Stock Market: Sensex, Nifty Rally on IT Stocks, Trent"
       ],
       [
-       "Nikkei 225",
-       "63,019.78",
-       "-2.54%"
+       "COALINDIA",
+       "In the news",
+       "Coal India falls 3% post Q2 results but brokerages upbeat on PSU stock"
       ],
       [
-       "Hang Seng",
-       "23,273.87",
-       "+1.37%"
+       "DALBHARAT",
+       "Setup: SELL (A+)",
+       "Entry 1,464.4, stop 1,487.4, target 1,402.0"
       ],
       [
-       "Shanghai Composite",
-       "3,616.52",
-       "-0.96%"
-      ],
-      [
-       "Kospi",
-       "5,612.16",
-       "-5.48%"
+       "JIOFIN",
+       "Setup: SELL (A+)",
+       "Entry 204.0, stop 206.1, target 198.7"
       ]
      ],
-     "trend": true,
+     "trend": false,
      "col_widths": [
-      0.5,
-      0.25,
-      0.25
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
      ]
     }
    ]
   },
   {
-   "heading": "Commodities & Currency",
+   "heading": "Events Today",
    "blocks": [
     {
-     "type": "table",
-     "headers": [
-      "Item",
-      "Level",
-      "% Chg"
-     ],
-     "rows": [
-      [
-       "Brent crude (US$/bbl)",
-       "112.19",
-       "-2.34%"
-      ],
-      [
-       "WTI crude (US$/bbl)",
-       "103.35",
-       "+1.32%"
-      ],
-      [
-       "Gold (US$/oz, Comex)",
-       "4,003.40",
-       "-0.69%"
-      ],
-      [
-       "USD/INR",
-       "95.19",
-       "-0.02%"
-      ],
-      [
-       "Dollar index (DXY)",
-       "101.71",
-       "-0.32%"
-      ],
-      [
-       "US 10-yr yield (%)",
-       "4.99",
-       "-1.11%"
-      ]
-     ],
-     "trend": true,
-     "col_widths": [
-      0.5,
-      0.25,
-      0.25
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
+      "Results today (120 companies): BEL, RELIANCE, SUNPHARMA, AARON, AARTIIND, ABCAPITAL, ACL, ADVAIT, AERONEU, AETHER, AFFLE, AFIL, AJANTPHARM and others."
      ]
     }
    ]
   },
   {
-   "heading": "India VIX & Previous Close",
+   "heading": "Overnight Cues",
    "blocks": [
     {
-     "type": "table",
-     "headers": [
-      "Index",
-      "Close",
-      "% Chg"
-     ],
-     "rows": [
-      [
-       "Nifty 50",
-       "22,936.75",
-       "+1.05%"
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
       ],
-      [
-       "Sensex",
-       "74,151.04",
-       "+1.24%"
+      "rows": [
+       [
+        "Dow Jones",
+        "52,342.56",
+        "-0.25%"
+       ],
+       [
+        "S&P 500",
+        "7,720.39",
+        "-0.30%"
+       ],
+       [
+        "Nasdaq Composite",
+        "26,184.72",
+        "-1.38%"
+       ],
+       [
+        "FTSE 100",
+        "10,722.10",
+        "+0.26%"
+       ],
+       [
+        "DAX",
+        "26,039.68",
+        "+1.31%"
+       ],
+       [
+        "Nikkei 225",
+        "63,235.50",
+        "-2.20%"
+       ],
+       [
+        "Hang Seng",
+        "23,334.52",
+        "+1.64%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,637.17",
+        "-0.39%"
+       ],
+       [
+        "Kospi",
+        "5,718.46",
+        "-3.69%"
+       ]
       ],
-      [
-       "Bank Nifty",
-       "54,909.65",
-       "+1.18%"
-      ],
-      [
-       "Nifty 500",
-       "21,941.50",
-       "+0.99%"
-      ],
-      [
-       "India VIX",
-       "15.12",
-       "-6.95%"
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
       ]
-     ],
-     "trend": true,
-     "col_widths": [
-      0.5,
-      0.25,
-      0.25
-     ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "111.88",
+        "-2.61%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "103.04",
+        "+1.02%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,013.40",
+        "-0.45%"
+       ],
+       [
+        "USD/INR",
+        "95.26",
+        "+0.06%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.85",
+        "-0.19%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.99",
+        "-1.11%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
     }
    ]
   },
   {
-   "heading": "Key Levels to Watch",
+   "heading": "Key Levels for Today",
    "blocks": [
     {
      "type": "table",
@@ -193,13 +243,13 @@
      "rows": [
       [
        "Nifty 50",
-       "22,742",
-       "23,047"
+       "22,920",
+       "23,034"
       ],
       [
        "Nifty 50 (2nd)",
-       "22,547",
-       "23,157"
+       "22,855",
+       "23,084"
       ]
      ],
      "trend": false,
@@ -212,17 +262,6 @@
     {
      "type": "note",
      "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
-    }
-   ]
-  },
-  {
-   "heading": "Alerts for the Day",
-   "blocks": [
-    {
-     "type": "bullets",
-     "items": [
-      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026."
-     ]
     }
    ]
   }
