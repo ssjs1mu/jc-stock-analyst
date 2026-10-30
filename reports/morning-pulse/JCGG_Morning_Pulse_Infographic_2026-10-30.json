@@ -1,7 +1,13 @@
 {
  "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (30 Oct 2026)",
- "headline": "Indian Markets Surge As Banking Rally Resumes",
- "bias_text": "Indian equity benchmarks logged strong gains in the last session, with the Sensex rising 1.24% to 74,151.04 and the Nifty 50 climbing 1.05% to 22,936.75. The advance was driven by buying in banking and Adani group stocks, pushing Bank Nifty up 1.18% to 54,909.65. ADANIPORTS led the Nifty gainers with a 6.29% surge, whereas HEROMOTOCO declined 4.09%. However, mixed signals from global peers and shifting commodity prices present an evolving market setup.",
+ "headline": "Flat to marginally mixed start - Nifty zone 22,882 - 22,997",
+ "bias_text": "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%. Asia this morning: Nikkei -2.18%, Hang Seng +1.70%, Kospi -3.63%. Carry-over: Nifty closed within 0.3% of its resistance pivot (23,032), so that level decides the early direction. Indicative view from overnight cues; GIFT Nifty is not used.",
+ "mood": {
+  "key": "neutral",
+  "label": "Flat to marginally mixed start",
+  "sub": "Indicative Nifty opening zone 22,882 - 22,997"
+ },
+ "mood_score": -0.17728252222074192,
  "spark": [
   22776.099609375,
   22603.05078125,
@@ -20,44 +26,44 @@
   22749.75,
   22698.849609375,
   22936.75,
-  22964.5
+  22980.44921875
  ],
  "spark_label": "Nifty 50 daily closes, last 18 sessions",
  "vix": {
-  "gauge": 0.7440000057220459,
-  "headline": "India VIX 15.12 (-6.95%)",
-  "text": "India VIX dropped by 6.95% to settle at 15.12, indicating reduced market volatility expectation. Meanwhile, the USD/INR currency rate edged down 0.02% to 95.19."
+  "gauge": 0.7273749828338623,
+  "headline": "India VIX 15.45 (+2.20%)",
+  "text": "India VIX 15.45 (+2.20%); USD/INR 95.26 (+0.06%); US 10-yr yield 4.99 (-1.11%). India VIX rose 2.2% - hedging demand up."
  },
  "tiles": [
   {
    "name": "Nifty 50",
    "sub": "prev close",
-   "value": "22,936.75",
-   "pct": "+1.05%"
+   "value": "22,980.65",
+   "pct": "+0.19%"
   },
   {
    "name": "Brent Crude",
    "sub": "US$/bbl",
-   "value": "112.19",
-   "pct": "-2.34%"
+   "value": "111.88",
+   "pct": "-2.61%"
   },
   {
    "name": "Gold Spot",
    "sub": "US$/oz",
-   "value": "4,011.80",
-   "pct": "-0.49%"
+   "value": "4,012.10",
+   "pct": "-0.48%"
   },
   {
    "name": "India VIX",
    "sub": "close",
-   "value": "15.12",
-   "pct": "-6.95%"
+   "value": "15.45",
+   "pct": "+2.20%"
   },
   {
    "name": "USD/INR",
    "sub": "latest",
-   "value": "95.188",
-   "pct": "-0.02%"
+   "value": "95.262",
+   "pct": "+0.06%"
   },
   {
    "name": "US 10-yr",
@@ -100,63 +106,93 @@
   {
    "name": "Nikkei 225",
    "code": "JP",
-   "level": "63,019.78",
-   "pct": "-2.54%"
+   "level": "63,252.15",
+   "pct": "-2.18%"
   },
   {
    "name": "Hang Seng",
    "code": "HK",
-   "level": "23,306.03",
-   "pct": "+1.51%"
+   "level": "23,349.04",
+   "pct": "+1.70%"
   },
   {
    "name": "Shanghai Composite",
    "code": "CN",
-   "level": "3,617.45",
-   "pct": "-0.93%"
+   "level": "3,639.36",
+   "pct": "-0.33%"
   },
   {
    "name": "Kospi",
    "code": "KR",
-   "level": "5,608.05",
-   "pct": "-5.55%"
+   "level": "5,722.11",
+   "pct": "-3.63%"
   }
  ],
  "asia": {
-  "head": "Mixed Trends In Asian Trading",
-  "text": "Asian markets showed mixed performance as South Korea's Kospi dropped 5.55% and Japan's Nikkei 225 fell 2.54%, while Hong Kong's Hang Seng rose 1.51%. In the US, tech sector weakness dragged the Nasdaq down 1.38% due to AI spending concerns. Meanwhile, European markets registered gains, led by Germany's DAX rising 1.31%."
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 63,252.15 (-2.18%), Hang Seng 23,349.04 (+1.70%), Shanghai 3,639.36 (-0.33%), Kospi 5,722.11 (-3.63%). Wall Street: Dow 52,342.56 (-0.25%), S&P 500 7,720.39 (-0.30%), Nasdaq 26,184.72 (-1.38%)."
  },
  "levels": [
   {
    "name": "Nifty 50",
-   "s": "22,547 - 22,742",
-   "r": "23,047 - 23,157",
-   "note": "A sustained move above 23,047 opens up 23,157; a slide below 22,742 would expose 22,547."
+   "s": "22,854 - 22,917",
+   "r": "23,032 - 23,082",
+   "note": "A sustained move above 23,032 opens up 23,082; a slide below 22,917 would expose 22,854."
   },
   {
    "name": "Bank Nifty",
-   "s": "53,714 - 54,312",
-   "r": "55,244 - 55,578",
-   "note": "A sustained move above 55,244 opens up 55,578; a slide below 54,312 would expose 53,714."
+   "s": "54,395 - 54,545",
+   "r": "54,881 - 55,066",
+   "note": "A sustained move above 54,881 opens up 55,066; a slide below 54,545 would expose 54,395."
   }
  ],
  "bottom": [
   {
-   "title": "Latest Headlines",
-   "icon": "list",
-   "text": "Tata Motors allotted 41,981 equity shares under its long term incentive scheme [Business Upturn | Wall Street experienced tech stock selling amid growing concerns over corporate spending on AI "
-  },
-  {
-   "title": "Biggest Movers (Nifty 50)",
-   "icon": "chart",
-   "text": "Top Nifty 50 gainers: ADANIPORTS +6.29%, ADANIENT +5.17%, KOTAKBANK +4.32%. Top losers: HEROMOTOCO -4.09%, TECHM -1.92%, TRENT -1.79%."
-  },
-  {
-   "title": "F&O Expiry Schedule Note",
+   "title": "Events Today",
    "icon": "cal",
-   "text": "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026. Bank Nifty has monthly expiry only (last Tuesday)."
+   "text": "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026. Results today (120 companies): BEL, RELIANCE, SUNPHARMA, AARON, AARTIIND, ABCAPITAL, ACL, ADVAIT, AERONEU, AETHER, AFFLE, AFIL, AJANTPHARM and others."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "BEL (Results today); RELIANCE (Results today); SUNPHARMA (Results today); ADANIPORTS (In the news); TRENT (In the news); COALINDIA (In the news)"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "Sensex, Nifty trade higher in early market; Sensex gains 50 points, Nifty rises  | GCPL slides 7% as Q2 margins contract; analysts flags input cost pressures"
   }
  ],
- "footnote": "Auto-generated 09:07 IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: Gemini | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session.",
- "disclaimer": "Not investment advice. Markets carry risk."
+ "movers": {
+  "up": [
+   {
+    "sym": "TRENT",
+    "pct": "+6.18%"
+   },
+   {
+    "sym": "DIVISLAB",
+    "pct": "+2.57%"
+   },
+   {
+    "sym": "POWERGRID",
+    "pct": "+2.50%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "INDUSINDBK",
+    "pct": "-2.03%"
+   },
+   {
+    "sym": "COALINDIA",
+    "pct": "-1.77%"
+   },
+   {
+    "sym": "ADANIENT",
+    "pct": "-1.68%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
 }
