@@ -1,0 +1,281 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "30 Oct 2026",
+  "date_iso": "2026-10-30",
+  "mood": {
+   "key": "bull",
+   "label": "Positive close",
+   "sub": "Nifty +0.57% in the session"
+  },
+  "label": "Positive close",
+  "headline": "Nifty gains 0.57%, Banks lag",
+  "summary": "Nifty 50 closed at 23,068.40 (+0.57%) and Sensex at 74,520.05 (+0.50%). Banks: Bank Nifty -0.39%. India VIX 15.29 (+1.14%). Brent crude -1.85%, USD/INR 95.048. 30 of 50 Nifty stocks advanced and 19 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "23,068.40",
+    "pct": "+0.57%"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "74,520.05",
+    "pct": "+0.50%"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "54,695.10",
+    "pct": "-0.39%"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "21,922.60",
+    "pct": "-0.09%"
+   }
+  ],
+  "spark": [
+   22776.099609375,
+   22603.05078125,
+   22231.80078125,
+   22520.44921875,
+   22363.349609375,
+   22721.94921875,
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23068.599609375
+  ],
+  "flows": {
+   "date": "28 Oct",
+   "fii": 871.83,
+   "dii": 643.35
+  },
+  "breadth": {
+   "up": 30,
+   "dn": 19
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "22,818 - 22,943",
+    "r": "23,156 - 23,244",
+    "note": "A close above 23,156 opens up 23,244; a slide below 22,943 would expose 22,818."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "54,294 - 54,494",
+    "r": "54,982 - 55,269",
+    "note": "A close above 54,982 opens up 55,269; a slide below 54,494 would expose 54,294."
+   }
+  ],
+  "events": [
+   "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "52,342.56",
+    "pct": "-0.25%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,720.39",
+    "pct": "-0.30%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "26,184.72",
+    "pct": "-1.38%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,771.27",
+    "pct": "+0.46%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "26,016.62",
+    "pct": "-0.09%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "63,290.11",
+    "pct": "-2.12%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "23,294.42",
+    "pct": "+1.46%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,599.02",
+    "pct": "-1.44%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,730.74",
+    "pct": "-3.48%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "112.75",
+    "pct": "-1.85%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "103.68",
+    "pct": "+1.65%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "4,007.80",
+    "pct": "-0.59%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "95.048",
+    "pct": "-0.17%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.70",
+    "pct": "-0.33%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.99",
+    "pct": "-1.11%"
+   }
+  ],
+  "vix": {
+   "level": "15.29",
+   "pct": "+1.14%",
+   "gauge": 0.7353750228881836,
+   "text": "India VIX 15.29."
+  },
+  "headlines": [
+   "Sensex Rises 298 Points, Nifty 50 Crosses 23,000 as IT Stocks Lead Gains",
+   "Global Market: European automakers get earnings boost as Chinese competition weighs on recovery",
+   "Sensex zooms 1,500 pts in 2 days, Nifty tops 23K: Why are bulls in charge?",
+   "IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; NIFTY trades above 23K",
+   "Why Stock Market Is Rallying? Nifty Reclaims 23,100, Sensex Surges 500 Points; Three Reasons Why",
+   "Developments in the international financial and monetary markets on the morning of October 30th.",
+   "Asian trading is mixed as worries about AI-related issues grow",
+   "Sensex, Nifty Open Marginally Higher as Rising Crude Prices Weigh on Sentiment"
+  ],
+  "gainers": [
+   [
+    "TRENT",
+    "3,034.50",
+    "+6.04%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,836.40",
+    "+4.28%"
+   ],
+   [
+    "WIPRO",
+    "197.16",
+    "+3.71%"
+   ],
+   [
+    "INFY",
+    "1,181.15",
+    "+3.02%"
+   ],
+   [
+    "HCLTECH",
+    "1,441.10",
+    "+2.65%"
+   ]
+  ],
+  "losers": [
+   [
+    "INDUSINDBK",
+    "840.85",
+    "-3.13%"
+   ],
+   [
+    "ADANIPORTS",
+    "1,837.50",
+    "-1.84%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "828.50",
+    "-1.50%"
+   ],
+   [
+    "BPCL",
+    "285.10",
+    "-1.42%"
+   ],
+   [
+    "BRITANNIA",
+    "4,589.20",
+    "-1.41%"
+   ]
+  ],
+  "shock": [
+   [
+    "TRENT",
+    "3,034.50",
+    "3.3x avg vol",
+    "+6.04%"
+   ],
+   [
+    "COALINDIA",
+    "389.50",
+    "2.9x avg vol",
+    "-0.92%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,836.40",
+    "2.3x avg vol",
+    "+4.28%"
+   ],
+   [
+    "ADANIPORTS",
+    "1,837.50",
+    "1.6x avg vol",
+    "-1.84%"
+   ]
+  ]
+ },
+ "title": "Evening Breeze (30 Oct 2026)",
+ "headline": "Nifty gains 0.57%, Banks lag",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +0.57% in the session"
+ },
+ "mood_score": 0.8035599937872627,
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
