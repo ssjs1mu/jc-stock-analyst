@@ -97,4 +97,6 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: dry-run-reports
-          path: /tmp/dry/*.pdf
+          path: |
+            /tmp/dry/*.pdf
+            /tmp/dry/*.png

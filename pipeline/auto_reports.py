@@ -541,7 +541,7 @@ def build_eve(qs, heads, now):
     for nm, key in (("Nifty 50", "^NSEI"), ("Sensex", "^BSESN"), ("Bank Nifty", "^NSEBANK"), ("Nifty 500", "^CRSLDX")):
         if qs.get(key):
             lv_, pc_ = _q(key)
-            snapshot.append({"name": nm, "sub": "close", "level": lv_, "pct": pc_})
+            snapshot.append({"name": nm, "sub": "close", "level": lv_, "pct": pc_, "pts": "%+.2f" % (qs[key]["last"] - qs[key]["prev"])})
     spark_vals = []
     try:
         j = json.loads(http("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?range=1mo&interval=1d"))
@@ -596,6 +596,16 @@ def build_eve(qs, heads, now):
         gtxt = {"last": f2(gift["last"], 1), "pct": ("%+.2f%%" % gift["pct"]) if gift.get("pct") is not None else "", "premium": "%+.0f pts" % gift.get("premium", 0),
                 "vs": "%+.2f%%" % gift.get("vs_pct", 0), "asof": gift["asof"].strftime("%d %b %H:%M") if gift.get("asof") else ""}
     nxt_txt = nxt.strftime("%A, %d %B %Y")
+    nextday = {"date": nxt_txt, "results": [], "results_n": 0, "actions": None, "due": None}
+    if not os.environ.get("AUTO_MOCK"):
+        try:
+            import nextday as ND
+            nextday["results"], nextday["results_n"] = ND.results_due(nxt)
+            nextday["results"] = nextday["results"][:14]
+            nextday["actions"] = ND.corp_actions(nxt)
+            nextday["due"] = ND.data_due(nxt)
+        except Exception as ex:
+            print("nextday:", ex)
     opening = {"label": ov["label"], "zone": ov["zone"], "headline": ov["headline"], "drivers": ov.get("drivers", [])[:5], "next": nxt_txt, "mood": ov["mood"], "gift": gtxt,
                "anchored": bool(gift)}
     # volatility movers: widest intraday swings (high-low as % of last) among Nifty 50 stocks
@@ -628,7 +638,7 @@ def build_eve(qs, heads, now):
             "summary": summary, "snapshot": snapshot, "spark": spark_vals, "flows": flows, "breadth": {"up": up_n, "dn": dn_n}, "levels": levels, "events": events,
             "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vx["pct"]) if vx else "n/a", "gauge": gfrac, "text": vtxt},
             "headlines": headl, "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True),
-            "opening": opening, "story": story, "risks": overnight_risks(qs, gift, nxt, now.date()), "vol_movers": vol_movers, "pv_up": pvrow(pv_up), "pv_dn": pvrow(pv_dn), "asof": now.strftime("%I:%M %p IST")}
+            "opening": opening, "nextday": nextday, "story": story, "risks": overnight_risks(qs, gift, nxt, now.date()), "vol_movers": vol_movers, "pv_up": pvrow(pv_up), "pv_dn": pvrow(pv_dn), "asof": now.strftime("%I:%M %p IST")}
     return {"book": book, "title": "Evening Breeze (%s)" % now.strftime("%d %b %Y"), "headline": head, "mood": mood, "mood_score": npc * 1.4, "mood_pic": pic,
             "edition": "evening", "disclaimer": brand.SHORT_DISCLAIMER}
 
@@ -827,7 +837,7 @@ def build(sid, qs, heads, now):
         for nm, k in (("Nifty 50", "^NSEI"), ("Sensex", "^BSESN"), ("Bank Nifty", "^NSEBANK"), ("Nifty 500", "^CRSLDX")):
             if qs.get(k):
                 lv_, pc_ = _q(k)
-                snapshot.append({"name": nm, "sub": "prev close", "level": lv_, "pct": pc_})
+                snapshot.append({"name": nm, "sub": "prev close", "level": lv_, "pct": pc_, "pts": "%+.2f" % (qs[k]["last"] - qs[k]["prev"])})
         short_nm = {"Brent crude (US$/bbl)": "Brent crude US$/bbl", "WTI crude (US$/bbl)": "WTI crude US$/bbl", "Gold (US$/oz, Comex)": "Gold US$/oz",
                     "USD/INR": "USD / INR", "Dollar index (DXY)": "Dollar index", "US 10-yr yield (%)": "US 10-yr yield %"}
         cmd_t = []
@@ -864,7 +874,20 @@ def build(sid, qs, heads, now):
         if gift:
             gtxt = {"last": f2(gift["last"], 1), "pct": ("%+.2f%%" % gift["pct"]) if gift.get("pct") is not None else "", "premium": "%+.0f pts" % gift.get("premium", 0),
                     "vs": "%+.2f%%" % gift.get("vs_pct", 0), "asof": gift["asof"].strftime("%d %b %H:%M") if gift.get("asof") else ""}
-        book = {"date_txt": now.strftime("%d %b %Y"), "date_iso": now.strftime("%Y-%m-%d"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
+        flows_m, pcr_m = None, None
+        try:
+            fj_ = json.load(open(os.path.join(ROOT, "data", "fiidii.json")))["daily"]
+            dk_ = max(k_ for k_ in fj_ if k_ < now.date().isoformat())
+            flows_m = {"date": dt.datetime.strptime(dk_, "%Y-%m-%d").strftime("%d %b"), "fii": fj_[dk_]["fii_net"], "dii": fj_[dk_]["dii_net"]}
+        except Exception as ex:
+            print("flows:", ex)
+        if not os.environ.get("AUTO_MOCK"):
+            try:
+                import nextday as ND
+                pcr_m = ND.pcr_nifty()
+            except Exception as ex:
+                print("pcr:", ex)
+        book = {"flows": flows_m, "pcr": pcr_m, "date_txt": now.strftime("%d %b %Y"), "date_iso": now.strftime("%Y-%m-%d"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
                 "open_text": open_text, "yday": ov["yday"], "spark": spark_vals, "proj": proj, "snapshot": snapshot, "levels": levels,
                 "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vix["pct"]) if vix else "n/a", "gauge": gfrac, "text": vtxt},
                 "events": evs, "watch": wl, "headlines": [cut(x, 130) for x in headl[:8]], "calls": calls_t, "gift": gtxt,

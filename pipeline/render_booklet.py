@@ -200,9 +200,17 @@ def p1(b, p, total, ph):
     return shell(p, inner, 1, total, "", cover=True)
 
 
+def _pts(r):
+    """Points change, coloured like the percentage."""
+    v = r.get("pts")
+    if v is None:
+        return ""
+    return '<span class="%s" style="font-weight:700">%s</span>' % ("up" if float(v) >= 0 else "dn", e("{:+,.2f}".format(float(v))))
+
+
 def p2(b, p, total):
     snap = "".join('<tr><td><b>%s</b> <span class="small">%s</span></td><td class="r"><b>%s</b></td><td class="r">%s</td><td class="r">%s</td></tr>'
-                   % (e(r["name"]), e(r.get("sub", "")), e(r["level"]), chg(r["pct"]), bar(r["pct"], p, 2.5)) for r in b["snapshot"])
+                   % (e(r["name"]), e(r.get("sub", "")), e(r["level"]), _pts(r), chg(r["pct"])) for r in b["snapshot"])
     lv = "".join('<div class="card"><div style="display:flex;align-items:center;gap:18px"><div style="font-size:29px;font-weight:900;width:190px">%s</div>'
                  '<div style="flex:1"><div class="small">Support zone</div><div class="up" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div>'
                  '<div style="flex:1"><div class="small">Resistance zone</div><div class="dn" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div></div>'
@@ -225,6 +233,61 @@ def p2(b, p, total):
     return shell(p, inner, 2, total, "Opening summary &middot; " + e(b["date_txt"]))
 
 
+SESS = {"Dow Jones": ("America/New_York", "09:30", "16:00"), "S&P 500": ("America/New_York", "09:30", "16:00"), "Nasdaq Composite": ("America/New_York", "09:30", "16:00"),
+        "FTSE 100": ("Europe/London", "08:00", "16:30"), "DAX": ("Europe/Berlin", "09:00", "17:30"), "Nikkei 225": ("Asia/Tokyo", "09:00", "15:30"),
+        "Hang Seng": ("Asia/Hong_Kong", "09:30", "16:00"), "Shanghai Composite": ("Asia/Shanghai", "09:30", "15:00"), "Kospi": ("Asia/Seoul", "09:00", "15:30")}
+
+
+def sess_ist(name, iso):
+    """Regular-session open-close in Indian time for the report date (follows daylight-saving changes). '' if unknown."""
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    s = SESS.get(name)
+    if not s:
+        return ""
+    try:
+        d = _dt.datetime.strptime(iso, "%Y-%m-%d").date()
+        ist = ZoneInfo("Asia/Kolkata")
+        t = []
+        for hm in s[1:]:
+            h, m = map(int, hm.split(":"))
+            t.append(_dt.datetime(d.year, d.month, d.day, h, m, tzinfo=ZoneInfo(s[0])).astimezone(ist))
+        nxt = " (+1)" if t[1].date() > t[0].date() else ""
+        return "%s&ndash;%s%s" % (t[0].strftime("%H:%M"), t[1].strftime("%H:%M"), nxt)
+    except Exception:
+        return ""
+
+
+DIAL_RANGE = {"Brent": 4.0, "WTI": 4.0, "Gold": 2.5, "USD": 0.8, "Dollar": 1.0, "US 10": 4.0}
+
+
+def dial(frac, p, size=210):
+    """Half-circle needle gauge: left = falling, right = rising, needle at the day's % change."""
+    frac = min(1, max(0, frac))
+    cx, cy, rr = 100, 100, 80
+    paths = ""
+    for k, a in enumerate((0, .25, .5, .75)):
+        b_ = a + .25
+        col = p["dn"] if a < .5 else p["up"]
+        op = (.45, .85, .85, .45)[k] if False else (.95 if k in (0, 3) else .6)
+        a0, a1 = math.pi * (1 - a), math.pi * (1 - b_)
+        paths += '<path d="M%.1f %.1f A%d %d 0 0 1 %.1f %.1f" stroke="%s" stroke-opacity="%.2f" stroke-width="22" fill="none"/>' % (cx + rr * math.cos(a0), cy - rr * math.sin(a0), rr, rr, cx + rr * math.cos(a1), cy - rr * math.sin(a1), col, op)
+    ang = math.pi * (1 - frac)
+    return ('<svg viewBox="0 0 200 112" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="#fff"/></svg>'
+            % (size, size * .56, paths, cx + 62 * math.cos(ang), cy - 62 * math.sin(ang)))
+
+
+def cmd_tiles(b, p, size=200):
+    out = ""
+    for t in b["cmd"]:
+        v = pc(t["pct"])
+        rng = next((x for k, x in DIAL_RANGE.items() if t["name"].startswith(k)), 3.0)
+        out += ('<div class="card" style="padding:12px 10px 12px;text-align:center"><div class="small" style="font-weight:700;font-size:21px">%s</div>%s'
+                '<div style="font-size:34px;font-weight:900;line-height:1.05">%s</div><div style="font-size:24px">%s</div></div>'
+                % (e(t["name"]), dial(0.5 + v / (2 * rng), p, size), e(t["level"]), chg(t["pct"])))
+    return out
+
+
 def p3(b, p, total):
     code = {"Dow Jones": "US", "S&P 500": "US", "Nasdaq Composite": "US", "FTSE 100": "UK", "DAX": "DE", "Nikkei 225": "JP", "Hang Seng": "HK", "Shanghai Composite": "CN", "Kospi": "KR"}
     bench = ""
@@ -233,15 +296,14 @@ def p3(b, p, total):
         col = p["up"] if v >= 0 else p["dn"]
         bench += ('<div style="display:flex;align-items:center;gap:14px;height:56px;border-radius:30px;padding:0 20px 0 8px;background:linear-gradient(90deg,%s55,%s15);border:1.5px solid #ffffff2a">'
                   '<span style="width:42px;height:42px;border-radius:50%%;background:#fff;color:#111;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center">%s</span>'
-                  '<span style="font-size:27px;font-weight:800;flex:1">%s</span><span style="font-size:27px;font-weight:700">%s</span><span style="width:210px;text-align:right;font-size:27px">%s</span></div>'
-                  % (col, col, code.get(r["name"], ""), e(r["name"]), e(r["level"]), chg(r["pct"])))
-    tiles = "".join('<div class="card" style="padding:12px 16px"><div class="small">%s</div><div style="font-size:35px;font-weight:900">%s</div><div style="font-size:25px">%s</div></div>'
-                    % (e(t["name"]), e(t["level"]), chg(t["pct"])) for t in b["cmd"])
+                  '<span style="font-size:27px;font-weight:800;flex:1;white-space:nowrap">%s</span><span style="font-size:21px;opacity:.85;white-space:nowrap">%s IST</span><span style="font-size:27px;font-weight:700;width:150px;text-align:right">%s</span><span style="width:185px;text-align:right;font-size:27px">%s</span></div>'
+                  % (col, col, code.get(r["name"], ""), e(r["name"]), sess_ist(r["name"], b.get("date_iso") or ""), e(r["level"]), chg(r["pct"])))
+    tiles = cmd_tiles(b, p)
     v = b["vix"]
-    inner = ('<h2 class="s">Global &amp; Asian equity markets</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
+    inner = ('<h2 class="s">Global &amp; Asian markets &middot; hours in IST</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
              '<h2 class="s">Commodities, currency &amp; bonds</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">%s</div>'
              % (bench, tiles)) if b.get("edition") == "evening" else (
-            '<h2 class="s">Global &amp; Asian equity markets</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
+            '<h2 class="s">Global &amp; Asian markets &middot; hours in IST</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
              '<h2 class="s">Commodities, currency &amp; bonds</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">%s</div>'
              '%s'
              % (bench, tiles, ('<h2 class="s">Volatility</h2><div class="card" style="display:flex;align-items:center;gap:24px">%s<div><div style="font-size:42px;font-weight:900">India VIX %s <span style="font-size:30px">%s</span></div>'
@@ -254,7 +316,18 @@ def p4(b, p, total):
     ev = "".join('<div style="font-size:25px;line-height:1.4;margin-top:6px">&bull; %s</div>' % e(x) for x in b["events"])
     wl = "".join('<tr><td><b>%s</b></td><td>%s</td><td class="small" style="font-size:22px">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2])) for r in b["watch"][:8]) or '<tr><td colspan="3">No specific triggers flagged for the open.</td></tr>'
     hd = "".join('<div style="font-size:24px;line-height:1.32;margin-top:9px">&bull; %s</div>' % e(x) for x in b["headlines"][:8])
-    inner = ('<h2 class="s">Corporate action &amp; market alerts</h2><div class="card">%s</div>'
+    fd, pr = b.get("flows"), b.get("pcr")
+    def cell(nm, v):
+        return '<div style="flex:1"><div class="small">%s</div><div class="%s" style="font-size:36px;font-weight:900">%+.0f Cr</div></div>' % (nm, "up" if v >= 0 else "dn", v)
+    if pr:
+        v_ = pr["pcr"]
+        tone = "Bullish tilt (more puts written)" if v_ >= 1.1 else "Bearish tilt (more calls written)" if v_ <= 0.8 else "Balanced positioning"
+        pcell = '<div style="flex:1"><div class="small">Nifty PCR (OI) &middot; %s expiry</div><div style="font-size:36px;font-weight:900">%.2f</div><div class="small" style="font-size:19px">%s</div></div>' % (e(pr["expiry"]), v_, tone)
+    else:
+        pcell = '<div style="flex:1"><div class="small">Nifty PCR (OI)</div><div style="font-size:36px;font-weight:900">n/a</div><div class="small" style="font-size:19px">option chain unavailable</div></div>'
+    flcard = ('<h2 class="s">Institutional flows &amp; PCR%s</h2><div class="card" style="display:flex;gap:16px">%s%s%s</div>'
+              % ((" &middot; " + e(fd["date"])) if fd else "", cell("FII / FPI net", fd["fii"]) if fd else "", cell("DII net", fd["dii"]) if fd else "", pcell)) if (fd or pr) else ""
+    inner = (flcard + '<h2 class="s">Corporate action &amp; market alerts</h2><div class="card">%s</div>'
              '<h2 class="s">Stocks to watch</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
              '<h2 class="s">Headlines to track</h2><div class="card">%s</div>' % (ev, wl, hd))
     return shell(p, inner, 4, total, "Alerts &amp; watchlist &middot; " + e(b["date_txt"]))
@@ -315,17 +388,10 @@ def p6(b, p, total):
 
 def e2(b, p, total):
     snap = "".join('<tr><td><b>%s</b> <span class="small">%s</span></td><td class="r"><b>%s</b></td><td class="r">%s</td><td class="r">%s</td></tr>'
-                   % (e(r["name"]), e(r.get("sub", "")), e(r["level"]), chg(r["pct"]), bar(r["pct"], p, 2.5)) for r in b["snapshot"])
+                   % (e(r["name"]), e(r.get("sub", "")), e(r["level"]), _pts(r), chg(r["pct"])) for r in b["snapshot"])
     sp = b.get("spark", [])
     chart_html = ('<h2 class="s">Nifty 50 &mdash; last %d sessions</h2>%s' % (len(sp), chart(sp, None, p, 988, 250))) if len(sp) > 2 else ""
-    fd = b.get("flows")
     fcard = ""
-    if fd:
-        def cell(nm, v):
-            col = "up" if v >= 0 else "dn"
-            return '<div style="flex:1"><div class="small">%s</div><div class="%s" style="font-size:38px;font-weight:900">%s Cr</div></div>' % (nm, col, e(("%+.0f" % v)))
-        fcard = ('<h2 class="s">FII / DII cash flows &middot; %s</h2><div class="card" style="display:flex;gap:20px">%s%s</div>'
-                 % (e(fd["date"]), cell("FII / FPI net", fd["fii"]), cell("DII net", fd["dii"])))
     br = b.get("breadth") or {}
     bcard = ""
     if br:
@@ -426,14 +492,35 @@ def e_open(b, p, total):
                  '<div style="flex:1"><div class="small">Support zone</div><div class="up" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div>'
                  '<div style="flex:1"><div class="small">Resistance zone</div><div class="dn" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div></div></div>' % (e(l["name"]), e(l["s"]), e(l["r"])) for l in b["levels"][:2])
     ev = "".join('<div style="font-size:25px;line-height:1.4;margin-top:6px">&bull; %s</div>' % e(x) for x in b["events"])
+    nd = b.get("nextday") or {}
+    def line(t):
+        return '<div style="font-size:24px;line-height:1.38;margin-top:6px">%s</div>' % t
+    ca = nd.get("actions")
+    if ca is None:
+        cat = line("Ex-date list could not be fetched at build time.")
+    elif not ca:
+        cat = line("No dividend, split or bonus ex-dates listed for this session.")
+    else:
+        cat = "".join(line("<b>%s</b> &middot; %s" % (e(x["sym"]), e(x["what"]))) for x in ca[:6]) + (line("+ %d more" % (len(ca) - 6)) if len(ca) > 6 else "")
+    rs = nd.get("results") or []
+    rt = line("<b>Results due (%d):</b> %s%s" % (nd.get("results_n", 0), e(", ".join(rs)), " and more" if nd.get("results_n", 0) > len(rs) else "")) if rs else line("No board meetings with financial results listed for this session.")
+    dd = nd.get("due")
+    if dd is None:
+        ddt = line("Economic calendar could not be fetched at build time.")
+    elif not dd:
+        ddt = line("No major scheduled releases listed for this session.")
+    else:
+        ddt = "".join(line("<b>%s IST</b> &middot; %s &middot; %s%s%s" % (e(x["t"]), e(x["ccy"]), e(x["title"]), (" (forecast %s)" % e(x["fc"])) if x["fc"] else "", " &#9733;" if x["hi"] else "")) for x in dd[:7])
+    nxtbox = ('<h2 class="s">Corporate actions on %s</h2><div class="card">%s%s</div>'
+              '<h2 class="s">Data due</h2><div class="card">%s</div>' % (e(o["next"].split(",")[0]), cat, rt, ddt))
     inner = ('<div><span class="chip">EXPECTED OPENING &middot; %s</span></div>'
              '<div style="font-size:50px;font-weight:900;line-height:1.08">%s</div>'
              '<div style="font-size:34px;font-weight:800">Nifty 50 opening zone <span class="%s">%s</span></div>%s'
              '<h2 class="s">What shapes the opening</h2><div class="card">%s</div>'
              '<h2 class="s">Key levels for the next session</h2><div style="display:flex;flex-direction:column;gap:12px">%s</div>'
-             '<h2 class="s">Coming up</h2><div class="card">%s</div>'
+             '<h2 class="s">Coming up</h2><div class="card">%s</div>%s'
              '<div class="small" style="opacity:.75;font-size:21px">Indicative, %s. Levels are classic pivot points from today\'s high, low and close, not a recommendation.</div>'
-             % (e(o["next"].upper()), e(o["headline"]), "up" if o["mood"] == "bull" else "dn" if o["mood"] == "bear" else "", e(o["zone"] or "n/a"), gcard, dr or "Overnight cues are mixed.", lv, ev,
+             % (e(o["next"].upper()), e(o["headline"]), "up" if o["mood"] == "bull" else "dn" if o["mood"] == "bear" else "", e(o["zone"] or "n/a"), gcard, dr or "Overnight cues are mixed.", lv, ev, nxtbox,
                 "anchored on GIFT Nifty" if o.get("anchored") else "from global cues as of this evening; GIFT Nifty was not available at build time"))
     return shell(p, inner, 6, total, "Next session &middot; " + e(b["date_txt"]))
 
