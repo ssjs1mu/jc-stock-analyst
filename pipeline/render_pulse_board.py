@@ -464,6 +464,95 @@ def build_html(c, force_layout=None, force_theme=None):
 <style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), BASE_CSS % dict(W=W, H=H, deco=deco_css(t)), body))
 
 
+# ---------------------------------------------------------------- mobile / social version (1080x1350, 4:5)
+MW, MH = 1080, 1350
+MOB_CSS = """
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1080px;height:1350px;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);position:relative;overflow:hidden}
+.deco{position:absolute;inset:0;%(deco)s}
+.m{position:absolute;inset:0;display:flex;flex-direction:column;padding:0}
+.mh{background:var(--top);border-bottom:4px solid var(--acc);padding:22px 36px;display:flex;align-items:center;gap:20px;height:116px;flex:none}
+.mh img{height:76px}.mh .t1{font-size:40px;font-weight:800;color:var(--topink);line-height:1.05}.mh .t2{font-size:24px;color:var(--topink);opacity:.85;margin-top:4px}
+.mh .art{margin-left:auto;display:flex;gap:6px}
+.mb{flex:1;padding:18px 34px 14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:0}
+.badge{display:inline-block;padding:6px 20px;border-radius:999px;background:var(--acc);color:#111;font-weight:800;font-size:24px;letter-spacing:1px}
+.hl{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-1px}
+.bias{font-size:28px;line-height:1.3;opacity:.95;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tl{background:var(--card);border:2px solid var(--cardb);border-radius:18px;padding:7px 12px;text-align:center}
+.tl .n{font-size:24px;font-weight:700;color:var(--mut)}.tl .v{font-size:34px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}.tl .c{font-size:28px;font-weight:800}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
+.sec{font-size:26px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--acc)}
+.bg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bc{background:var(--card);border:2px solid var(--cardb);border-top-width:6px;border-radius:16px;padding:5px 12px 6px}
+.bc .n{font-size:23px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bc .v{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}.bc .c{font-size:27px;font-weight:800}
+.lv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lc{background:var(--card);border:2px solid var(--cardb);border-radius:18px;padding:8px 16px}
+.lc .n{font-size:27px;font-weight:800}.lc .r{display:flex;justify-content:space-between;font-size:26px;font-weight:800;margin-top:4px}.lc small{display:block;font-size:20px;color:var(--mut);font-weight:600}
+.mb>*{flex:none}.mv{display:flex;gap:10px;flex-wrap:nowrap}
+.pl{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--cardb);border-radius:999px;padding:5px 18px 5px 6px;font-size:26px;font-weight:800}
+.pl i{width:40px;height:40px;border-radius:50%%;color:#111;font-style:normal;font-size:16px;display:flex;align-items:center;justify-content:center}
+.mf{flex:none;background:var(--top);color:var(--topink);padding:10px 34px;font-size:19px;line-height:1.3;height:58px;overflow:hidden}
+"""
+
+
+def build_mobile(c, force_theme=None):
+    mood, sc, lay, t = pick_design(c, None, force_theme)
+    mw = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
+    import re as _re
+    m = _re.search(r"\((\d{1,2}\s+\w{3}\s+\d{4})\)", c.get("title", ""))
+    dtxt = m.group(1) if m else ""
+    ph = mood_photo(sc)
+    art = ({"bull": bull_svg(t["up"], t["acc"], 70), "bear": bear_svg(t["dn"], t["acc"], 70),
+            "neutral": bull_svg(t["up"], t["acc"], 58) + bear_svg(t["dn"], t["acc"], 58)}[mood]) if not ph else ""
+    tiles = ""
+    for tl in c["tiles"][:6]:
+        tiles += '<div class="tl"><div class="n">%s</div><div class="v">%s</div><div class="c %s">%s</div></div>' % (e(tl["name"]), e(tl["value"]), pcls(tl.get("pct")), e(chg_txt(tl.get("pct"))))
+    B = t["bars"]
+    bench = ""
+    for i, b in enumerate(c["bench"][:9]):
+        bench += '<div class="bc" style="border-top-color:%s"><div class="n">%s</div><div class="v">%s</div><div class="c %s">%s</div></div>' % (
+            B[i % len(B)], e(b["name"]), e(b["level"]), pcls(b["pct"]), e(chg_txt(b["pct"])))
+    lv = ""
+    for l in c["levels"][:2]:
+        lv += '<div class="lc"><div class="n">%s</div><div class="r"><span class="up"><small>Support</small>%s</span><span class="dn" style="text-align:right"><small>Resistance</small>%s</span></div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]))
+    mv = parse_movers(c)
+    pills = ""
+    for kind in ("up", "dn"):
+        for x in (mv.get(kind) or [])[:1]:
+            sym = str(x["sym"]).replace(".NS", "")
+            col = t["up"] if kind == "up" else t["dn"]
+            pills += '<span class="pl"><i style="background:%s">%s</i>%s <span style="color:%s">%s %s</span></span>' % (col, e(sym[:2]), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(str(x["pct"]).replace("+", "").replace("-", "")))
+    vix = c["vix"]
+    photo = ""
+    if ph:
+        photo = '<div style="height:150px;border-radius:20px;border:2px solid var(--cardb);background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 55%%),url(%s) right 30%%/cover;display:flex;align-items:flex-end;padding:10px 14px;flex:none"><span class="badge" style="font-size:22px">%s</span></div>' % (ph, mw)
+    body = """<div class="m"><div class="mh"><img src="%s"><div><div class="t1">Morning Market Pulse</div><div class="t2">%s &middot; Joshi's Corner</div></div><div class="art">%s</div></div>
+<div class="mb"><div style="display:flex;align-items:center;gap:14px"><span class="badge">%s</span><span style="font-size:26px;font-weight:700;color:var(--mut)">%s</span></div>
+<div class="hl">%s</div>%s
+<div class="tg">%s</div><div class="sec">Global &amp; Asian markets</div><div class="bg">%s</div>
+<div class="sec">Key levels to watch</div><div class="lv">%s</div><div class="mv">%s</div></div>
+<div class="mf">%s</div></div>""" % (logo(), e(dtxt), art, mw, e(vix["headline"]), e(c["headline"]), photo, tiles, bench, lv, pills,
+                                      e(c.get("disclaimer", "Not investment advice. Markets carry risk.")))
+    return ("""<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), MOB_CSS % dict(deco=deco_css(t)), body))
+
+
+def render_mobile(cfg, png, force_theme=None):
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page(viewport={"width": MW, "height": MH})
+        pg.set_content(build_mobile(cfg, force_theme), wait_until="load")
+        try:
+            pg.wait_for_load_state("networkidle", timeout=6000)
+        except Exception:
+            pass
+        pg.screenshot(path=png, full_page=False)
+        b.close()
+    return png
+
+
 def render(cfg, png, pdf=None):
     from playwright.sync_api import sync_playwright
     html_s = build_html(cfg)
@@ -485,7 +574,11 @@ def render(cfg, png, pdf=None):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
-    ap.add_argument("--png", required=True)
+    ap.add_argument("--png", required=False)
     ap.add_argument("--pdf")
+    ap.add_argument("--mobile", help="also/only write the portrait 1080x1350 social version to this PNG")
     a = ap.parse_args()
-    print("Wrote", render(json.load(open(a.config)), a.png, a.pdf))
+    if a.mobile:
+        print("Wrote", render_mobile(json.load(open(a.config)), a.mobile))
+    else:
+        print("Wrote", render(json.load(open(a.config)), a.png, a.pdf))

@@ -829,7 +829,7 @@ function tgPostReports() {
       if (!runs.length) return;
       runs.sort(function (a, b) { return a.generated_at < b.generated_at ? 1 : -1; });
       var run = runs[0]; if (sent[id] && sent[id] >= run.generated_at) return;
-      var f = run.files.filter(function (x) { return x.type === 'png'; })[0] || run.files[0];
+      var pngs = run.files.filter(function (x) { return x.type === 'png'; }), f = pngs.filter(function (x) { return /Mobile/.test(x.name); })[0] || pngs[0] || run.files[0]; // phones: portrait version first
       var blob = UrlFetchApp.fetch(TG_SITE + f.path, { muteHttpExceptions: true }).getBlob().setName(f.name);
       var cap = (run.caption || f.name).slice(0, 900);
       var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/' + (f.type === 'png' ? 'sendPhoto' : 'sendDocument'), { method: 'post', payload: { chat_id: s.c, caption: cap, [f.type === 'png' ? 'photo' : 'document']: blob }, muteHttpExceptions: true });
