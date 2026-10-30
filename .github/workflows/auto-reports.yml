@@ -73,7 +73,7 @@ jobs:
       - name: Install renderer
         if: ${{ steps.pick.outputs.ids != '' }}
         run: |
-          pip install playwright pillow
+          pip install playwright pillow pypdf
           python -m playwright install --with-deps chromium
       - name: Build and publish
         if: ${{ steps.pick.outputs.ids != '' }}
