@@ -1,0 +1,368 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "30 Oct 2026",
+ "report_time": "09:06 IST",
+ "generated_line": "Generated: 30 Oct 2026, 09:06 IST",
+ "as_of_note": "Auto-generated at 09:06 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Today's Bias in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Indian equity benchmarks closed higher in the previous session, with the Nifty 50 surging 1.05% to 22,936.75 and the Sensex gaining 1.24% to reach 74,151.04. The market rally was supported by strong gains in Adani Ports, Adani Enterprises, and Kotak Bank, alongside banking sector strength. However, early indicators like GIFT Nifty suggest a cautious start following tech-led declines in US markets and mixed Asian trading."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Global Markets Close",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,342.56",
+       "-0.25%"
+      ],
+      [
+       "S&P 500",
+       "7,720.39",
+       "-0.30%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,184.72",
+       "-1.38%"
+      ],
+      [
+       "FTSE 100",
+       "10,722.10",
+       "+0.26%"
+      ],
+      [
+       "DAX",
+       "26,039.68",
+       "+1.31%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Asian Markets",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nikkei 225",
+       "63,019.78",
+       "-2.54%"
+      ],
+      [
+       "Hang Seng",
+       "23,300.50",
+       "+1.49%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,617.70",
+       "-0.92%"
+      ],
+      [
+       "Kospi",
+       "5,609.01",
+       "-5.54%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Commodities, Currency & Bonds",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Item",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Brent crude (US$/bbl)",
+       "112.27",
+       "-2.27%"
+      ],
+      [
+       "WTI crude (US$/bbl)",
+       "103.41",
+       "+1.38%"
+      ],
+      [
+       "Gold (US$/oz, Comex)",
+       "4,010.00",
+       "-0.53%"
+      ],
+      [
+       "USD/INR",
+       "95.19",
+       "-0.02%"
+      ],
+      [
+       "Dollar index (DXY)",
+       "101.74",
+       "-0.30%"
+      ],
+      [
+       "US 10-yr yield (%)",
+       "4.99",
+       "-1.11%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Indian Markets - Previous Session",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Close",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,936.75",
+       "+1.05%"
+      ],
+      [
+       "Sensex",
+       "74,151.04",
+       "+1.24%"
+      ],
+      [
+       "Bank Nifty",
+       "54,909.65",
+       "+1.18%"
+      ],
+      [
+       "Nifty 500",
+       "21,941.50",
+       "+0.99%"
+      ],
+      [
+       "India VIX",
+       "15.12",
+       "-6.95%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,742",
+       "23,047"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,547",
+       "23,157"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  },
+  {
+   "heading": "Outlook",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty pivot point is established at 22,852, with immediate support levels at 22,742 (S1) and 22,547 (S2).",
+      "Upside resistance levels for the Nifty 50 are placed at 23,047 (R1) and 23,157 (R2).",
+      "Market trends remain subject to foreign portfolio investment flows, crude oil price movements, and US 10-year bond yields.",
+      "Key stocks in focus include Reliance, Jio Platforms, Trent, BEL, RVNL, and Tata Motors."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks in Focus (previous session)",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Top gainers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "ADANIPORTS",
+       "1,872.00",
+       "+6.29%"
+      ],
+      [
+       "ADANIENT",
+       "2,607.90",
+       "+5.17%"
+      ],
+      [
+       "KOTAKBANK",
+       "459.00",
+       "+4.32%"
+      ],
+      [
+       "POWERGRID",
+       "260.00",
+       "+3.42%"
+      ],
+      [
+       "WIPRO",
+       "190.10",
+       "+3.04%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    {
+     "type": "table",
+     "headers": [
+      "Top losers",
+      "Close (Rs)",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "HEROMOTOCO",
+       "5,105.00",
+       "-4.09%"
+      ],
+      [
+       "TECHM",
+       "1,776.60",
+       "-1.92%"
+      ],
+      [
+       "TRENT",
+       "2,861.70",
+       "-1.79%"
+      ],
+      [
+       "BAJAJFINSV",
+       "1,652.40",
+       "-1.47%"
+      ],
+      [
+       "MARUTI",
+       "11,426.00",
+       "-1.32%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty indicates a quiet or weak start for domestic markets following declines in US tech stocks [Trade Brains].",
+      "Tata Motors has allotted 41,981 equity shares under its long-term incentive scheme [Business Upturn].",
+      "Tech sector spending worries pulled down Wall Street indices, with the Nasdaq falling 1.38% [NDTV Profit].",
+      "Foreign investor retreats from Indian equities remain shaped by rupee movement, crude oil prices, and bond yields [BW Businessworld].",
+      "Key stocks including Reliance, Jio Platforms, Trent, BEL, and RVNL remain under observation today [Livemint].",
+      "eClerx Services and Birlasoft reported their Q2 FY27 quarterly results [Equitymaster]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Alerts for the Day",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026."
+     ]
+    }
+   ]
+  }
+ ]
+}
