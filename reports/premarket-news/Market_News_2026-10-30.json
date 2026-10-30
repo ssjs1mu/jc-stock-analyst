@@ -1,0 +1,104 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "30 Oct 2026",
+ "report_time": "09:02 IST",
+ "generated_line": "Generated: 30 Oct 2026, 09:02 IST",
+ "as_of_note": "Auto-generated at 09:02 IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News headlines; commentary drafted by Gemini from those inputs only). GIFT Nifty, MCX, FII/DII and option-chain data are not available to this pipeline and show as n/a.",
+ "disclaimer": "For information only. Not investment advice. Levels and ideas are illustrative and not personalised; markets carry risk and no outcome is guaranteed.",
+ "report_title": "Market News",
+ "sections": [
+  {
+   "heading": "Top Headlines",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Tata Motors has allotted 41,981 equity shares under its long term incentive scheme [Business Upturn].",
+      "US stocks declined as an AI spending rotation and disappointing tech earnings weighed on Wall Street [NDTV Profit].",
+      "GIFT Nifty pointed toward a quiet start for Dalal Street following the prior session's rally [IndiaIPO].",
+      "Stocks in focus for the session include Reliance Industries, Jio Platforms, Trent, BEL, and RVNL [Livemint].",
+      "The European Central Bank kept interest rates unchanged while noting persistent inflation risks [The Economic Times].",
+      "Foreign institutional investor outflows reached Rs 3 trillion in 2026, influenced by crude, yields, and currency trends [BW Businessworld]."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Global Cues",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Level",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "Dow Jones",
+       "52,342.56",
+       "-0.25%"
+      ],
+      [
+       "S&P 500",
+       "7,720.39",
+       "-0.30%"
+      ],
+      [
+       "Nasdaq Composite",
+       "26,184.72",
+       "-1.38%"
+      ],
+      [
+       "FTSE 100",
+       "10,722.10",
+       "+0.26%"
+      ],
+      [
+       "DAX",
+       "26,039.68",
+       "+1.31%"
+      ],
+      [
+       "Nikkei 225",
+       "63,019.78",
+       "-2.54%"
+      ],
+      [
+       "Hang Seng",
+       "23,264.19",
+       "+1.33%"
+      ],
+      [
+       "Shanghai Composite",
+       "3,615.94",
+       "-0.97%"
+      ],
+      [
+       "Kospi",
+       "5,612.01",
+       "-5.48%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.5,
+      0.25,
+      0.25
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Calendar",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026."
+     ]
+    }
+   ]
+  }
+ ]
+}
