@@ -92,6 +92,13 @@ jobs:
               python pipeline/auto_reports.py "$id" $F || echo "::warning::$id failed"
             fi
           done
+      - name: Push dry-run previews to the preview branch
+        if: ${{ github.event.inputs.dry == 'true' }}
+        run: |
+          mkdir -p /tmp/pv && cp /tmp/dry/*.png /tmp/pv/ 2>/dev/null || true
+          cd /tmp/pv && git init -q && git checkout -q -b preview && git add -A && \
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm preview || exit 0
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" preview
       - name: Attach dry-run PDFs
         if: ${{ github.event.inputs.dry == 'true' }}
         uses: actions/upload-artifact@v5
