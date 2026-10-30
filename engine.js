@@ -1478,7 +1478,7 @@ function htmlUpcoming(U, forPrint) {
   const fromYahoo = U.source === 'yahoo';
   if (!U.rows.length) return `<div class="note warn"><b>No records.</b> ${U.manual ? 'No company in the uploaded / pasted list has results inside the window.' : fromYahoo ? `Yahoo was asked for the next earnings date of ${U.checked} stocks: ${U.withDate} returned a date, none falls between ${esc(dShort(U.from))} and ${esc(dShort(U.to))}${U.batchErrors ? ` (${U.batchErrors} batch(es) failed)` : ''}.` : 'No Nifty 500 company could be matched from the NSE calendar.'}</div>${htmlUpDiag(U)}`;
   const sym = (r) => (forPrint ? `<b>${esc(r.symbol)}</b>` : `<a href="#" class="symlink" onclick="loadSymbol('${esc(r.symbol)}');return false">${esc(r.symbol)}</a>`);
-  const dt = (r) => (r.date ? `<span class="${r.daysLeft <= 1 ? 'blink' : ''}">${dShort(r.date)}</span><small>${r.daysLeft <= 0 ? 'TODAY' : r.daysLeft === 1 ? 'TOMORROW' : 'in ' + r.daysLeft + ' days'}${r.tentative ? ' · tentative' : U.manual ? '' : ' · NSE'}</small>` : '—<small>date n/a</small>');
+  const dt = (r) => (r.date ? `<span class="${r.daysLeft <= 1 ? 'blink' : ''}">${dShort(r.date)}</span><small>${r.daysLeft == null ? '' : r.daysLeft <= 0 ? 'TODAY' : r.daysLeft === 1 ? 'TOMORROW' : 'in ' + r.daysLeft + ' days'}${r.tentative ? ' · tentative' : U.manual ? '' : ' · NSE'}</small>` : '—<small>date n/a</small>');
   const ok = U.rows.filter((r) => !r.error), nb = ok.filter((r) => r.tone === 'bull').length, nw = ok.filter((r) => r.tone === 'range').length, nr = ok.filter((r) => r.tone === 'bear').length;
   const withP = ok.filter((r) => r.p && r.dir > 0 && r.tone !== 'bear'), avgP = withP.length ? withP.reduce((a, r) => a + r.p.p1, 0) / withP.length : null;
   const kpi = `<div class="kp"><div class="kpi"><span class="cap">Reporting</span><b>${U.total}</b><small>${U.analysed} analysed</small></div><div class="kpi"><span class="cap">Pre-result longs</span><b class="num-green">${nb}</b><small>trend-supported</small></div><div class="kpi"><span class="cap">Wait / dip-buy</span><b style="color:#a86b00">${nw}</b><small>no edge before the number</small></div><div class="kpi"><span class="cap">Avoid / exit</span><b class="num-red">${nr}</b><small>weak trend</small></div><div class="kpi"><span class="cap">Avg T1 chance (longs)</span><b>${pct0(avgP)}</b><small>own 1-yr history</small></div></div>`;
@@ -1610,13 +1610,29 @@ async function runUpcomingList(P) {
   else { msg.textContent = `Analysing ${Math.min(P.list.length, 200)} stocks…`; const bench = await fetchChart('^NSEI', '1y', '1d').catch(() => null); const A = await analyseUpcoming(P.list, bench, (d, t) => { msg.textContent = `Analysing stocks… ${d}/${t}`; }, Date.now()); U = Object.assign({}, A, base); }
   window.__U = U; body.innerHTML = htmlUpcoming(U); msg.textContent = `Updated ${new Date().toLocaleTimeString('en-IN')}`; refreshChips();
 }
+/* Repo fallback: data/results.json is refreshed daily by the GitHub Action, so the calendar works without the Apps Script backend */
+async function fetchRepoUpcoming(nowMs, days) {
+  const bust = '?v=' + Math.floor(nowMs / 600000);
+  const [rj, cj] = await Promise.all([fetch('data/results.json' + bust, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('results.json ' + r.status); return r.json(); }),
+    fetch('data/constituents.json' + bust).then((r) => (r.ok ? r.json() : null)).catch(() => null)]);
+  const today = istDate(nowMs / 1000), end = addDays(today, days), uni = new Set(); const idx = (cj && cj.idx) || {};
+  ['^CNX200', 'NIFTY_MIDCAP_100.NS', '^CNX100', '^NSEI'].forEach((k) => (idx[k] || []).forEach((x) => uni.add(String(x).toUpperCase())));
+  const list = [];
+  Object.entries(rj.upcoming || {}).forEach(([sym, arr]) => {
+    const key = String(sym).toUpperCase(); if (uni.size && !uni.has(key)) return;
+    const hit = (arr || []).filter((r) => /result/i.test(r.purpose || '') && r.date >= today && r.date <= end).sort((a, b) => (a.date < b.date ? -1 : 1))[0];
+    if (hit) list.push({ symbol: key, company: key, industry: '', date: hit.date });
+  });
+  list.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.symbol < b.symbol ? -1 : 1));
+  return { list, from: today, to: end, n500: uni.size, n500Missing: true, stats: null, diag: ['Source: daily NSE results calendar kept on this site (updated ' + String(rj.updated || '').slice(0, 16).replace('T', ' ') + '), Nifty 200 + Midcap 100 stocks'], source: 'repo' };
+}
 async function loadUpcoming() {
   const btn = $('upBtn'), msg = $('upMsg'), body = $('upBody'); btn.disabled = true; msg.textContent = 'Fetching NSE calendar…';
   const fail = (html) => { msg.textContent = ''; body.innerHTML = `<div class="errbox">${html}</div>`; };
   try {
-    if (!getBackend()) { fail('<b>Data backend not connected.</b> The calendar needs the Apps Script backend (NSE and Yahoo both block direct browser access). Deploy <code>Code.gs</code> as a web app and paste its /exec URL under “Data backend”, or load an NSE Event-Calendar CSV / paste symbols above.'); return; }
     let j = null, P = null, nseErr = '';
-    try { j = await fetchUpcoming(7); P = parseUpcoming(j, Date.now(), 7); } catch (e) { nseErr = (e && e.message) || String(e); }
+    try { j = await fetchUpcoming(7); P = parseUpcoming(j, Date.now(), 7); } catch (e) { nseErr = (e && e.message) || String(e); if (nseErr === 'OLD_BACKEND') throw e; }
+    if (!P || !P.list.length) { try { msg.textContent = 'Backend unavailable - reading the daily results calendar…'; const R2 = await fetchRepoUpcoming(Date.now(), 7); if (R2.list.length) P = R2; } catch (e2) { nseErr += ' | repo: ' + ((e2 && e2.message) || e2); } }
     if (!P || !P.list.length) {
       const universe = j && rowsOf(j.nifty500).length ? rowsOf(j.nifty500) : null, syms = universe ? universe.map((x) => x.symbol) : NIFTY_FALLBACK, meta = universe ? new Map(universe.map((x) => [String(x.symbol).toUpperCase(), x])) : null;
       msg.textContent = `NSE calendar ${nseErr ? 'unreachable' : 'empty'} — reading Yahoo earnings dates for ${syms.length} stocks…`;
