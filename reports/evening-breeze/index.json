@@ -2,6 +2,63 @@
  "schedule_id": "evening-breeze",
  "runs": [
   {
+   "generated_at": "2026-10-30T15:05:37+05:30",
+   "date": "2026-10-30",
+   "status": "ok",
+   "caption": "Evening Breeze 30 Oct",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_1.png",
+     "type": "png",
+     "bytes": 885351
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_2.png",
+     "type": "png",
+     "bytes": 558805
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_3.png",
+     "type": "png",
+     "bytes": 578579
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_4.png",
+     "type": "png",
+     "bytes": 798821
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_5.png",
+     "type": "png",
+     "bytes": 736241
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_6.png",
+     "type": "png",
+     "bytes": 659049
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-10-30_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-10-30_7.png",
+     "type": "png",
+     "bytes": 1456165
+    },
+    {
+     "name": "JCGG_Evening_Breeze_2026-10-30.json",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_2026-10-30.json",
+     "type": "json",
+     "bytes": 5414
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T14:37:59+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -59,5 +116,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T14:37:59+05:30"
+ "updated_at": "2026-10-30T15:05:37+05:30"
 }
