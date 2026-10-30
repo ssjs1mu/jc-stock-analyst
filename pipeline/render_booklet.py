@@ -165,6 +165,14 @@ def eve_cover(b):
             % (e(r["level"]), "up" if up else "dn", e(r["pct"]), "&#9650;" if up else "&#9660;", e(b.get("headline", ""))))
 
 
+def _long_date(b):
+    import datetime as _d
+    try:
+        return _d.datetime.strptime(b["date_iso"], "%Y-%m-%d").strftime("%A, %d %B %Y")
+    except Exception:
+        return b["date_txt"]
+
+
 def _gen_now():
     import datetime as _d
     return _d.datetime.now(_d.timezone(_d.timedelta(hours=5, minutes=30))).strftime("%I:%M %p")
@@ -188,7 +196,7 @@ def p1(b, p, total, ph):
              '<div style="font-size:34px;font-weight:800;position:relative;max-width:920px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
              % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening Breeze" if b.get("edition") == "evening" else "Morning Sunrise",
-                e(b["date_txt"]), e(b.get("gen") or _gen_now()), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
+                e(_long_date(b)), e(b.get("gen") or _gen_now()), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
 
