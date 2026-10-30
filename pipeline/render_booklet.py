@@ -275,19 +275,20 @@ def p6(b, p, total):
     g = GRADS[d % len(GRADS)]
     qr = os.path.join(os.path.dirname(os.path.abspath(__file__)), "branding", "qr_mezz.png")
     qrd = "data:image/png;base64," + base64.b64encode(open(qr, "rb").read()).decode()
-    pts = "".join('<div style="font-size:40px;font-weight:700;line-height:1.3;margin-top:20px;display:flex;gap:14px"><span>&#10022;</span><span>%s</span></div>' % e(x) for x in pm["points"])
-    inner = ('<div style="flex:1;border-radius:34px;padding:44px 40px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:18px;color:#fff;'
+    steps = "".join('<div style="flex:1;background:#00000040;border:1.5px solid #ffffff55;border-radius:20px;padding:30px 12px;text-align:center"><div style="font-size:27px;font-weight:900;letter-spacing:2px;color:#FFE86B">%s</div><div style="font-size:32px;font-weight:700;line-height:1.2;margin-top:10px">%s</div></div>' % (e(a), e(t)) for a, t in pm["steps"])
+    inner = ('<div style="flex:1;border-radius:34px;padding:38px 36px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:20px;color:#fff;'
              'background:linear-gradient(145deg,%s 0%%,%s 55%%,%s 120%%);box-shadow:0 24px 70px #0009">'
              '<div style="display:flex;align-items:center;gap:20px"><img src="%s" style="height:96px;border-radius:16px;border:2px solid #fff8"><div class="brand" style="font-size:66px;color:#fff;text-shadow:0 3px 10px #0007">%s</div></div>'
-             '<div style="font-size:28px;font-weight:900;letter-spacing:4px;background:#00000044;display:inline-block;align-self:flex-start;padding:8px 22px;border-radius:30px">%s</div>'
-             '<div style="font-size:100px;font-weight:900;line-height:1.02;text-shadow:0 4px 18px #0006">%s</div>'
-             '<div style="font-size:40px;font-weight:600;opacity:.97">%s</div>'
-             '<div style="background:#0000003a;border-radius:24px;padding:18px 30px 30px">%s</div>'
-             '<div style="margin-top:auto;display:flex;align-items:flex-end;gap:26px">'
-             '<div style="flex:1"><div style="font-size:42px;font-weight:900;background:#fff;color:#1a1206;padding:14px 26px;border-radius:40px;display:inline-block">%s</div>'
-             '<div style="font-size:30px;font-weight:700;margin-top:18px;line-height:1.4">9/2C, Bijoygarh Colony, Jadavpur, Kolkata-32<br>Call 94770 30987</div></div>'
-             '<div style="text-align:center"><div style="background:#fff;padding:12px;border-radius:20px"><img src="%s" style="width:300px;display:block"></div><div style="font-size:21px;font-weight:800;margin-top:8px">Scan: Mezzanine menu</div></div></div>'
-             '</div>' % (g[0], g[1], g[2], brand.logo_original(), e(brand.BRAND), e(pm["kicker"]), e(pm["title"]), e(pm["sub"]), pts, e(pm["cta"]), qrd))
+             '<div style="font-size:26px;font-weight:900;letter-spacing:4px;background:#00000044;display:inline-block;align-self:flex-start;padding:8px 22px;border-radius:30px">%s</div>'
+             '<div style="font-size:84px;font-weight:900;line-height:1.02;text-shadow:0 4px 18px #0006">%s<br><span style="color:#FFE86B">%s</span></div>'
+             '<div style="font-size:33px;font-weight:600;opacity:.97;line-height:1.3">%s</div>'
+             '<div style="display:flex;gap:12px">%s</div>'
+             '<div style="font-size:50px;line-height:1.15;font-weight:800;font-style:italic;text-align:center;margin:14px 0;color:#FFE86B">%s</div>'
+             '<div style="margin-top:auto;display:flex;align-items:flex-end;gap:24px">'
+             '<div style="flex:1"><div style="font-size:23px;line-height:1.4;opacity:.95">%s</div>'
+             '<div style="font-size:28px;font-weight:700;margin-top:14px;line-height:1.4">9/2C, Bijoygarh Colony, Jadavpur, Kolkata-32<br>Call 94770 30987</div></div>'
+             '<div style="text-align:center"><div style="background:#fff;padding:12px;border-radius:20px"><img src="%s" style="width:240px;display:block"></div><div style="font-size:21px;font-weight:800;margin-top:8px">Scan: Mezzanine menu</div></div></div>'
+             '</div>' % (g[0], g[1], g[2], brand.logo_original(), e(brand.BRAND), e(pm["kicker"]), e(pm["title"]), e(pm["title2"]), e(pm["sub"]), steps, e(pm["punch"]), e(pm["terms"]), qrd))
     return shell(p, inner, 6, total, "Joshi's Corner &middot; Restaurant")
 
 
