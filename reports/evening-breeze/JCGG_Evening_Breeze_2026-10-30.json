@@ -10,7 +10,7 @@
   },
   "label": "Positive close",
   "headline": "Nifty gains 0.32%, Banks lag",
-  "summary": "Nifty 50 closed at 23,010.00 (+0.32%) and Sensex at 74,424.83 (+0.37%). Banks: Bank Nifty -0.49%. India VIX 15.30 (+1.21%). Brent crude -2.00%, USD/INR 95.018. 28 of 50 Nifty stocks advanced and 21 declined.",
+  "summary": "Nifty 50 closed at 23,010.00 (+0.32%) and Sensex at 74,433.81 (+0.38%). Banks: Bank Nifty -0.49%. India VIX 15.30 (+1.16%). Brent crude -2.01%, USD/INR 95.010. 28 of 50 Nifty stocks advanced and 21 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
@@ -21,8 +21,8 @@
    {
     "name": "Sensex",
     "sub": "close",
-    "level": "74,424.83",
-    "pct": "+0.37%"
+    "level": "74,433.81",
+    "pct": "+0.38%"
    },
    {
     "name": "Bank Nifty",
@@ -33,7 +33,7 @@
    {
     "name": "Nifty 500",
     "sub": "close",
-    "level": "21,863.30",
+    "level": "21,863.20",
     "pct": "-0.36%"
    }
   ],
@@ -105,14 +105,14 @@
    {
     "name": "FTSE 100",
     "code": "",
-    "level": "10,739.40",
-    "pct": "+0.16%"
+    "level": "10,737.59",
+    "pct": "+0.14%"
    },
    {
     "name": "DAX",
     "code": "",
-    "level": "25,915.62",
-    "pct": "-0.48%"
+    "level": "25,912.88",
+    "pct": "-0.49%"
    },
    {
     "name": "Nikkei 225",
@@ -142,8 +142,8 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "112.58",
-    "pct": "-2.00%"
+    "level": "112.57",
+    "pct": "-2.01%"
    },
    {
     "name": "WTI crude US$/bbl",
@@ -152,13 +152,13 @@
    },
    {
     "name": "Gold US$/oz",
-    "level": "4,000.90",
-    "pct": "-0.76%"
+    "level": "3,999.90",
+    "pct": "-0.78%"
    },
    {
     "name": "USD / INR",
-    "level": "95.018",
-    "pct": "-0.20%"
+    "level": "95.010",
+    "pct": "-0.21%"
    },
    {
     "name": "Dollar index",
@@ -173,8 +173,8 @@
   ],
   "vix": {
    "level": "15.30",
-   "pct": "+1.21%",
-   "gauge": 0.7348750114440918,
+   "pct": "+1.16%",
+   "gauge": 0.7352499961853027,
    "text": "India VIX 15.30."
   },
   "headlines": [
@@ -184,8 +184,8 @@
    "Global Market: European automakers get earnings boost as Chinese competition weighs on recovery",
    "Sensex zooms 1,500 pts in 2 days, Nifty tops 23K: Why are bulls in charge?",
    "IndiGo, Trent, Vedanta Power among buzzing stocks as SENSEX gains over 500 pts; NIFTY trades above 23K",
-   "ET Now Swadesh Live TV: Business News Live TV Online in Hindi",
-   "Why Stock Market Is Rallying? Nifty Reclaims 23,100, Sensex Surges 500 Points; Three Reasons Why"
+   "Why Stock Market Is Rallying? Nifty Reclaims 23,100, Sensex Surges 500 Points; Three Reasons Why",
+   "Developments in the international financial and monetary markets on the morning of October 30th."
   ],
   "gainers": [
    [
