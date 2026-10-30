@@ -188,7 +188,7 @@ def build_html(config):
   {brand.font_css()}
   .header-brand {{ position: absolute; top: 0; left: {TITLE_ZONE_LEFT_MM}mm; right: 8mm; height: {BAR_HEIGHT_MM}mm; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; z-index: 10; }}
   .header-brand .bn {{ font-family: {brand.SCRIPT_STACK}; font-weight: 700; font-size: 36pt; line-height: 1.05; color: #E2B84A; text-shadow: 0 0 1px #F6DC8A; }}
-  .header-brand .tg {{ font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 7.5pt; letter-spacing: 2.2px; text-transform: uppercase; color: {GOLD_LIGHT}; margin-top: 1mm; }}
+  .header-brand .tg {{ font-family: 'DejaVu Sans', Arial, sans-serif; margin-top: 1mm; text-align: right; }}
   .mood-strip {{ display: flex; justify-content: space-between; align-items: center; gap: 6mm; background: var(--sbg); color: var(--sfg); border-left: 2.2mm solid var(--rule); padding: 2.2mm 4mm; margin: 0 0 3mm 0; font-family: 'DejaVu Sans', Arial, sans-serif; }}
   .mood-strip b {{ font-size: 11pt; letter-spacing: 0.8px; text-transform: uppercase; }}
   .mood-strip span {{ font-size: 8.8pt; opacity: .92; text-align: right; }}
@@ -231,7 +231,7 @@ def build_html(config):
     <thead><tr><td>
       <div class="header-wrap">
         <div class="header-bar"></div>
-        <div class="header-brand"><div class="bn">{esc(brand.BRAND)}</div><div class="tg">{esc(brand.TAGLINE)}</div></div>
+        <div class="header-brand"><div class="bn">{esc(brand.BRAND)}</div><div class="tg">{brand.tagline_html(7, 2)}</div></div>
         <img class="header-logo" src="data:image/png;base64,{tree_logo_b64}">
         <div class="header-title-zone"><p class="report-title">{report_title}</p></div>
         <div class="header-gold-rule"></div>

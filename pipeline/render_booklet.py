@@ -50,7 +50,7 @@ h2.s{font-size:27px;letter-spacing:1.3px;text-transform:uppercase;color:%(gold)s
 .up{color:%(up)s}.dn{color:%(dn)s}
 table{width:100%%;border-collapse:collapse}
 td,th{padding:10px 10px;text-align:left;font-size:25px}th{font-size:19px;letter-spacing:1px;text-transform:uppercase;color:#d9d2bd;font-weight:700;border-bottom:1.5px solid #ffffff33}
-tr+tr td{border-top:1px solid #ffffff1c}td.r,th.r{text-align:right}td b{font-weight:800}
+tr+tr td{border-top:1px solid #ffffff1c}td.r,th.r{text-align:right;white-space:nowrap}td b{font-weight:800}
 .small{font-size:20px;opacity:.85}
 """ % dict(W=W, H=H, gold=GOLD, script=brand.SCRIPT_STACK, **p)
 
@@ -113,7 +113,7 @@ def chart(vals, proj, p, w=948, h=250):
               '<text x="%.1f" y="%.1f" text-anchor="end" font-size="26" font-weight="800" fill="#fff">Today (est.)</text>'
               % (ax, ay, px, py, GOLD, px - bw / 2, py, bw, h - bot - py, c, c, px + bw / 2, max(26, py - 12)))
     ax, ay = pts[len(vals) - 1]
-    return ('<svg viewBox="0 0 %d %d" width="100%%" height="%d">%s<polyline points="%s" fill="none" stroke="%s" stroke-width="5" stroke-linejoin="round"/>'
+    return ('<svg style="flex:none;display:block" viewBox="0 0 %d %d" width="100%%" height="%d">%s<polyline points="%s" fill="none" stroke="%s" stroke-width="5" stroke-linejoin="round"/>'
             '<circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="#fff" stroke-width="3"/>%s</svg>' % (w, h, h, bars, line, GOLD, ax, ay, GOLD, ex))
 
 
@@ -139,21 +139,32 @@ def photo(c, key_sc):
 
 
 # ------------------------------------------------------------------ pages
+def gift_cover(b):
+    g = b.get("gift")
+    if not g:
+        return e(("Nifty opening zone " + b["zone"]) if b.get("zone") else "Opening view from overnight cues")
+    up = pc(g["vs"]) >= 0
+    return ('<div style="font-size:22px;letter-spacing:4px;color:#d9d2bd;font-weight:700">GIFT NIFTY</div>'
+            '<div style="font-size:64px;font-weight:900;line-height:1">%s <span class="%s" style="font-size:36px">%s %s</span></div>'
+            '<div style="font-size:26px;font-weight:600;margin-top:4px">Expected Nifty opening zone %s</div>'
+            % (e(g["last"]), "up" if up else "dn", e(g["vs"]), "&#9650;" if up else "&#9660;", e(b["zone"])))
+
+
 def p1(b, p, total, ph):
     bg = ('<div style="position:absolute;inset:0;background:linear-gradient(180deg,%s00 0%%,%s 100%%),url(%s) center/cover;opacity:.55"></div>' % (p["base"], p["base"], ph)) if ph else ""
     spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if b.get("spark") else ""
     inner = ('<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center">%s%s'
              '<img src="%s" style="width:360px;border-radius:26px;border:3px solid %s;box-shadow:0 24px 70px #000a;position:relative">'
              '<div class="brand" style="font-size:118px;position:relative">%s</div>'
-             '<div style="font-size:23px;letter-spacing:6px;text-transform:uppercase;color:%s;font-weight:700;position:relative">%s</div>'
+             '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
              '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">Market Opening<br>Booklet</div>'
              '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">Morning Market Pulse &middot; %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:36px;font-weight:800;position:relative;max-width:900px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative">Tap the page to turn &rarr;</div></div>'
-             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), GOLD, e(brand.TAGLINE), GOLD, e(b["date_txt"]), e(b["label"].upper()),
-                e(("Nifty opening zone " + b["zone"]) if b.get("zone") else "Indicative opening from overnight cues")))
+             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, e(b["date_txt"]), e(b["label"].upper()),
+                gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
 
@@ -165,13 +176,20 @@ def p2(b, p, total):
                  '<div style="flex:1"><div class="small">Resistance zone</div><div class="dn" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div></div>'
                  '<div class="small" style="margin-top:6px;font-size:21px">%s</div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])) for l in b["levels"][:2])
     yd = ""
-    inner = ('<div><span class="chip">%s</span></div>'
-             '<div style="font-size:50px;font-weight:900;line-height:1.08">%s</div>'
-             '<div style="font-size:26px;line-height:1.38;opacity:.95">%s</div>%s'
-             '<h2 class="s">Market snapshot</h2><table>%s</table>'
-             '%s'
-             '<h2 class="s">Key technical levels to watch</h2><div style="display:flex;flex-direction:column;gap:12px">%s</div>'
-             % (e(b["label"].upper()), e(b["headline"]), e(b["open_text"]), yd, snap, ('<h2 class="s">Nifty 50 &mdash; last %d sessions &amp; today (est.)</h2>%s' % (len(b["spark"]), chart(b["spark"], b.get("proj"), p, 988, 250))) if len(b.get("spark", [])) > 2 else "", lv))
+    g = b.get("gift")
+    gcard = ""
+    if g:
+        up = pc(g["vs"]) >= 0
+        gcard = ('<div class="card" style="display:flex;align-items:center;gap:22px"><div><div class="small" style="letter-spacing:3px">GIFT NIFTY</div><div style="font-size:50px;font-weight:900;line-height:1.05">' + e(g["last"]) + '</div></div>'
+                 '<div style="flex:1"><div style="font-size:30px;font-weight:800" class="' + ("up" if up else "dn") + '">' + e(g["vs"]) + ' vs Nifty close ' + ("&#9650;" if up else "&#9660;") + '</div>'
+                 '<div class="small">' + ("Premium " if up else "Discount ") + e(g["premium"]) + ((" &middot; as of " + e(g["asof"])) if g.get("asof") else "") + '</div></div></div>')
+    sp = b.get("spark", [])
+    chart_html = ('<h2 class="s">Nifty 50 &mdash; last %d sessions &amp; today (est.)</h2>%s' % (len(sp), chart(sp, b.get("proj"), p, 988, 250))) if len(sp) > 2 else ""
+    inner = ('<div><span class="chip">' + e(b["label"].upper()) + '</span></div>' + gcard +
+             '<div style="font-size:50px;font-weight:900;line-height:1.08">' + e(b["headline"]) + '</div>'
+             '<div style="font-size:26px;line-height:1.38;opacity:.95">' + e(b["open_text"]) + '</div>'
+             '<h2 class="s">Market snapshot</h2><table>' + snap + '</table>' + chart_html +
+             '<h2 class="s">Key technical levels to watch</h2><div style="display:flex;flex-direction:column;gap:12px">' + lv + '</div>')
     return shell(p, inner, 2, total, "Opening summary &middot; " + e(b["date_txt"]))
 
 
@@ -197,22 +215,60 @@ def p3(b, p, total):
 
 
 def p4(b, p, total):
-    ev = "".join('<div style="font-size:24px;line-height:1.35;margin-top:5px">&bull; %s</div>' % e(x) for x in b["events"])
-    wl = "".join('<tr><td><b>%s</b></td><td>%s</td><td class="small" style="font-size:21px">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2])) for r in b["watch"][:7]) or '<tr><td colspan="3">No specific triggers flagged for the open.</td></tr>'
-    hd = "".join('<div style="font-size:23px;line-height:1.3;margin-top:7px">&bull; %s</div>' % e(x) for x in b["headlines"][:5])
-    cl = "".join('<tr><td><b>%s</b></td><td><b class="%s">%s</b></td><td class="r">%s</td><td class="r dn">%s</td><td class="r up">%s</td><td class="r">%s</td></tr>'
-                 % (e(c["sym"]), "up" if c["side"] == "BUY" else "dn", e(c["side"]), e(c["entry"]), e(c["sl"]), e(c["t1"]), e(c["grade"])) for c in b["calls"][:4])
-    calls = ('<table><tr><th>Stock</th><th>Call</th><th class="r">Entry</th><th class="r">Stop</th><th class="r">Target</th><th class="r">Grade</th></tr>%s</table>' % cl) if cl else '<div class="small" style="font-size:23px">No technical setups published yet for today.</div>'
+    ev = "".join('<div style="font-size:25px;line-height:1.4;margin-top:6px">&bull; %s</div>' % e(x) for x in b["events"])
+    wl = "".join('<tr><td><b>%s</b></td><td>%s</td><td class="small" style="font-size:22px">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2])) for r in b["watch"][:8]) or '<tr><td colspan="3">No specific triggers flagged for the open.</td></tr>'
+    hd = "".join('<div style="font-size:24px;line-height:1.32;margin-top:9px">&bull; %s</div>' % e(x) for x in b["headlines"][:8])
     inner = ('<h2 class="s">Corporate action &amp; market alerts</h2><div class="card">%s</div>'
              '<h2 class="s">Stocks to watch</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
-             '<h2 class="s">Headlines to track</h2><div class="card">%s</div>'
-             '<h2 class="s">Technical call for the day</h2><div class="card" style="padding:8px 14px">%s</div>'
-             '<div class="small" style="font-size:19px">Levels are classic pivots / ATR-based setups, illustrative and not personal advice.</div>'
-             % (ev, wl, hd, calls))
-    return shell(p, inner, 4, total, "Alerts &amp; calls &middot; " + e(b["date_txt"]))
+             '<h2 class="s">Headlines to track</h2><div class="card">%s</div>' % (ev, wl, hd))
+    return shell(p, inner, 4, total, "Alerts &amp; watchlist &middot; " + e(b["date_txt"]))
 
 
-PAGES = [p2, p3, p4]
+def _call_rows(lst, side):
+    out = ""
+    for c in lst:
+        col = "up" if side == "BUY" else "dn"
+        out += ('<tr><td><b>%s</b><div class="small" style="font-size:18px">%s</div></td><td class="r">%s</td><td class="r dn">%s</td><td class="r up">%s<div class="small" style="font-size:18px">%s</div></td>'
+                '<td class="r"><b>%s</b><div class="small" style="font-size:18px">R:R %s</div></td><td class="r"><b class="%s">%s%%</b><div class="small" style="font-size:18px">%s</div></td></tr>'
+                % (e(c["sym"]), e(" · ".join(c["why"][:1])), e(c["entry"]), e(c["sl"]), e(c["t1"]), "T2 " + e(c["t2"]), e(c["risk"]), e(c["rr"]), col, c["conv"], e(c["convl"])))
+    return out
+
+
+def p5(b, p, total):
+    c = b["calls"]
+    th = '<tr><th>Stock</th><th class="r">Entry</th><th class="r">Stop</th><th class="r">Target</th><th class="r">Risk / share</th><th class="r">Conviction</th></tr>'
+    def tbl(lst, side, label):
+        if not lst:
+            return '<div class="card small" style="font-size:23px">No %s setup met the rules for today.</div>' % label
+        return '<div class="card" style="padding:6px 12px"><table>%s%s</table></div>' % (th, _call_rows(lst, side))
+    wb = ""
+    if c.get("watch_buy"):
+        wb = ('<div class="small" style="font-size:21px;margin-top:2px"><b style="color:%s">Buy-side on watch (not triggered):</b> %s</div>'
+              % (GOLD, e(" · ".join("%s (%s%%, %s)" % (x["sym"], x["conv"], x["why"]) for x in c["watch_buy"]))))
+    inner = ('<h2 class="s" style="color:%s">Buy calls &mdash; intraday</h2>%s%s'
+             '<h2 class="s" style="color:%s">Sell calls &mdash; intraday</h2>%s'
+             '<div class="card" style="border-color:%s99"><b style="color:%s;font-size:25px">RISK</b><div style="font-size:23px;line-height:1.38;margin-top:4px">'
+             'Every call carries a stop-loss; exit if the stop is hit, do not average a losing trade. Risk per share is the entry-to-stop distance; keep total loss on a trade to about 1%% of capital. '
+             'Conviction is the setup score out of its maximum (Very high 85+, High 70+, Moderate 50+). Intraday positions are squared off the same day. Gap-ups or gap-downs can open beyond entry or stop, so wait for the price to come to the level.</div></div>'
+             % (p["up"], tbl(c.get("buy", []), "BUY", "buy"), wb, p["dn"], tbl(c.get("sell", []), "SELL", "sell"), GOLD, GOLD))
+    return shell(p, inner, 5, total, "Trading calls &middot; " + e(b["date_txt"]))
+
+
+def p6(b, p, total):
+    mv = lambda lst, nm: ('<div class="card" style="flex:1;padding:8px 12px"><div style="font-size:24px;font-weight:900;margin-bottom:2px">%s</div><table>%s</table></div>'
+                          % (nm, "".join('<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td></tr>' % (e(r[0]), e(r[1]), chg(r[2])) for r in lst)))
+    shock = "".join('<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td><td class="r">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2]), chg(r[3])) for r in b.get("shock", []))
+    pv = "".join('<tr><td><b>%s</b></td>%s</tr>' % (e(r["name"]), "".join('<td class="r %s">%s</td>' % (cl, e(v)) for cl, v in zip(("up", "up", "", "dn", "dn"), r["vals"]))) for r in b.get("pivots", []))
+    inner = ('<h2 class="s">Index pivot levels for today</h2><div class="card" style="padding:6px 14px"><table><tr><th>Index</th><th class="r">S2</th><th class="r">S1</th><th class="r">Pivot</th><th class="r">R1</th><th class="r">R2</th></tr>%s</table></div>'
+             '<h2 class="s">Nifty 50 &mdash; last session&#39;s movers</h2><div style="display:flex;gap:14px">%s%s</div>'
+             '<h2 class="s">Volume shockers</h2><div class="card" style="padding:6px 14px">%s</div>'
+             '<div class="small" style="font-size:20px">Pivots are classic levels from the last session&#39;s high, low and close. Volume shockers trade at 1.5x or more of their 20-day average volume.</div>'
+             % (pv, mv(b.get("gainers", []), "Top gainers"), mv(b.get("losers", []), "Top losers"),
+                ("<table><tr><th>Stock</th><th class=\"r\">Close</th><th class=\"r\">Volume</th><th class=\"r\">Chg</th></tr>%s</table>" % shock) if shock else '<div class="small" style="font-size:23px">No Nifty 50 stock crossed 1.5x its average volume.</div>'))
+    return shell(p, inner, 6, total, "Movers &amp; levels &middot; " + e(b["date_txt"]))
+
+
+PAGES = [p2, p3, p4, p5, p6]
 
 
 def render(cfg, png_base):

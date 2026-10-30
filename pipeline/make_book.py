@@ -37,10 +37,14 @@ html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140
 .top .b{font-family:%(script)s;font-size:30px;font-weight:700;color:#E2B84A;text-shadow:0 0 1px #F6DC8A}
 .stage{position:fixed;left:0;right:0;top:54px;bottom:64px;display:flex;align-items:center;justify-content:center;perspective:2200px}
 .book{position:relative;width:min(94vw,calc((100vh - 130px)*0.8));width:min(94vw,calc((100dvh - 130px)*0.8));aspect-ratio:1080/1350;filter:drop-shadow(0 18px 38px rgba(0,0,0,.6))}
-.leaf{position:absolute;inset:0;transform-origin:left center;transition:transform .85s cubic-bezier(.45,.05,.25,1);transform-style:preserve-3d;cursor:pointer;border-radius:4px 10px 10px 4px}
+.leaf{position:absolute;inset:0;transform-origin:left center;transition:transform 2.1s cubic-bezier(.37,.02,.2,1);transform-style:preserve-3d;cursor:pointer;border-radius:4px 10px 10px 4px}
 .leaf img{position:absolute;inset:0;width:100%%;height:100%%;border-radius:4px 10px 10px 4px;backface-visibility:hidden;object-fit:cover;background:#fff}
 .leaf .back{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;border-radius:10px 4px 4px 10px;background:linear-gradient(90deg,#d8cfb4,#efe8d4)}
 .leaf.turned{transform:rotateY(-180deg)}
+.leaf .shade{position:absolute;inset:0;border-radius:4px 10px 10px 4px;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 80%%);opacity:0;backface-visibility:hidden}
+.leaf.anim .shade{animation:shade 2.1s ease-in-out}
+@keyframes shade{0%%{opacity:0}45%%{opacity:.85}100%%{opacity:0}}
+.leaf.anim{filter:drop-shadow(14px 6px 18px rgba(0,0,0,.55))}
 .leaf::after{content:"";position:absolute;inset:0;border-radius:4px 10px 10px 4px;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(0,0,0,0) 7%%);backface-visibility:hidden}
 .spine{position:absolute;left:-3px;top:2px;bottom:2px;width:6px;background:linear-gradient(90deg,#000a,#0000);z-index:1000;pointer-events:none}
 .bar{position:fixed;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;gap:14px;z-index:50;padding:0 12px}
@@ -56,10 +60,10 @@ html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140
 <script>
 (function(){var L=[].slice.call(document.querySelectorAll('.leaf')),n=L.length,i=0,D=document.getElementById('dots');
 for(var k=0;k<n;k++){D.insertAdjacentHTML('beforeend','<i></i>')}
-function z(){L.forEach(function(l,k){l.style.zIndex=k<i?k:(n-k)+n});[].forEach.call(D.children,function(d,k){d.className=k===i?'on':''});
- document.getElementById('next').textContent=i>=n-1?'Back to cover':'Next page \\u203a'}
+function dots(){[].forEach.call(D.children,function(d,k){d.className=k===i?'on':''});document.getElementById('next').textContent=i>=n-1?'Back to cover':'Next page \\u203a'}
+function z(){L.forEach(function(l,k){l.style.zIndex=k<i?k:(n-k)+n});dots()}
 function go(d){var j=i+d;if(j<0)return;if(j>n-1){i=0;L.forEach(function(l){l.classList.remove('turned')});z();return}
- if(d>0){L[i].classList.add('turned')}else{L[j].classList.remove('turned')}i=j;z();document.getElementById('hint').style.opacity=0}
+ var lf=d>0?L[i]:L[j];lf.classList.add('anim');setTimeout(function(){lf.classList.remove('anim')},2200);if(d>0){lf.classList.add('turned')}else{lf.classList.remove('turned')}i=j;dots();lf.style.zIndex=999;setTimeout(z,2150);document.getElementById('hint').style.opacity=0}
 L.forEach(function(l,k){l.addEventListener('click',function(e){var r=l.getBoundingClientRect();(e.clientX-r.left)>r.width*.35?go(1):go(-1)})});
 document.getElementById('next').onclick=function(){go(1)};document.getElementById('prev').onclick=function(){go(-1)};
 document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')go(1);if(e.key==='ArrowLeft')go(-1)});
@@ -117,7 +121,7 @@ def build(date, pages, headline="", mood="neutral", caption=""):
         folder = os.path.join(ROOT, "morning", sub)
         os.makedirs(folder, exist_ok=True)
         up = "../" * (1 + (1 if sub else 0))
-        leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div></div>'
+        leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div><div class="shade"></div></div>'
                          % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
         url = BASE + "morning/" + sub
         og_path = os.path.join(folder, "og.png")

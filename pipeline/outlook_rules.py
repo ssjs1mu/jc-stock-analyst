@@ -35,7 +35,7 @@ def _clip(x, lo, hi):
     return max(lo, min(hi, x))
 
 
-def opening_view(qs, pv=None):
+def opening_view(qs, pv=None, gift=None):
     W = [("^GSPC", 1.0), ("^IXIC", 0.6), ("^DJI", 0.4), ("^N225", 0.3), ("^HSI", 0.3), ("^KS11", 0.2), ("^FTSE", 0.1), ("^GDAXI", 0.1)]
     num = den = 0.0
     for k, w in W:
@@ -55,6 +55,9 @@ def opening_view(qs, pv=None):
     if ty is not None:
         adj -= 0.05 * _clip(ty, -4, 4)
     est = _clip(0.55 * (base + adj), -1.3, 1.3)       # indicative Nifty opening move, %
+    est_model = est
+    if gift and gift.get("vs_pct") is not None:
+        est = _clip(float(gift["vs_pct"]), -3, 3)      # GIFT Nifty is the market's own first look: it leads the opening call
     if est >= 0.6:
         label, mood = "Gap-up opening likely", "bull"
     elif est >= 0.2:
@@ -85,11 +88,14 @@ def opening_view(qs, pv=None):
         pass
     zone = ""
     if last:
-        lo, hi = sorted([last * (1 + est / 100 - 0.0025), last * (1 + est / 100 + 0.0025)])
+        band = 0.0015 if gift else 0.0025
+        lo, hi = sorted([last * (1 + est / 100 - band), last * (1 + est / 100 + band)])
         zone = "%s - %s" % (format(round(lo), ","), format(round(hi), ","))
     drivers = []
     def d(txt):
         drivers.append(txt)
+    if gift:
+        d("GIFT Nifty %s (%+.0f pts, %+.2f%% vs Nifty's last close)." % (format(gift["last"], ",.1f"), gift.get("premium", 0), gift.get("vs_pct", 0)))
     if sp is not None:
         d("US: S&P 500 %+.2f%%, Nasdaq %s, Dow %s." % (sp, "%+.2f%%" % nq if nq is not None else "n/a", "%+.2f%%" % _pc(qs, "^DJI") if _pc(qs, "^DJI") is not None else "n/a"))
     if asia:
@@ -113,7 +119,7 @@ def opening_view(qs, pv=None):
             if abs(last - lv) / last < 0.003:
                 yday = "Nifty closed within 0.3%% of its %s pivot (%s), so that level decides the early direction." % (nm, format(round(lv), ","))
     return dict(est=round(est, 2), mood=mood, label=label, headline=headline, zone=zone, drivers=drivers, yday=yday,
-                score=est)
+                score=est, est_model=round(est_model, 2), gift=gift)
 
 
 def events_today(now, exp_text, qs=None):

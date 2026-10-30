@@ -33,6 +33,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import brand
 import outlook_rules as OR
+import gift as GIFT
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -300,7 +301,22 @@ def commentary(kind, facts, headlines):
         LAST_BY[0] = by
         return out
     return dict(bias=facts.split("\n")[0], outlook=[], by="template", headline="", vol_text="", asia_head="", asia_text="",
-                news=["%s (%s)" % (t, s or "news") for _, t, s in headlines[:8]])
+                news=[clean_head(t) for _, t, s in headlines[:8]])
+
+
+def clean_head(t):
+    """Headline text only: no publisher name (reports never disclose sources)."""
+    t = re.sub(r"\s*\((?:[^()]{2,40})\)\s*$", "", str(t))
+    for _ in range(2):
+        t = re.sub(r"\s+[-|\u2013\u2014]\s+[^-|\u2013\u2014]{3,45}$", "", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def cut(t, n=110):
+    t = clean_head(t)
+    if len(t) <= n:
+        return t
+    return t[:n].rsplit(" ", 1)[0].rstrip(",;:-") + "..."
 
 
 # ---------------------------------------------------------------- build
@@ -429,7 +445,14 @@ def build(sid, qs, heads, now):
             cm["outlook"] = ol
     pv = pivots(qs.get("^NSEI"))
     morning = sid in ("premarket-news", "morning-brief", "morning-detailed", "morning-pulse")
-    ov = OR.opening_view(qs, pv) if morning else None
+    gift = None
+    if morning and not os.environ.get("AUTO_MOCK"):
+        try:
+            gift = GIFT.fetch(float(qs["^NSEI"]["last"]))
+        except Exception as ex:
+            print("gift:", ex)
+    ov = OR.opening_view(qs, pv, gift) if morning else None
+    gnote = "Opening call anchored on GIFT Nifty." if gift else "GIFT Nifty not available at build time; indicative view from overnight cues."
     if morning:
         mood = {"key": ov["mood"], "label": ov["label"],
                 "sub": ("Indicative Nifty opening zone %s" % ov["zone"]) if ov["zone"] else "Indicative, from overnight global cues"}
@@ -452,6 +475,7 @@ def build(sid, qs, heads, now):
     nxt = next_trading_day(now.date())
     exp = expiry_text(nxt if sid.startswith("evening") else now.date())
     bias = cm["bias"]
+    cm["news"] = list(dict.fromkeys(cut(x, 140) for x in cm["news"] if x))
     headl = cm["news"] or ["No fresh headlines could be fetched."]
     lvl_note = {"type": "note", "text": "Levels are classic pivot points computed from the last session's high, low "
                 "and close, not a recommendation."}
@@ -483,8 +507,7 @@ def build(sid, qs, heads, now):
         wl = OR.watch_list(qs, heads, gain, lose, shock, now, NIFTY50)
         wl_t = T(["Stock", "Trigger", "What to watch"], wl, [.16, .26, .58], False)
         wl_t["align"] = ["left", "left", "left"]
-        ocl = ["Indicative opening view only: built from overnight US, Asian and European cues, crude, rupee and volatility. "
-               "Actual opening can differ with domestic news and GIFT Nifty."]
+        ocl = [gnote + " Indicative only; the actual opening can differ with domestic news."]
         open_blocks = [P("%s. Expected Nifty opening zone: %s (indicative)." % (ov["headline"], ov["zone"] or "n/a"))] + \
                       [B(ov["drivers"])]
         if ov["yday"]:
@@ -555,13 +578,12 @@ def build(sid, qs, heads, now):
             {"title": "Stocks to Watch", "icon": "chart", "text": "; ".join("%s (%s)" % (r[0], r[1]) for r in wl[:6]) or "No specific triggers flagged for the open."},
             {"title": "Headlines to Track", "icon": "list", "text": " | ".join(short(x) for x in headl[:2])}]
         open_text = ((lambda t: t[0].upper() + t[1:])(ov["headline"].split(": ", 1)[1]) + ". " if ": " in ov["headline"] else "") + \
-                    (("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "") + "Indicative view from overnight cues; GIFT Nifty is not used."
+                    (("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "") + gnote
         try:
             proj = round(float(n["last"]) * (1 + ov["est"] / 100), 1)
         except Exception:
             proj = None
-        bias_open = "%s%sIndicative view from overnight cues; GIFT Nifty is not used." % (
-            (" ".join(ov["drivers"][:2]) + " ") if ov["drivers"] else "", ("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "")
+        bias_open = ("%s%s" % ((" ".join(ov["drivers"][:2]) + " ") if ov["drivers"] else "", ("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "")) + gnote
         def _q(k, d=2):
             q = qs.get(k)
             return (f2(q["last"], d), pct(q["pct"])) if q else ("n/a", "n/a")
@@ -576,18 +598,41 @@ def build(sid, qs, heads, now):
         for nm_, k in CMDTY.items():
             lv_, pc_ = _q(k, 3 if k == "USDINR=X" else 2)
             cmd_t.append({"name": short_nm.get(nm_, nm_), "level": lv_, "pct": pc_})
-        calls_t = []
+        def conv_lbl(c):
+            return "Very high" if c >= 85 else "High" if c >= 70 else "Moderate" if c >= 50 else "Low"
+        buys, sells, watch_buy = [], [], []
         try:
-            cj_ = json.load(open(os.path.join(ROOT, "data", "calls", "latest.json")))
-            if cj_.get("date") == now.date().isoformat():
-                for x in sorted([x for x in cj_.get("calls", []) if x.get("type") == "DAY"], key=lambda z: -z.get("score", 0))[:4]:
-                    calls_t.append({"sym": x["sym"], "side": x["side"], "entry": f2(x["entry"]), "sl": f2(x["sl"]), "t1": f2(x["t1"]), "grade": x.get("grade", "")})
-        except Exception:
-            pass
+            bj = json.load(open(os.path.join(ROOT, "data", "calls", "board.json")))
+            if bj.get("date") == now.date().isoformat():
+                for sym, r in bj["rows"].items():
+                    pp = r.get("p")
+                    if pp and r.get("b") in ("BUY", "SELL"):
+                        ent, sl_ = pp["e"], pp["sl"]
+                        crow = {"sym": sym, "side": r["b"], "entry": f2(ent), "sl": f2(sl_), "t1": f2(pp["t1"]), "t2": f2(pp["t2"]),
+                               "rr": "%.1f" % pp["rr"], "risk": f2(abs(ent - sl_)), "riskpct": "%.2f%%" % (abs(ent - sl_) / ent * 100),
+                               "conv": int(r["conv"]), "convl": conv_lbl(r["conv"]), "grade": r.get("g", ""), "S": abs(r["S"]),
+                               "why": [re.sub(r"\s+", " ", w)[:70] for w in r.get("why", [])[:2]]}
+                        (buys if r["b"] == "BUY" else sells).append(crow)
+                    elif r.get("lean") == "BUY" and r.get("b") == "WAIT" and r.get("S", 0) >= r.get("need", 8) - 1.5:
+                        watch_buy.append({"sym": sym, "conv": int(r["conv"]), "S": r["S"], "why": (r.get("no") or "")[:80]})
+                buys.sort(key=lambda z: -z["S"]); sells.sort(key=lambda z: -z["S"]); watch_buy.sort(key=lambda z: -z["S"])
+        except Exception as ex:
+            print("calls board:", ex)
+        calls_t = {"buy": buys[:5], "sell": sells[:5], "watch_buy": watch_buy[:4]}
+        pivrows = []
+        for nm, k in (("Nifty 50", "^NSEI"), ("Bank Nifty", "^NSEBANK")):
+            pvx = pivots(qs.get(k))
+            if pvx:
+                pivrows.append({"name": nm, "vals": [f2(pvx[z], 0) for z in ("s2", "s1", "p", "r1", "r2")]})
+        gtxt = None
+        if gift:
+            gtxt = {"last": f2(gift["last"], 1), "pct": ("%+.2f%%" % gift["pct"]) if gift.get("pct") is not None else "", "premium": "%+.0f pts" % gift.get("premium", 0),
+                    "vs": "%+.2f%%" % gift.get("vs_pct", 0), "asof": gift["asof"].strftime("%d %b %H:%M") if gift.get("asof") else ""}
         book = {"date_txt": now.strftime("%d %b %Y"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
                 "open_text": open_text, "yday": ov["yday"], "spark": spark_vals, "proj": proj, "snapshot": snapshot, "levels": levels,
                 "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vix["pct"]) if vix else "n/a", "gauge": gfrac, "text": vtxt},
-                "events": evs, "watch": wl, "headlines": [short(x) for x in headl[:5]], "calls": calls_t}
+                "events": evs, "watch": wl, "headlines": [cut(x, 130) for x in headl[:8]], "calls": calls_t, "gift": gtxt,
+                "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True), "pivots": pivrows, "est": ov["est"]}
         return {"book": book, "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
                 "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"],
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
@@ -597,7 +642,7 @@ def build(sid, qs, heads, now):
                           tile("USD/INR", "latest", qs.get("USDINR=X"), 3), tile("US 10-yr", "yield %", qs.get("^TNX"))],
                 "bench": bench,
                 "asia": {"head": cm.get("asia_head") or "Asia & Global Cues",
-                         "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
+                         "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table."},
                 "levels": levels, "bottom": bottom,
                 "movers": {"up": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in gain[:3]], "dn": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in lose[:3]]},
                 "footnote": "", "disclaimer": brand.SHORT_DISCLAIMER}
@@ -652,7 +697,7 @@ def main():
     qs, heads = gather(mock)
     n = qs.get("^NSEI")
     if not n and not mock and not a.dry:
-        subprocess.run(pub + ["--status", "failed", "--note", "Auto pipeline could not fetch index data (Yahoo unavailable)."])
+        subprocess.run(pub + ["--status", "failed", "--note", "Auto pipeline could not fetch index data (market data unavailable)."])
         sys.exit("No Nifty data; marked failed.")
     if a.sid.startswith("evening") and n and n["date"] != now.date().isoformat() and not a.force and not mock and not a.dry:
         subprocess.run(pub + ["--status", "holiday", "--note", "No NSE session today (last bar %s)." % n["date"]])

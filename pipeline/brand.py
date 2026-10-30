@@ -30,3 +30,19 @@ def logo_original():
 def name_css(cls="brand", size="44px"):
     return (".%s{font-family:%s;font-weight:700;font-size:%s;line-height:1;white-space:nowrap;background:%s;-webkit-background-clip:text;background-clip:text;"
             "color:#E2B84A;-webkit-text-fill-color:transparent;letter-spacing:.5px;text-shadow:none;-webkit-text-stroke:.6px rgba(226,184,74,.55)}" % (cls, SCRIPT_STACK, size, GOLD_TEXT))
+
+
+# S.I.R = Shares . Insurance . Restaurant: S fluorescent yellow, I fluorescent light blue, R light fluorescent green
+SIR = {"S": "#F7FF00", "I": "#4DEBFF", "R": "#7CFF6B"}
+
+
+def tagline_html(size_px=22, spacing=5, dim="#E8D9A0"):
+    """Two-line tagline. Line 1: 'Connecting People Thru Services...S.I.R' (S, I, R coloured); line 2: 'Shares . Insurance . Restaurant'
+    with the bold coloured initials so S, I and R are recognised."""
+    c = lambda k: '<b style="color:%s">%s</b>' % (SIR[k], k)
+    l1 = ('<div style="font-size:%dpx;letter-spacing:%dpx;text-transform:uppercase;color:%s;font-weight:600">Connecting People Thru Services...%s.%s.%s</div>'
+          % (size_px, spacing, dim, c("S"), c("I"), c("R")))
+    big = lambda k, rest: '<b style="color:%s;font-weight:900;font-size:1.25em">%s</b>%s' % (SIR[k], k, rest)
+    l2 = ('<div style="font-size:%dpx;letter-spacing:%dpx;text-transform:uppercase;color:%s;margin-top:%dpx;font-weight:500">%s &nbsp;&bull;&nbsp; %s &nbsp;&bull;&nbsp; %s</div>'
+          % (size_px, max(2, spacing - 2), dim, max(3, size_px // 4), big("S", "hares"), big("I", "nsurance"), big("R", "estaurant")))
+    return l1 + l2
