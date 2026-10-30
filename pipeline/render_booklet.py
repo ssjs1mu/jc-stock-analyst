@@ -141,7 +141,7 @@ def photo(c, key_sc):
 # ------------------------------------------------------------------ pages
 def p1(b, p, total, ph):
     bg = ('<div style="position:absolute;inset:0;background:linear-gradient(180deg,%s00 0%%,%s 100%%),url(%s) center/cover;opacity:.55"></div>' % (p["base"], p["base"], ph)) if ph else ""
-    spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 240).replace('height="240"', 'height="240" style="position:absolute;left:0;bottom:46px;opacity:.22"') if b.get("spark") else ""
+    spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if b.get("spark") else ""
     inner = ('<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center">%s%s'
              '<img src="%s" style="width:360px;border-radius:26px;border:3px solid %s;box-shadow:0 24px 70px #000a;position:relative">'
              '<div class="brand" style="font-size:118px;position:relative">%s</div>'
