@@ -77,7 +77,8 @@ def main():
         json.dump(idx, f, indent=1)
 
     book_added = False
-    if a.schedule_id == "morning-pulse" and a.status == "ok":
+    if a.schedule_id in ("morning-pulse", "evening-breeze") and a.status == "ok":
+        kind = "evening" if a.schedule_id == "evening-breeze" else "morning"
         pages = sorted(x["path"] for x in files if "_Mobile_" in x["name"] and x["type"] == "png")
         if pages:
             try:   # booklet page (flip-book) + preview card, so a shared link shows as a picture card
@@ -89,7 +90,7 @@ def main():
                         cj = json.load(open(src))
                         head = cj.get("headline", "")
                         mood = (cj.get("mood") or {}).get("key", "neutral")
-                make_book.build(entry["date"], pages, head, mood)
+                make_book.build(entry["date"], pages, head, mood, kind=kind)
                 book_added = True
             except Exception as ex:
                 print("booklet not built:", ex)
@@ -97,7 +98,7 @@ def main():
     git("config", "user.email", "joshiscorner.group@gmail.com", check=False)
     git("add", f"reports/{a.schedule_id}")
     if book_added:
-        git("add", "morning")
+        git("add", "evening" if a.schedule_id == "evening-breeze" else "morning")
     msg = f"report: {a.schedule_id} {entry['date']} ({a.status})"
     git("commit", "-m", msg)
     branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()

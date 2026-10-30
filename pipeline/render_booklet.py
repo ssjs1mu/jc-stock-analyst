@@ -55,7 +55,11 @@ tr+tr td{border-top:1px solid #ffffff1c}td.r,th.r{text-align:right;white-space:n
 """ % dict(W=W, H=H, gold=GOLD, script=brand.SCRIPT_STACK, **p)
 
 
+CUR = [None]
+
+
 def shell(p, inner, n, total, title, cover=False):
+    n = CUR[0] or n
     head = ("" if cover else
             '<div class="hd"><img src="%s"><div><div class="brand">%s</div><div class="sub">%s</div></div><div class="n">%d / %d</div></div>'
             % (brand.logo_original(), e(brand.BRAND), title, n, total))
@@ -150,6 +154,17 @@ def gift_cover(b):
             % (e(g["last"]), "up" if up else "dn", e(g["vs"]), "&#9650;" if up else "&#9660;", e(b["zone"])))
 
 
+def eve_cover(b):
+    r = (b.get("snapshot") or [{}])[0]
+    if not r:
+        return e(b.get("headline", ""))
+    up = pc(r.get("pct", "0")) >= 0
+    return ('<div style="font-size:22px;letter-spacing:4px;color:#d9d2bd;font-weight:700">NIFTY 50 CLOSE</div>'
+            '<div style="font-size:64px;font-weight:900;line-height:1">%s <span class="%s" style="font-size:36px">%s %s</span></div>'
+            '<div style="font-size:26px;font-weight:600;margin-top:4px">%s</div>'
+            % (e(r["level"]), "up" if up else "dn", e(r["pct"]), "&#9650;" if up else "&#9660;", e(b.get("headline", ""))))
+
+
 def p1(b, p, total, ph):
     bg = ('<div style="position:absolute;inset:0;background:linear-gradient(180deg,%s00 0%%,%s 100%%),url(%s) center/cover;opacity:.55"></div>' % (p["base"], p["base"], ph)) if ph else ""
     spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if b.get("spark") else ""
@@ -158,13 +173,13 @@ def p1(b, p, total, ph):
              '<div class="brand" style="font-size:118px;position:relative">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">Morning<br>Breeze</div>'
+             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">%s<br>Breeze</div>'
              '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">for %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:36px;font-weight:800;position:relative;max-width:900px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative">Tap the page to turn &rarr;</div></div>'
-             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, e(b["date_txt"]), e(b["label"].upper()),
-                gift_cover(b)))
+             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening" if b.get("edition") == "evening" else "Morning",
+                e(b["date_txt"]), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
 
@@ -245,7 +260,7 @@ def _ul(items, color, size=27):
 
 def p5(b, p, total):
     plans = _data("plans.json")
-    pl = plans[_day_index(b) % len(plans)]
+    pl = plans[(_day_index(b) + (3 if b.get('edition') == 'evening' else 0)) % len(plans)]
     inner = ('<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="chip" style="background:#F7FF00">PLAN OF THE DAY</span><span class="chip" style="background:#4DEBFF">%s</span></div>'
              '<div style="font-size:60px;font-weight:900;line-height:1.1">%s</div>'
              '<div style="font-size:33px;opacity:.92;line-height:1.35">%s</div>'
@@ -277,6 +292,64 @@ def p6(b, p, total):
     return shell(p, inner, 6, total, "Joshi's Corner &middot; Restaurant")
 
 
+def e2(b, p, total):
+    snap = "".join('<tr><td><b>%s</b> <span class="small">%s</span></td><td class="r"><b>%s</b></td><td class="r">%s</td><td class="r">%s</td></tr>'
+                   % (e(r["name"]), e(r.get("sub", "")), e(r["level"]), chg(r["pct"]), bar(r["pct"], p, 2.5)) for r in b["snapshot"])
+    sp = b.get("spark", [])
+    chart_html = ('<h2 class="s">Nifty 50 &mdash; last %d sessions</h2>%s' % (len(sp), chart(sp, None, p, 988, 250))) if len(sp) > 2 else ""
+    fd = b.get("flows")
+    fcard = ""
+    if fd:
+        def cell(nm, v):
+            col = "up" if v >= 0 else "dn"
+            return '<div style="flex:1"><div class="small">%s</div><div class="%s" style="font-size:38px;font-weight:900">%s Cr</div></div>' % (nm, col, e(("%+.0f" % v)))
+        fcard = ('<h2 class="s">FII / DII cash flows &middot; %s</h2><div class="card" style="display:flex;gap:20px">%s%s</div>'
+                 % (e(fd["date"]), cell("FII / FPI net", fd["fii"]), cell("DII net", fd["dii"])))
+    br = b.get("breadth") or {}
+    bcard = ""
+    if br:
+        tot = max(1, br["up"] + br["dn"])
+        bcard = ('<h2 class="s">Nifty 50 breadth</h2><div class="card"><div style="display:flex;height:34px;border-radius:17px;overflow:hidden"><div style="width:%d%%;background:%s"></div><div style="width:%d%%;background:%s"></div></div>'
+                 '<div style="display:flex;justify-content:space-between;font-size:27px;font-weight:800;margin-top:8px"><span class="up">%d advancing</span><span class="dn">%d declining</span></div></div>'
+                 % (round(br["up"] * 100 / tot), p["up"], 100 - round(br["up"] * 100 / tot), p["dn"], br["up"], br["dn"]))
+    inner = ('<div><span class="chip">' + e(b["label"].upper()) + '</span></div>'
+             '<div style="font-size:50px;font-weight:900;line-height:1.08">' + e(b["headline"]) + '</div>'
+             '<div style="font-size:27px;line-height:1.38;opacity:.95">' + e(b["summary"]) + '</div>'
+             '<h2 class="s">Closing snapshot</h2><table>' + snap + '</table>' + chart_html + fcard + bcard)
+    return shell(p, inner, 2, total, "Market close &middot; " + e(b["date_txt"]))
+
+
+def e3(b, p, total):
+    def tbl(rows, up, vol=False):
+        out = ""
+        for r in rows:
+            v = pc(r[-1])
+            out += ('<tr><td><b>%s</b></td><td class="r">%s</td>%s<td class="r">%s</td><td style="width:230px">%s</td></tr>'
+                    % (e(r[0]), e(r[1]), ('<td class="r small">%s</td>' % e(r[2])) if vol else "", chg(r[-1]), bar(v, p, 7.0)))
+        return out
+    sh = tbl(b.get("shock", []), True, True)
+    inner = ('<h2 class="s" style="color:%s">Top gainers &middot; Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+             '<h2 class="s" style="color:%s">Top losers &middot; Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+             '<h2 class="s">Volume shockers &middot; 1.5x average volume or more</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+             % (p["up"], tbl(b["gainers"], True), p["dn"], tbl(b["losers"], False),
+                sh or '<tr><td>No Nifty 50 stock traded at 1.5x or more of its 20-day average volume.</td></tr>'))
+    return shell(p, inner, 3, total, "Movers &amp; shakers &middot; " + e(b["date_txt"]))
+
+
+def e5(b, p, total):
+    lv = "".join('<div class="card"><div style="display:flex;align-items:center;gap:18px"><div style="font-size:29px;font-weight:900;width:190px">%s</div>'
+                 '<div style="flex:1"><div class="small">Support zone</div><div class="up" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div>'
+                 '<div style="flex:1"><div class="small">Resistance zone</div><div class="dn" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div></div>'
+                 '<div class="small" style="margin-top:6px;font-size:21px">%s</div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])) for l in b["levels"][:2])
+    ev = "".join('<div style="font-size:26px;line-height:1.4;margin-top:7px">&bull; %s</div>' % e(x) for x in b["events"])
+    hd = "".join('<div style="font-size:25px;line-height:1.34;margin-top:10px">&bull; %s</div>' % e(x) for x in b["headlines"][:8])
+    inner = ('<h2 class="s">Key levels for the next session</h2><div style="display:flex;flex-direction:column;gap:12px">%s</div>'
+             '<h2 class="s">Coming up</h2><div class="card">%s</div>'
+             '<h2 class="s">Headlines to track</h2><div class="card">%s</div>'
+             '<div class="small" style="opacity:.75">Levels are classic pivot points from today\'s high, low and close, not a recommendation.</div>' % (lv, ev, hd))
+    return shell(p, inner, 5, total, "Tomorrow &middot; " + e(b["date_txt"]))
+
+
 PAGES = [p2, p3, p4, p5, p6]
 
 
@@ -284,9 +357,15 @@ def render(cfg, png_base):
     from playwright.sync_api import sync_playwright
     b = cfg["book"]
     p = PAL.get((b.get("mood") or {}).get("key", "neutral"), PAL["neutral"])
-    total = 1 + len(PAGES)
+    evening = b.get("edition") == "evening"
+    pagelist = [e2, e3, p3, e5, p5, p6] if evening else PAGES
+    total = 1 + len(pagelist)
     sc = float(cfg.get("mood_score") or 0) * 1.4
-    pages = [p1(b, p, total, photo(cfg, sc))] + [f(b, p, total) for f in PAGES]
+    pages = [p1(b, p, total, photo(cfg, sc))]
+    for k, f in enumerate(pagelist):
+        CUR[0] = k + 2
+        pages.append(f(b, p, total))
+    CUR[0] = None
     outs = []
     with sync_playwright() as pw:
         br = pw.chromium.launch()

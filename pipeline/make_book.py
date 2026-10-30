@@ -87,7 +87,7 @@ def _thumb(path):
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-def _og(path, date_txt, headline, mood, thumb_abs):
+def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Breeze"):
     """1200x630 preview card: page-1 thumbnail + brand + headline (rendered with Chromium so fonts match)."""
     acc, bg, word = MOODS.get(mood, MOODS["neutral"])
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,%s,#0d0a18 70%%);"
@@ -96,9 +96,9 @@ def _og(path, date_txt, headline, mood, thumb_abs):
             ".b{font-family:%s;font-size:78px;font-weight:700;color:#E2B84A}.t{font-size:34px;font-weight:700;margin-top:4px}"
             ".h{font-size:40px;font-weight:800;line-height:1.15;margin-top:26px}.p{display:inline-block;margin-top:24px;background:%s;color:#fff;padding:9px 22px;border-radius:22px;font-weight:800;font-size:24px}"
             ".go{margin-top:26px;font-size:26px;color:#E2B84A;font-weight:700}</style></head><body>"
-            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>Morning Breeze for %s</div>"
+            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>%s for %s</div>"
             "<div class='h'>%s</div><span class='p'>%s</span><div class='go'>Tap to open the booklet &rarr;</div></div></body></html>"
-            % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(date_txt), html.escape(headline[:90]), word))
+            % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(name), html.escape(date_txt), html.escape(headline[:90]), word))
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         b = p.chromium.launch()
@@ -122,22 +122,23 @@ def _og(path, date_txt, headline, mood, thumb_abs):
     os.remove(tmp)
 
 
-def build(date, pages, headline="", mood="neutral", caption=""):
+def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%d %b %Y")
-    title = "Joshi's Corner - Morning Breeze for " + dtxt
+    name = "Evening Breeze" if kind == "evening" else "Morning Breeze"
+    title = "Joshi's Corner - %s for %s" % (name, dtxt)
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
     out = {}
     for sub in ("", date + "/"):
-        folder = os.path.join(ROOT, "morning", sub)
+        folder = os.path.join(ROOT, kind, sub)
         os.makedirs(folder, exist_ok=True)
         up = "../" * (1 + (1 if sub else 0))
         leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div><div class="shade"></div></div>'
                          % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
-        url = BASE + "morning/" + sub
+        url = BASE + kind + "/" + sub
         og_path = os.path.join(folder, "og.jpg")
-        _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])))
+        _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name)
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
                           script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title))
         with open(os.path.join(folder, "index.html"), "w") as f:
@@ -153,5 +154,6 @@ if __name__ == "__main__":
     ap.add_argument("--page", action="append", required=True)
     ap.add_argument("--headline", default="")
     ap.add_argument("--mood", default="neutral")
+    ap.add_argument("--kind", default="morning")
     a = ap.parse_args()
-    print(build(a.date, a.page, a.headline, a.mood))
+    print(build(a.date, a.page, a.headline, a.mood, kind=a.kind))

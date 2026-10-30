@@ -7,6 +7,7 @@ name: Auto reports (primary builder, free, no Claude / no paid API)
 on:
   schedule:
     - cron: '7,22,37,52 2-4 * * 1-5'     # 07:37-10:22 IST every 15 min
+    - cron: '7,22,37,52 10-11 * * 1-5'   # 16:07-17:22 IST every 15 min (Evening Breeze by 4:30 PM)
     - cron: '7,22,37,52 12-14 * * 1-5'   # 17:37-20:22 IST every 15 min
   push:
     paths: ['.pulse/last.txt']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
@@ -53,7 +54,7 @@ jobs:
           today, hm = ist.date().isoformat(), ist.hour * 60 + ist.minute
           # (id, due-from minute of IST day, stop-after minute)
           plan = [("premarket-news", 7*60+40, 15*60), ("morning-brief", 8*60+10, 15*60), ("morning-detailed", 8*60+10, 15*60),
-                  ("morning-pulse", 8*60+25, 15*60), ("evening-market-wrap", 17*60+40, 23*60+59), ("evening-news-wrap", 18*60+40, 23*60+59)]
+                  ("morning-pulse", 8*60+10, 15*60), ("evening-breeze", 16*60+5, 23*60+59), ("evening-market-wrap", 17*60+40, 23*60+59), ("evening-news-wrap", 18*60+40, 23*60+59)]
           left = []
           for i, lo, hi in plan:
               if ist.weekday() > 4 or not (lo <= hm <= hi):

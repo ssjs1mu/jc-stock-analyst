@@ -10,7 +10,7 @@ fails, a plain template paragraph built only from the numbers is used instead.
 Fallback behaviour: if reports/<id>/index.json already holds an ok/holiday run for today
 (IST) -- e.g. the Claude scheduled task published -- this script exits without doing anything,
 unless --force. Never invents numbers: anything not fetched is printed as "n/a".
-Supported ids: premarket-news, morning-brief, morning-detailed, morning-pulse,
+Supported ids: premarket-news, morning-brief, morning-detailed, morning-pulse, evening-breeze,
 evening-market-wrap, evening-news-wrap. (circuit-watch needs NSE exchange files that block cloud servers,
 so it is not generated here.)
 """
@@ -399,7 +399,77 @@ def facts_text(qs, gain, lose):
     return "\n".join(lines)
 
 
+def build_eve(qs, heads, now):
+    """Evening Breeze: end-of-day booklet data (closing levels, movers, flows, next-session levels)."""
+    gain, lose, shock = movers(qs)
+    cm = commentary("evening-market-wrap", facts_text(qs, gain, lose), heads)
+    n = qs.get("^NSEI")
+    npc = float(n["pct"]) if n else 0.0
+    k = "bull" if npc >= 0.3 else "bear" if npc <= -0.3 else "neutral"
+    label = {"bull": "Positive close", "bear": "Weak close", "neutral": "Range-bound close"}[k]
+    mood = {"key": k, "label": label, "sub": "Nifty %s in the session" % pct(npc)}
+    def _q(key, d=2):
+        q = qs.get(key)
+        return (f2(q["last"], d), pct(q["pct"])) if q else ("n/a", "n/a")
+    bn, vx = qs.get("^NSEBANK"), qs.get("^INDIAVIX")
+    tone = "gains" if npc > 0.15 else "slips" if npc < -0.15 else "ends little changed"
+    head = "Nifty %s %.2f%%" % (tone, abs(npc)) if abs(npc) > 0.15 else "Nifty ends little changed"
+    if bn and abs(bn["pct"] - npc) >= 0.3:
+        head += ", Banks %s" % ("lead" if bn["pct"] > npc else "lag")
+    snapshot = []
+    for nm, key in (("Nifty 50", "^NSEI"), ("Sensex", "^BSESN"), ("Bank Nifty", "^NSEBANK"), ("Nifty 500", "^CRSLDX")):
+        if qs.get(key):
+            lv_, pc_ = _q(key)
+            snapshot.append({"name": nm, "sub": "close", "level": lv_, "pct": pc_})
+    spark_vals = []
+    try:
+        j = json.loads(http("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?range=1mo&interval=1d"))
+        spark_vals = [c for c in j["chart"]["result"][0]["indicators"]["quote"][0]["close"] if c][-18:]
+    except Exception:
+        pass
+    st = [qs.get(s_ + ".NS") for s_ in NIFTY50]
+    up_n, dn_n = sum(1 for q in st if q and q["pct"] > 0), sum(1 for q in st if q and q["pct"] < 0)
+    flows = None
+    try:
+        fj = json.load(open(os.path.join(ROOT, "data", "fiidii.json")))["daily"]
+        dkey = max(fj)
+        flows = {"date": dt.datetime.strptime(dkey, "%Y-%m-%d").strftime("%d %b"), "fii": fj[dkey]["fii_net"], "dii": fj[dkey]["dii_net"]}
+    except Exception:
+        pass
+    summary = ("%s Banks: Bank Nifty %s. India VIX %s. Brent crude %s, USD/INR %s. %d of 50 Nifty stocks advanced and %d declined."
+               % ((cm.get("bias") or "").split(". ")[0] + "." if False else "Nifty 50 closed at %s (%s) and Sensex at %s (%s)." % (*_q("^NSEI"), *_q("^BSESN")),
+                  _q("^NSEBANK")[1], "%s (%s)" % _q("^INDIAVIX"), _q("BZ=F")[1], _q("USDINR=X", 3)[0], up_n, dn_n))
+    levels = []
+    def zone(a, b_):
+        lo, hi = sorted([a, b_])
+        return "%s - %s" % (f2(lo, 0), f2(hi, 0))
+    for nm, key in (("Nifty 50", "^NSEI"), ("Bank Nifty", "^NSEBANK")):
+        pvx = pivots(qs.get(key))
+        if pvx:
+            levels.append({"name": nm, "s": zone(pvx["s2"], pvx["s1"]), "r": zone(pvx["r1"], pvx["r2"]),
+                           "note": "A close above %s opens up %s; a slide below %s would expose %s." % (f2(pvx["r1"], 0), f2(pvx["r2"], 0), f2(pvx["s1"], 0), f2(pvx["s2"], 0))})
+    nxt = next_trading_day(now.date())
+    events = [expiry_text(nxt)]
+    codes = {**GLOBAL, **ASIA}
+    bench = [{"name": k_, "code": "", "level": f2(qs[v]["last"]) if qs.get(v) else "n/a", "pct": pct(qs[v]["pct"]) if qs.get(v) else "n/a"} for k_, v in codes.items()]
+    short_nm = {"Brent crude (US$/bbl)": "Brent crude US$/bbl", "WTI crude (US$/bbl)": "WTI crude US$/bbl", "Gold (US$/oz, Comex)": "Gold US$/oz",
+                "USD/INR": "USD / INR", "Dollar index (DXY)": "Dollar index", "US 10-yr yield (%)": "US 10-yr yield %"}
+    cmd_t = [{"name": short_nm.get(nm_, nm_), "level": _q(k_, 3 if k_ == "USDINR=X" else 2)[0], "pct": _q(k_, 3 if k_ == "USDINR=X" else 2)[1]} for nm_, k_ in CMDTY.items()]
+    vv = vx["last"] if vx else None
+    gfrac = 0.5 if vv is None else min(1, max(0, 1 - (vv - 10) / 20))
+    vtxt = cm.get("vol_text") or "India VIX %s." % _q("^INDIAVIX")[0]
+    headl = list(dict.fromkeys(cut(clean_head(x), 130) for x in cm["news"] if x)) or ["No fresh headlines could be fetched."]
+    book = {"edition": "evening", "date_txt": now.strftime("%d %b %Y"), "date_iso": now.strftime("%Y-%m-%d"), "mood": mood, "label": label, "headline": head,
+            "summary": summary, "snapshot": snapshot, "spark": spark_vals, "flows": flows, "breadth": {"up": up_n, "dn": dn_n}, "levels": levels, "events": events,
+            "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vx["pct"]) if vx else "n/a", "gauge": gfrac, "text": vtxt},
+            "headlines": headl, "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True)}
+    return {"book": book, "title": "Evening Breeze (%s)" % now.strftime("%d %b %Y"), "headline": head, "mood": mood, "mood_score": npc * 1.4,
+            "edition": "evening", "disclaimer": brand.SHORT_DISCLAIMER}
+
+
 def build(sid, qs, heads, now):
+    if sid == "evening-breeze":
+        return build_eve(qs, heads, now)
     D = now.strftime("%d %b %Y")
     TM = now.strftime("%H:%M")
     gain, lose, shock = movers(qs)
@@ -709,13 +779,19 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     stem = {"premarket-news": "Market_News", "morning-brief": "JCGG_Morning_Updates_Brief",
             "morning-detailed": "JCGG_Morning_Updates_Detailed", "morning-pulse": "JCGG_Morning_Pulse_Infographic",
-            "evening-market-wrap": "Evening_Market_Wrap", "evening-news-wrap": "Evening_News_Wrap"}[a.sid]
+            "evening-market-wrap": "Evening_Market_Wrap", "evening-news-wrap": "Evening_News_Wrap",
+            "evening-breeze": "JCGG_Evening_Breeze"}[a.sid]
     pdf = os.path.join(a.out, "%s_%s.pdf" % (stem, now.strftime("%Y-%m-%d")))
     cj = os.path.join(a.out, a.sid + ".json")
     json.dump(cfg, open(cj, "w"), indent=1)
     png = pdf[:-4] + ".png"
     mpng = os.path.join(a.out, "JCGG_Morning_Pulse_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
-    if a.sid == "morning-pulse":
+    if a.sid == "evening-breeze":
+        mpng = os.path.join(a.out, "JCGG_Evening_Breeze_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
+        subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng])
+        open(pdf, "wb").close()
+        png = None
+    elif a.sid == "morning-pulse":
         subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--png", png, "--pdf", pdf])
         try:   # 4-page opening booklet, portrait 1080x1350, for phones / Instagram / Facebook / WhatsApp
             subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng])
@@ -731,6 +807,10 @@ def main():
     # structured copy of the report (same content as the PDF) for the terminal's Today's Outlook page
     js = pdf[:-4] + ".json"
     shutil.copyfile(cj, js)
+    if a.sid == "evening-breeze":
+        files = [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] + ["--file", js]
+        subprocess.check_call(pub + files + ["--caption", "Evening Breeze %s" % now.strftime("%d %b")])
+        return
     files = ["--file", pdf] + (["--file", png] + [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
     subprocess.check_call(pub + files + ["--caption", "%s %s" % (a.sid.replace("-", " ").title(), now.strftime("%d %b"))])
 
