@@ -267,28 +267,13 @@ GRADS = [("#ff2fa6", "#7b2cff", "#00e5ff"), ("#ff7a00", "#ffe600", "#ff2d55"), (
 
 
 def p6(b, p, total):
+    """Last page: the Parents' Week promotion, the app's own A4 poster artwork (pipeline/branding/parents_week_a4.jpg) shown unchanged."""
     import base64
     import os
-    promos = _data("promos.json")
-    d = _day_index(b)
-    pm = promos[d % len(promos)]
-    g = GRADS[d % len(GRADS)]
-    qr = os.path.join(os.path.dirname(os.path.abspath(__file__)), "branding", "qr_mezz.png")
-    qrd = "data:image/png;base64," + base64.b64encode(open(qr, "rb").read()).decode()
-    steps = "".join('<div style="flex:1;background:#00000040;border:1.5px solid #ffffff55;border-radius:20px;padding:30px 12px;text-align:center"><div style="font-size:27px;font-weight:900;letter-spacing:2px;color:#FFE86B">%s</div><div style="font-size:32px;font-weight:700;line-height:1.2;margin-top:10px">%s</div></div>' % (e(a), e(t)) for a, t in pm["steps"])
-    inner = ('<div style="flex:1;border-radius:34px;padding:38px 36px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:20px;color:#fff;'
-             'background:linear-gradient(145deg,%s 0%%,%s 55%%,%s 120%%);box-shadow:0 24px 70px #0009">'
-             '<div style="display:flex;align-items:center;gap:20px"><img src="%s" style="height:96px;border-radius:16px;border:2px solid #fff8"><div class="brand" style="font-size:66px;color:#fff;text-shadow:0 3px 10px #0007">%s</div></div>'
-             '<div style="font-size:26px;font-weight:900;letter-spacing:4px;background:#00000044;display:inline-block;align-self:flex-start;padding:8px 22px;border-radius:30px">%s</div>'
-             '<div style="font-size:84px;font-weight:900;line-height:1.02;text-shadow:0 4px 18px #0006">%s<br><span style="color:#FFE86B">%s</span></div>'
-             '<div style="font-size:33px;font-weight:600;opacity:.97;line-height:1.3">%s</div>'
-             '<div style="display:flex;gap:12px">%s</div>'
-             '<div style="font-size:50px;line-height:1.15;font-weight:800;font-style:italic;text-align:center;margin:14px 0;color:#FFE86B">%s</div>'
-             '<div style="margin-top:auto;display:flex;align-items:flex-end;gap:24px">'
-             '<div style="flex:1"><div style="font-size:23px;line-height:1.4;opacity:.95">%s</div>'
-             '<div style="font-size:28px;font-weight:700;margin-top:14px;line-height:1.4">9/2C, Bijoygarh Colony, Jadavpur, Kolkata-32<br>Call 94770 30987</div></div>'
-             '<div style="text-align:center"><div style="background:#fff;padding:12px;border-radius:20px"><img src="%s" style="width:240px;display:block"></div><div style="font-size:21px;font-weight:800;margin-top:8px">Scan: Mezzanine menu</div></div></div>'
-             '</div>' % (g[0], g[1], g[2], brand.logo_original(), e(brand.BRAND), e(pm["kicker"]), e(pm["title"]), e(pm["title2"]), e(pm["sub"]), steps, e(pm["punch"]), e(pm["terms"]), qrd))
+    img = os.path.join(os.path.dirname(os.path.abspath(__file__)), "branding", "parents_week_a4.jpg")
+    d = "data:image/jpeg;base64," + base64.b64encode(open(img, "rb").read()).decode()
+    inner = ('<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-bottom:10px">'
+             '<img src="%s" style="max-width:100%%;max-height:100%%;border-radius:18px;box-shadow:0 20px 60px #000a"></div>' % d)
     return shell(p, inner, 6, total, "Joshi's Corner &middot; Restaurant")
 
 
