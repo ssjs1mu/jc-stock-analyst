@@ -5,9 +5,8 @@ name: Day & investment calls (ready before 8:30 AM IST)
 # GitHub's own cron is often late or skipped, so an external heartbeat (a push to .pulse/) also starts it.
 on:
   schedule:
-    - cron: '33 1 * * 1-5'    # 07:03 IST
-    - cron: '3 2 * * 1-5'     # 07:33 IST retry
-    - cron: '33 2 * * 1-5'    # 08:03 IST last retry (must land before 08:30)
+    - cron: '3,13,23,33,43,53 0-1 * * 1-5'   # 05:33-07:23 IST every 10 min (idempotent)
+    - cron: '3,13,23,33,43,53 2 * * 1-5'   # 07:33-08:23 IST retries (must land before 08:30)
   push:
     paths: ['.pulse/calls.txt', '.pulse/last.txt']
   workflow_dispatch:

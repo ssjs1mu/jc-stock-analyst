@@ -1,14 +1,14 @@
 name: Auto reports (primary builder, free, no Claude / no paid API)
 
-# Self-healing: runs every 15 minutes through the IST morning and evening windows. Each run builds
+# Self-healing: runs every 10 minutes through the IST morning and evening windows. Each run builds
 # whatever is DUE by the current IST time and not yet published today, so a skipped or late GitHub
 # cron is simply caught by the next one. Finished reports are skipped in seconds. Commentary is
 # rule-based (no Gemini/Anthropic key needed); an optional LLM can be enabled with USE_LLM=1.
 on:
   schedule:
-    - cron: '7,22,37,52 2-4 * * 1-5'     # 07:37-10:22 IST every 15 min
-    - cron: '7,22,37,52 10-11 * * 1-5'   # 16:07-17:22 IST every 15 min (Evening Breeze by 4:30 PM)
-    - cron: '7,22,37,52 12-14 * * 1-5'   # 17:37-20:22 IST every 15 min
+    - cron: '3,13,23,33,43,53 2-4 * * 1-5'     # 07:33-10:23 IST every 10 min
+    - cron: '3,13,23,33,43,53 10-11 * * 1-5'   # 15:33-17:23 IST every 10 min (Evening Breeze by 4:30 PM)
+    - cron: '3,13,23,33,43,53 12-14 * * 1-5'   # 17:33-20:23 IST every 10 min
   push:
     paths: ['.pulse/last.txt']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
   workflow_dispatch:
