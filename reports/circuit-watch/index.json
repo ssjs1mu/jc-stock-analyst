@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-10-30T21:15:59+05:30",
+   "date": "2026-10-30",
+   "status": "ok",
+   "caption": "Circuit Watch - session of Fri 30 Oct 2026: Sensex 74,459.53, Nifty 23,053.10; circuit, 52-week high/low and momentum names with data flags",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-10-30.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-10-30.pdf",
+     "type": "pdf",
+     "bytes": 9448
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-29T21:24:11+05:30",
    "date": "2026-10-29",
    "status": "ok",
@@ -145,5 +160,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-29T21:24:11+05:30"
+ "updated_at": "2026-10-30T21:15:59+05:30"
 }
