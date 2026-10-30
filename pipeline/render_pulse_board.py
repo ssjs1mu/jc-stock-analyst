@@ -399,7 +399,7 @@ def mood_photo(sc):
     return None
 
 
-def top_art(c, t, mood, sc=0.0):
+def top_art(c, t, mood, sc=0.0, banner=True):
     mv = parse_movers(c)
     art = {"bull": bull_svg(t["up"], t["acc"]), "bear": bear_svg(t["dn"], t["acc"]),
            "neutral": bull_svg(t["up"], t["acc"], 76) + bear_svg(t["dn"], t["acc"], 76)}[mood]
@@ -408,7 +408,9 @@ def top_art(c, t, mood, sc=0.0):
         pills += mover_pill(mv["up"][0], "up", t)
     if mv.get("dn"):
         pills += mover_pill(mv["dn"][0], "dn", t)
-    ph = mood_photo(sc)
+    ph = mood_photo(sc) if banner else None
+    if not banner and mood_photo(sc):
+        return '<div class="art"><div class="mvs">%s</div></div>' % pills
     if ph:
         return ('<div class="art photo" style="background-image:linear-gradient(90deg,var(--top) 0,rgba(0,0,0,0) 45%%),url(%s)"><div class="mvs">%s</div></div>' % (ph, pills))
     return '<div class="art"><div class="mvs">%s</div>%s</div>' % (pills, art)
@@ -419,7 +421,7 @@ def build_html(c, force_layout=None, force_theme=None):
     mood_word = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
     v = c["vix"]
     vg = v.get("gauge", .5)
-    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood, sc))
+    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood, sc, lay != 'board'))
     foot = '<div class="foot" style="grid-area:foot"><span>%s</span><span>%s</span></div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "")))
     sp = spark2(c.get("spark", []), t, h=(150 if lay == 'magazine' else 230))
     spl = '<div style="font-size:15px;color:var(--mut)">%s</div>' % e(c.get("spark_label", ""))
@@ -428,14 +430,19 @@ def build_html(c, force_layout=None, force_theme=None):
     vixb = ('<div style="display:flex;gap:12px;align-items:center">%s<div class="big" style="font-size:27px">%s</div></div><p class="cl4 vt" style="font-size:19px;margin-top:8px">%s</p>' % (gauge2(vg, 120, t["ink"]), e(v["headline"]), e(v["text"])))
     vixc = ('<div style="display:flex;gap:16px;align-items:center">%s<div><div class="big" style="font-size:25px">%s</div><p class="cl2" style="font-size:17px;margin-top:4px">%s</p></div></div>'
             % (gauge2(vg, 104, t["ink"]), e(v["headline"]), e(v["text"])))
+    ph_card = ""
+    if lay == "board":
+        _ph = mood_photo(sc)
+        if _ph:
+            ph_card = ('<div style="flex:1;min-height:110px;border-radius:22px;border:2px solid var(--cardb);background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 55%%),url(%s) right 30%%/cover;display:flex;align-items:flex-end;padding:12px 16px"><span class="badge" style="font-size:18px">%s</span></div>' % (_ph, mood_word))
     if lay == "board":
         body = """<div class="wrap" style="grid-template-columns:470px 1fr 530px;grid-template-rows:92px minmax(0,1fr) 172px 30px;grid-template-areas:'top top top' 'l c r' 'b b b' 'foot foot foot';gap:0 40px;padding:0">
 %(top)s
-<div style="grid-area:l;padding:24px 0 0 40px;display:flex;flex-direction:column;gap:14px;min-width:0"><h2>Today's Market Bias<br>&amp; Macro Highlights</h2><div>%(sp)s%(spl)s</div>%(asia)s</div>
+<div style="grid-area:l;padding:24px 0 0 40px;display:flex;flex-direction:column;gap:14px;min-width:0"><h2>Today's Market Bias<br>&amp; Macro Highlights</h2><div>%(sp)s%(spl)s</div>%(asia)s%(phc)s</div>
 <div style="grid-area:c;padding:22px 0 0;min-width:0"><div style="display:grid;grid-template-columns:1fr 330px;gap:26px;height:240px"><div><div class="big" style="font-size:34px">%(hl)s</div><p class="cl6" style="font-size:19px;margin-top:10px">%(bias)s</p></div><div>%(vixb)s</div></div><h2 style="text-align:center;margin:6px 0 10px;font-size:26px">Global &amp; Asian Equity Benchmarks</h2>%(bench)s</div>
 <div style="grid-area:r;padding:20px 40px 0 0;display:flex;flex-direction:column;gap:14px;min-width:0"><div class="panel"><h2 style="font-size:19px;margin-bottom:4px">Commodities, Currency &amp; Volatility</h2>%(tiles)s</div><h2 style="text-align:center;font-size:22px">Key Technical Levels to Watch</h2><div>%(lvl)s</div></div>
 <div style="grid-area:b;padding:12px 40px 0;border-top:3px solid var(--cardb);margin:0 40px"><h2 style="font-size:26px;margin-bottom:8px">Corporate Action &amp; Market Alerts</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">%(al)s</div></div>
-%(foot)s</div>""" % dict(top=top, sp=sp, spl=spl, asia=asia, hl=e(c["headline"]), bias=e(c["bias_text"]), vixb=vixb, bench=comp_bench_bars(c, t), tiles=comp_tiles(c, t), lvl=comp_levels(c, t), al=comp_alerts(c, t), foot=foot)
+%(foot)s</div>""" % dict(top=top, phc=ph_card, sp=sp, spl=spl, asia=asia, hl=e(c["headline"]), bias=e(c["bias_text"]), vixb=vixb, bench=comp_bench_bars(c, t), tiles=comp_tiles(c, t), lvl=comp_levels(c, t), al=comp_alerts(c, t), foot=foot)
     elif lay == "hero":
         arc = gauge2(min(1, max(0, .5 + sc / 4)), 190, t["ink"])
         body = """<div class="wrap cmp" style="grid-template-columns:640px 1fr;grid-template-rows:92px minmax(0,1fr) 172px 30px;grid-template-areas:'top top' 'l r' 'b b' 'foot foot';gap:18px 30px">
