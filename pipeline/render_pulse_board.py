@@ -210,22 +210,33 @@ def gauge2(frac, size=150, ink="#fff"):
             'stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="%s"/></svg>' % (size, size * .59, paths, cx + 62 * math.cos(ang), cy - 62 * math.sin(ang), ink, ink))
 
 
-def spark2(vals, t, w=470, h=230):
+def spark2(vals, t, w=470, h=230, proj=None, proj_label="Today (est.)"):
     vals = [v for v in vals if isinstance(v, (int, float))]
     if len(vals) < 3:
         return ""
-    lo, hi = min(vals), max(vals)
+    allv = vals + ([proj] if isinstance(proj, (int, float)) else [])
+    lo, hi = min(allv), max(allv)
     rng = (hi - lo) or 1
-    n = len(vals)
-    pts = [(10 + i * (w - 20) / (n - 1), h - 20 - (v - lo) / rng * (h - 60)) for i, v in enumerate(vals)]
+    n = len(allv)
+    pts = [(10 + i * (w - 20) / (n - 1), h - 20 - (v - lo) / rng * (h - 60)) for i, v in enumerate(allv)]
+    hist = pts[:len(vals)]
     bars = ""
-    for i, (x, y) in enumerate(pts):
+    for i, (x, y) in enumerate(hist):
         cc = t["up"] if i == 0 or vals[i] >= vals[i - 1] else t["dn"]
         bars += '<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="3" fill="%s" opacity=".80"/>' % (x - (w / n) * .3, y, (w / n) * .6, h - 20 - y, cc)
-    line = " ".join("%.1f,%.1f" % p for p in pts)
-    ax, ay = pts[-1]
+    line = " ".join("%.1f,%.1f" % p for p in hist)
+    ax, ay = hist[-1]
+    extra = ""
+    if len(pts) > len(vals):
+        px, py = pts[-1]
+        cc = t["up"] if proj >= vals[-1] else t["dn"]
+        extra = ('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="4" stroke-dasharray="8 7" stroke-linecap="round"/>'
+                 '<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="3" fill="%s" fill-opacity=".22" stroke="%s" stroke-width="3" stroke-dasharray="6 5"/>'
+                 '<text x="%.1f" y="%.1f" text-anchor="end" font-size="%d" font-weight="700" fill="%s">%s</text>'
+                 % (ax, ay, px, py, t["acc"], px - (w / n) * .3, py, (w / n) * .6, h - 20 - py, cc, cc,
+                    px + (w / n) * .3, max(18, py - 40), max(18, int(h * .12)), t["ink"], proj_label))
     return ('<svg viewBox="0 0 %d %d" width="100%%" height="%d" preserveAspectRatio="xMidYMid meet">%s<polyline points="%s" fill="none" stroke="%s" stroke-width="5" '
-            'stroke-linejoin="round" stroke-linecap="round"/><circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="%s" stroke-width="3"/></svg>' % (w, h, h, bars, line, t["acc"], ax, ay, t["acc2"], t["ink"]))
+            'stroke-linejoin="round" stroke-linecap="round"/><circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="%s" stroke-width="3"/>%s</svg>' % (w, h, h, bars, line, t["acc"], ax, ay, t["acc2"], t["ink"], extra))
 
 
 def icon(name, t):
@@ -532,14 +543,16 @@ def build_mobile(c, page=1, force_theme=None):
         if ph:
             photo = ('<div style="height:170px;border-radius:18px;border:2px solid var(--cardb);background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 55%%),url(%s) right 30%%/cover"></div>' % ph)
         tiles = [dict(name=x["name"], sub=x.get("sub", ""), value=x["value"], pct=x.get("pct")) for x in c["tiles"]]
-        body = ('<div style="display:flex;align-items:center;gap:14px"><span class="badge">%s</span><span style="font-size:24px;font-weight:700;color:var(--mut)">%s</span></div>'
+        body = ('<div style="display:flex;align-items:center;gap:14px"><span class="badge">%s</span></div>'
                 '<div class="hl">%s</div>%s<div class="tx">%s</div>%s'
-                '<div class="sec">%s</div><div style="display:flex;align-items:center;gap:18px"><div style="flex:none">%s</div><div><div style="font-size:28px;font-weight:800">%s</div><div class="tx" style="font-size:23px;margin-top:2px">%s</div></div></div>'
-                '<div class="sec">%s</div><div class="tx" style="font-size:23px">%s</div><div class="sec">%s</div>%s'
-                % (mw, e(vix["headline"]), e(c["headline"]), photo, e(c["bias_text"]), _table("Market snapshot", tiles, t, True),
-                   "Volatility", gauge2(vix.get("gauge", .5), 120, t["ink"]), e(vix["headline"]), e(vix["text"]),
-                   e(c["asia"]["head"]), e(c["asia"]["text"]),
-                   e(c.get("spark_label", "Nifty 50 trend")), spark2(c.get("spark", []), t, 1000, 120)))
+                '<div class="sec">%s</div>%s'
+                % (mw, e(c["headline"]), photo, e(c.get("open_text") or c["bias_text"]), _table("Market snapshot", tiles, t, True),
+                   e(c.get("spark_label", "Nifty 50 trend")), spark2(c.get("spark", []), t, 1000, 250, c.get("proj"), c.get("proj_label", "Today (est.)"))))
+        lv1 = ""
+        for l in c["levels"][:2]:
+            lv1 += ('<div class="box"><div class="lvr"><div style="font-size:26px;font-weight:800">%s</div><div><small>Support zone</small><span class="v up">%s</span></div><div><small>Resistance zone</small><span class="v dn">%s</span></div></div>'
+                    '<p style="font-size:21px;margin-top:3px;opacity:.92">%s</p></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])))
+        body += '<div class="sec">Key technical levels for today</div>' + lv1
     else:
         mv = parse_movers(c)
         lv = ""
@@ -547,8 +560,8 @@ def build_mobile(c, page=1, force_theme=None):
             lv += ('<div class="box"><div class="lvr"><div style="font-size:26px;font-weight:800">%s</div><div><small>Support zone</small><span class="v up">%s</span></div><div><small>Resistance zone</small><span class="v dn">%s</span></div></div>'
                    '<p style="font-size:21px;margin-top:3px;opacity:.92">%s</p></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])))
         al = "".join('<div class="box"><h4>%s</h4><p>%s</p></div>' % (e(b["title"]), e(b["text"])) for b in c["bottom"][:3])
-        body = ('%s<div class="sec">Key technical levels to watch</div>%s<div class="sec">Corporate action &amp; market alerts</div>%s'
-                % (_table("Global &amp; Asian equity benchmarks", c["bench"][:9], t), lv, al))
+        body = ('%s<div class="sec">Events, stocks &amp; headlines for the session</div>%s'
+                % (_table("Global &amp; Asian equity benchmarks", c["bench"][:9], t), al))
     foot = '<div class="mf">%s</div>' % e(brand.SHORT_DISCLAIMER)
     return ("""<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>%s%s:root{%s}%s</style></head><body><div class="deco"></div><div class="m">%s<div class="mb" id="mb">%s</div>%s</div>

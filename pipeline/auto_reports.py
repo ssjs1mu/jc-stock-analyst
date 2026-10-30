@@ -554,10 +554,16 @@ def build(sid, qs, heads, now):
             {"title": "Events Today", "icon": "cal", "text": " ".join(evs)[:260]},
             {"title": "Stocks to Watch", "icon": "chart", "text": "; ".join("%s (%s)" % (r[0], r[1]) for r in wl[:6]) or "No specific triggers flagged for the open."},
             {"title": "Headlines to Track", "icon": "list", "text": " | ".join(short(x) for x in headl[:2])}]
+        open_text = (ov["headline"].split(": ", 1)[1].capitalize() + ". " if ": " in ov["headline"] else "") + \
+                    (("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "") + "Indicative view from overnight cues; GIFT Nifty is not used."
+        try:
+            proj = round(float(n["last"]) * (1 + ov["est"] / 100), 1)
+        except Exception:
+            proj = None
         bias_open = "%s%sIndicative view from overnight cues; GIFT Nifty is not used." % (
             (" ".join(ov["drivers"][:2]) + " ") if ov["drivers"] else "", ("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "")
         return {"title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
-                "headline": head, "bias_text": bias_open, "mood": mood, "mood_score": ov["score"],
+                "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"],
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
                 "vix": {"gauge": gfrac, "headline": "India VIX %s (%s)" % (f2(vv), pct(vix["pct"]) if vix else "n/a"), "text": vtxt},
                 "tiles": [tile("Nifty 50", "prev close", n), tile("Brent Crude", "US$/bbl", qs.get("BZ=F")),
