@@ -480,7 +480,11 @@ var JCE = (function () {
     var sc = scoreDay(x, m); out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
     var abs = Math.abs(sc.S), dir = sc.S > 0 ? 1 : -1, atrPct = a / x.c * 100, why = out.reasons;
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
+    /* today's pre-open MOOD (global cues, crude, rupee, VIX, Nifty's last move): a call that fights it is held back; one that agrees needs a little less confluence */
+    var md = m && isNum(m.mood) ? m.mood : null;
+    if (md != null) { if ((dir > 0 && md <= 40) || (dir < 0 && md >= 60)) out.moodBlock = true; else if ((dir > 0 && md >= 60) || (dir < 0 && md <= 40)) need -= 0.5; else if (dir < 0 && md > 50) need += (md - 50) / 10; else if (dir > 0 && md < 50) need += (50 - md) / 10; }
     out.need = need;
+    if (out.moodBlock) why.push("against today's market mood (" + (m.moodLabel || '') + ' ' + md + '/100)');
     if (abs < need) why.push('confluence ' + abs.toFixed(1) + ' < ' + need.toFixed(1) + ' needed');
     if (isNum(x.adx) && x.adx < CFG.minAdx && abs < CFG.gradeAA) why.push('ADX ' + x.adx.toFixed(0) + ' — chopping');
     if (atrPct < CFG.minAtrPct) why.push('range too small (ATR ' + atrPct.toFixed(1) + '%)'); if (atrPct > CFG.maxAtrPct) why.push('too volatile (ATR ' + atrPct.toFixed(1) + '%)');
@@ -623,7 +627,8 @@ var JCE = (function () {
   /* ---------- the call book for one morning ---------- */
   function buildBook(inputs) {
     // inputs: { dateIso, stocks: [{sym, ex, daily:[...]}], nifty:[...], vix:[...], maxDay, maxInv }
-    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {};
+    var mkt = mktSeries(inputs.nifty, inputs.vix), today = inputs.dateIso, day = [], inv = [], skipped = [], board = {}, held = [];
+    if (inputs.mood && isNum(inputs.mood.score)) { var mk0 = Object.keys(mkt).filter(function (d) { return d < today; }).sort(); if (mk0.length) { mkt[mk0[mk0.length - 1]].mood = inputs.mood.score; mkt[mk0[mk0.length - 1]].moodLabel = inputs.mood.label; } }
     inputs.stocks.forEach(function (s) {
       var dd = (s.daily || []).filter(function (b) { return istDate(b.t) < today; }).map(function (b) { return Object.assign({ date: istDate(b.t) }, b); });
       if (dd.length < 80) { skipped.push({ sym: s.sym, why: 'only ' + dd.length + ' sessions of history' }); return; }
@@ -633,13 +638,13 @@ var JCE = (function () {
         var sd = plan.sides[0], m = plan.mkt;
         day.push({ type: 'DAY', sym: s.sym, ex: s.ex || 'NS', date: today, side: sd.side, entry: sd.entry, sl: sd.sl, t1: sd.t1, t2: sd.t2, rr1: sd.rr1, rr2: sd.rr2, t1Why: sd.t1Why, t2Why: sd.t2Why, risk: sd.risk, atr: plan.atr, score: Math.abs(plan.score), grade: plan.grade,
           why: plan.pts.filter(function (p) { return Math.sign(p.v) === sd.dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 6).map(function (p) { return p.label + ': ' + p.txt; }), cmp0: plan.ref.c, regime: m ? m.bias : null });
-      } else skipped.push({ sym: s.sym, why: plan.reasons.join('; ') || 'no edge' });
+      } else { skipped.push({ sym: s.sym, why: plan.reasons.join('; ') || 'no edge' }); if (plan.moodBlock && held.length < 40) held.push({ sym: s.sym, side: plan.score > 0 ? 'BUY' : 'SELL', score: Math.round(Math.abs(plan.score) * 10) / 10 }); }
       var iv = investFor(dd, k, inputs.nifty, mkt);
       if (iv) inv.push(Object.assign(iv, { sym: s.sym, ex: s.ex || 'NS', date: today }));
     });
     day.sort(function (a, b) { return b.score - a.score; }); inv.sort(function (a, b) { return b.score - a.score; });
     var keys = Object.keys(mkt).filter(function (d) { return d < today; }).sort(), m0 = keys.length ? mkt[keys[keys.length - 1]] : null;
-    return { board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg } : null };
+    return { held: held, board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg, mood: inputs.mood ? inputs.mood.score : null, moodLabel: inputs.mood ? inputs.mood.label : null } : null };
   }
 
   return { CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };
@@ -785,7 +790,30 @@ var TG_HOLIDAYS = {
   '2026-05-28': 1, '2026-06-26': 1, '2026-09-14': 1, '2026-10-02': 1, '2026-10-20': 1, '2026-11-10': 1, '2026-11-24': 1, '2026-12-25': 1
 };
 function tgTradingDay_(ymd, dow) { return dow >= 1 && dow <= 5 && !TG_HOLIDAYS[ymd]; }
+// Watchdog: GitHub's own cron is often hours late. If GH_TOKEN (fine-grained token, repo ssjs1mu/jc-stock-analyst, Actions: read & write only)
+// is set in Script properties, this asks GitHub to build any report that is due but not yet published today. No token = does nothing.
+var GH_DUE = [['premarket-news', 460, 900], ['morning-brief', 490, 900], ['morning-detailed', 490, 900], ['morning-pulse', 505, 900], ['evening-market-wrap', 1060, 1439], ['evening-news-wrap', 1120, 1439]];
+function ghWatchdog_() {
+  try {
+    var p = PropertiesService.getScriptProperties(), tok = p.getProperty('GH_TOKEN'); if (!tok) return;
+    var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), ist = new Date(Date.now() + 19800000), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+    if (!tgTradingDay_(today, ist.getUTCDay())) return;
+    var last = parseInt(p.getProperty('GH_LAST') || '0', 10); if (Date.now() - last < 12 * 60000) return; // at most one nudge per 12 minutes
+    var due = [];
+    GH_DUE.forEach(function (d) {
+      if (mins < d[1] || mins > d[2]) return;
+      var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + d[0] + '/index.json?t=' + Date.now(), { muteHttpExceptions: true }); if (r.getResponseCode() !== 200) return;
+      var runs = (JSON.parse(r.getContentText()).runs || []);
+      if (!runs.some(function (x) { return x.date === today && (x.status === 'ok' || x.status === 'holiday'); })) due.push(d[0]);
+    });
+    if (!due.length) return;
+    p.setProperty('GH_LAST', String(Date.now()));
+    var res = UrlFetchApp.fetch('https://api.github.com/repos/ssjs1mu/jc-stock-analyst/actions/workflows/auto-reports.yml/dispatches', { method: 'post', contentType: 'application/json', headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' }, payload: JSON.stringify({ ref: 'main', inputs: { ids: due.join(' '), force: 'false' } }), muteHttpExceptions: true });
+    Logger.log('watchdog ' + due.join(',') + ' -> ' + res.getResponseCode());
+  } catch (e) { Logger.log('watchdog ' + e); }
+}
 function tgPostReports() {
+  ghWatchdog_();
   var pp = PropertiesService.getScriptProperties(); if (!pp.getProperty('TG_TOKEN') || !pp.getProperty('TG_CHAT')) return 0; // not configured yet - stay quiet
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;

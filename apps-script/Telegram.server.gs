@@ -21,7 +21,30 @@ var TG_HOLIDAYS = {
   '2026-05-28': 1, '2026-06-26': 1, '2026-09-14': 1, '2026-10-02': 1, '2026-10-20': 1, '2026-11-10': 1, '2026-11-24': 1, '2026-12-25': 1
 };
 function tgTradingDay_(ymd, dow) { return dow >= 1 && dow <= 5 && !TG_HOLIDAYS[ymd]; }
+// Watchdog: GitHub's own cron is often hours late. If GH_TOKEN (fine-grained token, repo ssjs1mu/jc-stock-analyst, Actions: read & write only)
+// is set in Script properties, this asks GitHub to build any report that is due but not yet published today. No token = does nothing.
+var GH_DUE = [['premarket-news', 460, 900], ['morning-brief', 490, 900], ['morning-detailed', 490, 900], ['morning-pulse', 505, 900], ['evening-market-wrap', 1060, 1439], ['evening-news-wrap', 1120, 1439]];
+function ghWatchdog_() {
+  try {
+    var p = PropertiesService.getScriptProperties(), tok = p.getProperty('GH_TOKEN'); if (!tok) return;
+    var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), ist = new Date(Date.now() + 19800000), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+    if (!tgTradingDay_(today, ist.getUTCDay())) return;
+    var last = parseInt(p.getProperty('GH_LAST') || '0', 10); if (Date.now() - last < 12 * 60000) return; // at most one nudge per 12 minutes
+    var due = [];
+    GH_DUE.forEach(function (d) {
+      if (mins < d[1] || mins > d[2]) return;
+      var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + d[0] + '/index.json?t=' + Date.now(), { muteHttpExceptions: true }); if (r.getResponseCode() !== 200) return;
+      var runs = (JSON.parse(r.getContentText()).runs || []);
+      if (!runs.some(function (x) { return x.date === today && (x.status === 'ok' || x.status === 'holiday'); })) due.push(d[0]);
+    });
+    if (!due.length) return;
+    p.setProperty('GH_LAST', String(Date.now()));
+    var res = UrlFetchApp.fetch('https://api.github.com/repos/ssjs1mu/jc-stock-analyst/actions/workflows/auto-reports.yml/dispatches', { method: 'post', contentType: 'application/json', headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' }, payload: JSON.stringify({ ref: 'main', inputs: { ids: due.join(' '), force: 'false' } }), muteHttpExceptions: true });
+    Logger.log('watchdog ' + due.join(',') + ' -> ' + res.getResponseCode());
+  } catch (e) { Logger.log('watchdog ' + e); }
+}
 function tgPostReports() {
+  ghWatchdog_();
   var pp = PropertiesService.getScriptProperties(); if (!pp.getProperty('TG_TOKEN') || !pp.getProperty('TG_CHAT')) return 0; // not configured yet - stay quiet
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
