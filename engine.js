@@ -1481,7 +1481,7 @@ function htmlUpcoming(U, forPrint) {
   const dt = (r) => (r.date ? `<span class="${r.daysLeft <= 1 ? 'blink' : ''}">${dShort(r.date)}</span><small>${r.daysLeft == null ? '' : r.daysLeft <= 0 ? 'TODAY' : r.daysLeft === 1 ? 'TOMORROW' : 'in ' + r.daysLeft + ' days'}${r.tentative ? ' · tentative' : U.manual ? '' : ' · NSE'}</small>` : '—<small>date n/a</small>');
   const ok = U.rows.filter((r) => !r.error), nb = ok.filter((r) => r.tone === 'bull').length, nw = ok.filter((r) => r.tone === 'range').length, nr = ok.filter((r) => r.tone === 'bear').length;
   const withP = ok.filter((r) => r.p && r.dir > 0 && r.tone !== 'bear'), avgP = withP.length ? withP.reduce((a, r) => a + r.p.p1, 0) / withP.length : null;
-  const kpi = `<div class="kp"><div class="kpi"><span class="cap">Reporting</span><b>${U.total}</b><small>${U.analysed} analysed</small></div><div class="kpi"><span class="cap">Pre-result longs</span><b class="num-green">${nb}</b><small>trend-supported</small></div><div class="kpi"><span class="cap">Wait / dip-buy</span><b style="color:#a86b00">${nw}</b><small>no edge before the number</small></div><div class="kpi"><span class="cap">Avoid / exit</span><b class="num-red">${nr}</b><small>weak trend</small></div><div class="kpi"><span class="cap">Avg T1 chance (longs)</span><b>${pct0(avgP)}</b><small>own 1-yr history</small></div></div>`;
+  const kpi = `<div class="kp"><div class="kpi"><span class="cap">Reporting</span><b>${U.total}</b><small>${U.analysed} of ${Math.min(U.total, U.cap || U.total)} processed · ${Math.min(U.total, U.cap || U.total) ? Math.round(U.analysed * 100 / Math.min(U.total, U.cap || U.total)) : 0}%</small></div><div class="kpi"><span class="cap">Pre-result longs</span><b class="num-green">${nb}</b><small>trend-supported</small></div><div class="kpi"><span class="cap">Wait / dip-buy</span><b style="color:#a86b00">${nw}</b><small>no edge before the number</small></div><div class="kpi"><span class="cap">Avoid / exit</span><b class="num-red">${nr}</b><small>weak trend</small></div><div class="kpi"><span class="cap">Avg T1 chance (longs)</span><b>${pct0(avgP)}</b><small>own 1-yr history</small></div></div>`;
   const picks = ok.filter((r) => isNum(r.edge)).sort((a, b) => b.edge - a.edge).slice(0, 6);
   const pickTbl = picks.length ? `<div class="halfcard"><div class="rh">TOP SETUPS BY EDGE (T1 chance × reward:risk − stop chance)</div><table class="lvl uptable"><tr><th style="text-align:left">Stock</th><th>Result</th><th style="text-align:left">Call</th><th>Entry</th><th>Stop-loss</th><th>Target 1</th><th style="text-align:left">Chance</th><th>Edge</th></tr>${picks.map((r) => `<tr class="${r.tone}"><td class="lbl">${sym(r)}<small>${esc(r.company)}</small></td><td class="dt">${dShort(r.date)}</td><td><span class="stance ${r.tone}">${r.dir > 0 ? '▲' : '▼'} ${esc(r.stance)}</span></td><td>${esc(r.entry)}</td><td>${esc(r.stop)}</td><td>${esc(r.t1)}</td><td>${chanceBar(r.p)}</td><td class="${r.edge >= 0 ? 'num-green' : 'num-red'}"><b>${r.edge >= 0 ? '+' : ''}${r.edge.toFixed(2)}R</b></td></tr>`).join('')}</table></div>` : '';
   const rows = U.rows.map((r) => (r.error ? `<tr class="ur"><td class="dt">${dt(r)}</td><td class="lbl">${sym(r)}<small>${esc(r.company)}</small></td><td colspan="10" class="rd">Price data unavailable (${esc(r.error)})</td></tr>`
@@ -1604,10 +1604,14 @@ function printPDF() {
 }
 function loadSymbol(sym) { $('symbolInput').value = symBase(sym); $('exchangeInput').value = symEx(sym); showTab('pSummary'); window.scrollTo({ top: 0, behavior: 'smooth' }); runAnalysis(); }
 async function feed(name, fn) { const tr = {}; try { const d = await fn(tr); return { name, ok: d != null, data: d, via: tr.via }; } catch (e) { return { name, ok: false, data: null, err: (e && e.message) || String(e) }; } }
+function upProgress(msg, label, d, t) {
+  const pc = t ? Math.min(100, Math.round(d * 100 / t)) : 0;
+  msg.innerHTML = `<span style="display:inline-flex;align-items:center;gap:10px;vertical-align:middle">${esc(label)}<span style="display:inline-block;width:220px;height:10px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden"><span style="display:block;height:100%;width:${pc}%;background:linear-gradient(90deg,#2ee59d,#e2b84a);transition:width .2s"></span></span><b>${pc}% processed</b> <small>(${d}/${t})</small></span>`;
+}
 async function runUpcomingList(P) {
   const msg = $('upMsg'), body = $('upBody'), base = { from: P.from, to: P.to, stats: P.stats, diag: P.diag, n500Missing: P.n500Missing, manual: P.manual, source: P.source, checked: P.checked, withDate: P.withDate, batchErrors: P.batchErrors }; let U;
   if (!P.list.length) U = Object.assign({ rows: [], analysed: 0, total: 0, capped: false }, base);
-  else { msg.textContent = `Analysing ${Math.min(P.list.length, 200)} stocks…`; const bench = await fetchChart('^NSEI', '1y', '1d').catch(() => null); const A = await analyseUpcoming(P.list, bench, (d, t) => { msg.textContent = `Analysing stocks… ${d}/${t}`; }, Date.now()); U = Object.assign({}, A, base); }
+  else { upProgress(msg, 'Analysing', 0, Math.min(P.list.length, 200)); const bench = await fetchChart('^NSEI', '1y', '1d').catch(() => null); const A = await analyseUpcoming(P.list, bench, (d, t) => upProgress(msg, 'Analysing', d, t), Date.now()); U = Object.assign({}, A, base); }
   window.__U = U; body.innerHTML = htmlUpcoming(U); msg.textContent = `Updated ${new Date().toLocaleTimeString('en-IN')}`; refreshChips();
 }
 /* Repo fallback: data/results.json is refreshed daily by the GitHub Action, so the calendar works without the Apps Script backend */
@@ -1636,7 +1640,7 @@ async function loadUpcoming() {
     if (!P || !P.list.length) {
       const universe = j && rowsOf(j.nifty500).length ? rowsOf(j.nifty500) : null, syms = universe ? universe.map((x) => x.symbol) : NIFTY_FALLBACK, meta = universe ? new Map(universe.map((x) => [String(x.symbol).toUpperCase(), x])) : null;
       msg.textContent = `NSE calendar ${nseErr ? 'unreachable' : 'empty'} — reading Yahoo earnings dates for ${syms.length} stocks…`;
-      const E = await fetchEarnDates(syms, (d, t) => { msg.textContent = `Reading Yahoo earnings dates… ${d}/${t}`; });
+      const E = await fetchEarnDates(syms, (d, t) => { upProgress(msg, 'Reading earnings dates', d, t); });
       const Y = parseYahooEarn(E, Date.now(), 7, meta); Y.diag = P ? P.diag : []; Y.stats = P ? P.stats : null; if (!universe) Y.n500Missing = true; P = Y;
     }
     await runUpcomingList(P);
