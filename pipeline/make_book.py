@@ -87,7 +87,7 @@ def _thumb(path):
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Breeze"):
+def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise"):
     """1200x630 preview card: page-1 thumbnail + brand + headline (rendered with Chromium so fonts match)."""
     acc, bg, word = MOODS.get(mood, MOODS["neutral"])
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,%s,#0d0a18 70%%);"
@@ -126,7 +126,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%d %b %Y")
-    name = "Evening Breeze" if kind == "evening" else "Morning Breeze"
+    name = "Evening Breeze" if kind == "evening" else "Morning Sunrise"
     title = "Joshi's Corner - %s for %s" % (name, dtxt)
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
     out = {}

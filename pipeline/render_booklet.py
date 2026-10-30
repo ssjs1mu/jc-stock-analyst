@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Morning Breeze booklet: 4 phone pages (1080x1800) in smoky mood-coloured gradients, no cartoons.
+"""Morning Sunrise / Evening Breeze booklet: 4 phone pages (1080x1800) in smoky mood-coloured gradients, no cartoons.
   1 Cover (tree logo, brand, report title, date, expected opening)
   2 Opening summary (snapshots, estimated-today chart, key technical levels)
   3 Global markets, commodities, currency, volatility
@@ -19,9 +19,9 @@ W, H = 1080, 1800
 e = lambda s: html.escape(str(s if s is not None else ""))
 
 PAL = {  # smoky mood palettes: base, three smoke hues, accent (chips/lines), up, down
-    "bull": dict(base="#031a12", s1="#0f6b46", s2="#0b3d5c", s3="#7a5c12", acc="#34d399", up="#34d399", dn="#fb7185", word="BULLISH TONE"),
-    "bear": dict(base="#1a050a", s1="#8a1b32", s2="#3b0a2a", s3="#7a4a0a", acc="#fb7185", up="#34d399", dn="#fb7185", word="CAUTIOUS TONE"),
-    "neutral": dict(base="#070b24", s1="#27408f", s2="#4b2a8a", s3="#0b5a73", acc="#7aa2ff", up="#34d399", dn="#fb7185", word="BALANCED TONE"),
+    "bull": dict(base="#03160f", s1="#12b86a", s2="#0a8fb0", s3="#d99a0a", acc="#2ee59d", up="#34d399", dn="#fb7185", word="BULLISH TONE"),
+    "bear": dict(base="#1a0509", s1="#d01c45", s2="#6d1fa8", s3="#e8691a", acc="#ff5c7a", up="#34d399", dn="#fb7185", word="CAUTIOUS TONE"),
+    "neutral": dict(base="#070b24", s1="#3555d6", s2="#7c3aed", s3="#0ea5c4", acc="#7aa2ff", up="#34d399", dn="#fb7185", word="BALANCED TONE"),
 }
 GOLD = "#E2B84A"
 
@@ -173,12 +173,12 @@ def p1(b, p, total, ph):
              '<div class="brand" style="font-size:118px;position:relative">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">%s<br>Breeze</div>'
+             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">%s</div>'
              '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">for %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:36px;font-weight:800;position:relative;max-width:900px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative">Tap the page to turn &rarr;</div></div>'
-             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening" if b.get("edition") == "evening" else "Morning",
+             % (bg, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening<br>Breeze" if b.get("edition") == "evening" else "Morning<br>Sunrise",
                 e(b["date_txt"]), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
