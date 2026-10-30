@@ -1,0 +1,337 @@
+[
+ {
+  "id": "jeevan-anand",
+  "name": "LIC's New Jeevan Anand",
+  "cat": "Endowment + whole life",
+  "kind": "Participating (bonuses)",
+  "entry": "18 – 50 yrs",
+  "term": "15 – 35 yrs",
+  "ages": "25 – 45",
+  "line": "Savings plus life cover that continues for life after maturity.",
+  "benefits": [
+   "Maturity amount plus bonuses, and the life cover does not stop at maturity",
+   "Death benefit higher than the basic sum assured",
+   "Loan facility; premiums qualify under Sec 80C and benefit under 10(10D) as per prevailing tax rules"
+  ],
+  "drawbacks": [
+   "Effective return is modest, usually below what long-term equity or even debt funds can offer",
+   "Bonuses are not guaranteed",
+   "Early surrender gives back much less than premiums paid"
+  ],
+  "warnings": [
+   "Do not buy it as a pure investment; the cover per rupee is far lower than a term plan",
+   "Missing premiums in the first years can make the policy lapse or become paid-up with low value"
+  ],
+  "outlook": "Steady demand from conservative savers; returns follow LIC's declared bonus rates, which have been stable but modest.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-labh",
+  "name": "LIC's Jeevan Labh",
+  "cat": "Limited-pay endowment",
+  "kind": "Participating (bonuses)",
+  "entry": "8 – 59 yrs",
+  "term": "16, 21 or 25 yrs",
+  "ages": "28 – 45",
+  "line": "Pay for a shorter period, stay covered for the whole term, receive a lump sum at the end.",
+  "benefits": [
+   "Premiums paid for 10, 15 or 16 years against a longer cover period",
+   "Maturity sum plus bonuses and final addition, if declared",
+   "Loan facility after the initial years; tax benefits as per prevailing rules"
+  ],
+  "drawbacks": [
+   "Lower effective return than market-linked options",
+   "Death cover is smaller than a term plan for the same premium",
+   "Bonus rates can change over the years"
+  ],
+  "warnings": [
+   "Check that the annual premium does not exceed 10% of the sum assured, or the 10(10D) maturity exemption may be affected",
+   "Surrender in the early years is heavily discounted"
+  ],
+  "outlook": "A popular mid-term savings product; attractive to those who want a disciplined, shorter premium period.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-umang",
+  "name": "LIC's Jeevan Umang",
+  "cat": "Whole life + regular income",
+  "kind": "Participating (bonuses)",
+  "entry": "90 days – 55 yrs",
+  "term": "Whole life, to age 100",
+  "ages": "30 – 45",
+  "line": "A fixed yearly income from the end of the premium period, and cover up to age 100.",
+  "benefits": [
+   "Survival benefit every year after the premium term ends, as a fixed share of the basic sum assured",
+   "Cover up to age 100 with a maturity payout at 100",
+   "Can double as a retirement-income or family legacy plan"
+  ],
+  "drawbacks": [
+   "Long premium commitment (15 to 30 years) before the income begins",
+   "The big maturity payment arrives only at age 100",
+   "Returns are modest in comparison with equity"
+  ],
+  "warnings": [
+   "Not suited for anyone who may need the money in the first 15 years",
+   "Do not stretch the premium beyond a comfortable level; lapsing wastes the early premiums"
+  ],
+  "outlook": "Well matched to people who want a pension-like stream plus a legacy; interest depends on rate trends.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-utsav",
+  "name": "LIC's Jeevan Utsav",
+  "cat": "Whole life with guaranteed income",
+  "kind": "Non-participating (guaranteed)",
+  "entry": "90 days – 65 yrs",
+  "term": "Whole life, to age 100",
+  "ages": "35 – 55",
+  "line": "Guaranteed additions during the premium period, then lifelong guaranteed income.",
+  "benefits": [
+   "Guaranteed additions credited during the premium paying term",
+   "Regular income option from the end of the premium term till age 100, or a flexible option that lets income accumulate",
+   "Guaranteed benefits do not depend on bonuses"
+  ],
+  "drawbacks": [
+   "Premium term is 5 to 16 years, which is a real commitment",
+   "Income is fixed and loses purchasing power to inflation over decades",
+   "Low liquidity; surrender value is limited"
+  ],
+  "warnings": [
+   "Read the income option carefully before choosing; the choice cannot be changed freely later",
+   "Do not compare with FD or mutual funds on yield alone, since the cover also costs money"
+  ],
+  "outlook": "Demand for guaranteed-income plans stays strong whenever deposit rates ease.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-azad",
+  "name": "LIC's Jeevan Azad",
+  "cat": "Limited-pay endowment",
+  "kind": "Non-participating (guaranteed)",
+  "entry": "90 days – 50 yrs",
+  "term": "15 – 20 yrs",
+  "ages": "25 – 40",
+  "line": "A guaranteed maturity amount with a shorter premium period.",
+  "benefits": [
+   "Premiums are paid for a shorter period than the policy term",
+   "Benefits are fixed at the start, with no dependence on bonuses",
+   "Death benefit protects the family during the term"
+  ],
+  "drawbacks": [
+   "No bonuses, so no upside if LIC's performance is strong",
+   "Return is moderate and fixed",
+   "Limited flexibility once started"
+  ],
+  "warnings": [
+   "Compare the guaranteed maturity amount against the total premiums paid before deciding",
+   "Suited to a fixed goal only; avoid it if you may need the money early"
+  ],
+  "outlook": "Fits goal-based savers who prefer certainty to bonus uncertainty.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "bima-jyoti",
+  "name": "LIC's Bima Jyoti",
+  "cat": "Savings with guaranteed additions",
+  "kind": "Non-participating (guaranteed)",
+  "entry": "90 days – 60 yrs",
+  "term": "15 – 20 yrs",
+  "ages": "25 – 45",
+  "line": "Guaranteed additions every year plus life cover, in a limited-pay format.",
+  "benefits": [
+   "Guaranteed additions per thousand of sum assured through the premium term",
+   "Maturity benefit is known upfront",
+   "Death cover for the full term"
+  ],
+  "drawbacks": [
+   "Modest returns after adjusting for the life cover",
+   "No participation in profits",
+   "Surrender value is low in the early years"
+  ],
+  "warnings": [
+   "Confirm the premium term and sum assured limits in the current brochure; features have been revised from time to time"
+  ],
+  "outlook": "Appeals to savers who want a fixed, predictable maturity amount.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "amritbaal",
+  "name": "LIC's Amritbaal",
+  "cat": "Child plan",
+  "kind": "Non-participating (guaranteed)",
+  "entry": "0 – 13 yrs",
+  "term": "Chosen at entry",
+  "ages": "Parents aged 25 – 40",
+  "line": "A guaranteed lump sum or income for a child's education and future.",
+  "benefits": [
+   "Guaranteed additions help the fund grow",
+   "Benefits designed around a child's education and career years",
+   "Cover continues for the child even if the parent is not around, subject to plan terms"
+  ],
+  "drawbacks": [
+   "Moderate return compared with equity-based child plans",
+   "Long lock-in with a low surrender value",
+   "Cover on the parent's life is not the core feature"
+  ],
+  "warnings": [
+   "Buy a separate term plan for the parent first; a child plan is not a substitute for it",
+   "Check the waiver or payor-benefit option before buying"
+  ],
+  "outlook": "Education costs keep rising, so the guaranteed corpus may lag; pair it with an equity SIP.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "childrens-money-back",
+  "name": "LIC's New Children's Money Back",
+  "cat": "Money back (child)",
+  "kind": "Participating (bonuses)",
+  "entry": "0 – 12 yrs",
+  "term": "25 years minus entry age",
+  "ages": "Parents aged 25 – 40",
+  "line": "Money-back instalments around the child's college years, with the balance at 25.",
+  "benefits": [
+   "Periodic survival benefits as a share of the sum assured when the child is in the 18 to 22 range",
+   "Full sum assured paid on death during the term, plus bonuses",
+   "Loan facility after the initial period"
+  ],
+  "drawbacks": [
+   "Money-back instalments are small against current education costs",
+   "Returns depend on declared bonuses",
+   "Premium continues through the term"
+  ],
+  "warnings": [
+   "Plan the instalments against your child's actual education timeline, not in isolation",
+   "Lapse in the early years causes large loss in value"
+  ],
+  "outlook": "Useful as a disciplined debt-side allocation for a child's goals; not as the only one.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-amar",
+  "name": "LIC's New Jeevan Amar",
+  "cat": "Pure term",
+  "kind": "Non-linked, non-participating",
+  "entry": "18 – 65 yrs",
+  "term": "10 – 40 yrs",
+  "ages": "25 – 50",
+  "line": "High life cover at the lowest cost; nothing is paid back if you survive.",
+  "benefits": [
+   "Large sum assured for a small premium",
+   "Death benefit as a lump sum or in instalments",
+   "Lower rates for women and non-smokers"
+  ],
+  "drawbacks": [
+   "No maturity benefit",
+   "Premium rises with age and health issues",
+   "Medical tests are required"
+  ],
+  "warnings": [
+   "Disclose health, habits and income truthfully; wrong information can lead to a rejected claim",
+   "Choose the cover as roughly 10 to 15 times annual income, not as a round guess"
+  ],
+  "outlook": "The core protection plan for any earning member; its value is highest when bought young.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "tech-term",
+  "name": "LIC's New Tech Term",
+  "cat": "Online pure term",
+  "kind": "Non-linked, non-participating",
+  "entry": "18 – 65 yrs",
+  "term": "10 – 40 yrs",
+  "ages": "25 – 45",
+  "line": "Online-only pure term with a higher minimum cover and lower pricing.",
+  "benefits": [
+   "Lower premium than the offline variant for the same cover",
+   "Large minimum sum assured, suited to income replacement",
+   "Purchase and paperwork handled online"
+  ],
+  "drawbacks": [
+   "No maturity benefit",
+   "Online-only; you must be comfortable with the process",
+   "Medical underwriting can still be required"
+  ],
+  "warnings": [
+   "Keep your nominee informed, and keep the policy documents where the family can find them"
+  ],
+  "outlook": "Online term is where price competition is strongest; compare quotes before buying, then keep it for the full term.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-akshay",
+  "name": "LIC's Jeevan Akshay VII",
+  "cat": "Immediate annuity",
+  "kind": "Pension, non-participating",
+  "entry": "30 – 85 yrs",
+  "term": "Lifetime",
+  "ages": "55 – 70",
+  "line": "Pay a lump sum once, receive pension for life, starting immediately.",
+  "benefits": [
+   "Guaranteed lifetime income from the first period",
+   "Multiple options, including return of the purchase price to the nominee and joint-life",
+   "Suited to those with a retirement corpus in hand"
+  ],
+  "drawbacks": [
+   "The annuity rate is fixed at purchase and cannot be changed",
+   "Pension is taxable as income",
+   "Money is locked in; limited access to the lump sum"
+  ],
+  "warnings": [
+   "Never put your entire retirement corpus into one annuity; keep money for emergencies and inflation",
+   "Compare annuity rates with other providers and with senior-citizen deposit income"
+  ],
+  "outlook": "Annuity rates follow interest rates; if rates fall further, today's rate may look attractive later.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "jeevan-shanti",
+  "name": "LIC's New Jeevan Shanti",
+  "cat": "Deferred annuity",
+  "kind": "Pension, non-participating",
+  "entry": "30 – 79 yrs",
+  "term": "Deferment 5 – 20 yrs, then lifetime",
+  "ages": "40 – 60",
+  "line": "Invest now, start a guaranteed pension after a deferment period you choose.",
+  "benefits": [
+   "The pension rate is guaranteed at purchase",
+   "Single or joint life options",
+   "Useful to convert savings into a pension later in life"
+  ],
+  "drawbacks": [
+   "Single premium locks the money for years",
+   "Pension is taxable",
+   "Inflation reduces the real value of a fixed pension"
+  ],
+  "warnings": [
+   "Check the deferment period carefully; the longer the wait, the higher the pension but the longer the lock-in",
+   "Not for those who may need the corpus before the pension starts"
+  ],
+  "outlook": "Reasonable for those who want certainty in retirement income, especially in a falling rate environment.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ },
+ {
+  "id": "saral-pension",
+  "name": "LIC's Saral Pension",
+  "cat": "Immediate annuity (simple)",
+  "kind": "Pension, non-participating",
+  "entry": "40 – 80 yrs",
+  "term": "Lifetime",
+  "ages": "55 – 70",
+  "line": "A simple, standard pension plan with fewer options and an easy structure.",
+  "benefits": [
+   "Lifetime pension for the policyholder, or joint-life with a spouse",
+   "Return of purchase price to the nominee on death",
+   "Simple structure; easy to understand"
+  ],
+  "drawbacks": [
+   "Fixed pension, not inflation-linked",
+   "Taxable pension",
+   "Limited flexibility"
+  ],
+  "warnings": [
+   "Compare it with Jeevan Akshay and bank options before committing; they can differ by a few percent in pension"
+  ],
+  "outlook": "A straightforward retirement-income tool for those who prefer simplicity.",
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+ }
+]

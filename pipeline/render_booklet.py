@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Morning Market Opening Booklet: 4 phone pages (1080x1800) in smoky mood-coloured gradients, no cartoons.
+"""Morning Breeze booklet: 4 phone pages (1080x1800) in smoky mood-coloured gradients, no cartoons.
   1 Cover (tree logo, brand, report title, date, expected opening)
   2 Opening summary (snapshots, estimated-today chart, key technical levels)
   3 Global markets, commodities, currency, volatility
@@ -158,8 +158,8 @@ def p1(b, p, total, ph):
              '<div class="brand" style="font-size:118px;position:relative">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">Market Opening<br>Booklet</div>'
-             '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">Morning Market Pulse &middot; %s</div>'
+             '<div style="font-size:64px;font-weight:900;line-height:1.05;position:relative">Morning<br>Breeze</div>'
+             '<div style="font-size:34px;font-weight:700;color:#efe9d6;position:relative">for %s</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:36px;font-weight:800;position:relative;max-width:900px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative">Tap the page to turn &rarr;</div></div>'
@@ -224,48 +224,71 @@ def p4(b, p, total):
     return shell(p, inner, 4, total, "Alerts &amp; watchlist &middot; " + e(b["date_txt"]))
 
 
-def _call_rows(lst, side):
-    out = ""
-    for c in lst:
-        col = "up" if side == "BUY" else "dn"
-        out += ('<tr><td><b>%s</b><div class="small" style="font-size:18px">%s</div></td><td class="r">%s</td><td class="r dn">%s</td><td class="r up">%s<div class="small" style="font-size:18px">%s</div></td>'
-                '<td class="r"><b>%s</b><div class="small" style="font-size:18px">R:R %s</div></td><td class="r"><b class="%s">%s%%</b><div class="small" style="font-size:18px">%s</div></td></tr>'
-                % (e(c["sym"]), e(" · ".join(c["why"][:1])), e(c["entry"]), e(c["sl"]), e(c["t1"]), "T2 " + e(c["t2"]), e(c["risk"]), e(c["rr"]), col, c["conv"], e(c["convl"])))
-    return out
+def _day_index(b):
+    from datetime import datetime
+    try:
+        d = datetime.strptime(b.get("date_iso") or "", "%Y-%m-%d")
+    except Exception:
+        d = datetime.now()
+    return d.toordinal()
+
+
+def _data(name):
+    import os
+    return json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "lic", name)))
+
+
+def _ul(items, color, size=27):
+    return "".join('<div style="font-size:%dpx;line-height:1.35;margin-top:9px;display:flex;gap:12px"><span style="color:%s;font-weight:900">%s</span><span>%s</span></div>'
+                   % (size, color, "&#10003;" if color == "#43e08a" else "&#9679;" if color == "#ffb454" else "!", e(x)) for x in items)
 
 
 def p5(b, p, total):
-    c = b["calls"]
-    th = '<tr><th>Stock</th><th class="r">Entry</th><th class="r">Stop</th><th class="r">Target</th><th class="r">Risk / share</th><th class="r">Conviction</th></tr>'
-    def tbl(lst, side, label):
-        if not lst:
-            return '<div class="card small" style="font-size:23px">No %s setup met the rules for today.</div>' % label
-        return '<div class="card" style="padding:6px 12px"><table>%s%s</table></div>' % (th, _call_rows(lst, side))
-    wb = ""
-    if c.get("watch_buy"):
-        wb = ('<div class="small" style="font-size:21px;margin-top:2px"><b style="color:%s">Buy-side on watch (not triggered):</b> %s</div>'
-              % (GOLD, e(" · ".join("%s (%s%%, %s)" % (x["sym"], x["conv"], x["why"]) for x in c["watch_buy"]))))
-    inner = ('<h2 class="s" style="color:%s">Buy calls &mdash; intraday</h2>%s%s'
-             '<h2 class="s" style="color:%s">Sell calls &mdash; intraday</h2>%s'
-             '<div class="card" style="border-color:%s99"><b style="color:%s;font-size:25px">RISK</b><div style="font-size:23px;line-height:1.38;margin-top:4px">'
-             'Every call carries a stop-loss; exit if the stop is hit, do not average a losing trade. Risk per share is the entry-to-stop distance; keep total loss on a trade to about 1%% of capital. '
-             'Conviction is the setup score out of its maximum (Very high 85+, High 70+, Moderate 50+). Intraday positions are squared off the same day. Gap-ups or gap-downs can open beyond entry or stop, so wait for the price to come to the level.</div></div>'
-             % (p["up"], tbl(c.get("buy", []), "BUY", "buy"), wb, p["dn"], tbl(c.get("sell", []), "SELL", "sell"), GOLD, GOLD))
-    return shell(p, inner, 5, total, "Trading calls &middot; " + e(b["date_txt"]))
+    plans = _data("plans.json")
+    pl = plans[_day_index(b) % len(plans)]
+    inner = ('<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="chip" style="background:#F7FF00">PLAN OF THE DAY</span><span class="chip" style="background:#4DEBFF">%s</span></div>'
+             '<div style="font-size:60px;font-weight:900;line-height:1.1">%s</div>'
+             '<div style="font-size:33px;opacity:.92;line-height:1.35">%s</div>'
+             '<div style="display:flex;gap:12px"><div class="card" style="flex:1;padding:12px 16px"><div class="small">ENTRY AGE</div><div style="font-size:30px;font-weight:800">%s</div></div>'
+             '<div class="card" style="flex:1;padding:12px 16px"><div class="small">TERM</div><div style="font-size:30px;font-weight:800">%s</div></div>'
+             '<div class="card" style="flex:1;padding:12px 16px"><div class="small">TYPE</div><div style="font-size:24px;font-weight:800">%s</div></div></div>'
+             '<div class="card" style="border-color:#F7FF0088"><div class="small" style="letter-spacing:1.4px">BEST FOR AGE GROUP</div><div style="font-size:40px;font-weight:900;color:#F7FF00">%s years</div></div>'
+             '<h2 class="s" style="color:#43e08a">Advantages</h2><div>%s</div>'
+             '<h2 class="s" style="color:#ffb454">Drawbacks</h2><div>%s</div>'
+             '<div class="card" style="border:2.5px solid #ff6b6b;background:#ff6b6b22"><div style="font-size:32px;font-weight:900;color:#ff8f8f;letter-spacing:1.2px">WARNINGS</div>%s</div>'
+             '<div style="font-size:30px;line-height:1.35;opacity:.95"><b style="color:#4DEBFF">Outlook:</b> %s</div>'
+             '<div class="small" style="opacity:.7;font-size:23px">Check the latest brochure with LIC or your agent before buying. General information, not advice.</div>'
+             % (e(pl["cat"].upper()), e(pl["name"]), e(pl["line"]), e(pl["entry"]), e(pl["term"]), e(pl["kind"]), e(pl["ages"]),
+                _ul(pl["benefits"], "#43e08a", 34), _ul(pl["drawbacks"], "#ffb454", 33), _ul(pl["warnings"], "#ff8f8f", 32), e(pl["outlook"])))
+    return shell(p, inner, 5, total, "Insurance &middot; Plan of the day")
+
+
+GRADS = [("#ff2fa6", "#7b2cff", "#00e5ff"), ("#ff7a00", "#ffe600", "#ff2d55"), ("#00ff9d", "#0077ff", "#7b2cff"), ("#ff3d00", "#ff00c8", "#ffd400")]
 
 
 def p6(b, p, total):
-    mv = lambda lst, nm: ('<div class="card" style="flex:1;padding:8px 12px"><div style="font-size:24px;font-weight:900;margin-bottom:2px">%s</div><table>%s</table></div>'
-                          % (nm, "".join('<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td></tr>' % (e(r[0]), e(r[1]), chg(r[2])) for r in lst)))
-    shock = "".join('<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td><td class="r">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2]), chg(r[3])) for r in b.get("shock", []))
-    pv = "".join('<tr><td><b>%s</b></td>%s</tr>' % (e(r["name"]), "".join('<td class="r %s">%s</td>' % (cl, e(v)) for cl, v in zip(("up", "up", "", "dn", "dn"), r["vals"]))) for r in b.get("pivots", []))
-    inner = ('<h2 class="s">Index pivot levels for today</h2><div class="card" style="padding:6px 14px"><table><tr><th>Index</th><th class="r">S2</th><th class="r">S1</th><th class="r">Pivot</th><th class="r">R1</th><th class="r">R2</th></tr>%s</table></div>'
-             '<h2 class="s">Nifty 50 &mdash; last session&#39;s movers</h2><div style="display:flex;gap:14px">%s%s</div>'
-             '<h2 class="s">Volume shockers</h2><div class="card" style="padding:6px 14px">%s</div>'
-             '<div class="small" style="font-size:20px">Pivots are classic levels from the last session&#39;s high, low and close. Volume shockers trade at 1.5x or more of their 20-day average volume.</div>'
-             % (pv, mv(b.get("gainers", []), "Top gainers"), mv(b.get("losers", []), "Top losers"),
-                ("<table><tr><th>Stock</th><th class=\"r\">Close</th><th class=\"r\">Volume</th><th class=\"r\">Chg</th></tr>%s</table>" % shock) if shock else '<div class="small" style="font-size:23px">No Nifty 50 stock crossed 1.5x its average volume.</div>'))
-    return shell(p, inner, 6, total, "Movers &amp; levels &middot; " + e(b["date_txt"]))
+    import base64
+    import os
+    promos = _data("promos.json")
+    d = _day_index(b)
+    pm = promos[d % len(promos)]
+    g = GRADS[d % len(GRADS)]
+    qr = os.path.join(os.path.dirname(os.path.abspath(__file__)), "branding", "qr_mezz.png")
+    qrd = "data:image/png;base64," + base64.b64encode(open(qr, "rb").read()).decode()
+    pts = "".join('<div style="font-size:40px;font-weight:700;line-height:1.3;margin-top:20px;display:flex;gap:14px"><span>&#10022;</span><span>%s</span></div>' % e(x) for x in pm["points"])
+    inner = ('<div style="flex:1;border-radius:34px;padding:44px 40px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:18px;color:#fff;'
+             'background:linear-gradient(145deg,%s 0%%,%s 55%%,%s 120%%);box-shadow:0 24px 70px #0009">'
+             '<div style="display:flex;align-items:center;gap:20px"><img src="%s" style="height:96px;border-radius:16px;border:2px solid #fff8"><div class="brand" style="font-size:66px;color:#fff;text-shadow:0 3px 10px #0007">%s</div></div>'
+             '<div style="font-size:28px;font-weight:900;letter-spacing:4px;background:#00000044;display:inline-block;align-self:flex-start;padding:8px 22px;border-radius:30px">%s</div>'
+             '<div style="font-size:100px;font-weight:900;line-height:1.02;text-shadow:0 4px 18px #0006">%s</div>'
+             '<div style="font-size:40px;font-weight:600;opacity:.97">%s</div>'
+             '<div style="background:#0000003a;border-radius:24px;padding:18px 30px 30px">%s</div>'
+             '<div style="margin-top:auto;display:flex;align-items:flex-end;gap:26px">'
+             '<div style="flex:1"><div style="font-size:42px;font-weight:900;background:#fff;color:#1a1206;padding:14px 26px;border-radius:40px;display:inline-block">%s</div>'
+             '<div style="font-size:30px;font-weight:700;margin-top:18px;line-height:1.4">9/2C, Bijoygarh Colony, Jadavpur, Kolkata-32<br>Call 94770 30987</div></div>'
+             '<div style="text-align:center"><div style="background:#fff;padding:12px;border-radius:20px"><img src="%s" style="width:300px;display:block"></div><div style="font-size:21px;font-weight:800;margin-top:8px">Scan: Mezzanine menu</div></div></div>'
+             '</div>' % (g[0], g[1], g[2], brand.logo_original(), e(brand.BRAND), e(pm["kicker"]), e(pm["title"]), e(pm["sub"]), pts, e(pm["cta"]), qrd))
+    return shell(p, inner, 6, total, "Joshi's Corner &middot; Restaurant")
 
 
 PAGES = [p2, p3, p4, p5, p6]

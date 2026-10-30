@@ -96,7 +96,7 @@ def _og(path, date_txt, headline, mood, thumb_abs):
             ".b{font-family:%s;font-size:78px;font-weight:700;color:#E2B84A}.t{font-size:34px;font-weight:700;margin-top:4px}"
             ".h{font-size:40px;font-weight:800;line-height:1.15;margin-top:26px}.p{display:inline-block;margin-top:24px;background:%s;color:#fff;padding:9px 22px;border-radius:22px;font-weight:800;font-size:24px}"
             ".go{margin-top:26px;font-size:26px;color:#E2B84A;font-weight:700}</style></head><body>"
-            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>Morning Market Pulse &middot; %s</div>"
+            "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>Morning Breeze for %s</div>"
             "<div class='h'>%s</div><span class='p'>%s</span><div class='go'>Tap to open the booklet &rarr;</div></div></body></html>"
             % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(date_txt), html.escape(headline[:90]), word))
     from playwright.sync_api import sync_playwright
@@ -126,8 +126,8 @@ def build(date, pages, headline="", mood="neutral", caption=""):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%d %b %Y")
-    title = "Joshi's Corner - Morning Market Pulse, " + dtxt
-    desc = caption or (headline + " | What to expect at the open, key levels and stocks to watch." if headline else "What to expect at the open, key levels and stocks to watch.")
+    title = "Joshi's Corner - Morning Breeze for " + dtxt
+    desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
     out = {}
     for sub in ("", date + "/"):
         folder = os.path.join(ROOT, "morning", sub)

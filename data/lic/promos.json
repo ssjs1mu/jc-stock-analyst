@@ -1,0 +1,62 @@
+[
+ {
+  "id": "party",
+  "kicker": "PARTY PACKAGES",
+  "title": "Celebrate at Joshi's Corner",
+  "sub": "Birthdays · Kitty parties · Office get-togethers · Baby showers · Family gatherings",
+  "points": [
+   "Silver, Gold and Platinum party menus",
+   "Silver from Rs 549 per adult, kids from Rs 349 (up to 10 years)",
+   "Decor for the occasion, 2 hours plus 15 minutes grace"
+  ],
+  "cta": "Book your table today"
+ },
+ {
+  "id": "family",
+  "kicker": "FAMILY TIME",
+  "title": "Weekend lunch, the whole family",
+  "sub": "Good food and warm service in Jadavpur",
+  "points": [
+   "Full à la carte menu on the Ground Floor",
+   "Comfortable seating for family groups",
+   "Ask at the counter for the day's special"
+  ],
+  "cta": "Reserve for the weekend"
+ },
+ {
+  "id": "adda",
+  "kicker": "ADDA & GAME ZONE",
+  "title": "The Mezzanine is open for adda",
+  "sub": "Friends, games and good food on the Mezzanine floor",
+  "points": [
+   "Mezzanine menu with its own rates",
+   "Perfect for friends, college groups and small celebrations",
+   "Scan the QR to view the Mezzanine menu"
+  ],
+  "cta": "Scan the QR for the Mezzanine menu"
+ },
+ {
+  "id": "office",
+  "kicker": "OFFICE & KITTY",
+  "title": "Team lunches and kitty parties",
+  "sub": "A set menu and an easy-to-split bill",
+  "points": [
+   "Set party menus keep ordering simple",
+   "Good for groups of 10 to 25 and more",
+   "Pre-book to get the table arranged"
+  ],
+  "cta": "Call to pre-book"
+ },
+ {
+  "id": "online",
+  "kicker": "ORDER ONLINE",
+  "title": "Can't visit? Order Joshi's Corner home",
+  "sub": "Available on Zomato and Swiggy",
+  "points": [
+   "Order on Zomato or Swiggy",
+   "Dine-in guests can scan the QR for the menu",
+   "Ask us about party orders"
+  ],
+  "cta": "Search Joshi's Corner, Jadavpur"
+ }
+]

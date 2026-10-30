@@ -628,7 +628,7 @@ def build(sid, qs, heads, now):
         if gift:
             gtxt = {"last": f2(gift["last"], 1), "pct": ("%+.2f%%" % gift["pct"]) if gift.get("pct") is not None else "", "premium": "%+.0f pts" % gift.get("premium", 0),
                     "vs": "%+.2f%%" % gift.get("vs_pct", 0), "asof": gift["asof"].strftime("%d %b %H:%M") if gift.get("asof") else ""}
-        book = {"date_txt": now.strftime("%d %b %Y"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
+        book = {"date_txt": now.strftime("%d %b %Y"), "date_iso": now.strftime("%Y-%m-%d"), "mood": mood, "label": ov["label"], "zone": ov["zone"], "headline": head,
                 "open_text": open_text, "yday": ov["yday"], "spark": spark_vals, "proj": proj, "snapshot": snapshot, "levels": levels,
                 "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vix["pct"]) if vix else "n/a", "gauge": gfrac, "text": vtxt},
                 "events": evs, "watch": wl, "headlines": [cut(x, 130) for x in headl[:8]], "calls": calls_t, "gift": gtxt,
