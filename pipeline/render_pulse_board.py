@@ -152,6 +152,7 @@ def mood_of(c):
             break
     avg = sum(vals) / len(vals) if vals else 0.0
     sc = (nif if nif is not None else avg) * 0.6 + avg * 0.4
+    PIC[0] = c.get("mood_pic")
     if c.get("mood_score") is not None:          # morning reports: mood = expected opening, not the past session
         sc = float(c["mood_score"]) * 1.4
     return ("bull" if sc > 0.35 else ("bear" if sc < -0.35 else "neutral")), sc
@@ -399,8 +400,11 @@ def mover_pill(m, kind, t):
             % (col, e(mono), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(chg_txt(m["pct"]).replace("+", "").replace("-", ""))))
 
 
+PIC = [None]   # explicit picture key chosen by the report builder (overrides the score thresholds)
+
+
 def mood_photo(sc):
-    key = ("bull_roar" if sc > 1.0 else "bull_calm" if sc > 0.35 else "bear_roar" if sc < -1.0 else "bear_calm" if sc < -0.35
+    key = PIC[0] or ("bull_roar" if sc > 1.0 else "bull_calm" if sc > 0.35 else "bear_roar" if sc < -1.0 else "bear_calm" if sc < -0.35
            else ("bull_over_bear" if sc >= 0 else "bear_over_bull"))
     d = os.path.join(HERE, "branding", "mood")
     import datetime as _dt

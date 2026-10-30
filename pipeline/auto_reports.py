@@ -399,6 +399,127 @@ def facts_text(qs, gain, lose):
     return "\n".join(lines)
 
 
+def session_story(qs, flows, br, up_n, dn_n):
+    """Plain-English account of the session from open to close (Nifty 50), from 5-minute data when reachable. Returns (sentences, reversal) where reversal is
+    'bull' (weak/negative stretch then a strong close), 'bear' (strong stretch then a weak close) or ''."""
+    n = qs.get("^NSEI")
+    if not n:
+        return [], ""
+    prev, last = float(n["prev"]), float(n["last"])
+    cp = (last / prev - 1) * 100
+    op = hi = lo = hi_t = lo_t = None
+    last_hr = None
+    try:
+        j = json.loads(http("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?range=1d&interval=5m"))
+        r = j["chart"]["result"][0]
+        off = r["meta"].get("gmtoffset", 19800)
+        qd = r["indicators"]["quote"][0]
+        rows = [(t, o_, h_, l_, c_) for t, o_, h_, l_, c_ in zip(r["timestamp"], qd["open"], qd["high"], qd["low"], qd["close"]) if None not in (o_, h_, l_, c_)]
+        if len(rows) >= 20:
+            op = rows[0][1]
+            hi, hi_t = max((x[2], x[0]) for x in rows)
+            lo, lo_t = min((x[3], x[0]) for x in rows)
+            hh = lambda t: dt.datetime.fromtimestamp(t + off, dt.timezone.utc).strftime("%I:%M %p").lstrip("0")
+            hi_t, lo_t = hh(hi_t), hh(lo_t)
+            cut_ = rows[-1][0] - 3600
+            base = [x for x in rows if x[0] <= cut_]
+            if base:
+                last_hr = last - base[-1][4]
+    except Exception:
+        pass
+    if op is None:
+        hi, lo = float(n["hi"]), float(n["lo"])
+    L = []
+    if op is not None:
+        gap = (op / prev - 1) * 100
+        gtxt = "flat" if abs(gap) < 0.1 else ("a gap-up of %.2f%%" % gap if gap > 0 else "a gap-down of %.2f%%" % abs(gap))
+        L.append("Nifty 50 opened at %s, %s from the previous close of %s." % (f2(op, 0), gtxt, f2(prev, 0)))
+    lo_p, hi_p = (lo / prev - 1) * 100, (hi / prev - 1) * 100
+    if lo_t:
+        L.append("The index dipped to a low of %s (%+.2f%%) around %s and touched a high of %s (%+.2f%%) around %s." % (f2(lo, 0), lo_p, lo_t, f2(hi, 0), hi_p, hi_t))
+    else:
+        L.append("The day's range was %s to %s (%+.2f%% to %+.2f%% against the previous close)." % (f2(lo, 0), f2(hi, 0), lo_p, hi_p))
+    rng = max(hi - lo, 1e-9)
+    pos = (last - lo) / rng
+    place = "near the top of the day's range" if pos >= 0.75 else "near the bottom of the day's range" if pos <= 0.25 else "in the middle of the day's range"
+    L.append("It settled at %s (%+.2f%%), %s, %s." % (f2(last, 0), cp, place,
+             "so buyers held control into the close" if pos >= 0.75 and cp > 0 else "so sellers stayed in charge into the close" if pos <= 0.25 and cp < 0 else "a session of two-way trade"))
+    if last_hr is not None and abs(last_hr) >= 15:
+        L.append("The final hour added %+.0f points." % last_hr if last_hr > 0 else "The final hour shed %.0f points." % abs(last_hr))
+    bn = qs.get("^NSEBANK")
+    br_txt = "%d of the 50 Nifty stocks advanced and %d declined" % (up_n, dn_n)
+    if bn:
+        br_txt += "; Bank Nifty %s (%s)" % ("outperformed" if bn["pct"] > cp + 0.2 else "lagged" if bn["pct"] < cp - 0.2 else "moved in line", pct(bn["pct"]))
+    L.append(br_txt + ".")
+    if flows:
+        L.append("Latest institutional data (%s): FII/FPI net %+.0f Cr, DII net %+.0f Cr." % (flows["date"], flows["fii"], flows["dii"]))
+    rev = ""
+    if lo_p <= -0.3 and cp >= 0.3:
+        rev = "bull"
+    elif hi_p >= 0.3 and cp <= -0.3:
+        rev = "bear"
+    return L, rev, lo_p, hi_p
+
+
+def pic_key_evening(cp, rev, lo_p, hi_p):
+    if rev == "bull":
+        return "bull_over_bear"          # sellers led early, bulls took over and closed strong
+    if rev == "bear":
+        return "bear_over_bull"
+    if cp >= 1.0:
+        return "bull_roar"
+    if cp >= 0.35:
+        return "bull_calm"
+    if cp <= -1.0:
+        return "bear_roar"
+    if cp <= -0.35:
+        return "bear_calm"
+    return "bull_over_bear" if cp >= 0 else "bear_over_bull"
+
+
+def pic_key_morning(est):
+    if est >= 0.6:
+        return "bull_roar"
+    if est >= 0.2:
+        return "bull_calm"
+    if est >= 0:
+        return "bull_over_bear"
+    if est > -0.6:
+        return "bear_over_bull"          # flat / weak start: the bear is on top but the bull is still in the fight
+    return "bear_roar"
+
+
+def overnight_risks(qs, gift, nxt, today_d):
+    R = []
+    gapd = (nxt - today_d).days
+    if gapd > 1:
+        R.append("Markets stay shut until %s (%d days): weekend news, geopolitics and any Wall Street or Asian moves will all be priced in at the open." % (nxt.strftime("%A"), gapd))
+    sp = qs.get("^GSPC")
+    if sp:
+        R.append("Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at %s (%s), so US data and Fed commentary can swing the opening." % (f2(sp["last"]), pct(sp["pct"])))
+    bz = qs.get("BZ=F")
+    if bz:
+        R.append("Brent crude is at US$%s (%s); %s." % (f2(bz["last"]), pct(bz["pct"]), "a further spike would pressure oil marketers, paints, aviation and the rupee" if bz["pct"] > 0.8 else "a sharp fall would help oil marketers and the rupee" if bz["pct"] < -0.8 else "no sharp move so far, but it is a swing factor for inflation and the rupee"))
+    fx, ty = qs.get("USDINR=X"), qs.get("^TNX")
+    bits = []
+    if fx:
+        bits.append("USD/INR %s (%s)" % (f2(fx["last"], 3), pct(fx["pct"])))
+    if ty:
+        bits.append("US 10-year yield %s%% (%s)" % (f2(ty["last"]), pct(ty["pct"])))
+    if bits:
+        R.append("Currency and yields to track: " + ", ".join(bits) + ". A firmer dollar or higher US yields usually weigh on foreign flows.")
+    if gift:
+        R.append("GIFT Nifty keeps trading into the late evening, now %s (%s vs Nifty's close): the best live read on the next opening." % (f2(gift["last"], 1), "%+.2f%%" % gift.get("vs_pct", 0)))
+    try:
+        up = json.load(open(os.path.join(ROOT, "data", "results.json"))).get("upcoming", {})
+        nm = sorted(k for k, v in up.items() if k in set(NIFTY50) and any(r.get("date") == nxt.isoformat() and "result" in r.get("purpose", "").lower() for r in v))
+        if nm:
+            R.append("Nifty 50 results due on %s: %s." % (nxt.strftime("%A"), ", ".join(nm[:8])))
+    except Exception:
+        pass
+    return R[:7]
+
+
 def build_eve(qs, heads, now):
     """Evening Breeze: end-of-day booklet data (closing levels, movers, flows, next-session levels)."""
     gain, lose, shock = movers(qs)
@@ -436,6 +557,8 @@ def build_eve(qs, heads, now):
         flows = {"date": dt.datetime.strptime(dkey, "%Y-%m-%d").strftime("%d %b"), "fii": fj[dkey]["fii_net"], "dii": fj[dkey]["dii_net"]}
     except Exception:
         pass
+    story, rev, lo_p, hi_p = session_story(qs, flows, None, up_n, dn_n)
+    pic = pic_key_evening(npc, rev, lo_p, hi_p)
     summary = ("%s Banks: Bank Nifty %s. India VIX %s. Brent crude %s, USD/INR %s. %d of 50 Nifty stocks advanced and %d declined."
                % ((cm.get("bias") or "").split(". ")[0] + "." if False else "Nifty 50 closed at %s (%s) and Sensex at %s (%s)." % (*_q("^NSEI"), *_q("^BSESN")),
                   _q("^NSEBANK")[1], "%s (%s)" % _q("^INDIAVIX"), _q("BZ=F")[1], _q("USDINR=X", 3)[0], up_n, dn_n))
@@ -505,8 +628,8 @@ def build_eve(qs, heads, now):
             "summary": summary, "snapshot": snapshot, "spark": spark_vals, "flows": flows, "breadth": {"up": up_n, "dn": dn_n}, "levels": levels, "events": events,
             "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vx["pct"]) if vx else "n/a", "gauge": gfrac, "text": vtxt},
             "headlines": headl, "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True),
-            "opening": opening, "vol_movers": vol_movers, "pv_up": pvrow(pv_up), "pv_dn": pvrow(pv_dn), "asof": now.strftime("%I:%M %p IST")}
-    return {"book": book, "title": "Evening Breeze (%s)" % now.strftime("%d %b %Y"), "headline": head, "mood": mood, "mood_score": npc * 1.4,
+            "opening": opening, "story": story, "risks": overnight_risks(qs, gift, nxt, now.date()), "vol_movers": vol_movers, "pv_up": pvrow(pv_up), "pv_dn": pvrow(pv_dn), "asof": now.strftime("%I:%M %p IST")}
+    return {"book": book, "title": "Evening Breeze (%s)" % now.strftime("%d %b %Y"), "headline": head, "mood": mood, "mood_score": npc * 1.4, "mood_pic": pic,
             "edition": "evening", "disclaimer": brand.SHORT_DISCLAIMER}
 
 
@@ -747,7 +870,7 @@ def build(sid, qs, heads, now):
                 "events": evs, "watch": wl, "headlines": [cut(x, 130) for x in headl[:8]], "calls": calls_t, "gift": gtxt,
                 "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True), "pivots": pivrows, "est": ov["est"]}
         return {"book": book, "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
-                "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"],
+                "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"], "mood_pic": pic_key_morning(ov["est"]),
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
                 "vix": {"gauge": gfrac, "headline": "India VIX %s (%s)" % (f2(vv), pct(vix["pct"]) if vix else "n/a"), "text": vtxt},
                 "tiles": [tile("Nifty 50", "prev close", n), tile("Brent Crude", "US$/bbl", qs.get("BZ=F")),

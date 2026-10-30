@@ -240,9 +240,13 @@ def p3(b, p, total):
     v = b["vix"]
     inner = ('<h2 class="s">Global &amp; Asian equity markets</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
              '<h2 class="s">Commodities, currency &amp; bonds</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">%s</div>'
-             '<h2 class="s">Volatility</h2><div class="card" style="display:flex;align-items:center;gap:24px">%s<div><div style="font-size:42px;font-weight:900">India VIX %s <span style="font-size:30px">%s</span></div>'
+             % (bench, tiles)) if b.get("edition") == "evening" else (
+            '<h2 class="s">Global &amp; Asian equity markets</h2><div style="display:flex;flex-direction:column;gap:9px">%s</div>'
+             '<h2 class="s">Commodities, currency &amp; bonds</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">%s</div>'
+             '%s'
+             % (bench, tiles, ('<h2 class="s">Volatility</h2><div class="card" style="display:flex;align-items:center;gap:24px">%s<div><div style="font-size:42px;font-weight:900">India VIX %s <span style="font-size:30px">%s</span></div>'
              '<div style="font-size:24px;line-height:1.35;opacity:.92;margin-top:4px">%s</div></div></div>'
-             % (bench, tiles, gauge(v["gauge"], 240), e(v["level"]), chg(v["pct"]), e(v["text"])))
+             % (gauge(v["gauge"], 240), e(v["level"]), chg(v["pct"]), e(v["text"]))) if b.get("edition") != "evening" else ""))
     return shell(p, inner, 3, total, "Global markets &middot; " + e(b["date_txt"]))
 
 
@@ -329,29 +333,44 @@ def e2(b, p, total):
         bcard = ('<h2 class="s">Nifty 50 breadth</h2><div class="card"><div style="display:flex;height:34px;border-radius:17px;overflow:hidden"><div style="width:%d%%;background:%s"></div><div style="width:%d%%;background:%s"></div></div>'
                  '<div style="display:flex;justify-content:space-between;font-size:27px;font-weight:800;margin-top:8px"><span class="up">%d advancing</span><span class="dn">%d declining</span></div></div>'
                  % (round(br["up"] * 100 / tot), p["up"], 100 - round(br["up"] * 100 / tot), p["dn"], br["up"], br["dn"]))
+    v = b["vix"]
+    vcard = ('<h2 class="s">India VIX &mdash; the market\'s fear gauge</h2><div class="card" style="display:flex;align-items:center;gap:24px">%s<div><div style="font-size:44px;font-weight:900">India VIX %s <span style="font-size:30px">%s</span></div>'
+             '<div style="font-size:24px;line-height:1.35;opacity:.92;margin-top:4px">%s</div></div></div>' % (gauge(v["gauge"], 220), e(v["level"]), chg(v["pct"]), e(v["text"])))
+    story = "".join('<div style="font-size:26px;line-height:1.4;margin-top:8px">%s</div>' % e(x) for x in b.get("story", [])) or '<div style="font-size:26px">%s</div>' % e(b["summary"])
     inner = ('<div><span class="chip">' + e(b["label"].upper()) + '</span></div>'
              '<div style="font-size:50px;font-weight:900;line-height:1.08">' + e(b["headline"]) + '</div>'
-             '<div style="font-size:27px;line-height:1.38;opacity:.95">' + e(b["summary"]) + '</div>'
-             '<h2 class="s">Closing snapshot</h2><table>' + snap + '</table>' + chart_html + fcard + bcard)
+             '<h2 class="s">How the session unfolded</h2><div class="card">' + story + '</div>'
+             '<h2 class="s">Closing snapshot</h2><table>' + snap + '</table>' + chart_html + vcard + fcard + bcard)
     return shell(p, inner, 2, total, "Market close &middot; " + e(b["date_txt"]))
 
 
 def _tbl(b, p, rows, vol=False):
     out = ""
     for r in rows:
-        v = pc(r[-1])
-        out += ('<tr><td><b>%s</b></td><td class="r">%s</td>%s<td class="r">%s</td><td style="width:230px">%s</td></tr>'
-                % (e(r[0]), e(r[1]), ('<td class="r small">%s</td>' % e(r[2])) if vol else "", chg(r[-1]), bar(v, p, 7.0)))
+        out += ('<tr><td><b>%s</b></td><td class="r">%s</td>%s<td class="r">%s</td></tr>'
+                % (e(r[0]), e(r[1]), ('<td class="r small">%s</td>' % e(r[2])) if vol else "", chg(r[-1])))
     return out
 
 
 def e3(b, p, total):
+    g, l = b["gainers"], b["losers"]
+    n = max(len(g), len(l))
+    rows = ""
+    for i in range(n):
+        def cell(r):
+            return ('<td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td>' % (e(r[0]), e(r[1]), chg(r[-1]))) if r else '<td></td><td></td><td></td>'
+        rows += "<tr>%s<td style=\"width:26px\"></td>%s</tr>" % (cell(g[i] if i < len(g) else None), cell(l[i] if i < len(l) else None))
+    head = ('<tr><th colspan="3" style="color:%s;text-align:left">TOP GAINERS</th><th></th><th colspan="3" style="color:%s;text-align:left">TOP LOSERS</th></tr>' % (p["up"], p["dn"]))
     pvu, pvd = _tbl(b, p, b.get("pv_up", []), True), _tbl(b, p, b.get("pv_dn", []), True)
-    inner = ('<h2 class="s" style="color:%s">Top gainers &middot; Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
-             '<h2 class="s" style="color:%s">Top losers &middot; Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+    sw = _tbl(b, p, [[r[0], r[1], "range " + r[2], r[3]] for r in b.get("vol_movers", [])], True)
+    inner = ('<h2 class="s">Gainers &amp; losers &middot; Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s%s</table></div>'
              '<h2 class="s">Price + volume together &middot; a 1%%+ move on above-average volume</h2><div class="card" style="padding:6px 14px"><table>%s%s</table></div>'
-             % (p["up"], _tbl(b, p, b["gainers"]), p["dn"], _tbl(b, p, b["losers"]),
-                pvu or '<tr><td>No Nifty 50 stock rose 1%+ on above-average volume.</td></tr>', pvd or '<tr><td>No Nifty 50 stock fell 1%+ on above-average volume.</td></tr>'))
+             '<h2 class="s">Volatility movers &middot; widest intraday swings</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+             '<h2 class="s">Volume shockers &middot; 1.5x average volume or more</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
+             '<div class="small" style="opacity:.8;font-size:21px">Range = day high minus day low as a share of the last price.</div>'
+             % (head, rows, pvu or '<tr><td>No Nifty 50 stock rose 1%+ on above-average volume.</td></tr>', pvd or '<tr><td>No Nifty 50 stock fell 1%+ on above-average volume.</td></tr>',
+                sw or '<tr><td>Intraday range data not available.</td></tr>',
+                _tbl(b, p, b.get("shock", []), True) or '<tr><td>No Nifty 50 stock traded at 1.5x or more of its 20-day average volume.</td></tr>'))
     return shell(p, inner, 3, total, "Movers &amp; shakers &middot; " + e(b["date_txt"]))
 
 
@@ -375,19 +394,6 @@ def e4(b, p, total):
     return pg.replace("Global markets &middot; " + e(b["date_txt"]), "Global markets as of " + e(b.get("asof", "now")) + " &middot; " + e(b["date_txt"]))
 
 
-def e_vol(b, p, total):
-    v = b["vix"]
-    rows = "".join('<tr><td><b>%s</b></td><td class="r">%s</td><td class="r small">range %s</td><td class="r">%s</td></tr>' % (e(r[0]), e(r[1]), e(r[2]), chg(r[3])) for r in b.get("vol_movers", []))
-    inner = ('<h2 class="s">India VIX &mdash; the market\'s fear gauge</h2><div class="card" style="display:flex;align-items:center;gap:24px">%s<div><div style="font-size:46px;font-weight:900">India VIX %s <span style="font-size:32px">%s</span></div>'
-             '<div style="font-size:25px;line-height:1.35;opacity:.92;margin-top:4px">%s</div></div></div>'
-             '<h2 class="s">Volatility movers &middot; widest intraday swings in the Nifty 50</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
-             '<h2 class="s">Volume shockers &middot; 1.5x average volume or more</h2><div class="card" style="padding:6px 14px"><table>%s</table></div>'
-             '<div class="small" style="opacity:.8;font-size:22px">Range = day high minus day low as a share of the last price. A wide range with a modest close means a tug of war between buyers and sellers.</div>'
-             % (gauge(v["gauge"], 250), e(v["level"]), chg(v["pct"]), e(v["text"]), rows or '<tr><td>Intraday range data not available.</td></tr>',
-                _tbl(b, p, b.get("shock", []), True) or '<tr><td>No Nifty 50 stock traded at 1.5x or more of its 20-day average volume.</td></tr>'))
-    return shell(p, inner, 5, total, "Volatility &middot; " + e(b["date_txt"]))
-
-
 def e_news(b, p, total):
     tags = (("rbi", "RBI"), ("fed", "FED"), ("crude", "CRUDE"), ("oil", "CRUDE"), ("rupee", "RUPEE"), ("fii", "FLOWS"), ("fpi", "FLOWS"), ("bank", "BANKS"), ("earn", "RESULTS"), ("profit", "RESULTS"),
             ("nifty", "INDEX"), ("sensex", "INDEX"), ("wall street", "GLOBAL"), ("nasdaq", "GLOBAL"), ("china", "GLOBAL"), ("gold", "GOLD"))
@@ -399,9 +405,11 @@ def e_news(b, p, total):
         return "MARKETS"
     hd = "".join('<div style="display:flex;gap:14px;align-items:flex-start;margin-top:14px"><span class="chip" style="flex:none;font-size:17px;padding:5px 12px">%s</span><div style="font-size:27px;line-height:1.32;font-weight:600">%s</div></div>' % (tag(x), e(x))
                  for x in b["headlines"][:8])
+    rk = "".join('<div style="font-size:26px;line-height:1.38;margin-top:11px">&#9888;&#65039; %s</div>' % e(x) for x in b.get("risks", [])) or '<div style="font-size:26px">No specific overnight risks flagged.</div>'
     inner = ('<h2 class="s">News riding the markets</h2><div class="card">%s</div>'
-             '<div class="small" style="opacity:.8;font-size:22px">Headlines that moved or can move prices; tags show the theme. For information only.</div>' % hd)
-    return shell(p, inner, 6, total, "News &middot; " + e(b["date_txt"]))
+             '<h2 class="s">Overnight risks until the next trading session</h2><div class="card">%s</div>'
+             '<div class="small" style="opacity:.8;font-size:21px">Headlines that moved or can move prices; tags show the theme. For information only, not advice.</div>' % (hd, rk))
+    return shell(p, inner, 5, total, "News &middot; " + e(b["date_txt"]))
 
 
 def e_open(b, p, total):
@@ -427,7 +435,7 @@ def e_open(b, p, total):
              '<div class="small" style="opacity:.75;font-size:21px">Indicative, %s. Levels are classic pivot points from today\'s high, low and close, not a recommendation.</div>'
              % (e(o["next"].upper()), e(o["headline"]), "up" if o["mood"] == "bull" else "dn" if o["mood"] == "bear" else "", e(o["zone"] or "n/a"), gcard, dr or "Overnight cues are mixed.", lv, ev,
                 "anchored on GIFT Nifty" if o.get("anchored") else "from global cues as of this evening; GIFT Nifty was not available at build time"))
-    return shell(p, inner, 7, total, "Next session &middot; " + e(b["date_txt"]))
+    return shell(p, inner, 6, total, "Next session &middot; " + e(b["date_txt"]))
 
 
 PAGES = [p2, p3, p4, p5, p6]
@@ -438,9 +446,14 @@ def render(cfg, png_base):
     b = cfg["book"]
     p = PAL.get((b.get("mood") or {}).get("key", "neutral"), PAL["neutral"])
     evening = b.get("edition") == "evening"
-    pagelist = [e2, e3, e4, e_vol, e_news, e_open, p5, p6] if evening else PAGES
+    pagelist = [e2, e3, e4, e_news, e_open, p5, p6] if evening else PAGES
     total = 1 + len(pagelist)
     sc = float(cfg.get("mood_score") or 0) * 1.4
+    try:
+        import render_pulse_board as _r
+        _r.PIC[0] = cfg.get("mood_pic")
+    except Exception:
+        pass
     pages = [p1(b, p, total, photo(cfg, sc))]
     for k, f in enumerate(pagelist):
         CUR[0] = k + 2
