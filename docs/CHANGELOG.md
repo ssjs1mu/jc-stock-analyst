@@ -65,3 +65,10 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 | 2026-10-27 | [Claude] Top-bar symbol search: Generate (and Enter) now opens the report in a NEW window (index.html?embed=1&win=1&sym=…): estimated-% progress bar, then the Quick summary first, with links on top for X-ray, Intraday, Short term, Long term. |
 
 | 2026-10-27 | [Claude] Report window/embed now shows errors (index.html html.lean #errArea) and a clear 'live data paused — Google daily limit' notice instead of a blank page. Observed 27-Oct ~20:00 IST: Apps Script urlfetch daily quota exhausted (backend returns 'Service invoked too many times for one day: urlfetch'); resets ~12:30–13:30 IST. |
+
+## 2026-10-30 - Standing report rules applied (docs/REPORT_RULES.md)
+- Brand: original tree logo + "Joshi's Corner" (Brush Script stack, embedded Kaushan Script fallback), gold, bold, at the top of every PDF, desktop pulse and mobile page.
+- Mood colour template on every report (bull green / bear crimson / neutral blue) incl. a mood strip; morning mood = expected opening, evening mood = session close.
+- Footer: no source disclosure anywhere; short disclaimer only (letterhead address kept on PDFs).
+- Morning reports (Pre-Market, Brief, Detailed, Pulse) are forward-looking: Opening Outlook first (indicative Nifty zone from overnight cues; GIFT Nifty not used), Events Today, Stocks to Watch, Headlines to Track; yesterday only when it affects today's open.
+- PDFs auto-fit to one page by scaling fonts/tables (floor 0.68; two-up tables); cartoon bull/bear fallback removed from the pulse.

@@ -20,6 +20,9 @@ import base64
 import json
 import os
 import re
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import brand
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BRANDING = os.path.join(HERE, "branding")
@@ -33,12 +36,17 @@ INK = "#232323"
 BODY_GRAY = "#3A3A3A"
 UP_GREEN = "#1E7A34"
 DOWN_RED = "#B02A2A"
+MOODS = {
+    "bull":    dict(head="#1B6B34", rule="#2E9C52", bg="#F1FAF3", frame="#2E9C52", stripbg="#0F3D1F", stripfg="#9CF0B6", th="#1B6B34", stripe="rgba(233,246,237,0.95)"),
+    "bear":    dict(head="#9B2230", rule="#C8404F", bg="#FDF2F3", frame="#C8404F", stripbg="#4A0F18", stripfg="#FFB3BB", th="#9B2230", stripe="rgba(252,236,238,0.95)"),
+    "neutral": dict(head="#244F8F", rule="#3C7BD0", bg="#F1F5FC", frame="#3C7BD0", stripbg="#122A4F", stripfg="#A9C9FF", th="#244F8F", stripe="rgba(234,241,252,0.95)"),
+}
 FOOTER_ADDR = "9/25C, Bijoygarh Colony, Jadavpur, Kolkata-32, Tel: 9477030987"
 
-BAR_HEIGHT_MM = 40
+BAR_HEIGHT_MM = 30
 BAR_INSET_MM = 3
 BANNER_HEIGHT_MM = BAR_HEIGHT_MM - 2 * BAR_INSET_MM
-LOGO_HEIGHT_MM = 58
+LOGO_HEIGHT_MM = 44
 LOGO_WIDTH_MM = LOGO_HEIGHT_MM * 797 / 811
 LOGO_LEFT_MM = 8
 TITLE_ZONE_LEFT_MM = LOGO_LEFT_MM + LOGO_WIDTH_MM + 6
@@ -113,6 +121,8 @@ def render_block(block):
     t = block.get("type")
     if t == "table":
         return render_table(block)
+    if t == "pair":
+        return '<div class="pair"><div>%s</div><div>%s</div></div>' % (render_block(block["left"]), render_block(block["right"]))
     if t == "paragraph":
         return f'<p class="body-p {esc(block.get("class", ""))}">{esc(block["text"])}</p>'
     if t == "bullets":
@@ -128,7 +138,9 @@ def render_block(block):
 def build_html(config):
     tree_logo_b64 = b64(os.path.join(BRANDING, "tree_logo.png"))
     tree_logo_transparent_b64 = b64(os.path.join(BRANDING, "tree_logo_transparent.png"))
-    banner_b64 = b64(os.path.join(BRANDING, "wordmark_banner.png"))
+    mk = (config.get("mood") or {}).get("key", "")
+    M = MOODS.get(mk)
+    scale = float(config.get("_scale", 1.0))
 
     report_title = esc(config.get("report_title", "Report"))
     report_subtitle = esc(config.get("report_subtitle", ""))
@@ -152,8 +164,11 @@ def build_html(config):
                 f'''<section class="rpt-section"><h2 class="section-head">{heading}</h2>
                     <div class="gold-rule"></div>{blocks_html}</section>''')
 
-    disclaimer = esc(config.get("disclaimer", "This report is for informational purposes only and does not constitute investment advice."))
-    as_of_html = f'<p class="as-of-note">{esc(as_of_note)}</p>' if as_of_note else ""
+    disclaimer = esc(brand.SHORT_DISCLAIMER)
+    as_of_html = ""   # standing rule: never disclose data sources in a report
+    mood_html = ""
+    if M:
+        mood_html = '<div class="mood-strip"><b>%s</b><span>%s</span></div>' % (esc(config["mood"].get("label", "")), esc(config["mood"].get("sub", "")))
     subtitle_html = f'<p class="report-subtitle">{report_subtitle}</p>' if report_subtitle else ""
     generated_html = f'<p class="report-generated">{generated_line}</p>' if generated_line else ""
     sep = " &nbsp;|&nbsp; " if report_date and report_time else ""
@@ -163,13 +178,23 @@ def build_html(config):
 <style>
   @page {{ size: A4; margin: 0 0 {PAGE_NUM_BOX_MM}mm 0;
     @bottom-right {{ content: "Page " counter(page) " / " counter(pages); font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 9pt; color: {GOLD_LIGHT}; padding: 0 8mm 2mm 0; }} }}
+  :root {{ --head: {M['head'] if M else GOLD_DARK}; --rule: {M['rule'] if M else GOLD}; --sbg: {M['stripbg'] if M else '#111'}; --sfg: {M['stripfg'] if M else GOLD_LIGHT}; --fbg: {M['bg'] if M else FRAME_BG}; --frame: {M['frame'] if M else FRAME_GOLD}; --stripe: {M['stripe'] if M else 'rgba(251,248,239,0.94)'}; }}
   * {{ box-sizing: border-box; }}
   html, body {{ margin: 0; padding: 0; font-family: 'DejaVu Serif', Georgia, 'Times New Roman', serif; color: {INK}; background: #ffffff; }}
   .doc-table {{ width: 100%; border-collapse: collapse; }}
   .doc-table > thead > tr > td {{ padding: 0; }}
   .header-wrap {{ position: relative; height: {LOGO_HEIGHT_MM}mm; }}
   .header-bar {{ position: absolute; top: 0; left: 0; right: 0; height: {BAR_HEIGHT_MM}mm; background: #0a0a0a; z-index: 5; }}
-  .header-banner {{ position: absolute; top: {BAR_INSET_MM}mm; right: {BAR_INSET_MM + 5}mm; height: {BANNER_HEIGHT_MM}mm; object-fit: contain; z-index: 10; }}
+  {brand.font_css()}
+  .header-brand {{ position: absolute; top: 0; left: {TITLE_ZONE_LEFT_MM}mm; right: 8mm; height: {BAR_HEIGHT_MM}mm; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; z-index: 10; }}
+  .header-brand .bn {{ font-family: {brand.SCRIPT_STACK}; font-weight: 700; font-size: 36pt; line-height: 1.05; color: #E2B84A; text-shadow: 0 0 1px #F6DC8A; }}
+  .header-brand .tg {{ font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 7.5pt; letter-spacing: 2.2px; text-transform: uppercase; color: {GOLD_LIGHT}; margin-top: 1mm; }}
+  .mood-strip {{ display: flex; justify-content: space-between; align-items: center; gap: 6mm; background: var(--sbg); color: var(--sfg); border-left: 2.2mm solid var(--rule); padding: 2.2mm 4mm; margin: 0 0 3mm 0; font-family: 'DejaVu Sans', Arial, sans-serif; }}
+  .mood-strip b {{ font-size: 11pt; letter-spacing: 0.8px; text-transform: uppercase; }}
+  .mood-strip span {{ font-size: 8.8pt; opacity: .92; text-align: right; }}
+  .fit {{ zoom: {scale}; }}
+  .pair {{ display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }}
+  .pair table.rpt-table {{ font-size: 8.4pt; }}
   .header-logo {{ position: absolute; top: 0; left: {LOGO_LEFT_MM}mm; height: {LOGO_HEIGHT_MM}mm; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); z-index: 11; }}
   .header-title-zone {{ position: absolute; top: {BAR_HEIGHT_MM}mm; bottom: 0; left: {TITLE_ZONE_LEFT_MM}mm; right: 8mm; display: flex; align-items: flex-end; justify-content: flex-end; z-index: 3; }}
   .report-title {{ font-size: 20pt; font-weight: 700; background: linear-gradient(180deg, {GOLD_LIGHT}, {GOLD_DARK}); -webkit-background-clip: text; background-clip: text; color: {GOLD_DARK}; -webkit-text-fill-color: transparent; margin: 0 0 1.5mm 0; line-height: 1.15; text-align: right; }}
@@ -183,21 +208,21 @@ def build_html(config):
   .report-datetime {{ font-size: 9.5pt; color: #555; margin: 0 0 1mm 0; }}
   .report-generated {{ font-size: 9pt; color: {GOLD_DARK}; font-style: italic; margin: 0; }}
   .as-of-note {{ font-size: 8.8pt; color: #777; font-style: italic; text-align: justify; margin: 2mm 0 4mm 0; line-height: 1.35; }}
-  .rpt-section {{ margin-top: 5mm; break-inside: avoid-page; }}
-  .section-head {{ font-size: 12.5pt; color: {GOLD_DARK}; margin: 0 0 1mm 0; letter-spacing: 0.3px; }}
-  .bias-frame-outer {{ border: 1.1pt solid {FRAME_GOLD}; padding: 1.3mm; }}
-  .bias-frame-inner {{ border: 1.1pt solid {FRAME_GOLD}; background: {FRAME_BG}; padding: 4mm 6mm 5mm 6mm; }}
-  .bias-frame-heading {{ text-align: center; text-transform: uppercase; font-size: 12pt; font-weight: 700; letter-spacing: 0.8px; color: {GOLD_DARK}; margin: 0 0 2.5mm 0; }}
+  .rpt-section {{ margin-top: 3.2mm; break-inside: avoid-page; }}
+  .section-head {{ font-size: 12.5pt; color: var(--head); margin: 0 0 1mm 0; letter-spacing: 0.3px; }}
+  .bias-frame-outer {{ border: 1.1pt solid var(--frame); padding: 1.3mm; }}
+  .bias-frame-inner {{ border: 1.1pt solid var(--frame); background: var(--fbg); padding: 4mm 6mm 5mm 6mm; }}
+  .bias-frame-heading {{ text-align: center; text-transform: uppercase; font-size: 12pt; font-weight: 700; letter-spacing: 0.8px; color: var(--head); margin: 0 0 2.5mm 0; }}
   .bias-frame-inner .body-p {{ margin: 0; }}
-  .gold-rule {{ height: 1.4px; background: linear-gradient(90deg, {GOLD}, rgba(199,160,60,0.15)); margin-bottom: 2mm; }}
-  .body-p {{ font-size: 10pt; line-height: 1.5; text-align: justify; color: {BODY_GRAY}; margin: 1mm 0 2mm 0; }}
-  .body-bullets {{ margin: 1mm 0 2mm 0; padding-left: 5mm; font-size: 10pt; line-height: 1.45; color: {BODY_GRAY}; }}
-  .body-bullets li {{ margin-bottom: 1mm; text-align: justify; }}
-  table.rpt-table {{ width: 100%; border-collapse: collapse; margin: 1mm 0 3mm 0; font-size: 9.3pt; background: rgba(255,255,255,0.92); }}
-  table.rpt-table thead th {{ border-bottom: 1.3px solid {GOLD}; color: {GOLD_DARK}; font-weight: 700; padding: 1.6mm 2mm; text-align: right; }}
-  table.rpt-table tbody td {{ padding: 1.5mm 2mm; border-bottom: 0.5px solid #e2e2e2; }}
-  table.rpt-table tbody tr:nth-child(even) {{ background: rgba(251,248,239,0.94); }}
-  .disclaimer {{ margin-top: 5mm; padding-top: 2mm; border-top: 1px solid {GOLD}; font-size: 8pt; color: #a33; font-style: italic; text-align: justify; }}
+  .gold-rule {{ height: 1.4px; background: linear-gradient(90deg, var(--rule), rgba(150,150,150,0.12)); margin-bottom: 2mm; }}
+  .body-p {{ font-size: 9.6pt; line-height: 1.38; text-align: justify; color: {BODY_GRAY}; margin: 1mm 0 2mm 0; }}
+  .body-bullets {{ margin: 1mm 0 2mm 0; padding-left: 5mm; font-size: 9.4pt; line-height: 1.32; color: {BODY_GRAY}; }}
+  .body-bullets li {{ margin-bottom: 0.5mm; text-align: justify; }}
+  table.rpt-table {{ width: 100%; border-collapse: collapse; margin: 1mm 0 3mm 0; font-size: 8.8pt; background: rgba(255,255,255,0.92); }}
+  table.rpt-table thead th {{ border-bottom: 1.3px solid var(--rule); color: var(--head); font-weight: 700; padding: 1.1mm 1.6mm; text-align: right; }}
+  table.rpt-table tbody td {{ padding: 0.9mm 1.6mm; border-bottom: 0.5px solid #e2e2e2; }}
+  table.rpt-table tbody tr:nth-child(even) {{ background: var(--stripe); }}
+  .disclaimer {{ margin-top: 4mm; padding-top: 1.5mm; border-top: 1px solid var(--rule); font-size: 8pt; color: #666; font-style: italic; text-align: center; }}
 </style></head>
 <body>
   <img class="watermark" src="data:image/png;base64,{tree_logo_transparent_b64}">
@@ -206,34 +231,57 @@ def build_html(config):
     <thead><tr><td>
       <div class="header-wrap">
         <div class="header-bar"></div>
-        <img class="header-banner" src="data:image/png;base64,{banner_b64}">
+        <div class="header-brand"><div class="bn">{esc(brand.BRAND)}</div><div class="tg">{esc(brand.TAGLINE)}</div></div>
         <img class="header-logo" src="data:image/png;base64,{tree_logo_b64}">
         <div class="header-title-zone"><p class="report-title">{report_title}</p></div>
         <div class="header-gold-rule"></div>
       </div>
     </td></tr></thead>
     <tbody><tr><td>
+      <div class="fit">{mood_html}
       <div class="meta-block">{subtitle_html}<p class="report-datetime">{report_date}{sep}{report_time}</p>{generated_html}</div>
       {as_of_html}
       {''.join(sections_html)}
-      <p class="disclaimer">{disclaimer}</p>
+      <p class="disclaimer">{disclaimer}</p></div>
     </td></tr></tbody>
   </table>
 </body></html>"""
 
 
-def render_pdf(config, output_path):
-    html_path = output_path + ".render.html"
-    with open(html_path, "w") as f:
-        f.write(build_html(config))
+def _pages(path):
+    from pypdf import PdfReader
+    return len(PdfReader(path).pages)
+
+
+def render_pdf(config, output_path, one_page=True):
+    """Standing rule: fit on ONE page by shrinking fonts/tables step by step (floor 0.62)."""
     from playwright.sync_api import sync_playwright
+    html_path = output_path + ".render.html"
+    scales = [1.0, 0.95, 0.9, 0.85, 0.8, 0.76, 0.72, 0.68] if one_page else [1.0]
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto("file://" + os.path.abspath(html_path))
-        page.pdf(path=output_path, format="A4", print_background=True)
+        for sc in scales:
+            cfg = dict(config, _scale=sc)
+            with open(html_path, "w") as f:
+                f.write(build_html(cfg))
+            page = browser.new_page()
+            page.goto("file://" + os.path.abspath(html_path))
+            page.pdf(path=output_path, format="A4", print_background=True)
+            page.close()
+            if _pages(output_path) <= 1:
+                break
+        else:   # genuinely too long for one readable page: keep it legible over 2 pages
+            cfg = dict(config, _scale=0.88)
+            with open(html_path, "w") as f:
+                f.write(build_html(cfg))
+            page = browser.new_page()
+            page.goto("file://" + os.path.abspath(html_path))
+            page.pdf(path=output_path, format="A4", print_background=True)
+            page.close()
+            sc = 0.88
         browser.close()
     os.remove(html_path)
+    print("pdf scale", sc, "pages", _pages(output_path), file=sys.stderr)
     return output_path
 
 

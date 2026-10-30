@@ -17,6 +17,9 @@ import math
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+import sys
+sys.path.insert(0, HERE)
+import brand
 W, H = 2000, 1116
 BAR = ["#1f6fa8", "#d6336c", "#1b9a77", "#2b5f9e", "#f2711c", "#2a9d8f", "#c2255c", "#e8590c", "#3b6fb6"]
 
@@ -26,11 +29,7 @@ def e(x):
 
 
 def logo():
-    p = os.path.join(HERE, "branding", "tree_logo_transparent.png")
-    try:
-        return "data:image/png;base64," + base64.b64encode(open(p, "rb").read()).decode()
-    except Exception:
-        return ""
+    return brand.logo_original()
 
 
 def sign(p):
@@ -153,6 +152,8 @@ def mood_of(c):
             break
     avg = sum(vals) / len(vals) if vals else 0.0
     sc = (nif if nif is not None else avg) * 0.6 + avg * 0.4
+    if c.get("mood_score") is not None:          # morning reports: mood = expected opening, not the past session
+        sc = float(c["mood_score"]) * 1.4
     return ("bull" if sc > 0.35 else ("bear" if sc < -0.35 else "neutral")), sc
 
 
@@ -317,7 +318,7 @@ p{font-size:21px;line-height:1.36;color:var(--ink);opacity:.92}
 .big{font-weight:800;line-height:1.1}
 .up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
 .top{background:var(--top);color:var(--topink);display:flex;align-items:center;gap:22px;padding:0 40px;border-bottom:3px solid var(--acc)}
-.top img{height:70px}.art{margin-left:auto;display:flex;align-items:center;gap:14px}.art.photo{width:560px;height:92px;margin-right:-40px;background-size:cover;background-position:right 30%%;padding-left:20px}.mvs{display:flex;flex-direction:column;gap:5px}.mv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1.5px solid var(--cardb);border-radius:999px;padding:2px 12px 2px 3px;font-size:16px;color:var(--topink)}.mv i{width:26px;height:26px;border-radius:50%%;color:#111;font-style:normal;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.mv em{font-style:normal;font-weight:800}
+.top .lg{height:78px;border-radius:12px;border:1.5px solid #C7A03C}.tt{display:flex;flex-direction:column;gap:2px;min-width:0}.art{margin-left:auto;display:flex;align-items:center;gap:14px}.art.photo{width:560px;height:92px;margin-right:-40px;background-size:cover;background-position:right 30%%;padding-left:20px}.mvs{display:flex;flex-direction:column;gap:5px}.mv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1.5px solid var(--cardb);border-radius:999px;padding:2px 12px 2px 3px;font-size:16px;color:var(--topink)}.mv i{width:26px;height:26px;border-radius:50%%;color:#111;font-style:normal;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.mv em{font-style:normal;font-weight:800}
 .panel{background:var(--panel);border:2px solid var(--cardb);border-radius:26px;padding:20px 24px}
 .card{background:var(--card);border:2px solid var(--cardb);border-radius:22px;padding:18px 22px}
 .tiles{display:grid;gap:8px 14px;margin-top:6px}
@@ -413,7 +414,7 @@ def top_art(c, t, mood, sc=0.0, banner=True):
         return '<div class="art"><div class="mvs">%s</div></div>' % pills
     if ph:
         return ('<div class="art photo" style="background-image:linear-gradient(90deg,var(--top) 0,rgba(0,0,0,0) 45%%),url(%s)"><div class="mvs">%s</div></div>' % (ph, pills))
-    return '<div class="art"><div class="mvs">%s</div>%s</div>' % (pills, art)
+    return '<div class="art"><div class="mvs">%s</div></div>' % pills   # no cartoon fallback: realistic photos only
 
 
 def build_html(c, force_layout=None, force_theme=None):
@@ -421,8 +422,9 @@ def build_html(c, force_layout=None, force_theme=None):
     mood_word = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
     v = c["vix"]
     vg = v.get("gauge", .5)
-    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood, sc, lay != 'board'))
-    foot = '<div class="foot" style="grid-area:foot"><span>%s</span><span>%s</span></div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "")))
+    top = ('<div class="top" style="grid-area:top"><img class="lg" src="%s"><div class="tt"><div class="brand">%s</div><h1 style="font-size:%dpx">%s</h1></div>%s</div>'
+           % (logo(), e(brand.BRAND), 30, e(c["title"]), top_art(c, t, mood, sc, lay != 'board')))
+    foot = '<div class="foot" style="grid-area:foot"><span>%s</span></div>' % e(brand.SHORT_DISCLAIMER)
     sp = spark2(c.get("spark", []), t, h=(150 if lay == 'magazine' else 230))
     spl = '<div style="font-size:15px;color:var(--mut)">%s</div>' % e(c.get("spark_label", ""))
     asia = ('<div style="display:flex;gap:16px;align-items:flex-start">%s<div><div class="big" style="font-size:30px">%s</div><p class="cl6" style="font-size:20px;margin-top:6px">%s</p></div></div>'
@@ -461,7 +463,7 @@ def build_html(c, force_layout=None, force_theme=None):
 %(foot)s</div>""" % dict(top=top, chips=comp_bench_chips(c, t, 9), mw=mood_word, hl=e(c["headline"]), bias=e(c["bias_text"]), asia=asia, sp=sp, spl=spl, tiles=comp_tiles(c, t, 3, 74), lvl=comp_levels(c, t, True), vixb=vixc, al=comp_alerts(c, t), foot=foot)
     return ("""<!doctype html><html><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), BASE_CSS % dict(W=W, H=H, deco=deco_css(t)), body))
+<style>%s%s:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (brand.font_css(), brand.name_css('brand', '46px'), css_vars(t), BASE_CSS % dict(W=W, H=H, deco=deco_css(t)), body))
 
 
 # ---------------------------------------------------------------- mobile / social version: 2 portrait pages, 1080x1350 (4:5)
@@ -471,8 +473,8 @@ MOB_CSS = """
 body{width:1080px;height:1350px;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);position:relative;overflow:hidden}
 .deco{position:absolute;inset:0;%(deco)s}
 .m{position:absolute;inset:0;display:flex;flex-direction:column}
-.mh{background:var(--top);border-bottom:4px solid var(--acc);padding:0 34px;display:flex;align-items:center;gap:18px;height:104px;flex:none}
-.mh img{height:70px}.mh .t1{font-size:38px;font-weight:800;color:var(--topink);line-height:1.05}.mh .t2{font-size:23px;color:var(--topink);opacity:.85;margin-top:3px}
+.mh{background:var(--top);border-bottom:4px solid var(--acc);padding:0 34px;display:flex;align-items:center;gap:18px;height:112px;flex:none}
+.mh .lg{height:78px;border-radius:12px;border:1.5px solid #C7A03C}.mh .brand{font-size:50px}.mh .t2{font-size:23px;color:var(--topink);opacity:.85;margin-top:3px}
 .mh .pg{margin-left:auto;font-size:24px;font-weight:800;color:var(--topink);border:2px solid var(--acc);border-radius:999px;padding:4px 16px}
 .mb{flex:1;padding:12px 34px 8px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
 .mb>*{flex:none}
@@ -524,7 +526,7 @@ def build_mobile(c, page=1, force_theme=None):
     dtxt = m.group(1) if m else ""
     vix = c["vix"]
     ph = mood_photo(sc)
-    head = ('<div class="mh"><img src="%s"><div><div class="t1">Morning Market Pulse</div><div class="t2">%s &middot; Joshi\'s Corner</div></div><div class="pg">%d / 2</div></div>' % (logo(), e(dtxt), page))
+    head = ('<div class="mh"><img class="lg" src="%s"><div><div class="brand">%s</div><div class="t2">Morning Market Pulse &middot; %s</div></div><div class="pg">%d / 2</div></div>' % (logo(), e(brand.BRAND), e(dtxt), page))
     if page == 1:
         photo = ""
         if ph:
@@ -547,11 +549,11 @@ def build_mobile(c, page=1, force_theme=None):
         al = "".join('<div class="box"><h4>%s</h4><p>%s</p></div>' % (e(b["title"]), e(b["text"])) for b in c["bottom"][:3])
         body = ('%s<div class="sec">Key technical levels to watch</div>%s<div class="sec">Corporate action &amp; market alerts</div>%s'
                 % (_table("Global &amp; Asian equity benchmarks", c["bench"][:9], t), lv, al))
-    foot = '<div class="mf">%s &nbsp;|&nbsp; %s</div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "Not investment advice. Markets carry risk.")))
+    foot = '<div class="mf">%s</div>' % e(brand.SHORT_DISCLAIMER)
     return ("""<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>:root{%s}%s</style></head><body><div class="deco"></div><div class="m">%s<div class="mb" id="mb">%s</div>%s</div>
+<style>%s%s:root{%s}%s</style></head><body><div class="deco"></div><div class="m">%s<div class="mb" id="mb">%s</div>%s</div>
 <script>(function(){var mb=document.getElementById('mb'),r=@R@;while(mb.scrollHeight>mb.clientHeight+1&&r>30){r-=2;document.documentElement.style.setProperty('--rh',r+'px');}var z=1;while(mb.scrollHeight>mb.clientHeight+1&&z>0.84){z-=0.02;mb.style.zoom=z;}})();</script></body></html>"""
-            % (css_vars(t), MOB_CSS % dict(deco=deco_css(t)), head, body, foot)).replace('@R@', str(42 if page == 1 else 38))
+            % (brand.font_css(), brand.name_css('brand', '46px'), css_vars(t), MOB_CSS % dict(deco=deco_css(t)), head, body, foot)).replace('@R@', str(42 if page == 1 else 38))
 
 
 def render_mobile(cfg, png_base, force_theme=None):

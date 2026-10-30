@@ -30,12 +30,15 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from zoneinfo import ZoneInfo
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import brand
+import outlook_rules as OR
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 IST = ZoneInfo("Asia/Kolkata")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; JoshisCornerBot/1.0)"}
-DISC = ("For information only. Not investment advice. Levels and ideas are illustrative and not "
-        "personalised; markets carry risk and no outcome is guaranteed.")
+DISC = brand.SHORT_DISCLAIMER
 NIFTY50 = ('RELIANCE TCS HDFCBANK ICICIBANK INFY BHARTIARTL ITC SBIN LT HINDUNILVR KOTAKBANK AXISBANK '
            'BAJFINANCE MARUTI SUNPHARMA HCLTECH ASIANPAINT NTPC ULTRACEMCO TITAN ONGC POWERGRID M&M '
            'BAJAJFINSV WIPRO ADANIENT ADANIPORTS COALINDIA JSWSTEEL TATASTEEL NESTLEIND TECHM GRASIM '
@@ -425,12 +428,21 @@ def build(sid, qs, heads, now):
                 ol.append("Top Nifty losers: " + ", ".join("%s %s" % (g[0], pct(g[1]["pct"])) for g in lose[:3]) + ".")
             cm["outlook"] = ol
     pv = pivots(qs.get("^NSEI"))
-    note = ("Auto-generated at %s IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News "
-            "headlines; commentary %s). GIFT Nifty, MCX, FII/DII and option-chain data are not available to "
-            "this pipeline and show as n/a." % (TM, "drafted by %s from those inputs only" % cm["by"].title()
-                                                if cm["by"] != "template" else "rule-based from the numbers only"))
+    morning = sid in ("premarket-news", "morning-brief", "morning-detailed", "morning-pulse")
+    ov = OR.opening_view(qs, pv) if morning else None
+    if morning:
+        mood = {"key": ov["mood"], "label": ov["label"],
+                "sub": ("Indicative Nifty opening zone %s" % ov["zone"]) if ov["zone"] else "Indicative, from overnight global cues"}
+    else:
+        try:
+            npc = float(qs["^NSEI"]["pct"])
+        except Exception:
+            npc = 0.0
+        k = "bull" if npc >= 0.3 else "bear" if npc <= -0.3 else "neutral"
+        mood = {"key": k, "label": {"bull": "Positive close", "bear": "Weak close", "neutral": "Range-bound close"}[k],
+                "sub": "Nifty %s in the session" % pct(npc)}
     base = dict(report_subtitle="Joshi's Corner", report_date=D, report_time=TM + " IST",
-                generated_line="Generated: %s, %s IST" % (D, TM), as_of_note=note, disclaimer=DISC)
+                generated_line="", disclaimer=DISC, mood=mood)
     ind = [row(n, qs.get(s)) for n, s in IDX.items()]
     glo = [row(n, qs.get(s)) for n, s in GLOBAL.items()]
     asi = [row(n, qs.get(s)) for n, s in ASIA.items()]
@@ -446,48 +458,57 @@ def build(sid, qs, heads, now):
     if sid == "evening-market-wrap":
         return dict(base, report_title="Evening Market Wrap", sections=[
             sec("Today's Close in Brief", [P(bias)], "framed"),
-            sec("Indian Market Snapshot", [T(["Index", "Close", "% Chg"], ind, [.5, .25, .25])]),
-            sec("Global Market Wrap", [T(["Index", "Level", "% Chg"], glo + asi, [.5, .25, .25])]),
-            sec("Currencies, Commodities & Bonds", [T(["Item", "Level", "% Chg"], cmd, [.5, .25, .25])]),
-            sec("Stocks in Focus (Nifty 50)", [T(["Top gainers", "Close (Rs)", "% Chg"], stock_rows(gain), [.5, .25, .25]),
-                                               T(["Top losers", "Close (Rs)", "% Chg"], stock_rows(lose), [.5, .25, .25])]),
+            sec("Indian Markets & Key Levels", [{"type": "pair",
+                "left": T(["Index", "Close", "% Chg"], ind, [.44, .28, .28], False),
+                "right": T(["Nifty levels", "Support", "Resistance"], lv, [.42, .29, .29], False)}]),
+            sec("Global Markets, Currencies & Commodities", [{"type": "pair",
+                "left": T(["Equities", "Level", "% Chg"], glo + asi, [.46, .27, .27], False),
+                "right": T(["Crude, FX, bonds", "Level", "% Chg"], cmd, [.46, .27, .27], False)}]),
+            sec("Stocks in Focus (Nifty 50)", [{"type": "pair",
+                "left": T(["Top gainers", "Close (Rs)", "% Chg"], stock_rows(gain), [.4, .32, .28], False),
+                "right": T(["Top losers", "Close (Rs)", "% Chg"], stock_rows(lose), [.4, .32, .28], False)}]),
             sec("Volume Shockers - Watch for Tomorrow", [T(["Stock", "Close (Rs)", "Volume", "% Chg"],
                                                            stock_rows(shock, True), [.3, .25, .25, .2])]
                 if shock else B(["No Nifty 50 stock traded at 1.5x or more of its 20-day average volume."])),
-            sec("Near-Term Outlook", [B(cm["outlook"]), T(["Index", "Support", "Resistance"], lv, [.4, .3, .3], False), lvl_note]),
-            sec("Next Session", [B([exp])])])
+            sec("Outlook & Next Session", [B(cm["outlook"][:2] + [exp]), lvl_note])])
     if sid == "evening-news-wrap":
         return dict(base, report_title="Evening News Wrap", sections=[
             sec("Market Movers", [B(["%s %s (Rs %s)" % (s, pct(q["pct"]), f2(q["last"])) for s, q in gain[:3] + lose[:3]])]),
             sec("Headlines That Moved Markets", [B(headl)]),
             sec("Calendar for %s" % nxt.strftime("%A, %d %b"), [B([exp, "Pre-market global cues arrive in the 8:00 AM Pre-Market News."])]),
             sec("What to Watch", [B(cm["outlook"])])])
+    if morning:
+        nxt_today = now.date()
+        evs = OR.events_today(now, exp, qs)
+        wl = OR.watch_list(qs, heads, gain, lose, shock, now, NIFTY50)
+        wl_t = T(["Stock", "Trigger", "What to watch"], wl, [.16, .26, .58], False)
+        wl_t["align"] = ["left", "left", "left"]
+        ocl = ["Indicative opening view only: built from overnight US, Asian and European cues, crude, rupee and volatility. "
+               "Actual opening can differ with domestic news and GIFT Nifty."]
+        open_blocks = [P("%s. Expected Nifty opening zone: %s (indicative)." % (ov["headline"], ov["zone"] or "n/a"))] + \
+                      [B(ov["drivers"])]
+        if ov["yday"]:
+            open_blocks.append(P("Carry-over from yesterday: " + ov["yday"]))
+        open_blocks.append({"type": "note", "text": ocl[0]})
+        open_sec = sec("Opening Outlook", open_blocks, "framed")
+        ev_sec = sec("Events Today", [B(evs)])
+        wl_sec = sec("Stocks to Watch", [wl_t] if wl else [B(["No specific triggers flagged for the open."])])
+        hd_sec = sec("Headlines to Track", [B(headl[:4])])
+        def pr(a_, b_):
+            return {"type": "pair", "left": a_, "right": b_}
+        cues = pr(T(["Equities", "Level", "% Chg"], glo + asi, [.46, .27, .27], False),
+                  T(["Crude, FX, bonds", "Level", "% Chg"], cmd, [.46, .27, .27], False))
+        lvl_sec = sec("Key Levels for Today", [T(["Index", "Support", "Resistance"], lv, [.4, .3, .3], False), lvl_note])
     if sid == "premarket-news":
-        return dict(base, report_title="Market News", sections=[
-            sec("Top Headlines", [B(headl)]),
-            sec("Overnight Global Cues", [T(["Index", "Level", "% Chg"], glo + asi, [.5, .25, .25])]),
-            sec("Calendar", [B([exp])])])
+        return dict(base, report_title="Pre-Market News", sections=[open_sec, hd_sec, ev_sec, wl_sec,
+                    sec("Overnight Global Cues", [cues])])
     if sid == "morning-brief":
-        return dict(base, report_title="JCGG - Morning Updates (Brief)", sections=[
-            sec("Today's Bias in Brief", [P(bias)], "framed"),
-            sec("Global & Asian Markets", [T(["Index", "Level", "% Chg"], glo + asi, [.5, .25, .25])]),
-            sec("Commodities & Currency", [T(["Item", "Level", "% Chg"], cmd, [.5, .25, .25])]),
-            sec("India VIX & Previous Close", [T(["Index", "Close", "% Chg"], ind, [.5, .25, .25])]),
-            sec("Key Levels to Watch", [T(["Index", "Support", "Resistance"], lv, [.4, .3, .3], False), lvl_note]),
-            sec("Alerts for the Day", [B([exp])])])
+        return dict(base, report_title="JCGG - Morning Updates (Brief)", sections=[open_sec, wl_sec, ev_sec,
+                    sec("Overnight Cues", [cues]), lvl_sec])
     if sid == "morning-detailed":
-        return dict(base, report_title="JCGG - Morning Updates (Detailed)", sections=[
-            sec("Today's Bias in Brief", [P(bias)], "framed"),
-            sec("Global Markets Close", [T(["Index", "Level", "% Chg"], glo, [.5, .25, .25])]),
-            sec("Asian Markets", [T(["Index", "Level", "% Chg"], asi, [.5, .25, .25])]),
-            sec("Commodities, Currency & Bonds", [T(["Item", "Level", "% Chg"], cmd, [.5, .25, .25])]),
-            sec("Indian Markets - Previous Session", [T(["Index", "Close", "% Chg"], ind, [.5, .25, .25])]),
-            sec("Key Levels to Watch", [T(["Index", "Support", "Resistance"], lv, [.4, .3, .3], False), lvl_note]),
-            sec("Outlook", [B(cm["outlook"])]),
-            sec("Stocks in Focus (previous session)", [T(["Top gainers", "Close (Rs)", "% Chg"], stock_rows(gain), [.5, .25, .25]),
-                                                       T(["Top losers", "Close (Rs)", "% Chg"], stock_rows(lose), [.5, .25, .25])]),
-            sec("Headlines", [B(headl)]),
-            sec("Alerts for the Day", [B([exp])])])
+        return dict(base, report_title="JCGG - Morning Updates (Detailed)", sections=[open_sec, ev_sec, wl_sec, hd_sec,
+                    sec("Overnight & Asian Cues", [cues]),
+                    lvl_sec])
     if sid == "morning-pulse":
         n, s_, bn = qs.get("^NSEI"), qs.get("^BSESN"), qs.get("^NSEBANK")
         vix = qs.get("^INDIAVIX")
@@ -521,18 +542,22 @@ def build(sid, qs, heads, now):
         bench = [{"name": k, "code": codes.get(k, ""), "level": f2(qs.get(v)["last"]) if qs.get(v) else "n/a",
                   "pct": pct(qs[v]["pct"]) if qs.get(v) else "n/a"} for k, v in {**GLOBAL, **ASIA}.items()]
         npct = n["pct"] if n else 0
-        head = cm.get("headline") or ("Nifty %s at %s" % (pct(npct), f2(n["last"], 0)) if n else "Market snapshot")
+        head = ov["label"] + (" - Nifty zone " + ov["zone"] if ov["zone"] else "")
         vtxt = cm.get("vol_text") or ("India VIX closed at %s (%s); USD/INR at %s."
                                       % (f2(vv), pct(vix["pct"]) if vix else "n/a", f2(qs.get("USDINR=X")["last"], 3) if qs.get("USDINR=X") else "n/a"))
         movers_txt = "Top Nifty 50 gainers: %s. Top losers: %s." % (
             ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in gain[:3]) or "n/a",
             ", ".join("%s %s" % (s2, pct(q["pct"])) for s2, q in lose[:3]) or "n/a")
+        def short(x):
+            return re.sub(r"\s*[-|]\s*[^-|]{3,40}$", "", x)[:80]
         bottom = [
-            {"title": "Latest Headlines", "icon": "list", "text": " | ".join(re.sub(r"\s*[-|]\s*[^-|]{3,40}$", "", x)[:95] for x in headl[:2])},
-            {"title": "Biggest Movers (Nifty 50)", "icon": "chart", "text": movers_txt},
-            {"title": "F&O Expiry Schedule Note", "icon": "cal", "text": exp + " Bank Nifty has monthly expiry only (last Tuesday)."}]
+            {"title": "Events Today", "icon": "cal", "text": " ".join(evs)[:260]},
+            {"title": "Stocks to Watch", "icon": "chart", "text": "; ".join("%s (%s)" % (r[0], r[1]) for r in wl[:6]) or "No specific triggers flagged for the open."},
+            {"title": "Headlines to Track", "icon": "list", "text": " | ".join(short(x) for x in headl[:2])}]
+        bias_open = "%s%sIndicative view from overnight cues; GIFT Nifty is not used." % (
+            (" ".join(ov["drivers"][:2]) + " ") if ov["drivers"] else "", ("Carry-over: " + ov["yday"] + " ") if ov["yday"] else "")
         return {"title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
-                "headline": head, "bias_text": bias,
+                "headline": head, "bias_text": bias_open, "mood": mood, "mood_score": ov["score"],
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",
                 "vix": {"gauge": gfrac, "headline": "India VIX %s (%s)" % (f2(vv), pct(vix["pct"]) if vix else "n/a"), "text": vtxt},
                 "tiles": [tile("Nifty 50", "prev close", n), tile("Brent Crude", "US$/bbl", qs.get("BZ=F")),
@@ -543,9 +568,7 @@ def build(sid, qs, heads, now):
                          "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
                 "levels": levels, "bottom": bottom,
                 "movers": {"up": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in gain[:3]], "dn": [{"sym": s2, "pct": pct(q["pct"])} for s2, q in lose[:3]]},
-                "footnote": "Auto-generated %s IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: %s | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session."
-                            % (TM, "rule-based" if cm["by"] == "template" else cm["by"].title()),
-                "disclaimer": "Not investment advice. Markets carry risk."}
+                "footnote": "", "disclaimer": brand.SHORT_DISCLAIMER}
     raise SystemExit("unsupported id " + sid)
 
 
@@ -632,7 +655,7 @@ def main():
     js = pdf[:-4] + ".json"
     shutil.copyfile(cj, js)
     files = ["--file", pdf] + (["--file", png] + [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
-    subprocess.check_call(pub + files + ["--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
+    subprocess.check_call(pub + files + ["--caption", "%s %s" % (a.sid.replace("-", " ").title(), now.strftime("%d %b"))])
 
 
 if __name__ == "__main__":
