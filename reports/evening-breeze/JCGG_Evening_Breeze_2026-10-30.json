@@ -10,7 +10,7 @@
   },
   "label": "Positive close",
   "headline": "Nifty gains 0.51%, Banks lag",
-  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.08%, USD/INR 94.950. 28 of 50 Nifty stocks advanced and 21 declined.",
+  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.09%, USD/INR 94.950. 28 of 50 Nifty stocks advanced and 21 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
@@ -105,14 +105,14 @@
    {
     "name": "FTSE 100",
     "code": "",
-    "level": "10,748.56",
-    "pct": "+0.25%"
+    "level": "10,747.93",
+    "pct": "+0.24%"
    },
    {
     "name": "DAX",
     "code": "",
-    "level": "25,892.34",
-    "pct": "-0.57%"
+    "level": "25,884.46",
+    "pct": "-0.60%"
    },
    {
     "name": "Nikkei 225",
@@ -142,18 +142,18 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "113.64",
-    "pct": "-1.08%"
+    "level": "113.63",
+    "pct": "-1.09%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "104.27",
-    "pct": "+2.23%"
+    "level": "104.24",
+    "pct": "+2.20%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,986.50",
-    "pct": "-1.11%"
+    "level": "3,987.90",
+    "pct": "-1.08%"
    },
    {
     "name": "USD / INR",
@@ -162,8 +162,8 @@
    },
    {
     "name": "Dollar index",
-    "level": "101.64",
-    "pct": "-0.39%"
+    "level": "101.65",
+    "pct": "-0.38%"
    },
    {
     "name": "US 10-yr yield %",
@@ -275,7 +275,7 @@
     "GIFT Nifty 23,083.5 (+30 pts, +0.13% vs Nifty's last close).",
     "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%.",
     "Asia this morning: Nikkei -2.12%, Hang Seng +1.46%, Kospi -3.48%.",
-    "Currency, crude and volatility: Brent 113.64 (-1.08%); USD/INR 94.950 (-0.27%); India VIX 15.30 (+1.21%)."
+    "Currency, crude and volatility: Brent 113.63 (-1.09%); USD/INR 94.950 (-0.27%); India VIX 15.30 (+1.21%)."
    ],
    "next": "Monday, 02 November 2026",
    "mood": "neutral",
@@ -366,7 +366,7 @@
     "-1.18%"
    ]
   ],
-  "asof": "04:34 PM IST"
+  "asof": "04:36 PM IST"
  },
  "title": "Evening Breeze (30 Oct 2026)",
  "headline": "Nifty gains 0.51%, Banks lag",
