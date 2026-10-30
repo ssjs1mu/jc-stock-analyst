@@ -23,7 +23,37 @@
    "Missing premiums in the first years can make the policy lapse or become paid-up with low value"
   ],
   "outlook": "Steady demand from conservative savers; returns follow LIC's declared bonus rates, which have been stable but modest.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 18,
+  "ageMax": 50,
+  "goals": [
+   "savings",
+   "protection"
+  ],
+  "pay": "regular",
+  "minMonthly": 2000,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 25,
+    "k": "pay"
+   },
+   {
+    "l": "Maturity payout + cover continues for life",
+    "y": 15,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Endowment plus whole life: maturity sum plus bonuses, and a basic cover stays after maturity",
+   "Death benefit higher than the basic sum assured",
+   "Premium modes: yearly, half-yearly, quarterly, monthly",
+   "Loan facility after the initial years",
+   "Optional accident and disability riders"
+  ],
+  "tax": "Premiums can qualify for Sec 80C and maturity or death proceeds for 10(10D), as per the rules in force at purchase.",
+  "suited": "Salaried people and families who want one plan for both saving and lifelong cover.",
+  "avoid": "Anyone who needs high cover cheaply or high returns."
  },
  {
   "id": "jeevan-labh",
@@ -49,7 +79,41 @@
    "Surrender in the early years is heavily discounted"
   ],
   "outlook": "A popular mid-term savings product; attractive to those who want a disciplined, shorter premium period.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 8,
+  "ageMax": 59,
+  "goals": [
+   "savings",
+   "protection"
+  ],
+  "pay": "regular",
+  "minMonthly": 2500,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 15,
+    "k": "pay"
+   },
+   {
+    "l": "Cover continues",
+    "y": 6,
+    "k": "cover"
+   },
+   {
+    "l": "Maturity lump sum",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Limited premium paying term against a longer cover term",
+   "Maturity sum plus bonuses and final addition, if declared",
+   "Death benefit during the term",
+   "Loan facility; riders available"
+  ],
+  "tax": "80C and 10(10D) as per rules in force; keep the annual premium within 10% of sum assured for the maturity exemption.",
+  "suited": "People who want a defined savings goal in 16 to 25 years with a shorter payment period.",
+  "avoid": "Those who may stop paying early; surrender in early years is costly."
  },
  {
   "id": "jeevan-umang",
@@ -75,7 +139,42 @@
    "Do not stretch the premium beyond a comfortable level; lapsing wastes the early premiums"
   ],
   "outlook": "Well matched to people who want a pension-like stream plus a legacy; interest depends on rate trends.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 55,
+  "goals": [
+   "income",
+   "protection",
+   "savings"
+  ],
+  "pay": "regular",
+  "minMonthly": 4000,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 20,
+    "k": "pay"
+   },
+   {
+    "l": "Yearly income",
+    "y": 30,
+    "k": "get"
+   },
+   {
+    "l": "Maturity at 100 + cover",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Whole life cover to age 100",
+   "Yearly survival income after the premium term",
+   "Maturity payout at 100, plus bonuses",
+   "Loan facility; riders available"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "People in their 30s and 40s who want a pension-like income and a legacy.",
+  "avoid": "Those who need liquidity in the first 15 years."
  },
  {
   "id": "jeevan-utsav",
@@ -101,7 +200,41 @@
    "Do not compare with FD or mutual funds on yield alone, since the cover also costs money"
   ],
   "outlook": "Demand for guaranteed-income plans stays strong whenever deposit rates ease.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 65,
+  "goals": [
+   "income",
+   "savings"
+  ],
+  "pay": "regular",
+  "minMonthly": 5000,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 12,
+    "k": "pay"
+   },
+   {
+    "l": "Guaranteed additions accrue",
+    "y": 0,
+    "k": "cover"
+   },
+   {
+    "l": "Lifelong income",
+    "y": 40,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Guaranteed additions during the premium term",
+   "Regular or flexible income options to age 100",
+   "Guaranteed benefits do not depend on bonuses",
+   "Death benefit during the term"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "People nearing the mid-career who want guaranteed income later.",
+  "avoid": "Anyone who wants inflation-linked returns."
  },
  {
   "id": "jeevan-azad",
@@ -127,7 +260,39 @@
    "Suited to a fixed goal only; avoid it if you may need the money early"
   ],
   "outlook": "Fits goal-based savers who prefer certainty to bonus uncertainty.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 50,
+  "goals": [
+   "savings"
+  ],
+  "pay": "regular",
+  "minMonthly": 3000,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 10,
+    "k": "pay"
+   },
+   {
+    "l": "Cover continues",
+    "y": 7,
+    "k": "cover"
+   },
+   {
+    "l": "Guaranteed maturity",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Premiums for a shorter period than the policy term",
+   "Guaranteed benefits at the start",
+   "Death benefit during the term"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "Goal savers who prefer certainty to bonus uncertainty.",
+  "avoid": "Anyone who may need money before maturity."
  },
  {
   "id": "bima-jyoti",
@@ -152,7 +317,39 @@
    "Confirm the premium term and sum assured limits in the current brochure; features have been revised from time to time"
   ],
   "outlook": "Appeals to savers who want a fixed, predictable maturity amount.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 60,
+  "goals": [
+   "savings"
+  ],
+  "pay": "regular",
+  "minMonthly": 3000,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 12,
+    "k": "pay"
+   },
+   {
+    "l": "Guaranteed additions accrue",
+    "y": 0,
+    "k": "cover"
+   },
+   {
+    "l": "Guaranteed maturity",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Guaranteed additions for each thousand of sum assured during the premium term",
+   "Fixed maturity benefit known upfront",
+   "Death cover for the term"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "People who want a fixed, predictable lump sum.",
+  "avoid": "Anyone expecting bonus-driven upside."
  },
  {
   "id": "amritbaal",
@@ -178,7 +375,40 @@
    "Check the waiver or payor-benefit option before buying"
   ],
   "outlook": "Education costs keep rising, so the guaranteed corpus may lag; pair it with an equity SIP.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 13,
+  "goals": [
+   "child",
+   "savings"
+  ],
+  "pay": "regular",
+  "minMonthly": 2500,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 15,
+    "k": "pay"
+   },
+   {
+    "l": "Cover continues",
+    "y": 5,
+    "k": "cover"
+   },
+   {
+    "l": "Education / career payout",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Guaranteed additions help build a child's corpus",
+   "Benefits timed for education and career years",
+   "Entry from birth up to 13 years"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "Parents and grandparents of a child aged 0 to 13.",
+  "avoid": "Anyone who has not yet bought term cover for the parent."
  },
  {
   "id": "childrens-money-back",
@@ -204,7 +434,39 @@
    "Lapse in the early years causes large loss in value"
   ],
   "outlook": "Useful as a disciplined debt-side allocation for a child's goals; not as the only one.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 0,
+  "ageMax": 12,
+  "goals": [
+   "child"
+  ],
+  "pay": "regular",
+  "minMonthly": 2500,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 20,
+    "k": "pay"
+   },
+   {
+    "l": "Money-back instalments (18 to 22)",
+    "y": 4,
+    "k": "get"
+   },
+   {
+    "l": "Final payout at 25",
+    "y": 1,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Instalments at the child's college years",
+   "Full sum assured on death plus bonuses",
+   "Loan facility after the initial period"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "Parents of a child aged 0 to 12 planning education.",
+  "avoid": "Those who want one large lump sum, rather than instalments."
  },
  {
   "id": "jeevan-amar",
@@ -230,7 +492,35 @@
    "Choose the cover as roughly 10 to 15 times annual income, not as a round guess"
   ],
   "outlook": "The core protection plan for any earning member; its value is highest when bought young.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 18,
+  "ageMax": 65,
+  "goals": [
+   "protection"
+  ],
+  "pay": "regular",
+  "minMonthly": 500,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 25,
+    "k": "pay"
+   },
+   {
+    "l": "Pure cover, no maturity",
+    "y": 0,
+    "k": "cover"
+   }
+  ],
+  "features": [
+   "Pure protection with a large sum assured",
+   "Lump sum or instalment death benefit",
+   "Lower rates for women and non-smokers",
+   "Level or increasing cover options"
+  ],
+  "tax": "Premium under 80C and death benefit under 10(10D) as per rules in force.",
+  "suited": "Every earning member with dependants, bought as early as possible.",
+  "avoid": "Anyone who wants money back on survival."
  },
  {
   "id": "tech-term",
@@ -255,7 +545,34 @@
    "Keep your nominee informed, and keep the policy documents where the family can find them"
   ],
   "outlook": "Online term is where price competition is strongest; compare quotes before buying, then keep it for the full term.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 18,
+  "ageMax": 65,
+  "goals": [
+   "protection"
+  ],
+  "pay": "regular",
+  "minMonthly": 450,
+  "phases": [
+   {
+    "l": "Pay premiums",
+    "y": 25,
+    "k": "pay"
+   },
+   {
+    "l": "Pure cover, no maturity",
+    "y": 0,
+    "k": "cover"
+   }
+  ],
+  "features": [
+   "Online-only pure term with a higher minimum cover",
+   "Lower price than the offline variant",
+   "Premium concession for women and non-smokers"
+  ],
+  "tax": "80C and 10(10D) as per rules in force.",
+  "suited": "Comfortable-with-online buyers who want large income-replacement cover.",
+  "avoid": "Those who want maturity benefits."
  },
  {
   "id": "jeevan-akshay",
@@ -281,7 +598,35 @@
    "Compare annuity rates with other providers and with senior-citizen deposit income"
   ],
   "outlook": "Annuity rates follow interest rates; if rates fall further, today's rate may look attractive later.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 30,
+  "ageMax": 85,
+  "goals": [
+   "retirement",
+   "income"
+  ],
+  "pay": "single",
+  "minMonthly": 0,
+  "phases": [
+   {
+    "l": "Pay once",
+    "y": 0,
+    "k": "pay"
+   },
+   {
+    "l": "Pension for life, from the first period",
+    "y": 30,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Lump sum once, pension for life",
+   "Single or joint life options, with or without return of purchase price",
+   "Rate fixed at purchase"
+  ],
+  "tax": "Pension is taxable as income.",
+  "suited": "Retirees aged 55 to 70 with a corpus ready.",
+  "avoid": "Anyone who needs access to the lump sum later."
  },
  {
   "id": "jeevan-shanti",
@@ -307,7 +652,40 @@
    "Not for those who may need the corpus before the pension starts"
   ],
   "outlook": "Reasonable for those who want certainty in retirement income, especially in a falling rate environment.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 30,
+  "ageMax": 79,
+  "goals": [
+   "retirement",
+   "income"
+  ],
+  "pay": "single",
+  "minMonthly": 0,
+  "phases": [
+   {
+    "l": "Pay once",
+    "y": 0,
+    "k": "pay"
+   },
+   {
+    "l": "Wait (deferment 5 to 20 yrs)",
+    "y": 10,
+    "k": "cover"
+   },
+   {
+    "l": "Pension for life",
+    "y": 25,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Single premium now, guaranteed pension later",
+   "Deferment period of your choice",
+   "Single or joint life options"
+  ],
+  "tax": "Pension is taxable as income.",
+  "suited": "People aged 40 to 60 who want a retirement pension fixed today.",
+  "avoid": "Those who may need the money before the pension starts."
  },
  {
   "id": "saral-pension",
@@ -332,6 +710,34 @@
    "Compare it with Jeevan Akshay and bank options before committing; they can differ by a few percent in pension"
   ],
   "outlook": "A straightforward retirement-income tool for those who prefer simplicity.",
-  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice."
+  "note": "Always check the latest brochure at licindia.in or with an LIC agent before buying. This is general information and not advice.",
+  "ageMin": 40,
+  "ageMax": 80,
+  "goals": [
+   "retirement",
+   "income"
+  ],
+  "pay": "single",
+  "minMonthly": 0,
+  "phases": [
+   {
+    "l": "Pay once",
+    "y": 0,
+    "k": "pay"
+   },
+   {
+    "l": "Pension for life",
+    "y": 30,
+    "k": "get"
+   }
+  ],
+  "features": [
+   "Simple standard annuity, single or joint life",
+   "Return of purchase price on death",
+   "Easy to understand"
+  ],
+  "tax": "Pension is taxable as income.",
+  "suited": "Retirees aged 55 to 70 who prefer a simple option.",
+  "avoid": "Anyone wanting inflation-linked income."
  }
 ]
