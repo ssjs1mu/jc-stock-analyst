@@ -816,4 +816,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception:
+        import traceback
+        print("::warning title=trace::" + traceback.format_exc().replace("\n", " | ")[-900:])
+        raise
