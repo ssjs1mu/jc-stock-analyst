@@ -10,7 +10,7 @@
   },
   "label": "Positive close",
   "headline": "Nifty gains 0.51%, Banks lag",
-  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.09%, USD/INR 94.950. 28 of 50 Nifty stocks advanced and 21 declined.",
+  "summary": "Nifty 50 closed at 23,053.10 (+0.51%) and Sensex at 74,459.53 (+0.42%). Banks: Bank Nifty -0.41%. India VIX 15.30 (+1.21%). Brent crude -1.12%, USD/INR 94.940. 28 of 50 Nifty stocks advanced and 21 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
@@ -105,14 +105,14 @@
    {
     "name": "FTSE 100",
     "code": "",
-    "level": "10,747.93",
-    "pct": "+0.24%"
+    "level": "10,764.18",
+    "pct": "+0.39%"
    },
    {
     "name": "DAX",
     "code": "",
-    "level": "25,884.46",
-    "pct": "-0.60%"
+    "level": "25,922.10",
+    "pct": "-0.45%"
    },
    {
     "name": "Nikkei 225",
@@ -142,28 +142,28 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "113.63",
-    "pct": "-1.09%"
+    "level": "113.59",
+    "pct": "-1.12%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "104.24",
-    "pct": "+2.20%"
+    "level": "104.30",
+    "pct": "+2.25%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,987.90",
-    "pct": "-1.08%"
+    "level": "3,986.30",
+    "pct": "-1.12%"
    },
    {
     "name": "USD / INR",
-    "level": "94.950",
-    "pct": "-0.27%"
+    "level": "94.940",
+    "pct": "-0.28%"
    },
    {
     "name": "Dollar index",
-    "level": "101.65",
-    "pct": "-0.38%"
+    "level": "101.63",
+    "pct": "-0.40%"
    },
    {
     "name": "US 10-yr yield %",
@@ -178,14 +178,14 @@
    "text": "India VIX 15.30."
   },
   "headlines": [
+   "Markets rally for 2nd day amid buying in IT firms, earnings-driven demand in Trent",
+   "Tech Earnings Drive Losses on Wall Street Pre-Bell; Asia Off, Europe Mixed",
+   "5 things to know before Wall Street opens on October 30",
+   "Indian Equities Rally on IT Sector Strength, Trent Earnings",
+   "Sensex Rises Over 300 Points, Nifty Closes Above 23,050; IT, Pharma Stocks Lead Market Gains",
    "Market wrap: Shriram Finance, Nestle India, Trent, InterGlobe top gainers and losers on Nifty and Sensex on Friday",
-   "Sensex, Nifty Rise; IT & Pharma Lift Markets as Midcaps Slide",
-   "Indian Shares Snap Two-Month Losing Streak, Nifty And Sensex Gain In October",
-   "Indian rupee gains 33 paise to close at 94.93 against US dollar",
-   "Rupee rises 33 paise to close at 94.93 against US dollar",
-   "Business News",
-   "Tech Sell-Off Visits Asian Stock Markets",
-   "Closing Bell: Sensex Gains 300 Points, Nifty Reclaims 23,000 Mark as IT Stocks a Lead Rally"
+   "Sensex Up 308 Points, Nifty Rallies Again: Why Market Climbed For Second Straight Session",
+   "Sensex, Nifty Rise; IT & Pharma Lift Markets as Midcaps Slide"
   ],
   "gainers": [
    [
@@ -268,26 +268,41 @@
    ]
   ],
   "opening": {
-   "label": "Flat to marginally mixed start",
-   "zone": "23,048 - 23,118",
-   "headline": "Flat to marginally mixed start: Wall Street weak, Asia negative, crude easing",
+   "label": "Positive start likely",
+   "zone": "23,085 - 23,155",
+   "headline": "Positive start likely: Wall Street weak, Asia negative, crude easing",
    "drivers": [
-    "GIFT Nifty 23,083.5 (+30 pts, +0.13% vs Nifty's last close).",
+    "GIFT Nifty 23,119.5 (+66 pts, +0.29% vs Nifty's last close).",
     "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%.",
     "Asia this morning: Nikkei -2.12%, Hang Seng +1.46%, Kospi -3.48%.",
-    "Currency, crude and volatility: Brent 113.63 (-1.09%); USD/INR 94.950 (-0.27%); India VIX 15.30 (+1.21%)."
+    "Currency, crude and volatility: Brent 113.59 (-1.12%); USD/INR 94.940 (-0.28%); India VIX 15.30 (+1.21%)."
    ],
    "next": "Monday, 02 November 2026",
-   "mood": "neutral",
+   "mood": "bull",
    "gift": {
-    "last": "23,083.5",
-    "pct": "+0.11%",
-    "premium": "+30 pts",
-    "vs": "+0.13%",
-    "asof": "30 Oct 16:30"
+    "last": "23,119.5",
+    "pct": "+0.15%",
+    "premium": "+66 pts",
+    "vs": "+0.29%",
+    "asof": "30 Oct 16:45"
    },
    "anchored": true
   },
+  "story": [
+   "Nifty 50 opened at 22,964, a gap-up of 0.12% from the previous close of 22,937.",
+   "The index dipped to a low of 22,905 (-0.14%) around 10:15 AM and touched a high of 23,118 (+0.79%) around 12:55 PM.",
+   "It settled at 23,053 (+0.51%), in the middle of the day's range, a session of two-way trade.",
+   "28 of the 50 Nifty stocks advanced and 21 declined; Bank Nifty lagged (-0.41%).",
+   "Latest institutional data (29 Oct): FII/FPI net -944 Cr, DII net +1924 Cr."
+  ],
+  "risks": [
+   "Markets stay shut until Monday (3 days): weekend news, geopolitics and any Wall Street or Asian moves will all be priced in at the open.",
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,720.39 (-0.30%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$113.59 (-1.12%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 94.940 (-0.28%), US 10-year yield 4.99% (-1.11%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 23,119.5 (+0.29% vs Nifty's close): the best live read on the next opening.",
+   "Nifty 50 results due on Monday: ITC."
+  ],
   "vol_movers": [
    [
     "SUNPHARMA",
@@ -366,7 +381,7 @@
     "-1.18%"
    ]
   ],
-  "asof": "04:36 PM IST"
+  "asof": "04:55 PM IST"
  },
  "title": "Evening Breeze (30 Oct 2026)",
  "headline": "Nifty gains 0.51%, Banks lag",
@@ -376,6 +391,7 @@
   "sub": "Nifty +0.51% in the session"
  },
  "mood_score": 0.7101679755196355,
+ "mood_pic": "bull_calm",
  "edition": "evening",
  "disclaimer": "For information only. Not investment advice. Markets carry risk."
 }
