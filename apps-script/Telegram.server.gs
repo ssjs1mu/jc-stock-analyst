@@ -60,11 +60,14 @@ function tgPostReports() {
       if (!runs.length) return;
       runs.sort(function (a, b) { return a.generated_at < b.generated_at ? 1 : -1; });
       var run = runs[0]; if (sent[id] && sent[id] >= run.generated_at) return;
-      var pngs = run.files.filter(function (x) { return x.type === 'png'; }), f = pngs.filter(function (x) { return /Mobile/.test(x.name); })[0] || pngs[0] || run.files[0]; // phones: portrait version first
-      var blob = UrlFetchApp.fetch(TG_SITE + f.path, { muteHttpExceptions: true }).getBlob().setName(f.name);
-      var cap = (run.caption || f.name).slice(0, 900);
-      var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/' + (f.type === 'png' ? 'sendPhoto' : 'sendDocument'), { method: 'post', payload: { chat_id: s.c, caption: cap, [f.type === 'png' ? 'photo' : 'document']: blob }, muteHttpExceptions: true });
-      if (res.getResponseCode() === 200) { sent[id] = run.generated_at; n++; if (TG_MORNING[id] && tradingDay) { morningDone = true; mq.t = Date.now(); s.p.setProperty('TG_MQ', JSON.stringify(mq)); } } else Logger.log(id + ' ' + res.getContentText());
+      var pngs = run.files.filter(function (x) { return x.type === 'png'; }), mob = pngs.filter(function (x) { return /Mobile/.test(x.name); }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }), ok = true; // phones: portrait pages first
+      var send = mob.length ? mob : [pngs[0] || run.files[0]], cap = (run.caption || send[0].name).slice(0, 900);
+      send.forEach(function (f, i) {
+        var blob = UrlFetchApp.fetch(TG_SITE + f.path, { muteHttpExceptions: true }).getBlob().setName(f.name), isP = f.type === 'png', pl = { chat_id: s.c }; if (i === 0) pl.caption = cap; pl[isP ? 'photo' : 'document'] = blob;
+        var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/' + (isP ? 'sendPhoto' : 'sendDocument'), { method: 'post', payload: pl, muteHttpExceptions: true });
+        if (res.getResponseCode() !== 200) { ok = false; Logger.log(id + ' ' + res.getContentText()); }
+      });
+      if (ok) { sent[id] = run.generated_at; n++; if (TG_MORNING[id] && tradingDay) { morningDone = true; mq.t = Date.now(); s.p.setProperty('TG_MQ', JSON.stringify(mq)); } }
     } catch (e) { Logger.log(id + ' ' + e); }
   });
   s.p.setProperty('TG_SENT', JSON.stringify(sent));

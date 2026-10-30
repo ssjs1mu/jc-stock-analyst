@@ -17,6 +17,7 @@ so it is not generated here.)
 import argparse
 import concurrent.futures as cf
 import datetime as dt
+import glob
 import json
 import shutil
 import os
@@ -616,7 +617,7 @@ def main():
     mpng = os.path.join(a.out, "JCGG_Morning_Pulse_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
     if a.sid == "morning-pulse":
         subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--png", png, "--pdf", pdf])
-        try:   # portrait 1080x1350 version for phones / Instagram / Facebook / WhatsApp
+        try:   # 2-page portrait 1080x1350 version for phones / Instagram / Facebook / WhatsApp
             subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--mobile", mpng])
         except Exception as ex:
             print("mobile render failed:", ex)
@@ -630,7 +631,7 @@ def main():
     # structured copy of the report (same content as the PDF) for the terminal's Today's Outlook page
     js = pdf[:-4] + ".json"
     shutil.copyfile(cj, js)
-    files = ["--file", pdf] + (["--file", png] + (["--file", mpng] if os.path.exists(mpng) else []) if a.sid == "morning-pulse" else []) + ["--file", js]
+    files = ["--file", pdf] + (["--file", png] + [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
     subprocess.check_call(pub + files + ["--caption", "%s %s (auto pipeline)" % (a.sid, now.strftime("%d %b"))])
 
 

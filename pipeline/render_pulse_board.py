@@ -402,7 +402,7 @@ def mood_photo(sc):
 def top_art(c, t, mood, sc=0.0, banner=True):
     mv = parse_movers(c)
     art = {"bull": bull_svg(t["up"], t["acc"]), "bear": bear_svg(t["dn"], t["acc"]),
-           "neutral": bull_svg(t["up"], t["acc"], 76) + bear_svg(t["dn"], t["acc"], 76)}[mood]
+           "neutral": ''}[mood]
     pills = ""
     if mv.get("up"):
         pills += mover_pill(mv["up"][0], "up", t)
@@ -464,93 +464,114 @@ def build_html(c, force_layout=None, force_theme=None):
 <style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), BASE_CSS % dict(W=W, H=H, deco=deco_css(t)), body))
 
 
-# ---------------------------------------------------------------- mobile / social version (1080x1350, 4:5)
+# ---------------------------------------------------------------- mobile / social version: 2 portrait pages, 1080x1350 (4:5)
 MW, MH = 1080, 1350
 MOB_CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
 body{width:1080px;height:1350px;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);position:relative;overflow:hidden}
 .deco{position:absolute;inset:0;%(deco)s}
-.m{position:absolute;inset:0;display:flex;flex-direction:column;padding:0}
-.mh{background:var(--top);border-bottom:4px solid var(--acc);padding:22px 36px;display:flex;align-items:center;gap:20px;height:116px;flex:none}
-.mh img{height:76px}.mh .t1{font-size:40px;font-weight:800;color:var(--topink);line-height:1.05}.mh .t2{font-size:24px;color:var(--topink);opacity:.85;margin-top:4px}
-.mh .art{margin-left:auto;display:flex;gap:6px}
-.mb{flex:1;padding:18px 34px 14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:0}
-.badge{display:inline-block;padding:6px 20px;border-radius:999px;background:var(--acc);color:#111;font-weight:800;font-size:24px;letter-spacing:1px}
-.hl{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-1px}
-.bias{font-size:28px;line-height:1.3;opacity:.95;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.tl{background:var(--card);border:2px solid var(--cardb);border-radius:18px;padding:7px 12px;text-align:center}
-.tl .n{font-size:24px;font-weight:700;color:var(--mut)}.tl .v{font-size:34px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}.tl .c{font-size:28px;font-weight:800}
+.m{position:absolute;inset:0;display:flex;flex-direction:column}
+.mh{background:var(--top);border-bottom:4px solid var(--acc);padding:0 34px;display:flex;align-items:center;gap:18px;height:104px;flex:none}
+.mh img{height:70px}.mh .t1{font-size:38px;font-weight:800;color:var(--topink);line-height:1.05}.mh .t2{font-size:23px;color:var(--topink);opacity:.85;margin-top:3px}
+.mh .pg{margin-left:auto;font-size:24px;font-weight:800;color:var(--topink);border:2px solid var(--acc);border-radius:999px;padding:4px 16px}
+.mb{flex:1;padding:12px 34px 8px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+.mb>*{flex:none}
+.badge{display:inline-block;padding:5px 18px;border-radius:999px;background:var(--acc);color:#111;font-weight:800;font-size:22px;letter-spacing:1px}
+.hl{font-size:48px;font-weight:800;line-height:1.06;letter-spacing:-1px}
+.tx{font-size:25px;line-height:1.3;opacity:.96}
+.sec{font-size:22px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--acc);border-bottom:2px solid var(--cardb);padding-bottom:2px;margin-top:4px}
+table{width:100%%;border-collapse:collapse}
+td,th{padding:0 12px;height:var(--rh,42px);font-size:25px;vertical-align:middle}
+th{font-size:19px;color:var(--mut);font-weight:700;text-align:right;height:26px;letter-spacing:.5px;text-transform:uppercase}
+th:first-child,td:first-child{text-align:left}
+td{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+td:first-child{font-weight:700}td small{display:inline;font-size:19px;color:var(--mut);font-weight:600;margin-left:10px}
+tr:nth-child(even) td{background:var(--card)}
+tbody tr{border-bottom:1px solid var(--cardb)}
 .up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
-.sec{font-size:26px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--acc)}
-.bg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.bc{background:var(--card);border:2px solid var(--cardb);border-top-width:6px;border-radius:16px;padding:5px 12px 6px}
-.bc .n{font-size:23px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bc .v{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}.bc .c{font-size:27px;font-weight:800}
-.lv{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.lc{background:var(--card);border:2px solid var(--cardb);border-radius:18px;padding:8px 16px}
-.lc .n{font-size:27px;font-weight:800}.lc .r{display:flex;justify-content:space-between;font-size:26px;font-weight:800;margin-top:4px}.lc small{display:block;font-size:20px;color:var(--mut);font-weight:600}
-.mb>*{flex:none}.mv{display:flex;gap:10px;flex-wrap:nowrap}
-.pl{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--cardb);border-radius:999px;padding:5px 18px 5px 6px;font-size:26px;font-weight:800}
-.pl i{width:40px;height:40px;border-radius:50%%;color:#111;font-style:normal;font-size:16px;display:flex;align-items:center;justify-content:center}
-.mf{flex:none;background:var(--top);color:var(--topink);padding:10px 34px;font-size:19px;line-height:1.3;height:58px;overflow:hidden}
+td.bar{width:150px;padding-right:6px}.dv{position:relative;height:14px;background:rgba(128,128,128,.18);border-radius:7px}.dv i{position:absolute;top:0;height:14px;border-radius:7px}.dv b{position:absolute;left:50%%;top:-3px;width:2px;height:20px;background:var(--mut)}
+.box{background:var(--card);border:2px solid var(--cardb);border-radius:16px;padding:8px 14px}
+.box h4{font-size:24px;font-weight:800;color:var(--acc);margin-bottom:2px}.box p{font-size:21px;line-height:1.26}
+.lvr{display:grid;grid-template-columns:150px 1fr 1fr;gap:8px 14px;align-items:baseline}.lvr small{display:block;font-size:18px;color:var(--mut);font-weight:600}.lvr .v{font-size:24px;font-weight:800}
+.mf{flex:none;background:var(--top);color:var(--topink);padding:6px 34px;font-size:16px;line-height:1.3;overflow:hidden}
 """
 
 
-def build_mobile(c, force_theme=None):
+def _rows(items, t, mx=None, sub=False):
+    vals = [abs(fnum(i.get("pct")) or 0) for i in items]
+    mx = mx or max(vals + [0.5])
+    out = ""
+    for i in items:
+        v = fnum(i.get("pct")) or 0
+        w = min(50, abs(v) / mx * 50)
+        side = "left:%.1f%%" % (50 if v >= 0 else 50 - w)
+        col = "var(--up)" if v > 0 else ("var(--dn)" if v < 0 else "var(--mut)")
+        nm = e(i["name"]) + (("<small>%s</small>" % e(i.get("sub", ""))) if sub and i.get("sub") else "")
+        out += ('<tr><td>%s</td><td>%s</td><td class="%s">%s</td><td class="bar"><div class="dv"><b></b><i style="%s;width:%.1f%%;background:%s"></i></div></td></tr>'
+                % (nm, e(i.get("value", i.get("level", ""))), pcls(i.get("pct")), e(chg_txt(i.get("pct"))), side, w, col))
+    return out
+
+
+def _table(title, items, t, sub=False):
+    return ('<div class="sec">%s</div><table><thead><tr><th></th><th>Level</th><th>Change</th><th></th></tr></thead><tbody>%s</tbody></table>' % (title, _rows(items, t, None, sub)))
+
+
+def build_mobile(c, page=1, force_theme=None):
     mood, sc, lay, t = pick_design(c, None, force_theme)
     mw = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
     import re as _re
     m = _re.search(r"\((\d{1,2}\s+\w{3}\s+\d{4})\)", c.get("title", ""))
     dtxt = m.group(1) if m else ""
-    ph = mood_photo(sc)
-    art = ({"bull": bull_svg(t["up"], t["acc"], 70), "bear": bear_svg(t["dn"], t["acc"], 70),
-            "neutral": bull_svg(t["up"], t["acc"], 58) + bear_svg(t["dn"], t["acc"], 58)}[mood]) if not ph else ""
-    tiles = ""
-    for tl in c["tiles"][:6]:
-        tiles += '<div class="tl"><div class="n">%s</div><div class="v">%s</div><div class="c %s">%s</div></div>' % (e(tl["name"]), e(tl["value"]), pcls(tl.get("pct")), e(chg_txt(tl.get("pct"))))
-    B = t["bars"]
-    bench = ""
-    for i, b in enumerate(c["bench"][:9]):
-        bench += '<div class="bc" style="border-top-color:%s"><div class="n">%s</div><div class="v">%s</div><div class="c %s">%s</div></div>' % (
-            B[i % len(B)], e(b["name"]), e(b["level"]), pcls(b["pct"]), e(chg_txt(b["pct"])))
-    lv = ""
-    for l in c["levels"][:2]:
-        lv += '<div class="lc"><div class="n">%s</div><div class="r"><span class="up"><small>Support</small>%s</span><span class="dn" style="text-align:right"><small>Resistance</small>%s</span></div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]))
-    mv = parse_movers(c)
-    pills = ""
-    for kind in ("up", "dn"):
-        for x in (mv.get(kind) or [])[:1]:
-            sym = str(x["sym"]).replace(".NS", "")
-            col = t["up"] if kind == "up" else t["dn"]
-            pills += '<span class="pl"><i style="background:%s">%s</i>%s <span style="color:%s">%s %s</span></span>' % (col, e(sym[:2]), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(str(x["pct"]).replace("+", "").replace("-", "")))
     vix = c["vix"]
-    photo = ""
-    if ph:
-        photo = '<div style="height:150px;border-radius:20px;border:2px solid var(--cardb);background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 55%%),url(%s) right 30%%/cover;display:flex;align-items:flex-end;padding:10px 14px;flex:none"><span class="badge" style="font-size:22px">%s</span></div>' % (ph, mw)
-    body = """<div class="m"><div class="mh"><img src="%s"><div><div class="t1">Morning Market Pulse</div><div class="t2">%s &middot; Joshi's Corner</div></div><div class="art">%s</div></div>
-<div class="mb"><div style="display:flex;align-items:center;gap:14px"><span class="badge">%s</span><span style="font-size:26px;font-weight:700;color:var(--mut)">%s</span></div>
-<div class="hl">%s</div>%s
-<div class="tg">%s</div><div class="sec">Global &amp; Asian markets</div><div class="bg">%s</div>
-<div class="sec">Key levels to watch</div><div class="lv">%s</div><div class="mv">%s</div></div>
-<div class="mf">%s</div></div>""" % (logo(), e(dtxt), art, mw, e(vix["headline"]), e(c["headline"]), photo, tiles, bench, lv, pills,
-                                      e(c.get("disclaimer", "Not investment advice. Markets carry risk.")))
+    ph = mood_photo(sc)
+    head = ('<div class="mh"><img src="%s"><div><div class="t1">Morning Market Pulse</div><div class="t2">%s &middot; Joshi\'s Corner</div></div><div class="pg">%d / 2</div></div>' % (logo(), e(dtxt), page))
+    if page == 1:
+        photo = ""
+        if ph:
+            photo = ('<div style="height:170px;border-radius:18px;border:2px solid var(--cardb);background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 55%%),url(%s) right 30%%/cover"></div>' % ph)
+        tiles = [dict(name=x["name"], sub=x.get("sub", ""), value=x["value"], pct=x.get("pct")) for x in c["tiles"]]
+        body = ('<div style="display:flex;align-items:center;gap:14px"><span class="badge">%s</span><span style="font-size:24px;font-weight:700;color:var(--mut)">%s</span></div>'
+                '<div class="hl">%s</div>%s<div class="tx">%s</div>%s'
+                '<div class="sec">%s</div><div style="display:flex;align-items:center;gap:18px"><div style="flex:none">%s</div><div><div style="font-size:28px;font-weight:800">%s</div><div class="tx" style="font-size:23px;margin-top:2px">%s</div></div></div>'
+                '<div class="sec">%s</div><div class="tx" style="font-size:23px">%s</div><div class="sec">%s</div>%s'
+                % (mw, e(vix["headline"]), e(c["headline"]), photo, e(c["bias_text"]), _table("Market snapshot", tiles, t, True),
+                   "Volatility", gauge2(vix.get("gauge", .5), 120, t["ink"]), e(vix["headline"]), e(vix["text"]),
+                   e(c["asia"]["head"]), e(c["asia"]["text"]),
+                   e(c.get("spark_label", "Nifty 50 trend")), spark2(c.get("spark", []), t, 1000, 120)))
+    else:
+        mv = parse_movers(c)
+        lv = ""
+        for l in c["levels"][:2]:
+            lv += ('<div class="box"><div class="lvr"><div style="font-size:26px;font-weight:800">%s</div><div><small>Support zone</small><span class="v up">%s</span></div><div><small>Resistance zone</small><span class="v dn">%s</span></div></div>'
+                   '<p style="font-size:21px;margin-top:3px;opacity:.92">%s</p></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])))
+        al = "".join('<div class="box"><h4>%s</h4><p>%s</p></div>' % (e(b["title"]), e(b["text"])) for b in c["bottom"][:3])
+        body = ('%s<div class="sec">Key technical levels to watch</div>%s<div class="sec">Corporate action &amp; market alerts</div>%s'
+                % (_table("Global &amp; Asian equity benchmarks", c["bench"][:9], t), lv, al))
+    foot = '<div class="mf">%s &nbsp;|&nbsp; %s</div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "Not investment advice. Markets carry risk.")))
     return ("""<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), MOB_CSS % dict(deco=deco_css(t)), body))
+<style>:root{%s}%s</style></head><body><div class="deco"></div><div class="m">%s<div class="mb" id="mb">%s</div>%s</div>
+<script>(function(){var mb=document.getElementById('mb'),r=@R@;while(mb.scrollHeight>mb.clientHeight+1&&r>30){r-=2;document.documentElement.style.setProperty('--rh',r+'px');}var z=1;while(mb.scrollHeight>mb.clientHeight+1&&z>0.84){z-=0.02;mb.style.zoom=z;}})();</script></body></html>"""
+            % (css_vars(t), MOB_CSS % dict(deco=deco_css(t)), head, body, foot)).replace('@R@', str(42 if page == 1 else 38))
 
 
-def render_mobile(cfg, png, force_theme=None):
+def render_mobile(cfg, png_base, force_theme=None):
+    """-> [page1.png, page2.png]; png_base like out/Name_Mobile.png -> out/Name_Mobile_1.png, _2.png"""
     from playwright.sync_api import sync_playwright
+    outs = []
     with sync_playwright() as p:
         b = p.chromium.launch()
         pg = b.new_page(viewport={"width": MW, "height": MH})
-        pg.set_content(build_mobile(cfg, force_theme), wait_until="load")
-        try:
-            pg.wait_for_load_state("networkidle", timeout=6000)
-        except Exception:
-            pass
-        pg.screenshot(path=png, full_page=False)
+        for n in (1, 2):
+            pg.set_content(build_mobile(cfg, n, force_theme), wait_until="load")
+            try:
+                pg.wait_for_load_state("networkidle", timeout=6000)
+            except Exception:
+                pass
+            f = png_base[:-4] + "_%d.png" % n
+            pg.screenshot(path=f, full_page=False)
+            outs.append(f)
         b.close()
-    return png
+    return outs
 
 
 def render(cfg, png, pdf=None):
