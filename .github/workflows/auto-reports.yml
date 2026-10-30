@@ -1,19 +1,13 @@
-name: Auto reports (primary builder, no Claude needed)
+name: Auto reports (primary builder, free, no Claude / no paid API)
 
-# Builds each report shortly BEFORE its due time (IST), then retries twice. A run whose report
-# is already in reports/<id>/index.json for today does nothing, so retries are free.
-# Off-the-hour minutes are used because GitHub delays jobs queued at :00 / :30.
+# Self-healing: runs every 15 minutes through the IST morning and evening windows. Each run builds
+# whatever is DUE by the current IST time and not yet published today, so a skipped or late GitHub
+# cron is simply caught by the next one. Finished reports are skipped in seconds. Commentary is
+# rule-based (no Gemini/Anthropic key needed); an optional LLM can be enabled with USE_LLM=1.
 on:
   schedule:
-    - cron: '13 2 * * 1-5'    # 07:43 IST  premarket-news            (due 08:00)
-    - cron: '28 2 * * 1-5'    # 07:58 IST  premarket-news retry
-    - cron: '43 2 * * 1-5'    # 08:13 IST  morning-brief, morning-detailed (due 08:30) + premarket retry
-    - cron: '58 2 * * 1-5'    # 08:28 IST  morning-pulse (due 08:45) + brief/detailed retry
-    - cron: '13 3 * * 1-5'    # 08:43 IST  final retry, all morning reports
-    - cron: '13 12 * * 1-5'   # 17:43 IST  evening-market-wrap        (due 18:00)
-    - cron: '43 12 * * 1-5'   # 18:13 IST  evening-market-wrap retry
-    - cron: '13 13 * * 1-5'   # 18:43 IST  evening-news-wrap (due 19:00) + market-wrap retry
-    - cron: '43 13 * * 1-5'   # 19:13 IST  evening-news-wrap retry
+    - cron: '7,22,37,52 2-4 * * 1-5'     # 07:37-10:22 IST every 15 min
+    - cron: '7,22,37,52 12-14 * * 1-5'   # 17:37-20:22 IST every 15 min
   push:
     paths: ['.pulse/last.txt']   # heartbeat from an external scheduler: GitHub's own cron is often late or skipped
   workflow_dispatch:
@@ -51,30 +45,19 @@ jobs:
       - name: Pick report ids
         id: pick
         run: |
-          case "${{ github.event.schedule }}" in
-            "13 2 * * 1-5")  IDS="premarket-news" ;;
-            "28 2 * * 1-5")  IDS="premarket-news" ;;
-            "43 2 * * 1-5")  IDS="premarket-news morning-brief morning-detailed" ;;
-            "58 2 * * 1-5")  IDS="morning-pulse morning-brief morning-detailed" ;;
-            "13 3 * * 1-5")  IDS="premarket-news morning-brief morning-detailed morning-pulse" ;;
-            "13 12 * * 1-5") IDS="evening-market-wrap" ;;
-            "43 12 * * 1-5") IDS="evening-market-wrap" ;;
-            "13 13 * * 1-5") IDS="evening-news-wrap evening-market-wrap" ;;
-            "43 13 * * 1-5") IDS="evening-news-wrap" ;;
-            *) IDS="${{ github.event.inputs.ids }}" ;;
-          esac
-          if [ "${{ github.event_name }}" = "push" ]; then
-            # heartbeat: build whatever is due for this time of day (IST); finished reports are skipped below
-            H=$(TZ=Asia/Kolkata date +%H)
-            if [ "$H" -lt 12 ]; then IDS="premarket-news morning-brief morning-detailed morning-pulse"; else IDS="evening-market-wrap evening-news-wrap"; fi
-          fi
+          IDS="${{ github.event.inputs.ids }}"
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            # drop reports already published (or marked holiday) today, so retries finish in seconds
-            IDS=$(python3 - $IDS <<'PY'
-          import json, sys, datetime as dt
-          today = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=5, minutes=30)).date().isoformat()
+            IDS=$(python3 - <<'PY'
+          import json, datetime as dt
+          ist = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=5, minutes=30)
+          today, hm = ist.date().isoformat(), ist.hour * 60 + ist.minute
+          # (id, due-from minute of IST day, stop-after minute)
+          plan = [("premarket-news", 7*60+40, 15*60), ("morning-brief", 8*60+10, 15*60), ("morning-detailed", 8*60+10, 15*60),
+                  ("morning-pulse", 8*60+25, 15*60), ("evening-market-wrap", 17*60+40, 23*60+59), ("evening-news-wrap", 18*60+40, 23*60+59)]
           left = []
-          for i in sys.argv[1:]:
+          for i, lo, hi in plan:
+              if ist.weekday() > 4 or not (lo <= hm <= hi):
+                  continue
               try:
                   runs = json.load(open("reports/%s/index.json" % i)).get("runs", [])
               except Exception:
@@ -86,7 +69,7 @@ jobs:
           )
           fi
           echo "ids=$IDS" >> "$GITHUB_OUTPUT"
-          echo "To build: ${IDS:-nothing (all done)}"
+          echo "To build: ${IDS:-nothing (all done or not yet due)}"
       - name: Install renderer
         if: ${{ steps.pick.outputs.ids != '' }}
         run: |
@@ -95,8 +78,6 @@ jobs:
       - name: Build and publish
         if: ${{ steps.pick.outputs.ids != '' }}
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           FORCE: ${{ github.event.inputs.force }}
           DRY: ${{ github.event.inputs.dry }}
         run: |

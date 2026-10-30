@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Morning Pulse 'board' infographic (landscape 2000x1116) -> PNG + PDF.
+"""Morning Pulse infographic (landscape 2000x1116) -> PNG + PDF. Daily-varying design: 3 layouts x 10 themes picked from the date and the day's mood.
 
 Usage: python3 render_pulse_board.py --config pulse.json --png out.png [--pdf out.pdf]
 
@@ -99,88 +99,283 @@ ICON = {
 }
 
 
-def build_html(c):
-    tiles = ""
-    for t in c["tiles"][:6]:
-        p = t.get("pct")
-        frac = .5 + (float(str(p).replace("%", "").replace("+", "")) / 4 if sign(p) or str(p).strip("+-%0.") == "" and p not in ("n/a", None) else 0)
-        try:
-            frac = .5 + float(str(p).replace("%", "").replace("+", "")) / 4
-        except Exception:
-            frac = .5
-        tiles += ('<div class="tile">%s<div class="tn">%s</div><div class="ts">%s</div><div class="tv">%s</div>'
-                  '<div class="tc" style="color:%s">%s</div></div>'
-                  % (gauge(frac, 104), e(t["name"]), e(t.get("sub", "")), e(t["value"]), "#7ee2a8" if sign(p) > 0 else ("#ff8aa1" if sign(p) < 0 else "#cbd5e1"), e(chg_txt(p))))
-    bench = ""
-    for i, b in enumerate(c["bench"][:9]):
-        bench += ('<div class="brow"><div class="bar" style="background:linear-gradient(90deg,%s,%s)"><span class="flag">%s</span>'
-                  '<span class="bn">%s</span><span class="bl">%s</span></div><div class="pill" style="color:%s;background:%s">%s</div></div>'
-                  % (BAR[i % len(BAR)], BAR[(i + 1) % len(BAR)], e(b.get("code", "")), e(b["name"]), e(b["level"]),
-                     col(b["pct"]), "#dff5e8" if sign(b["pct"]) > 0 else ("#fde2e7" if sign(b["pct"]) < 0 else "#e8edf3"), e(chg_txt(b["pct"]))))
-    levels = ""
+
+# ---------------------------------------------------------------- daily design system
+THEMES = {
+    "bull": [
+        dict(name="Emerald Gold", bg="linear-gradient(135deg,#04241d,#0b4a3a 55%,#0d3b30)", ink="#eafff6", mut="#9fd9c3", card="rgba(255,255,255,.07)", cardb="rgba(255,215,120,.35)", acc="#f5c451", acc2="#34d399", up="#4ade80", dn="#fb7185", upbg="rgba(74,222,128,.16)", dnbg="rgba(251,113,133,.16)", top="#031a15", topink="#f5c451", panel="rgba(0,0,0,.28)", deco="rings", bars=["#10b981", "#f5c451", "#14b8a6", "#84cc16", "#22c55e", "#eab308", "#06b6d4", "#16a34a", "#fbbf24"]),
+        dict(name="Aurora", bg="linear-gradient(135deg,#071a3a,#0a3d62 50%,#0f5c63)", ink="#effcff", mut="#9ccbe0", card="rgba(255,255,255,.08)", cardb="rgba(120,255,230,.35)", acc="#5eead4", acc2="#a3e635", up="#86efac", dn="#fda4af", upbg="rgba(134,239,172,.16)", dnbg="rgba(253,164,175,.16)", top="#06122b", topink="#5eead4", panel="rgba(2,12,40,.45)", deco="glow", bars=["#0ea5e9", "#14b8a6", "#6366f1", "#22d3ee", "#10b981", "#8b5cf6", "#06b6d4", "#38bdf8", "#34d399"]),
+        dict(name="Sunrise Saffron", bg="linear-gradient(135deg,#fff7e6,#ffe9c2 55%,#ffd9a0)", ink="#3a2200", mut="#8a5a1a", card="rgba(255,255,255,.75)", cardb="rgba(214,120,20,.35)", acc="#e8590c", acc2="#15803d", up="#15803d", dn="#c2255c", upbg="#dcf7e3", dnbg="#fde2e7", top="#7a3b00", topink="#fff3da", panel="rgba(255,255,255,.72)", deco="sun", bars=["#b45309", "#15803d", "#c2410c", "#0f766e", "#a16207", "#166534", "#9a3412", "#4d7c0f", "#b91c1c"]),
+    ],
+    "bear": [
+        dict(name="Crimson Dusk", bg="linear-gradient(135deg,#25040f,#4a0d24 55%,#2d0a1e)", ink="#fff0f3", mut="#e5a3b4", card="rgba(255,255,255,.07)", cardb="rgba(255,150,160,.35)", acc="#ffb347", acc2="#ff6b81", up="#6ee7b7", dn="#ff7a90", upbg="rgba(110,231,183,.15)", dnbg="rgba(255,122,144,.18)", top="#1a0209", topink="#ffb347", panel="rgba(0,0,0,.32)", deco="rings", bars=["#e11d48", "#f97316", "#be185d", "#fb923c", "#9f1239", "#f59e0b", "#db2777", "#ea580c", "#dc2626"]),
+        dict(name="Ember Slate", bg="linear-gradient(135deg,#14181f,#232b38 55%,#1a1f29)", ink="#f4f6fa", mut="#a7b2c4", card="rgba(255,255,255,.06)", cardb="rgba(255,140,60,.40)", acc="#ff8a3d", acc2="#ffd166", up="#5eead4", dn="#ff6b6b", upbg="rgba(94,234,212,.14)", dnbg="rgba(255,107,107,.18)", top="#0b0e13", topink="#ff8a3d", panel="rgba(0,0,0,.35)", deco="stripes", bars=["#f97316", "#ef4444", "#f59e0b", "#e11d48", "#fb923c", "#dc2626", "#eab308", "#c2410c", "#ea580c"]),
+        dict(name="Storm Violet", bg="linear-gradient(135deg,#1a1033,#2c1a52 55%,#1d1240)", ink="#f6f0ff", mut="#baa7e0", card="rgba(255,255,255,.07)", cardb="rgba(190,150,255,.38)", acc="#ff9ecb", acc2="#c4b5fd", up="#86efac", dn="#ff8fa3", upbg="rgba(134,239,172,.15)", dnbg="rgba(255,143,163,.18)", top="#0f0a22", topink="#ff9ecb", panel="rgba(0,0,0,.30)", deco="glow", bars=["#8b5cf6", "#ec4899", "#6366f1", "#f43f5e", "#a855f7", "#d946ef", "#7c3aed", "#f472b6", "#9333ea"]),
+    ],
+    "neutral": [
+        dict(name="Midnight Royal", bg="linear-gradient(135deg,#0a1a3a,#12306b 55%,#0e2556)", ink="#f1f6ff", mut="#9fb4d8", card="rgba(255,255,255,.07)", cardb="rgba(245,196,81,.35)", acc="#f5c451", acc2="#7dd3fc", up="#4ade80", dn="#fb7185", upbg="rgba(74,222,128,.16)", dnbg="rgba(251,113,133,.17)", top="#071230", topink="#f5c451", panel="rgba(0,0,0,.28)", deco="rings", bars=["#2563eb", "#f5c451", "#0ea5e9", "#6366f1", "#14b8a6", "#f59e0b", "#3b82f6", "#8b5cf6", "#06b6d4"]),
+        dict(name="Ocean Neon", bg="linear-gradient(135deg,#031b34,#06406b 50%,#082a4d)", ink="#eefaff", mut="#8fc3e0", card="rgba(255,255,255,.07)", cardb="rgba(34,211,238,.40)", acc="#22d3ee", acc2="#f472b6", up="#34d399", dn="#fb7185", upbg="rgba(52,211,153,.16)", dnbg="rgba(251,113,133,.17)", top="#021325", topink="#22d3ee", panel="rgba(0,10,30,.45)", deco="glow", bars=["#06b6d4", "#ec4899", "#3b82f6", "#14b8a6", "#8b5cf6", "#0ea5e9", "#f472b6", "#2dd4bf", "#6366f1"]),
+        dict(name="Indigo Pearl", bg="linear-gradient(135deg,#f3f1ff,#e4e8ff 55%,#eef3ff)", ink="#1b1f4a", mut="#5a6190", card="rgba(255,255,255,.85)", cardb="rgba(99,102,241,.30)", acc="#4f46e5", acc2="#db2777", up="#047857", dn="#be123c", upbg="#d9f7e8", dnbg="#fde2e8", top="#1b1f4a", topink="#ffffff", panel="rgba(255,255,255,.85)", deco="dots", bars=["#4f46e5", "#db2777", "#0891b2", "#7c3aed", "#059669", "#d97706", "#2563eb", "#c026d3", "#0d9488"]),
+        dict(name="Teal Copper", bg="linear-gradient(135deg,#06262b,#0b4b52 55%,#0a353c)", ink="#effffd", mut="#9bd0cd", card="rgba(255,255,255,.07)", cardb="rgba(255,160,100,.38)", acc="#ffa566", acc2="#5eead4", up="#5eead4", dn="#ff8a80", upbg="rgba(94,234,212,.16)", dnbg="rgba(255,138,128,.17)", top="#041a1e", topink="#ffa566", panel="rgba(0,0,0,.28)", deco="stripes", bars=["#14b8a6", "#f97316", "#0ea5e9", "#f59e0b", "#10b981", "#fb923c", "#06b6d4", "#d97706", "#22c55e"]),
+    ],
+}
+LAYOUTS = ["board", "hero", "magazine"]
+
+
+def fnum(p):
+    try:
+        return float(str(p).replace("%", "").replace("+", "").replace(",", ""))
+    except Exception:
+        return None
+
+
+def mood_of(c):
+    """-> ('bull'|'bear'|'neutral', score -3..3) from the config's own numbers only"""
+    vals = [fnum(b.get("pct")) for b in c.get("bench", [])]
+    vals = [v for v in vals if v is not None]
+    nif = None
+    for t in c.get("tiles", []):
+        if "nifty" in str(t.get("name", "")).lower():
+            nif = fnum(t.get("pct"))
+            break
+    avg = sum(vals) / len(vals) if vals else 0.0
+    sc = (nif if nif is not None else avg) * 0.6 + avg * 0.4
+    return ("bull" if sc > 0.35 else ("bear" if sc < -0.35 else "neutral")), sc
+
+
+def pick_design(c, force_layout=None, force_theme=None):
+    mood, sc = mood_of(c)
+    import datetime as _dt, re as _re
+    d = None
+    for src in (c.get("date"), c.get("report_date"), c.get("title"), c.get("footnote")):
+        m = _re.search(r"(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?\s+(\d{4})", str(src or ""))
+        if m:
+            try:
+                d = _dt.datetime.strptime("%s %s %s" % m.groups(), "%d %b %Y").toordinal()
+                break
+            except Exception:
+                pass
+    if d is None:
+        d = _dt.date.today().toordinal()
+    lay = LAYOUTS[d % 3] if force_layout is None else force_layout
+    lst = THEMES[mood]
+    th = lst[(d // 3 + d) % len(lst)] if force_theme is None else force_theme
+    return mood, sc, lay, th
+
+
+def css_vars(t):
+    return ";".join("--%s:%s" % (k, v) for k, v in t.items() if k not in ("name", "bars", "deco"))
+
+
+def deco_css(t):
+    d = t.get("deco")
+    if d == "rings":
+        return "background-image:radial-gradient(circle at 92% 8%,transparent 0 120px,rgba(255,255,255,.05) 121px 124px,transparent 125px 190px,rgba(255,255,255,.04) 191px 194px,transparent 195px),radial-gradient(circle at 4% 96%,rgba(255,255,255,.05) 0 3px,transparent 4px);background-size:auto,34px 34px"
+    if d == "glow":
+        return "background-image:radial-gradient(900px 500px at 85% -10%,rgba(94,234,212,.20),transparent 60%),radial-gradient(700px 420px at 0% 100%,rgba(167,139,250,.18),transparent 60%)"
+    if d == "sun":
+        return "background-image:radial-gradient(700px 520px at 95% -8%,rgba(255,170,60,.45),transparent 62%),radial-gradient(420px 300px at 0% 100%,rgba(34,160,90,.18),transparent 70%)"
+    if d == "stripes":
+        return "background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 26px)"
+    if d == "dots":
+        return "background-image:radial-gradient(rgba(79,70,229,.14) 2px,transparent 2.5px);background-size:30px 30px"
+    return ""
+
+
+def gauge2(frac, size=150, ink="#fff"):
+    frac = min(1, max(0, frac))
+    cx, cy, r = 100, 100, 80
+    segs = [("#ef476f", 0, .25), ("#f78c40", .25, .5), ("#ffd166", .5, .7), ("#06d6a0", .7, 1)]
+    paths = ""
+    for c, a, b in segs:
+        a0, a1 = math.pi * (1 - a), math.pi * (1 - b)
+        paths += '<path d="M%.1f %.1f A%d %d 0 0 1 %.1f %.1f" stroke="%s" stroke-width="22" fill="none"/>' % (
+            cx + r * math.cos(a0), cy - r * math.sin(a0), r, r, cx + r * math.cos(a1), cy - r * math.sin(a1), c)
+    ang = math.pi * (1 - frac)
+    return ('<svg viewBox="0 0 200 118" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="7" '
+            'stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="%s"/></svg>' % (size, size * .59, paths, cx + 62 * math.cos(ang), cy - 62 * math.sin(ang), ink, ink))
+
+
+def spark2(vals, t, w=470, h=230):
+    vals = [v for v in vals if isinstance(v, (int, float))]
+    if len(vals) < 3:
+        return ""
+    lo, hi = min(vals), max(vals)
+    rng = (hi - lo) or 1
+    n = len(vals)
+    pts = [(10 + i * (w - 20) / (n - 1), h - 20 - (v - lo) / rng * (h - 60)) for i, v in enumerate(vals)]
+    bars = ""
+    for i, (x, y) in enumerate(pts):
+        cc = t["up"] if i == 0 or vals[i] >= vals[i - 1] else t["dn"]
+        bars += '<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="3" fill="%s" opacity=".80"/>' % (x - (w / n) * .3, y, (w / n) * .6, h - 20 - y, cc)
+    line = " ".join("%.1f,%.1f" % p for p in pts)
+    ax, ay = pts[-1]
+    return ('<svg viewBox="0 0 %d %d" width="100%%" height="%d" preserveAspectRatio="xMidYMid meet">%s<polyline points="%s" fill="none" stroke="%s" stroke-width="5" '
+            'stroke-linejoin="round" stroke-linecap="round"/><circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="%s" stroke-width="3"/></svg>' % (w, h, h, bars, line, t["acc"], ax, ay, t["acc2"], t["ink"]))
+
+
+def icon(name, t):
+    a, b = t["acc"], t["acc2"]
+    I = {
+        "cal": '<svg viewBox="0 0 64 64" width="88" height="88"><rect x="6" y="12" width="52" height="46" rx="9" fill="none" stroke="%s" stroke-width="4"/><rect x="6" y="12" width="52" height="16" rx="9" fill="%s"/><g fill="%s"><rect x="14" y="34" width="8" height="6" rx="2"/><rect x="28" y="34" width="8" height="6" rx="2"/><rect x="42" y="34" width="8" height="6" rx="2"/><rect x="14" y="45" width="8" height="6" rx="2"/><rect x="28" y="45" width="8" height="6" rx="2"/></g></svg>' % (b, a, b),
+        "list": '<svg viewBox="0 0 64 64" width="88" height="88"><rect x="10" y="8" width="44" height="52" rx="8" fill="none" stroke="%s" stroke-width="4"/><g stroke="%s" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 24l4 4 7-8"/><path d="M17 40l4 4 7-8"/></g><g stroke="%s" stroke-width="4" stroke-linecap="round"><path d="M34 25h14"/><path d="M34 41h14"/></g></svg>' % (b, a, b),
+        "chart": '<svg viewBox="0 0 64 64" width="88" height="88"><rect x="6" y="8" width="52" height="48" rx="9" fill="none" stroke="%s" stroke-width="4"/><rect x="15" y="34" width="8" height="15" rx="2" fill="%s"/><rect x="28" y="24" width="8" height="25" rx="2" fill="%s"/><rect x="41" y="16" width="8" height="33" rx="2" fill="%s"/></svg>' % (b, b, a, a),
+        "chip": '<svg viewBox="0 0 64 64" width="120" height="120"><rect x="16" y="16" width="32" height="32" rx="7" fill="%s"/><rect x="24" y="24" width="16" height="16" rx="3" fill="#fff" opacity=".85"/><g stroke="%s" stroke-width="3" stroke-linecap="round"><path d="M24 8v8M32 8v8M40 8v8M24 48v8M32 48v8M40 48v8M8 24h8M8 32h8M8 40h8M48 24h8M48 32h8M48 40h8"/></g></svg>' % (a, b),
+    }
+    return I.get(name, I["chart"])
+
+
+def pcls(p):
+    s = sign(p)
+    return "up" if s > 0 else ("dn" if s < 0 else "fl")
+
+
+def comp_tiles(c, t, cols=3, gsize=104):
+    out = ""
+    for tl in c["tiles"][:6]:
+        p = tl.get("pct")
+        v = fnum(p)
+        frac = .5 + (v / 4 if v is not None else 0)
+        out += ('<div class="tile">%s<div class="tn">%s</div><div class="ts">%s</div><div class="tv">%s</div><div class="tc %s">%s</div></div>'
+                % (gauge2(frac, gsize, t["ink"]), e(tl["name"]), e(tl.get("sub", "")), e(tl["value"]), pcls(p), e(chg_txt(p))))
+    return '<div class="tiles" style="grid-template-columns:repeat(%d,1fr)">%s</div>' % (cols, out)
+
+
+def comp_bench_bars(c, t, n=9):
+    out = ""
+    B = t["bars"]
+    for i, b in enumerate(c["bench"][:n]):
+        out += ('<div class="brow"><div class="bar" style="background:linear-gradient(90deg,%s,%s)"><span class="flag">%s</span><span class="bn">%s</span><span class="bl">%s</span></div>'
+                '<div class="pill %s">%s</div></div>' % (B[i % len(B)], B[(i + 1) % len(B)], e(b.get("code", "")), e(b["name"]), e(b["level"]), pcls(b["pct"]), e(chg_txt(b["pct"]))))
+    return out
+
+
+def comp_bench_cards(c, t, n=9, cols=3):
+    out = ""
+    B = t["bars"]
+    vals = [abs(fnum(b.get("pct")) or 0) for b in c["bench"][:n]]
+    mx = max(vals + [0.5])
+    for i, b in enumerate(c["bench"][:n]):
+        v = fnum(b.get("pct")) or 0
+        w = min(100, abs(v) / mx * 100)
+        out += ('<div class="bcard" style="border-top:6px solid %s"><div class="bt"><span class="flag" style="background:%s">%s</span><span class="bn2">%s</span></div>'
+                '<div class="bv">%s</div><div class="bpct %s">%s</div><div class="mini"><i class="%s" style="width:%.0f%%"></i></div></div>'
+                % (B[i % len(B)], B[i % len(B)], e(b.get("code", "")), e(b["name"]), e(b["level"]), pcls(b["pct"]), e(chg_txt(b["pct"])), pcls(b["pct"]), w))
+    return '<div class="bgrid" style="grid-template-columns:repeat(%d,1fr)">%s</div>' % (cols, out)
+
+
+def comp_bench_chips(c, t, n=9):
+    out = ""
+    for i, b in enumerate(c["bench"][:n]):
+        out += '<div class="chip %s"><span class="cc">%s</span><b>%s</b><span class="cl">%s</span><span class="cp">%s</span></div>' % (
+            pcls(b["pct"]), e(b.get("code", "")), e(b["name"]), e(b["level"]), e(chg_txt(b["pct"])))
+    return '<div class="chips">%s</div>' % out
+
+
+def comp_levels(c, t, track=False):
+    out = ""
     for lv in c["levels"][:2]:
-        levels += ('<div class="lvl"><div class="ln">%s</div><div class="lz"><div class="zone"><small>Support Zone</small><b>%s</b></div>'
-                   '<div class="zone"><small>Resistance Zone</small><b>%s</b></div></div><div class="lnote"><b>Upside Potential:</b> %s</div></div>'
-                   % (e(lv["name"]), e(lv["s"]), e(lv["r"]), e(lv["note"])))
-    bottom = ""
-    for b in c["bottom"][:3]:
-        bottom += '<div class="bp">%s<div><h4>%s</h4><p>%s</p></div></div>' % (ICON.get(b.get("icon", "chart"), ""), e(b["title"]), e(b["text"]))
-    v = c["vix"]
-    vv = v.get("gauge", .5)
-    return """<!doctype html><html><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
+        if track:
+            out += ('<div class="lvl2"><div class="ln">%s</div><div class="track"><span class="s">%s</span><i></i><span class="r">%s</span></div><div class="lnote">%s</div></div>'
+                    % (e(lv["name"]), e(lv["s"]), e(lv["r"]), e(lv["note"])))
+        else:
+            out += ('<div class="lvl"><div class="ln">%s</div><div class="lz"><div class="zone s"><small>Support Zone</small><b>%s</b></div><div class="zone r"><small>Resistance Zone</small><b>%s</b></div></div>'
+                    '<div class="lnote">%s</div></div>' % (e(lv["name"]), e(lv["s"]), e(lv["r"]), e(lv["note"])))
+    return out
+
+
+def comp_alerts(c, t):
+    return "".join('<div class="bp">%s<div><h4>%s</h4><p>%s</p></div></div>' % (icon(b.get("icon", "chart"), t), e(b["title"]), e(b["text"])) for b in c["bottom"][:3])
+
+
+BASE_CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
-body{width:%dpx;height:%dpx;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;color:#0f2747;background:linear-gradient(180deg,#f4f8fc,#eaf1f8);position:relative;overflow:hidden}
-.top{height:92px;background:#0f2747;color:#fff;display:flex;align-items:center;gap:22px;padding:0 40px}
-.top img{height:70px}.top h1{font-size:48px;font-weight:700;letter-spacing:-.5px;white-space:nowrap}
-h2{font-size:25px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
-.abs{position:absolute}
-.big{font-size:38px;font-weight:800;line-height:1.1}
-p{font-size:21px;line-height:1.35;color:#1e3553}.clamp6{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;font-size:19px}.bp p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.panel{background:#1d3a5e;border-radius:26px;padding:22px 26px;border:3px solid #2e547f}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 14px;margin-top:6px}
-.tile{text-align:center;color:#fff}.tn{font-weight:700;font-size:20px;margin-top:-2px}.ts{font-size:14px;color:#a9bfdc}.tv{font-weight:800;font-size:24px}.tc{font-weight:700;font-size:19px}
+body{width:%(W)dpx;height:%(H)dpx;font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);position:relative;overflow:hidden}
+.wrap svg{flex:none}.wrap p{flex:none}.lvl2 .lnote{display:none}.lvl2{margin-bottom:10px}.lvl2 .ln{font-size:23px;margin-bottom:2px}.cmp .ts{display:none}.cmp .mini{display:none}.cmp .vt{-webkit-line-clamp:2!important}.cmp .bcard{padding:7px 16px 9px}.cmp .tn{font-size:18px}.cmp .tv{font-size:22px}.cmp .tc{font-size:17px}.cmp .tiles{gap:2px 10px}.wrap>div{overflow:hidden}
+.deco{position:absolute;inset:0;%(deco)s;pointer-events:none}
+.wrap{position:absolute;inset:0;display:grid}
+h1{font-weight:800;letter-spacing:-.5px;white-space:nowrap}
+h2{font-size:24px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--acc)}
+p{font-size:21px;line-height:1.36;color:var(--ink);opacity:.92}
+.cl6{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.cl4{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.cl2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cl3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.big{font-weight:800;line-height:1.1}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
+.top{background:var(--top);color:var(--topink);display:flex;align-items:center;gap:22px;padding:0 40px;border-bottom:3px solid var(--acc)}
+.top img{height:70px}
+.panel{background:var(--panel);border:2px solid var(--cardb);border-radius:26px;padding:20px 24px}
+.card{background:var(--card);border:2px solid var(--cardb);border-radius:22px;padding:18px 22px}
+.tiles{display:grid;gap:8px 14px;margin-top:6px}
+.tile{text-align:center}.tn{font-weight:700;font-size:20px;margin-top:-2px}.ts{font-size:14px;color:var(--mut)}.tv{font-weight:800;font-size:24px}.tc{font-weight:700;font-size:19px}
 .brow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.bar{flex:1;height:46px;border-radius:23px;color:#fff;display:flex;align-items:center;padding:0 18px 0 6px;font-weight:700;font-size:22px;box-shadow:0 3px 6px rgba(15,39,71,.18)}
-.flag{width:36px;height:36px;border-radius:50%%;background:#fff;color:#0f2747;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-right:12px}
+.bar{flex:1;height:46px;border-radius:23px;color:#fff;display:flex;align-items:center;padding:0 20px 0 6px;font-weight:700;font-size:22px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.flag{min-width:38px;height:38px;border-radius:50%%;background:#fff;color:#0f2747;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-right:12px}
 .bn{width:235px;white-space:nowrap}.bl{margin-left:auto;font-variant-numeric:tabular-nums}
-.pill{width:140px;height:42px;border-radius:21px;font-weight:800;font-size:21px;display:flex;align-items:center;justify-content:center}
-.lvl{display:grid;grid-template-columns:110px 1fr;gap:8px 14px;align-items:center;margin-bottom:12px;border-bottom:2px solid #c9d6e6;padding-bottom:10px}.lnote{grid-column:1/3}
-.ln{font-size:26px;font-weight:800;line-height:1.05}.lz{display:flex;gap:18px}.zone{flex:1;text-align:center;border-top:4px solid #1b9a77;padding-top:6px}
-.zone:nth-child(2){border-top-color:#d6336c}.zone small{display:block;font-size:16px;color:#4a6486}.zone b{font-size:22px;white-space:nowrap}
-.lnote{font-size:17px;line-height:1.25}
-.bp{display:flex;gap:18px;align-items:flex-start}.bp svg{flex:none}.bp h4{font-size:26px;font-weight:800;margin-bottom:6px}.bp p{font-size:19px;line-height:1.32}
-.foot{position:absolute;left:0;right:0;bottom:0;height:30px;background:#0f2747;color:#c3d1e6;font-size:14px;display:flex;align-items:center;padding:0 40px;gap:30px;white-space:nowrap;overflow:hidden}
-</style></head><body>
-<div class="top"><img src="%s"><h1>%s</h1></div>
+.pill{width:140px;height:42px;border-radius:21px;font-weight:800;font-size:21px;display:flex;align-items:center;justify-content:center;background:var(--card)}
+.pill.up{background:var(--upbg)}.pill.dn{background:var(--dnbg)}
+.bgrid{display:grid;gap:12px}.bcard{background:var(--card);border:2px solid var(--cardb);border-radius:18px;padding:9px 16px}
+.bt{display:flex;align-items:center;gap:10px}.bt .flag{color:#fff;margin:0}.bn2{font-weight:700;font-size:21px}
+.bv{font-size:28px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}.bpct{font-size:22px;font-weight:800}
+.mini{height:9px;border-radius:5px;background:rgba(128,128,128,.25);margin-top:5px;overflow:hidden}.mini i{display:block;height:100%%;border-radius:5px}.mini i.up{background:var(--up)}.mini i.dn{background:var(--dn)}.mini i.fl{background:var(--mut)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}.chip{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--cardb);border-radius:999px;padding:6px 16px 6px 6px;font-size:18px}
+.chip .cc{width:34px;height:34px;border-radius:50%%;background:var(--acc);color:#111;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}.chip .cl{opacity:.8;font-variant-numeric:tabular-nums}.chip .cp{font-weight:800}.chip.up .cp{color:var(--up)}.chip.dn .cp{color:var(--dn)}
+.lvl{display:grid;grid-template-columns:120px 1fr;gap:8px 14px;align-items:center;margin-bottom:12px;border-bottom:2px solid var(--cardb);padding-bottom:10px}.lnote{grid-column:1/3;font-size:17px;line-height:1.28;opacity:.9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ln{font-size:26px;font-weight:800;line-height:1.05}.lz{display:flex;gap:16px}.zone{flex:1;text-align:center;border-top:4px solid var(--up);padding-top:6px}.zone.r{border-top-color:var(--dn)}.zone small{display:block;font-size:16px;color:var(--mut)}.zone b{font-size:22px;white-space:nowrap}
+.lvl2{margin-bottom:16px}.lvl2 .ln{font-size:26px;margin-bottom:6px}.track{display:flex;align-items:center;gap:12px;font-weight:800;font-size:23px}.track i{flex:1;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--up),var(--acc),var(--dn))}.track .s{color:var(--up)}.track .r{color:var(--dn)}
+.bp{display:flex;gap:18px;align-items:flex-start}.bp svg{flex:none;width:72px;height:72px}.bp h4{font-size:26px;font-weight:800;margin-bottom:6px;color:var(--acc)}.bp p{font-size:19px;line-height:1.32;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.foot{background:var(--top);color:var(--topink);opacity:.95;font-size:14px;display:flex;align-items:center;padding:0 40px;gap:30px;white-space:nowrap;overflow:hidden}
+.badge{display:inline-block;padding:6px 18px;border-radius:999px;background:var(--acc);color:#111;font-weight:800;font-size:22px;letter-spacing:1px}
+"""
 
-<div class="abs" style="left:40px;top:116px;width:480px"><h2>Today's Market Bias<br>&amp; Macro Highlights</h2></div>
-<div class="abs" style="left:40px;top:215px">%s</div>
-<div class="abs" style="left:40px;top:455px;width:470px;font-size:15px;color:#4a6486">%s</div>
 
-<div class="abs" style="left:560px;top:118px;width:450px"><div class="big" style="font-size:34px">%s</div><p class="clamp6" style="margin-top:12px">%s</p></div>
-<div class="abs" style="left:1025px;top:118px;width:2px;height:200px;background:#c9d6e6"></div>
-<div class="abs" style="left:1045px;top:112px;display:flex;gap:12px;width:350px;align-items:center">%s<div><div class="big" style="font-size:26px">%s</div></div></div>
-<div class="abs" style="left:1045px;top:215px;width:350px"><p style="font-size:19px">%s</p></div>
+def title_size(s):
+    n = len(s)
+    return 48 if n <= 58 else (42 if n <= 70 else 36)
 
-<div class="abs panel" style="left:1430px;top:112px;width:530px;height:420px"><h2 style="color:#fff;font-size:20px;margin-bottom:6px">Commodities, Currency &amp; Volatility</h2><div class="tiles">%s</div></div>
 
-<div class="abs" style="left:540px;top:345px;width:850px"><h2 style="text-align:center;margin-bottom:12px;font-size:27px">Global &amp; Asian Equity Benchmarks</h2>%s</div>
-
-<div class="abs" style="left:40px;top:535px;width:470px;display:flex;gap:14px">%s<div><div class="big" style="font-size:32px">%s</div></div></div>
-<div class="abs" style="left:40px;top:645px;width:470px"><p style="font-size:20px">%s</p></div>
-
-<div class="abs" style="left:1430px;top:550px;width:530px;"><h2 style="font-size:23px;text-align:center">Key Technical Levels to Watch</h2></div>
-<div class="abs" style="left:1430px;top:600px;width:530px">%s</div>
-
-<div class="abs" style="left:40px;top:890px;width:1920px;height:3px;background:#c9d6e6"></div>
-<div class="abs" style="left:40px;top:905px;width:600px"><h2 style="font-size:27px">Corporate Action &amp; Market Alerts</h2></div>
-<div class="abs" style="left:40px;top:950px;width:1920px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">%s</div>
-<div class="foot"><span>%s</span><span>%s</span></div>
-</body></html>""" % (W, H, logo(), e(c["title"]), spark(c.get("spark", [])), e(c.get("spark_label", "")),
-                     e(c["headline"]), e(c["bias_text"]), gauge(vv, 120), e(v["headline"]), e(v["text"]), tiles, bench,
-                     ICON["chip"], e(c["asia"]["head"]), e(c["asia"]["text"]), levels, bottom, e(c.get("footnote", "")), e(c.get("disclaimer", "")))
+def build_html(c, force_layout=None, force_theme=None):
+    mood, sc, lay, t = pick_design(c, force_layout, force_theme)
+    mood_word = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
+    v = c["vix"]
+    vg = v.get("gauge", .5)
+    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1></div>' % (logo(), title_size(c["title"]), e(c["title"]))
+    foot = '<div class="foot" style="grid-area:foot"><span>%s</span><span>%s</span></div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "")))
+    sp = spark2(c.get("spark", []), t, h=(150 if lay == 'magazine' else 230))
+    spl = '<div style="font-size:15px;color:var(--mut)">%s</div>' % e(c.get("spark_label", ""))
+    asia = ('<div style="display:flex;gap:16px;align-items:flex-start">%s<div><div class="big" style="font-size:30px">%s</div><p class="cl6" style="font-size:20px;margin-top:6px">%s</p></div></div>'
+            % (icon("chip", t), e(c["asia"]["head"]), e(c["asia"]["text"])))
+    vixb = ('<div style="display:flex;gap:12px;align-items:center">%s<div class="big" style="font-size:27px">%s</div></div><p class="cl4 vt" style="font-size:19px;margin-top:8px">%s</p>' % (gauge2(vg, 120, t["ink"]), e(v["headline"]), e(v["text"])))
+    vixc = ('<div style="display:flex;gap:16px;align-items:center">%s<div><div class="big" style="font-size:25px">%s</div><p class="cl2" style="font-size:17px;margin-top:4px">%s</p></div></div>'
+            % (gauge2(vg, 104, t["ink"]), e(v["headline"]), e(v["text"])))
+    if lay == "board":
+        body = """<div class="wrap" style="grid-template-columns:470px 1fr 530px;grid-template-rows:92px minmax(0,1fr) 172px 30px;grid-template-areas:'top top top' 'l c r' 'b b b' 'foot foot foot';gap:0 40px;padding:0">
+%(top)s
+<div style="grid-area:l;padding:24px 0 0 40px;display:flex;flex-direction:column;gap:14px;min-width:0"><h2>Today's Market Bias<br>&amp; Macro Highlights</h2><div>%(sp)s%(spl)s</div>%(asia)s</div>
+<div style="grid-area:c;padding:22px 0 0;min-width:0"><div style="display:grid;grid-template-columns:1fr 330px;gap:26px;height:240px"><div><div class="big" style="font-size:34px">%(hl)s</div><p class="cl6" style="font-size:19px;margin-top:10px">%(bias)s</p></div><div>%(vixb)s</div></div><h2 style="text-align:center;margin:6px 0 10px;font-size:26px">Global &amp; Asian Equity Benchmarks</h2>%(bench)s</div>
+<div style="grid-area:r;padding:20px 40px 0 0;display:flex;flex-direction:column;gap:14px;min-width:0"><div class="panel"><h2 style="font-size:19px;margin-bottom:4px">Commodities, Currency &amp; Volatility</h2>%(tiles)s</div><h2 style="text-align:center;font-size:22px">Key Technical Levels to Watch</h2><div>%(lvl)s</div></div>
+<div style="grid-area:b;padding:12px 40px 0;border-top:3px solid var(--cardb);margin:0 40px"><h2 style="font-size:26px;margin-bottom:8px">Corporate Action &amp; Market Alerts</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">%(al)s</div></div>
+%(foot)s</div>""" % dict(top=top, sp=sp, spl=spl, asia=asia, hl=e(c["headline"]), bias=e(c["bias_text"]), vixb=vixb, bench=comp_bench_bars(c, t), tiles=comp_tiles(c, t), lvl=comp_levels(c, t), al=comp_alerts(c, t), foot=foot)
+    elif lay == "hero":
+        arc = gauge2(min(1, max(0, .5 + sc / 4)), 190, t["ink"])
+        body = """<div class="wrap cmp" style="grid-template-columns:640px 1fr;grid-template-rows:92px minmax(0,1fr) 172px 30px;grid-template-areas:'top top' 'l r' 'b b' 'foot foot';gap:18px 30px">
+%(top)s
+<div style="grid-area:l;padding:22px 0 0 40px;display:flex;flex-direction:column;gap:14px;min-width:0"><div class="card" style="text-align:center;padding:12px"><div style="display:flex;justify-content:center">%(arc)s</div><div style="margin-top:6px"><span class="badge">%(mw)s</span></div></div><div class="big" style="font-size:34px">%(hl)s</div><p class="cl4" style="font-size:19px">%(bias)s</p>%(asia)s<div class="card" style="padding:12px 18px">%(vixb)s</div></div>
+<div style="grid-area:r;padding:22px 40px 0 0;display:flex;flex-direction:column;gap:14px;min-width:0"><h2 style="font-size:26px">Global &amp; Asian Equity Benchmarks</h2>%(bench)s<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div class="panel"><h2 style="font-size:18px">Commodities, Currency &amp; Volatility</h2>%(tiles)s</div><div class="card"><h2 style="font-size:20px;margin-bottom:8px">Key Levels to Watch</h2>%(lvl)s</div></div></div>
+<div style="grid-area:b;padding:10px 40px 0;border-top:3px solid var(--cardb);margin:0 40px"><h2 style="font-size:26px;margin-bottom:8px">Corporate Action &amp; Market Alerts</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">%(al)s</div></div>
+%(foot)s</div>""" % dict(top=top, arc=arc, mw=mood_word, hl=e(c["headline"]), bias=e(c["bias_text"]), asia=asia, bench=comp_bench_cards(c, t, 9, 3), tiles=comp_tiles(c, t, 3, 66), lvl=comp_levels(c, t, True), vixb=vixc, al=comp_alerts(c, t), foot=foot)
+    else:  # magazine
+        body = """<div class="wrap cmp" style="grid-template-columns:1fr 560px;grid-template-rows:92px 138px minmax(0,1fr) 172px 30px;grid-template-areas:'top top' 'tk tk' 'l r' 'b b' 'foot foot';gap:16px 36px">
+%(top)s
+<div style="grid-area:tk;padding:14px 40px 0">%(chips)s</div>
+<div style="grid-area:l;padding:6px 0 0 40px;display:flex;flex-direction:column;gap:14px;min-width:0"><div><span class="badge">%(mw)s</span></div><div class="big" style="font-size:56px;line-height:1.04">%(hl)s</div><p class="cl4" style="font-size:22px">%(bias)s</p><div class="card" style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:center"><div>%(asia)s</div><div>%(sp)s%(spl)s</div></div><div class="card" style="padding:12px 18px">%(vixb)s</div></div>
+<div style="grid-area:r;padding:6px 40px 0 0;display:flex;flex-direction:column;gap:14px;min-width:0"><div class="panel"><h2 style="font-size:19px;margin-bottom:4px">Commodities, Currency &amp; Volatility</h2>%(tiles)s</div><div class="card"><h2 style="font-size:20px;margin-bottom:8px">Key Levels to Watch</h2>%(lvl)s</div></div>
+<div style="grid-area:b;padding:10px 40px 0;border-top:3px solid var(--cardb);margin:0 40px"><h2 style="font-size:26px;margin-bottom:8px">Corporate Action &amp; Market Alerts</h2><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">%(al)s</div></div>
+%(foot)s</div>""" % dict(top=top, chips=comp_bench_chips(c, t, 9), mw=mood_word, hl=e(c["headline"]), bias=e(c["bias_text"]), asia=asia, sp=sp, spl=spl, tiles=comp_tiles(c, t, 3, 74), lvl=comp_levels(c, t, True), vixb=vixc, al=comp_alerts(c, t), foot=foot)
+    return ("""<!doctype html><html><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>:root{%s}%s</style></head><body><div class="deco"></div>%s</body></html>""" % (css_vars(t), BASE_CSS % dict(W=W, H=H, deco=deco_css(t)), body))
 
 
 def render(cfg, png, pdf=None):

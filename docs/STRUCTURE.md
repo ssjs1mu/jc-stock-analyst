@@ -11,7 +11,7 @@ Public GitHub Pages app `ssjs1mu/jc-stock-analyst` + a Google Apps Script backen
 - `reports/<id>/index.json` + `schedules.json` — report runs published by GitHub Actions.
 
 ## Pipeline (GitHub Actions)
-- `.github/workflows/day-calls.yml`, `auto-reports.yml`; scripts in `pipeline/` (`build_calls.js`, `auto_reports.py` with `NSE_HOLIDAYS`, `publish.py`).
+- `.github/workflows/day-calls.yml`, `auto-reports.yml` (every 15 min in the IST windows, builds whatever is due; no paid API; `render_pulse_board.py` = daily-varying infographic: 3 layouts x 10 themes); scripts in `pipeline/` (`build_calls.js`, `auto_reports.py` with `NSE_HOLIDAYS`, `publish.py`).
 
 ## Backend (`apps-script/`)
 Edit the source parts, never `Code.gs` directly: `Code.base.gs` (routes, watchlists), `Calls.server.gs`, `Telegram.server.gs` (schedule, holidays, posts), `Clients.server.gs` (client store, passcode, backups, Telegram to clients). Run `python3 pipeline/build_gs.py` → `Code.gs` → paste into Apps Script editor → Save → Deploy › Manage deployments › edit › Version: **New version** → Deploy.

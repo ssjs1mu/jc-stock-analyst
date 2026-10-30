@@ -4,7 +4,7 @@
 Usage: python3 pipeline/auto_reports.py <schedule_id> [--force] [--out DIR]
 
 Data: Yahoo Finance chart API (prices) + Google News RSS (headlines).
-Commentary: Gemini free API (GEMINI_API_KEY secret); if the key is missing or the call
+Commentary: rule-based writer by default (no paid API). Optional LLM only when USE_LLM=1; if the key is missing or the call
 fails, a plain template paragraph built only from the numbers is used instead.
 
 Fallback behaviour: if reports/<id>/index.json already holds an ok/holiday run for today
@@ -282,9 +282,11 @@ def commentary(kind, facts, headlines):
         '"vol_text": "2 sentences on India VIX and the rupee from the facts", '
         '"asia_head": "max 5 words on Asian markets", '
         '"asia_text": "2-3 sentences on Asian and global cues from the facts"}' % (kind, facts, heads or "(none)"))
-    out, by = gemini(prompt), "gemini"
-    if not (out and isinstance(out.get("bias"), str)):
-        out, by = claude_json(prompt), "claude"
+    out, by = None, "template"
+    if os.environ.get("USE_LLM") == "1":   # optional extra only; reports never depend on any paid/subscribed API
+        out, by = gemini(prompt), "gemini"
+        if not (out and isinstance(out.get("bias"), str)):
+            out, by = claude_json(prompt), "claude"
     if out and isinstance(out.get("bias"), str):
         out["outlook"] = [str(x) for x in out.get("outlook", [])][:6]
         out["news"] = [str(x) for x in out.get("news", [])][:8]
@@ -395,11 +397,37 @@ def build(sid, qs, heads, now):
         cm["asia_text"] = ("Latest closes: Nikkei %s, Hang Seng %s, Shanghai %s, Kospi %s. Wall Street: Dow %s, S&P 500 %s, "
                            "Nasdaq %s." % tuple(lv_(k) for k in ("^N225", "^HSI", "000001.SS", "^KS11", "^DJI", "^GSPC", "^IXIC")))
         cm["vol_text"] = "India VIX %s; USD/INR %s; US 10-yr yield %s." % (lv_("^INDIAVIX"), lv_("USDINR=X"), lv_("^TNX"))
+        # rule-based headline / outlook from the numbers only
+        def pc(k):
+            q = qs.get(k)
+            try:
+                return float(q["pct"])
+            except Exception:
+                return None
+        nf, bn, vx = pc("^NSEI"), pc("^NSEBANK"), pc("^INDIAVIX")
+        if nf is not None:
+            tone = "Gains" if nf > 0.15 else ("Slips" if nf < -0.15 else "Little Changed")
+            tail = ""
+            if bn is not None and abs(bn - nf) >= 0.3:
+                tail = ", Banks %s" % ("Lead" if bn > nf else "Lag")
+            cm["headline"] = ("Nifty %s %.2f%%%s" % (tone, abs(nf), tail)) if tone != "Little Changed" else "Nifty Little Changed%s" % tail
+        if vx is not None:
+            cm["vol_text"] += " India VIX %s %.1f%% - %s." % ("eased" if vx < 0 else "rose", abs(vx), "volatility expectations cooling" if vx < 0 else "hedging demand up")
+        if not cm.get("outlook"):
+            ol = []
+            pv = pivots(qs.get("^NSEI"))
+            if pv:
+                ol.append("Nifty 50 pivot support %s / %s, resistance %s / %s from the last session." % (f2(pv["s1"], 0), f2(pv["s2"], 0), f2(pv["r1"], 0), f2(pv["r2"], 0)))
+            if gain:
+                ol.append("Top Nifty gainers: " + ", ".join("%s %s" % (g[0], pct(g[1]["pct"])) for g in gain[:3]) + ".")
+            if lose:
+                ol.append("Top Nifty losers: " + ", ".join("%s %s" % (g[0], pct(g[1]["pct"])) for g in lose[:3]) + ".")
+            cm["outlook"] = ol
     pv = pivots(qs.get("^NSEI"))
     note = ("Auto-generated at %s IST by the Joshi's Corner data pipeline (Yahoo Finance prices, Google News "
             "headlines; commentary %s). GIFT Nifty, MCX, FII/DII and option-chain data are not available to "
             "this pipeline and show as n/a." % (TM, "drafted by %s from those inputs only" % cm["by"].title()
-                                                if cm["by"] != "template" else "templated from the numbers only"))
+                                                if cm["by"] != "template" else "rule-based from the numbers only"))
     base = dict(report_subtitle="Joshi's Corner", report_date=D, report_time=TM + " IST",
                 generated_line="Generated: %s, %s IST" % (D, TM), as_of_note=note, disclaimer=DISC)
     ind = [row(n, qs.get(s)) for n, s in IDX.items()]
@@ -514,7 +542,7 @@ def build(sid, qs, heads, now):
                          "text": cm.get("asia_text") or "Asian and global index moves are shown in the benchmark table; official GIFT Nifty and MCX figures are not available to this pipeline."},
                 "levels": levels, "bottom": bottom,
                 "footnote": "Auto-generated %s IST | Prices: Yahoo Finance | Headlines: Google News | Commentary: %s | GIFT Nifty, MCX, FII/DII not available (n/a). Levels are classic pivots from the last session."
-                            % (TM, cm["by"].title()),
+                            % (TM, "rule-based" if cm["by"] == "template" else cm["by"].title()),
                 "disclaimer": "Not investment advice. Markets carry risk."}
     raise SystemExit("unsupported id " + sid)
 
