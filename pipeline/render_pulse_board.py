@@ -317,7 +317,7 @@ p{font-size:21px;line-height:1.36;color:var(--ink);opacity:.92}
 .big{font-weight:800;line-height:1.1}
 .up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
 .top{background:var(--top);color:var(--topink);display:flex;align-items:center;gap:22px;padding:0 40px;border-bottom:3px solid var(--acc)}
-.top img{height:70px}.art{margin-left:auto;display:flex;align-items:center;gap:14px}.mvs{display:flex;flex-direction:column;gap:5px}.mv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1.5px solid var(--cardb);border-radius:999px;padding:2px 12px 2px 3px;font-size:16px;color:var(--topink)}.mv i{width:26px;height:26px;border-radius:50%%;color:#111;font-style:normal;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.mv em{font-style:normal;font-weight:800}
+.top img{height:70px}.art{margin-left:auto;display:flex;align-items:center;gap:14px}.art.photo{width:560px;height:92px;margin-right:-40px;background-size:cover;background-position:right 30%%;padding-left:20px}.mvs{display:flex;flex-direction:column;gap:5px}.mv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1.5px solid var(--cardb);border-radius:999px;padding:2px 12px 2px 3px;font-size:16px;color:var(--topink)}.mv i{width:26px;height:26px;border-radius:50%%;color:#111;font-style:normal;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}.mv em{font-style:normal;font-weight:800}
 .panel{background:var(--panel);border:2px solid var(--cardb);border-radius:26px;padding:20px 24px}
 .card{background:var(--card);border:2px solid var(--cardb);border-radius:22px;padding:18px 22px}
 .tiles{display:grid;gap:8px 14px;margin-top:6px}
@@ -387,7 +387,19 @@ def mover_pill(m, kind, t):
             % (col, e(mono), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(chg_txt(m["pct"]).replace("+", "").replace("-", ""))))
 
 
-def top_art(c, t, mood):
+def mood_photo(sc):
+    key = ("bull_roar" if sc > 1.0 else "bull_calm" if sc > 0.35 else "bear_roar" if sc < -1.0 else "bear_calm" if sc < -0.35
+           else ("bull_over_bear" if sc >= 0 else "bear_over_bull"))
+    d = os.path.join(HERE, "branding", "mood")
+    for ext in (".jpg", ".jpeg", ".png", ".webp"):
+        f = os.path.join(d, key + ext)
+        if os.path.exists(f):
+            mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[ext[1:]]
+            return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
+    return None
+
+
+def top_art(c, t, mood, sc=0.0):
     mv = parse_movers(c)
     art = {"bull": bull_svg(t["up"], t["acc"]), "bear": bear_svg(t["dn"], t["acc"]),
            "neutral": bull_svg(t["up"], t["acc"], 76) + bear_svg(t["dn"], t["acc"], 76)}[mood]
@@ -396,6 +408,9 @@ def top_art(c, t, mood):
         pills += mover_pill(mv["up"][0], "up", t)
     if mv.get("dn"):
         pills += mover_pill(mv["dn"][0], "dn", t)
+    ph = mood_photo(sc)
+    if ph:
+        return ('<div class="art photo" style="background-image:linear-gradient(90deg,var(--top) 0,rgba(0,0,0,0) 45%%),url(%s)"><div class="mvs">%s</div></div>' % (ph, pills))
     return '<div class="art"><div class="mvs">%s</div>%s</div>' % (pills, art)
 
 
@@ -404,7 +419,7 @@ def build_html(c, force_layout=None, force_theme=None):
     mood_word = {"bull": "BULLISH TONE", "bear": "CAUTIOUS TONE", "neutral": "BALANCED TONE"}[mood]
     v = c["vix"]
     vg = v.get("gauge", .5)
-    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood))
+    top = '<div class="top" style="grid-area:top"><img src="%s"><h1 style="font-size:%dpx">%s</h1>%s</div>' % (logo(), min(title_size(c["title"]), 40), e(c["title"]), top_art(c, t, mood, sc))
     foot = '<div class="foot" style="grid-area:foot"><span>%s</span><span>%s</span></div>' % (e(c.get("footnote", "")), e(c.get("disclaimer", "")))
     sp = spark2(c.get("spark", []), t, h=(150 if lay == 'magazine' else 230))
     spl = '<div style="font-size:15px;color:var(--mut)">%s</div>' % e(c.get("spark_label", ""))
