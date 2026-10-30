@@ -7,7 +7,7 @@
           TG_TOKEN = <bot token>      TG_CHAT = @yourchannelname   (or the numeric id like -100123456789)
      3. Run installTelegramTrigger() once (authorise when asked). Run tgTest() to send a test line.            */
 var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
-var TG_MORNING = { 'premarket-news': 1, 'morning-brief': 1, 'morning-detailed': 1, 'morning-pulse': 1 }; // posted one by one from 08:15 IST, at least 10 minutes apart, in this order
+var TG_MORNING = { 'premarket-news': 480, 'morning-brief': 510, 'morning-detailed': 510, 'morning-pulse': 525 }; // fixed post times (minutes after midnight IST) on trading days: 08:00, 08:30, 08:30, 08:45 - never earlier
 var TG_IDS = ['premarket-news', 'morning-brief', 'morning-detailed', 'morning-pulse', 'evening-market-wrap', 'evening-news-wrap', 'circuit-watch'];
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
@@ -49,11 +49,10 @@ function tgPostReports() {
   var s = tgProps_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_SENT') || '{}'); } catch (e) { }
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
   var ist0 = new Date(Date.now() + 19800000), dow0 = ist0.getUTCDay(), min0 = ist0.getUTCHours() * 60 + ist0.getUTCMinutes(), tradingDay = tgTradingDay_(today, dow0);
-  var mq = {}; try { mq = JSON.parse(s.p.getProperty('TG_MQ') || '{}'); } catch (e) { } if (mq.d !== today) mq = { d: today, t: 0 };
-  var morningDone = false;
+  var dayP = {}; try { dayP = JSON.parse(s.p.getProperty('TG_DAY') || '{}'); } catch (e) { } if (dayP.d !== today) { dayP = { d: today, ids: {} }; Object.keys(sent).forEach(function (k) { if (String(sent[k]).slice(0, 10) === today) dayP.ids[k] = 1; }); } // each report is posted ONCE per day, later rebuilds are never re-posted
   TG_IDS.forEach(function (id) {
     try {
-      if (TG_MORNING[id] && tradingDay) { if (min0 < 495 || morningDone || Date.now() - mq.t < 540000) return; } // 08:15 start, one report per turn, 10-minute gap
+      if (dayP.ids[id]) return; if (TG_MORNING[id] && tradingDay && min0 < TG_MORNING[id]) return; // fixed post time
       var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + id + '/index.json?t=' + Date.now(), { muteHttpExceptions: true });
       if (r.getResponseCode() !== 200) return;
       var runs = (JSON.parse(r.getContentText()).runs || []).filter(function (x) { return x.date === today && x.status === 'ok' && x.files && x.files.length; });
@@ -67,10 +66,10 @@ function tgPostReports() {
         var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/' + (isP ? 'sendPhoto' : 'sendDocument'), { method: 'post', payload: pl, muteHttpExceptions: true });
         if (res.getResponseCode() !== 200) { ok = false; Logger.log(id + ' ' + res.getContentText()); }
       });
-      if (ok) { sent[id] = run.generated_at; n++; if (TG_MORNING[id] && tradingDay) { morningDone = true; mq.t = Date.now(); s.p.setProperty('TG_MQ', JSON.stringify(mq)); } }
+      if (ok) { sent[id] = run.generated_at; dayP.ids[id] = 1; n++; }
     } catch (e) { Logger.log(id + ' ' + e); }
   });
-  s.p.setProperty('TG_SENT', JSON.stringify(sent));
+  s.p.setProperty('TG_SENT', JSON.stringify(sent)); s.p.setProperty('TG_DAY', JSON.stringify(dayP));
   try { tgLive_(s); } catch (e) { Logger.log('live ' + e); }
   return n;
 }
@@ -82,12 +81,18 @@ function tgNum_(v, d) { return Number(v).toLocaleString('en-IN', { minimumFracti
 function tgLive_(s) {
   var ist = new Date(Date.now() + 19800000), dow = ist.getUTCDay(), m = ist.getUTCHours() * 60 + ist.getUTCMinutes();
   var today = ist.toISOString().slice(0, 10), hhmm = ist.toISOString().slice(11, 16), wk = tgTradingDay_(today, dow); // false on weekends AND NSE holidays
-  var trading = wk && m >= 555 && m <= 930; // 09:15-15:30 IST
-  /* trading hours: live news + live stock signals every 5 minutes. Outside trading hours: live news every 30 minutes (06:00-23:00 IST, every day), quiet overnight. */
-  if (trading) { tgNews_(s); if (m >= 560 && m <= 940) tgSignals_(s, m, today, hhmm); }
-  else if (m >= 360 && m <= 1380) {
-    var last = parseInt(s.p.getProperty('TG_LT') || '0', 10);
-    if (Date.now() - last >= 28 * 60000) { s.p.setProperty('TG_LT', String(Date.now())); tgNews_(s); }
+  var trading = wk && m >= 555 && m <= 930; // 09:15-15:30 IST on a trading day
+  /* QUIET HOURS: nothing is sent before 08:00 or after 22:00 IST. Trading hours: live stock signals every 15 minutes, live news every 30 minutes.
+     Off-market hours (08:00-09:15, 15:30-22:00) and on weekends/holidays: live news every 3 hours, no stock signals. */
+  var awake = m >= 480 && m <= 1320;
+  if (trading) {
+    var ls = parseInt(s.p.getProperty('TG_LS') || '0', 10);
+    if (Date.now() - ls >= 14 * 60000 && m >= 560 && m <= 940) { s.p.setProperty('TG_LS', String(Date.now())); tgSignals_(s, m, today, hhmm); }
+    var ln = parseInt(s.p.getProperty('TG_LN') || '0', 10);
+    if (Date.now() - ln >= 29 * 60000) { s.p.setProperty('TG_LN', String(Date.now())); tgNews_(s); }
+  } else if (awake) {
+    var lt = parseInt(s.p.getProperty('TG_LN') || '0', 10);
+    if (Date.now() - lt >= 179 * 60000) { s.p.setProperty('TG_LN', String(Date.now())); tgNews_(s); }
   }
   if (wk) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
   if (wk && m >= 495 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
@@ -159,7 +164,7 @@ function tgSignals_(s, m, today, hhmm) {
     snap[sym] = [px, v, now];
     var chg = (px / pc - 1) * 100, pace = v / (av * frac), P = prev[sym], key;
     if (chg >= 2.5 && pace >= 3 && px >= h * 0.985) { G.BRK.push({ sym: sym, px: px, chg: chg, pace: pace }); return; }
-    if (P && now - P[2] >= 150000 && now - P[2] <= 720000) { var dpx = (px / P[0] - 1) * 100, dv = v - P[1]; if (dpx >= 1.5 && dv >= 0.1 * av && chg >= 1.5) { G.BURST.push({ sym: sym, px: px, chg: chg, pace: pace, d: dpx, mins: Math.round((now - P[2]) / 60000) }); return; } }
+    if (P && now - P[2] >= 600000 && now - P[2] <= 1500000) { var dpx = (px / P[0] - 1) * 100, dv = v - P[1]; if (dpx >= 1.5 && dv >= 0.1 * av && chg >= 1.5) { G.BURST.push({ sym: sym, px: px, chg: chg, pace: pace, d: dpx, mins: Math.round((now - P[2]) / 60000) }); return; } }
     if (Math.abs(chg) >= 4) G.RATE.push({ sym: sym, px: px, chg: chg, pace: pace });
     else if (pace >= 3) G.VOL.push({ sym: sym, px: px, chg: chg, pace: pace });
     if (h52 && px >= h52 * 0.999) G.H52.push({ sym: sym, px: px, chg: chg, pace: pace }); else if (l52 && px <= l52 * 1.001) G.L52.push({ sym: sym, px: px, chg: chg, pace: pace });
