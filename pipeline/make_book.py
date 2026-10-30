@@ -36,9 +36,9 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140 0%%,#0d0a18 70%%);color:#f4efe0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
 .top{position:fixed;left:0;right:0;top:0;height:44px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:50}
 .top .b{font-family:%(script)s;font-size:30px;font-weight:700;color:#E2B84A;text-shadow:0 0 1px #F6DC8A}
-.stage{position:fixed;left:0;right:0;top:44px;bottom:60px;display:flex;align-items:flex-start;justify-content:center;perspective:2200px}
-@media (max-width:700px){.stage{top:40px;bottom:56px;align-items:center}.book{width:min(100vw,calc((100dvh - 100px)*0.6)) !important;border-radius:0}.leaf,.leaf img,.leaf .shade{border-radius:0}.bar button{padding:10px 14px;white-space:nowrap}.top{height:40px}.top .b{font-size:26px}.bar{height:56px}.hint{display:none}}
-.book{position:relative;width:min(94vw,calc((100vh - 130px)*0.6));width:min(94vw,calc((100dvh - 130px)*0.6));aspect-ratio:1080/1800;filter:drop-shadow(0 18px 38px rgba(0,0,0,.6))}
+.stage{position:fixed;left:0;right:0;top:44px;bottom:92px;display:flex;align-items:flex-start;justify-content:center;perspective:2200px}
+@media (max-width:700px){.stage{top:40px;bottom:88px;align-items:center}.book{width:min(100vw,calc((100dvh - 132px)*0.6)) !important;border-radius:0}.leaf,.leaf img,.leaf .shade{border-radius:0}.bar button{padding:10px 14px;white-space:nowrap}.top{height:40px}.top .b{font-size:26px}.bar{height:56px}.hint{display:none}}
+.book{position:relative;width:min(94vw,calc((100vh - 130px)*0.6));width:min(94vw,calc((100dvh - 160px)*0.6));aspect-ratio:1080/1800;filter:drop-shadow(0 18px 38px rgba(0,0,0,.6))}
 .leaf{position:absolute;inset:0;transform-origin:left center;transition:transform 2.1s cubic-bezier(.37,.02,.2,1);transform-style:preserve-3d;cursor:pointer;border-radius:4px 10px 10px 4px}
 .leaf img{position:absolute;inset:0;width:100%%;height:100%%;border-radius:4px 10px 10px 4px;backface-visibility:hidden;object-fit:cover;background:#fff}
 .leaf .back{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;border-radius:10px 4px 4px 10px;background:linear-gradient(90deg,#d8cfb4,#efe8d4)}
@@ -54,10 +54,14 @@ html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140
 .bar button.g{background:#ffffff1f;color:#f4efe0}
 .dots{display:flex;gap:7px;align-items:center}.dots i{width:9px;height:9px;border-radius:50%%;background:#ffffff40}.dots i.on{background:#E2B84A}
 .hint{position:fixed;left:0;right:0;top:46px;text-align:center;font-size:13px;opacity:.75;pointer-events:none;transition:opacity .6s}
+.stat{position:fixed;left:0;right:0;bottom:64px;z-index:49;text-align:center;font-size:12.5px;color:#d9d2bd;padding:0 10px;line-height:1.3}
+.stat b{color:#E2B84A}.old{background:#7a1020;color:#fff;border-radius:10px;margin:0 10px 4px;padding:6px 10px;font-size:12.5px;display:none}.old a{color:#ffd36a;font-weight:800}
+@media (max-width:700px){.stat{bottom:56px}}
 </style></head><body>
 <div class="top"><span class="b">Joshi's Corner</span></div>
 <div class="stage"><div class="book" id="book"><div class="spine"></div>%(leaves)s</div></div>
 <div class="hint" id="hint">Tap the page to turn it</div>
+<div class="stat"><div class="old" id="old"></div><span id="gen">Report generated <b>%(gen)s</b></span></div>
 <div class="bar"><button class="g" id="prev" aria-label="Previous page">&#8249;</button><div class="dots" id="dots"></div><button id="next" aria-label="Next page">Next page &#8250;</button><button class="g" id="share">Share</button></div>
 <script>
 (function(){var L=[].slice.call(document.querySelectorAll('.leaf')),n=L.length,i=0,D=document.getElementById('dots');
@@ -72,6 +76,15 @@ document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==
 var sx=null;document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
 document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(dx<0?1:-1);sx=null},{passive:true});
 document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text:%(jtitle)s,url:location.href};if(navigator.share){navigator.share(d).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(location.href);this.textContent='Link copied'}};
+(function(){var RD='%(rdate)s',KIND='%(kind)s',ADM='%(admin)s',GEN='%(gen)s';
+ var n=new Date(Date.now()+19800000),mm=n.getUTCHours()*60+n.getUTCMinutes(),dow=n.getUTCDay(),due=KIND==='evening'?16*60+40:8*60+55;
+ function iso(d){return d.toISOString().slice(0,10)}
+ var e=new Date(n.getTime());if(dow>=1&&dow<=5&&mm>=due){}else{do{e=new Date(e.getTime()-86400000)}while(e.getUTCDay()===0||e.getUTCDay()===6)}
+ var exp=iso(e);if(dow>=1&&dow<=5&&mm>=due)exp=iso(n);
+ var o=document.getElementById('old');
+ if(RD<exp){var msg='This report was last updated <b>'+GEN+'</b> and is older than the latest one. Please inform the admin.';
+  if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
+  msg+=' <span style="opacity:.8">(No report is issued on market holidays.)</span>';o.innerHTML=msg;o.style.display='block'}})();
 z();setTimeout(function(){document.getElementById('hint').style.opacity=0},6000)})();
 </script></body></html>"""
 
@@ -87,7 +100,7 @@ def _thumb(path):
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise"):
+def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise", gen=""):
     """1200x630 preview card: page-1 thumbnail + brand + headline (rendered with Chromium so fonts match)."""
     acc, bg, word = MOODS.get(mood, MOODS["neutral"])
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,%s,#0d0a18 70%%);"
@@ -97,8 +110,8 @@ def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise"):
             ".h{font-size:40px;font-weight:800;line-height:1.15;margin-top:26px}.p{display:inline-block;margin-top:24px;background:%s;color:#fff;padding:9px 22px;border-radius:22px;font-weight:800;font-size:24px}"
             ".go{margin-top:26px;font-size:26px;color:#E2B84A;font-weight:700}</style></head><body>"
             "<img class='th' src='%s'><div><div class='b'>Joshi's Corner</div><div class='t'>%s<br><span style='font-weight:600;color:#efe9d6;font-size:32px'>for %s</span></div>"
-            "<div class='h'>%s</div><span class='p'>%s</span><div class='go'>Tap to open the booklet &rarr;</div></div></body></html>"
-            % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(name), html.escape(date_txt), html.escape(headline[:90]), word))
+            "<div class='h'>%s</div><span class='p'>%s</span><span style='margin-left:14px;font-size:24px;color:#d9d2bd'>%s</span><div class='go'>Tap to open the booklet &rarr;</div></div></body></html>"
+            % (brand.font_css(), bg, brand.SCRIPT_STACK, acc, thumb_abs, html.escape(name), html.escape(date_txt), html.escape(headline[:90]), word, ('Generated ' + gen) if gen else ''))
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         b = p.chromium.launch()
@@ -129,6 +142,13 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
     name = "Evening Breeze" if kind == "evening" else "Morning Sunrise"
     title = "Joshi's Corner - %s for %s" % (name, dtxt)
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
+    from datetime import timezone, timedelta
+    _now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+    gen = _now.strftime("%a %d %b %Y, %I:%M %p IST")
+    try:
+        admin = "".join(ch for ch in str(json.load(open(os.path.join(ROOT, "data", "admin.json"))).get("whatsapp", "")) if ch.isdigit())
+    except Exception:
+        admin = ""
     out = {}
     for sub in ("", date + "/"):
         folder = os.path.join(ROOT, kind, sub)
@@ -138,9 +158,9 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
                          % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
         url = BASE + kind + "/" + sub
         og_path = os.path.join(folder, "og.jpg")
-        _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name)
+        _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
-                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title))
+                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin)
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)
         out[sub or "latest"] = url

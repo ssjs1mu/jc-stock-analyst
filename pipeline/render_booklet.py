@@ -165,6 +165,11 @@ def eve_cover(b):
             % (e(r["level"]), "up" if up else "dn", e(r["pct"]), "&#9650;" if up else "&#9660;", e(b.get("headline", ""))))
 
 
+def _gen_now():
+    import datetime as _d
+    return _d.datetime.now(_d.timezone(_d.timedelta(hours=5, minutes=30))).strftime("%I:%M %p")
+
+
 def p1(b, p, total, ph):
     # hero picture fills the top band at full width (16:9, nothing cropped), fading into the page colour
     hero = ('<div style="position:absolute;left:0;top:0;width:1080px;height:640px;background:url(%s) center/cover"></div>'
@@ -176,12 +181,14 @@ def p1(b, p, total, ph):
              '<div class="brand" style="font-size:104px;position:relative;line-height:1.05">%s</div>'
              '<div style="position:relative;text-align:center">%s</div>'
              '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:36px;font-weight:900;line-height:1.1;white-space:nowrap;position:relative;text-shadow:0 4px 24px #000a;width:1040px;text-align:center">%s <span style="font-weight:700;color:#efe9d6">for %s</span></div>'
+             '<div style="font-size:84px;font-weight:900;line-height:1.04;white-space:nowrap;position:relative;text-shadow:0 4px 24px #000a;width:1040px;text-align:center">%s</div>'
+             '<div style="font-size:36px;font-weight:700;color:#efe9d6;position:relative;text-align:center;width:100%%">for %s</div>'
+             '<div style="font-size:26px;font-weight:600;color:#d9d2bd;position:relative">Report generated %s IST</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:34px;font-weight:800;position:relative;max-width:920px">%s</div>'
              '<div style="font-size:24px;opacity:.75;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
              % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening Breeze" if b.get("edition") == "evening" else "Morning Sunrise",
-                e(b["date_txt"]), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
+                e(b["date_txt"]), e(b.get("gen") or _gen_now()), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
 
 
