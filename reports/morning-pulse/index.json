@@ -2,6 +2,33 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-10-30T09:09:48+05:30",
+   "date": "2026-10-30",
+   "status": "ok",
+   "caption": "morning-pulse 30 Oct (auto pipeline)",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.pdf",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.pdf",
+     "type": "pdf",
+     "bytes": 601033
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.png",
+     "type": "png",
+     "bytes": 692923
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-10-30.json",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-10-30.json",
+     "type": "json",
+     "bytes": 4488
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-29T15:05:56+05:30",
    "date": "2026-10-29",
    "status": "ok",
@@ -283,5 +310,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-29T15:05:56+05:30"
+ "updated_at": "2026-10-30T09:09:48+05:30"
 }
