@@ -4,37 +4,37 @@
   "date_txt": "30 Oct 2026",
   "date_iso": "2026-10-30",
   "mood": {
-   "key": "bull",
-   "label": "Positive close",
-   "sub": "Nifty +0.39% in the session"
+   "key": "neutral",
+   "label": "Range-bound close",
+   "sub": "Nifty +0.30% in the session"
   },
-  "label": "Positive close",
-  "headline": "Nifty gains 0.39%, Banks lag",
-  "summary": "Nifty 50 closed at 23,027.35 (+0.39%) and Sensex at 74,505.44 (+0.48%). Banks: Bank Nifty -0.50%. India VIX 15.32 (+1.32%). Brent crude -1.79%, USD/INR 94.993. 29 of 50 Nifty stocks advanced and 20 declined.",
+  "label": "Range-bound close",
+  "headline": "Nifty gains 0.30%, Banks lag",
+  "summary": "Nifty 50 closed at 23,004.90 (+0.30%) and Sensex at 74,479.59 (+0.44%). Banks: Bank Nifty -0.56%. India VIX 15.28 (+1.09%). Brent crude -1.88%, USD/INR 95.033. 28 of 50 Nifty stocks advanced and 21 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
     "sub": "close",
-    "level": "23,027.35",
-    "pct": "+0.39%"
+    "level": "23,004.90",
+    "pct": "+0.30%"
    },
    {
     "name": "Sensex",
     "sub": "close",
-    "level": "74,505.44",
-    "pct": "+0.48%"
+    "level": "74,479.59",
+    "pct": "+0.44%"
    },
    {
     "name": "Bank Nifty",
     "sub": "close",
-    "level": "54,636.80",
-    "pct": "-0.50%"
+    "level": "54,604.40",
+    "pct": "-0.56%"
    },
    {
     "name": "Nifty 500",
     "sub": "close",
-    "level": "21,882.75",
-    "pct": "-0.27%"
+    "level": "21,862.85",
+    "pct": "-0.36%"
    }
   ],
   "spark": [
@@ -55,7 +55,7 @@
    22749.75,
    22698.849609375,
    22936.75,
-   23027.349609375
+   23006.75
   ],
   "flows": {
    "date": "28 Oct",
@@ -63,21 +63,21 @@
    "dii": 643.35
   },
   "breadth": {
-   "up": 29,
-   "dn": 20
+   "up": 28,
+   "dn": 21
   },
   "levels": [
    {
     "name": "Nifty 50",
-    "s": "22,804 - 22,916",
-    "r": "23,129 - 23,230",
-    "note": "A close above 23,129 opens up 23,230; a slide below 22,916 would expose 22,804."
+    "s": "22,796 - 22,901",
+    "r": "23,114 - 23,222",
+    "note": "A close above 23,114 opens up 23,222; a slide below 22,901 would expose 22,796."
    },
    {
     "name": "Bank Nifty",
-    "s": "54,274 - 54,456",
-    "r": "54,943 - 55,250",
-    "note": "A close above 54,943 opens up 55,250; a slide below 54,456 would expose 54,274."
+    "s": "54,263 - 54,434",
+    "r": "54,922 - 55,239",
+    "note": "A close above 54,922 opens up 55,239; a slide below 54,434 would expose 54,263."
    }
   ],
   "events": [
@@ -105,14 +105,14 @@
    {
     "name": "FTSE 100",
     "code": "",
-    "level": "10,755.16",
-    "pct": "+0.31%"
+    "level": "10,742.72",
+    "pct": "+0.19%"
    },
    {
     "name": "DAX",
     "code": "",
-    "level": "25,969.83",
-    "pct": "-0.27%"
+    "level": "25,920.95",
+    "pct": "-0.46%"
    },
    {
     "name": "Nikkei 225",
@@ -142,28 +142,28 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "112.82",
-    "pct": "-1.79%"
+    "level": "112.72",
+    "pct": "-1.88%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "103.72",
-    "pct": "+1.69%"
+    "level": "103.64",
+    "pct": "+1.61%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "4,001.20",
-    "pct": "-0.75%"
+    "level": "4,000.50",
+    "pct": "-0.77%"
    },
    {
     "name": "USD / INR",
-    "level": "94.993",
-    "pct": "-0.23%"
+    "level": "95.033",
+    "pct": "-0.19%"
    },
    {
     "name": "Dollar index",
-    "level": "101.72",
-    "pct": "-0.31%"
+    "level": "101.68",
+    "pct": "-0.35%"
    },
    {
     "name": "US 10-yr yield %",
@@ -172,10 +172,10 @@
    }
   ],
   "vix": {
-   "level": "15.32",
-   "pct": "+1.32%",
-   "gauge": 0.7340000152587891,
-   "text": "India VIX 15.32."
+   "level": "15.28",
+   "pct": "+1.09%",
+   "gauge": 0.7357500076293946,
+   "text": "India VIX 15.28."
   },
   "headlines": [
    "Global trading is mixed as worries about AI-related issues grow",
@@ -190,92 +190,92 @@
   "gainers": [
    [
     "TRENT",
-    "3,030.90",
-    "+5.91%"
+    "3,012.50",
+    "+5.27%"
    ],
    [
     "WIPRO",
-    "197.29",
-    "+3.78%"
+    "197.35",
+    "+3.81%"
    ],
    [
     "INFY",
-    "1,181.70",
-    "+3.07%"
-   ],
-   [
-    "SUNPHARMA",
-    "1,806.00",
-    "+2.56%"
+    "1,178.20",
+    "+2.76%"
    ],
    [
     "HCLTECH",
-    "1,439.70",
-    "+2.55%"
+    "1,437.10",
+    "+2.36%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,801.30",
+    "+2.29%"
    ]
   ],
   "losers": [
    [
     "INDUSINDBK",
-    "841.20",
-    "-3.09%"
-   ],
-   [
-    "ADANIPORTS",
-    "1,837.90",
-    "-1.82%"
-   ],
-   [
-    "BPCL",
-    "284.10",
-    "-1.76%"
-   ],
-   [
-    "M&M",
-    "2,843.30",
-    "-1.62%"
+    "841.00",
+    "-3.11%"
    ],
    [
     "SHRIRAMFIN",
-    "827.65",
-    "-1.60%"
+    "825.60",
+    "-1.84%"
+   ],
+   [
+    "BPCL",
+    "284.35",
+    "-1.68%"
+   ],
+   [
+    "ADANIPORTS",
+    "1,840.90",
+    "-1.66%"
+   ],
+   [
+    "M&M",
+    "2,844.40",
+    "-1.58%"
    ]
   ],
   "shock": [
    [
     "TRENT",
-    "3,030.90",
-    "3.5x avg vol",
-    "+5.91%"
+    "3,012.50",
+    "3.8x avg vol",
+    "+5.27%"
    ],
    [
     "COALINDIA",
-    "389.80",
-    "3.2x avg vol",
-    "-0.84%"
+    "390.35",
+    "3.4x avg vol",
+    "-0.70%"
    ],
    [
     "SUNPHARMA",
-    "1,806.00",
-    "3.0x avg vol",
-    "+2.56%"
+    "1,801.30",
+    "3.2x avg vol",
+    "+2.29%"
    ],
    [
     "ADANIPORTS",
-    "1,837.90",
-    "1.7x avg vol",
-    "-1.82%"
+    "1,840.90",
+    "1.9x avg vol",
+    "-1.66%"
    ]
   ]
  },
  "title": "Evening Breeze (30 Oct 2026)",
- "headline": "Nifty gains 0.39%, Banks lag",
+ "headline": "Nifty gains 0.30%, Banks lag",
  "mood": {
-  "key": "bull",
-  "label": "Positive close",
-  "sub": "Nifty +0.39% in the session"
+  "key": "neutral",
+  "label": "Range-bound close",
+  "sub": "Nifty +0.30% in the session"
  },
- "mood_score": 0.5529966238678103,
+ "mood_score": 0.41597238874295617,
  "edition": "evening",
  "disclaimer": "For information only. Not investment advice. Markets carry risk."
 }
