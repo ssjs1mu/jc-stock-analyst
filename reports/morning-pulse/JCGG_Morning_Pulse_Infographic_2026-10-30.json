@@ -4,12 +4,12 @@
   "mood": {
    "key": "neutral",
    "label": "Flat to marginally mixed start",
-   "sub": "Indicative Nifty opening zone 22,991 - 23,107"
+   "sub": "Indicative Nifty opening zone 23,095 - 23,165"
   },
   "label": "Flat to marginally mixed start",
-  "zone": "22,991 - 23,107",
-  "headline": "Flat to marginally mixed start - Nifty zone 22,991 - 23,107",
-  "open_text": "Wall Street weak, Asia negative, crude easing. Indicative view from overnight cues; GIFT Nifty is not used.",
+  "zone": "23,095 - 23,165",
+  "headline": "Flat to marginally mixed start - Nifty zone 23,095 - 23,165",
+  "open_text": "Wall Street weak, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
   "yday": null,
   "spark": [
    22776.099609375,
@@ -29,47 +29,47 @@
    22749.75,
    22698.849609375,
    22936.75,
-   23087.25
+   23102.44921875
   ],
-  "proj": 23048.2,
+  "proj": 23130.1,
   "snapshot": [
    {
     "name": "Nifty 50",
     "sub": "prev close",
-    "level": "23,087.40",
-    "pct": "+0.66%"
+    "level": "23,102.40",
+    "pct": "+0.72%"
    },
    {
     "name": "Sensex",
     "sub": "prev close",
-    "level": "74,622.91",
-    "pct": "+0.64%"
+    "level": "74,655.84",
+    "pct": "+0.68%"
    },
    {
     "name": "Bank Nifty",
     "sub": "prev close",
-    "level": "54,939.20",
-    "pct": "+0.05%"
+    "level": "54,973.60",
+    "pct": "+0.12%"
    },
    {
     "name": "Nifty 500",
     "sub": "prev close",
-    "level": "21,953.85",
-    "pct": "+0.06%"
+    "level": "21,961.95",
+    "pct": "+0.09%"
    }
   ],
   "levels": [
    {
     "name": "Nifty 50",
-    "s": "22,829 - 22,958",
-    "r": "23,164 - 23,240",
-    "note": "A sustained move above 23,164 opens up 23,240; a slide below 22,958 would expose 22,829."
+    "s": "22,834 - 22,968",
+    "r": "23,174 - 23,245",
+    "note": "A sustained move above 23,174 opens up 23,245; a slide below 22,968 would expose 22,834."
    },
    {
     "name": "Bank Nifty",
-    "s": "54,375 - 54,657",
-    "r": "55,145 - 55,351",
-    "note": "A sustained move above 55,145 opens up 55,351; a slide below 54,657 would expose 54,375."
+    "s": "54,387 - 54,680",
+    "r": "55,168 - 55,362",
+    "note": "A sustained move above 55,168 opens up 55,362; a slide below 54,680 would expose 54,387."
    }
   ],
   "bench": [
@@ -112,14 +112,14 @@
    {
     "name": "Hang Seng",
     "code": "HK",
-    "level": "23,337.95",
-    "pct": "+1.65%"
+    "level": "23,273.97",
+    "pct": "+1.37%"
    },
    {
     "name": "Shanghai Composite",
     "code": "CN",
-    "level": "3,609.50",
-    "pct": "-1.15%"
+    "level": "3,596.61",
+    "pct": "-1.50%"
    },
    {
     "name": "Kospi",
@@ -131,28 +131,28 @@
   "cmd": [
    {
     "name": "Brent crude US$/bbl",
-    "level": "112.03",
-    "pct": "-2.48%"
+    "level": "111.94",
+    "pct": "-2.56%"
    },
    {
     "name": "WTI crude US$/bbl",
-    "level": "102.95",
-    "pct": "+0.93%"
+    "level": "102.96",
+    "pct": "+0.94%"
    },
    {
     "name": "Gold US$/oz",
-    "level": "3,994.30",
-    "pct": "-0.92%"
+    "level": "3,991.00",
+    "pct": "-1.00%"
    },
    {
     "name": "USD / INR",
-    "level": "95.185",
-    "pct": "-0.03%"
+    "level": "95.158",
+    "pct": "-0.05%"
    },
    {
     "name": "Dollar index",
-    "level": "101.86",
-    "pct": "-0.18%"
+    "level": "101.85",
+    "pct": "-0.19%"
    },
    {
     "name": "US 10-yr yield %",
@@ -161,10 +161,10 @@
    }
   ],
   "vix": {
-   "level": "15.43",
-   "pct": "+2.05%",
-   "gauge": 0.7284999847412109,
-   "text": "India VIX 15.43 (+2.05%); USD/INR 95.18 (-0.03%); US 10-yr yield 4.99 (-1.11%). India VIX rose 2.1% - hedging demand up."
+   "level": "15.38",
+   "pct": "+1.69%",
+   "gauge": 0.73125,
+   "text": "India VIX 15.38 (+1.69%); USD/INR 95.16 (-0.05%); US 10-yr yield 4.99 (-1.11%). India VIX rose 1.7% - hedging demand up."
   },
   "events": [
    "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
@@ -199,7 +199,7 @@
    [
     "TRENT",
     "In the news",
-    "Sensex, Nifty extend gains in early trade; Trent jumps 6% on strong Q2 earnings"
+    "Indian Stock Market: Sensex, Nifty Rally on IT Stocks, Trent"
    ],
    [
     "DALBHARAT",
@@ -213,59 +213,291 @@
    ]
   ],
   "headlines": [
-   "Sensex, Nifty Open Higher Amid Rising Crude Prices - Dainik Jagran MP CG (Dainik",
-   "Sensex Today Live: Sensex, Nifty Trade Higher; Trent, IndiGo Gain, Coal India Sh",
+   "Asian trading is mixed as worries about AI-related issues grow",
+   "Sensex, Nifty Open Marginally Higher as Rising Crude Prices Weigh on Sentiment",
+   "Indian Rupee Gains 11 Paise Against US Dollar After Fed Rate Decision",
+   "Sensex Today Live: Sensex, Nifty Trade Higher; Trent, IndiGo Gain, Coal India Shares Fall",
    "Sensex, Nifty open flat as crude oil prices remain elevated; IT stocks gain",
    "BSE IT index set to report 2nd sharpest monthly rally in over two decades",
-   "Asian stocks fall on US tech sell-off; BoJ holds rate at 31-year high; Australia"
+   "Asian stocks fall on US tech sell-off; BoJ holds rate at 31-year high; Australia PPI rises 1.1% Q/Q",
+   "Sensex, Nifty turn lower; broader markets crash as oil tops $116/barrel. What lies ahead?"
   ],
-  "calls": [
+  "calls": {
+   "buy": [
+    {
+     "sym": "SONACOMS",
+     "side": "BUY",
+     "entry": "884.84",
+     "sl": "872.35",
+     "t1": "904.92",
+     "t2": "925.88",
+     "rr": "1.6",
+     "risk": "12.49",
+     "riskpct": "1.41%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 9,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 19: developing trend"
+     ]
+    },
+    {
+     "sym": "PPLPHARMA",
+     "side": "BUY",
+     "entry": "235.92",
+     "sl": "228.99",
+     "t1": "247.43",
+     "t2": "252.43",
+     "rr": "1.7",
+     "risk": "6.93",
+     "riskpct": "2.94%",
+     "conv": 89,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 24: developing trend"
+     ]
+    }
+   ],
+   "sell": [
+    {
+     "sym": "DALBHARAT",
+     "side": "SELL",
+     "entry": "1,464.37",
+     "sl": "1,487.43",
+     "t1": "1,402.03",
+     "t2": "1,367.44",
+     "rr": "2.7",
+     "risk": "23.06",
+     "riskpct": "1.57%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 19: developing trend"
+     ]
+    },
+    {
+     "sym": "RELIANCE",
+     "side": "SELL",
+     "entry": "1,155.58",
+     "sl": "1,168.18",
+     "t1": "1,131.65",
+     "t2": "1,115.26",
+     "rr": "1.9",
+     "risk": "12.60",
+     "riskpct": "1.09%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 27: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "COALINDIA",
+     "side": "SELL",
+     "entry": "390.93",
+     "sl": "394.52",
+     "t1": "382.13",
+     "t2": "376.75",
+     "rr": "2.5",
+     "risk": "3.59",
+     "riskpct": "0.92%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 18: developing trend"
+     ]
+    },
+    {
+     "sym": "JIOFIN",
+     "side": "SELL",
+     "entry": "204.01",
+     "sl": "206.09",
+     "t1": "198.70",
+     "t2": "195.69",
+     "rr": "2.6",
+     "risk": "2.08",
+     "riskpct": "1.02%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 37: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "TATAPOWER",
+     "side": "SELL",
+     "entry": "334.06",
+     "sl": "337.30",
+     "t1": "326.03",
+     "t2": "321.17",
+     "rr": "2.5",
+     "risk": "3.24",
+     "riskpct": "0.97%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 21: developing trend"
+     ]
+    }
+   ],
+   "watch_buy": [
+    {
+     "sym": "LAURUSLABS",
+     "conv": 49,
+     "S": 9,
+     "why": "first target too close for the risk (R:R 1.23 < 1.5)"
+    },
+    {
+     "sym": "LENSKART",
+     "conv": 49,
+     "S": 9,
+     "why": "first target too close for the risk (R:R 1.26 < 1.5)"
+    },
+    {
+     "sym": "TVSMOTOR",
+     "conv": 49,
+     "S": 8,
+     "why": "first target too close for the risk (R:R 1.40 < 1.5)"
+    },
+    {
+     "sym": "TECHM",
+     "conv": 49,
+     "S": 7.5,
+     "why": "confluence 7.5 < 8.0 needed"
+    }
+   ]
+  },
+  "gift": {
+   "last": "23,130.0",
+   "pct": "+0.31%",
+   "premium": "+28 pts",
+   "vs": "+0.12%",
+   "asof": "30 Oct 12:30"
+  },
+  "gainers": [
+   [
+    "TRENT",
+    "3,044.00",
+    "+6.37%"
+   ],
+   [
+    "WIPRO",
+    "196.50",
+    "+3.37%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,809.50",
+    "+2.96%"
+   ],
+   [
+    "HCLTECH",
+    "1,444.60",
+    "+2.90%"
+   ],
+   [
+    "DIVISLAB",
+    "9,811.00",
+    "+2.64%"
+   ]
+  ],
+  "losers": [
+   [
+    "INDUSINDBK",
+    "848.40",
+    "-2.26%"
+   ],
+   [
+    "BPCL",
+    "284.85",
+    "-1.50%"
+   ],
+   [
+    "COALINDIA",
+    "387.65",
+    "-1.39%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "832.85",
+    "-0.98%"
+   ],
+   [
+    "ADANIENT",
+    "2,584.00",
+    "-0.92%"
+   ]
+  ],
+  "shock": [
+   [
+    "TRENT",
+    "3,044.00",
+    "2.8x avg vol",
+    "+6.37%"
+   ],
+   [
+    "COALINDIA",
+    "387.65",
+    "2.5x avg vol",
+    "-1.39%"
+   ]
+  ],
+  "pivots": [
    {
-    "sym": "DALBHARAT",
-    "side": "SELL",
-    "entry": "1,464.37",
-    "sl": "1,487.43",
-    "t1": "1,402.03",
-    "grade": "A+"
+    "name": "Nifty 50",
+    "vals": [
+     "22,834",
+     "22,968",
+     "23,039",
+     "23,174",
+     "23,245"
+    ]
    },
    {
-    "sym": "RELIANCE",
-    "side": "SELL",
-    "entry": "1,155.58",
-    "sl": "1,168.18",
-    "t1": "1,131.65",
-    "grade": "A+"
-   },
-   {
-    "sym": "COALINDIA",
-    "side": "SELL",
-    "entry": "390.93",
-    "sl": "394.52",
-    "t1": "382.13",
-    "grade": "A+"
-   },
-   {
-    "sym": "JIOFIN",
-    "side": "SELL",
-    "entry": "204.01",
-    "sl": "206.09",
-    "t1": "198.70",
-    "grade": "A+"
+    "name": "Bank Nifty",
+    "vals": [
+     "54,387",
+     "54,680",
+     "54,874",
+     "55,168",
+     "55,362"
+    ]
    }
-  ]
+  ],
+  "est": 0.12
  },
  "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (30 Oct 2026)",
- "headline": "Flat to marginally mixed start - Nifty zone 22,991 - 23,107",
- "bias_text": "US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%. Asia this morning: Nikkei -2.12%, Hang Seng +1.65%, Kospi -3.48%. Indicative view from overnight cues; GIFT Nifty is not used.",
- "open_text": "Wall Street weak, Asia negative, crude easing. Indicative view from overnight cues; GIFT Nifty is not used.",
- "proj": 23048.2,
+ "headline": "Flat to marginally mixed start - Nifty zone 23,095 - 23,165",
+ "bias_text": "GIFT Nifty 23,130.0 (+28 pts, +0.12% vs Nifty's last close). US: S&P 500 -0.30%, Nasdaq -1.38%, Dow -0.25%. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street weak, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
+ "proj": 23130.1,
  "proj_label": "Today (est.)",
  "mood": {
   "key": "neutral",
   "label": "Flat to marginally mixed start",
-  "sub": "Indicative Nifty opening zone 22,991 - 23,107"
+  "sub": "Indicative Nifty opening zone 23,095 - 23,165"
  },
- "mood_score": -0.16720336801896474,
+ "mood_score": 0.12,
  "spark": [
   22776.099609375,
   22603.05078125,
@@ -284,44 +516,44 @@
   22749.75,
   22698.849609375,
   22936.75,
-  23087.25
+  23102.44921875
  ],
  "spark_label": "Nifty 50 daily closes, last 18 sessions",
  "vix": {
-  "gauge": 0.7284999847412109,
-  "headline": "India VIX 15.43 (+2.05%)",
-  "text": "India VIX 15.43 (+2.05%); USD/INR 95.18 (-0.03%); US 10-yr yield 4.99 (-1.11%). India VIX rose 2.1% - hedging demand up."
+  "gauge": 0.73125,
+  "headline": "India VIX 15.38 (+1.69%)",
+  "text": "India VIX 15.38 (+1.69%); USD/INR 95.16 (-0.05%); US 10-yr yield 4.99 (-1.11%). India VIX rose 1.7% - hedging demand up."
  },
  "tiles": [
   {
    "name": "Nifty 50",
    "sub": "prev close",
-   "value": "23,087.40",
-   "pct": "+0.66%"
+   "value": "23,102.40",
+   "pct": "+0.72%"
   },
   {
    "name": "Brent Crude",
    "sub": "US$/bbl",
-   "value": "112.03",
-   "pct": "-2.48%"
+   "value": "111.94",
+   "pct": "-2.56%"
   },
   {
    "name": "Gold Spot",
    "sub": "US$/oz",
-   "value": "3,994.30",
-   "pct": "-0.92%"
+   "value": "3,991.00",
+   "pct": "-1.00%"
   },
   {
    "name": "India VIX",
    "sub": "close",
-   "value": "15.43",
-   "pct": "+2.05%"
+   "value": "15.38",
+   "pct": "+1.69%"
   },
   {
    "name": "USD/INR",
    "sub": "latest",
-   "value": "95.185",
-   "pct": "-0.03%"
+   "value": "95.158",
+   "pct": "-0.05%"
   },
   {
    "name": "US 10-yr",
@@ -370,14 +602,14 @@
   {
    "name": "Hang Seng",
    "code": "HK",
-   "level": "23,337.95",
-   "pct": "+1.65%"
+   "level": "23,273.97",
+   "pct": "+1.37%"
   },
   {
    "name": "Shanghai Composite",
    "code": "CN",
-   "level": "3,609.50",
-   "pct": "-1.15%"
+   "level": "3,596.61",
+   "pct": "-1.50%"
   },
   {
    "name": "Kospi",
@@ -388,20 +620,20 @@
  ],
  "asia": {
   "head": "Asia & Global Cues",
-  "text": "Latest closes: Nikkei 63,290.11 (-2.12%), Hang Seng 23,337.95 (+1.65%), Shanghai 3,609.50 (-1.15%), Kospi 5,730.74 (-3.48%). Wall Street: Dow 52,342.56 (-0.25%), S&P 500 7,720.39 (-0.30%), Nasdaq 26,184.72 (-1.38%)."
+  "text": "Latest closes: Nikkei 63,290.11 (-2.12%), Hang Seng 23,273.97 (+1.37%), Shanghai 3,596.61 (-1.50%), Kospi 5,730.74 (-3.48%). Wall Street: Dow 52,342.56 (-0.25%), S&P 500 7,720.39 (-0.30%), Nasdaq 26,184.72 (-1.38%)."
  },
  "levels": [
   {
    "name": "Nifty 50",
-   "s": "22,829 - 22,958",
-   "r": "23,164 - 23,240",
-   "note": "A sustained move above 23,164 opens up 23,240; a slide below 22,958 would expose 22,829."
+   "s": "22,834 - 22,968",
+   "r": "23,174 - 23,245",
+   "note": "A sustained move above 23,174 opens up 23,245; a slide below 22,968 would expose 22,834."
   },
   {
    "name": "Bank Nifty",
-   "s": "54,375 - 54,657",
-   "r": "55,145 - 55,351",
-   "note": "A sustained move above 55,145 opens up 55,351; a slide below 54,657 would expose 54,375."
+   "s": "54,387 - 54,680",
+   "r": "55,168 - 55,362",
+   "note": "A sustained move above 55,168 opens up 55,362; a slide below 54,680 would expose 54,387."
   }
  ],
  "bottom": [
@@ -418,36 +650,36 @@
   {
    "title": "Headlines to Track",
    "icon": "list",
-   "text": "Sensex, Nifty Open Higher Amid Rising Crude Prices - Dainik Jagran MP CG (Dainik | Sensex Today Live: Sensex, Nifty Trade Higher; Trent, IndiGo Gain, Coal India Sh"
+   "text": "Asian trading is mixed as worries about AI | Sensex, Nifty Open Marginally Higher as Rising Crude Prices Weigh on Sentiment"
   }
  ],
  "movers": {
   "up": [
    {
     "sym": "TRENT",
-    "pct": "+6.17%"
+    "pct": "+6.37%"
    },
    {
     "sym": "WIPRO",
-    "pct": "+3.28%"
+    "pct": "+3.37%"
    },
    {
-    "sym": "HCLTECH",
-    "pct": "+2.98%"
+    "sym": "SUNPHARMA",
+    "pct": "+2.96%"
    }
   ],
   "dn": [
    {
     "sym": "INDUSINDBK",
-    "pct": "-2.10%"
-   },
-   {
-    "sym": "COALINDIA",
-    "pct": "-1.44%"
+    "pct": "-2.26%"
    },
    {
     "sym": "BPCL",
-    "pct": "-1.37%"
+    "pct": "-1.50%"
+   },
+   {
+    "sym": "COALINDIA",
+    "pct": "-1.39%"
    }
   ]
  },
