@@ -1705,6 +1705,7 @@ async function runAnalysis() {
     window.__R = R; $('titlebar').classList.remove('hidden');
     $('asOfTag').textContent = 'data as of ' + R.lastDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + (R.live ? ' · market live' : ' · market closed'); $('coName').textContent = `${R.name} (${R.sym})`;
     $('pSummary').innerHTML = htmlSummary(R); $('pIntraday').innerHTML = htmlIntradayTab(R); $('pSwing').innerHTML = htmlSwingTab(R); $('pLong').innerHTML = htmlLongTab(R); $('pDataBody').innerHTML = htmlData(R);
+    if (window.JCProj) window.JCProj.run(R);
     refreshChips(); showTab(window.__curTab === 'pUpcoming' ? 'pUpcoming' : window.__curTab === 'pSummary' || !$(window.__curTab) ? 'pSummary' : window.__curTab);
     setStatus('Report generated · ' + new Date().toLocaleTimeString('en-IN') + (usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''), 'ok');
   } catch (e) {
