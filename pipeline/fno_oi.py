@@ -7,7 +7,7 @@ def num(x):
     try: return float(x.replace(",", ""))
     except ValueError: return None
 ERR = {}
-def one(sym):
+def one(sym, depth=0):
     h = None
     for a in range(4):
         try:
@@ -17,8 +17,13 @@ def one(sym):
             if "404" in str(ex): return sym, None        # not an F&O stock
             time.sleep(3 * (a + 1))
     if h is None: return sym, None
+    time.sleep(0.8)
     tx = re.sub(r"\s+", " ", re.sub(r"&nbsp;", " ", re.sub(r"<[^>]+>", " ", h)))
-    m = re.search(r"Spot Close\s*:\s*([\d.]+)", tx); e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", tx)
+    m = re.search(r"Spot Close\s*:\s*([\d.]+)", tx)
+    if not m:
+        ERR["nospot:" + str(len(h))[:2]] = ERR.get("nospot:" + str(len(h))[:2], 0) + 1
+        if depth < 2 and "Option Chain" not in h[:20000]: time.sleep(6); return one(sym, depth + 1)
+    e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", tx)
     if not m: return sym, None
     spot = float(m.group(1)); rows = []
     for r in re.findall(r"<tr[\s\S]*?</tr>", h):
@@ -36,7 +41,7 @@ def one(sym):
 def main():
     c = json.load(open("data/constituents.json"))["idx"]; syms = sorted(set(c.get("^CNX200", []) + c.get("NIFTY_MIDCAP_100.NS", []) + c.get("^NSEI", []) + c.get("^NSEBANK", [])))
     out = {}
-    with cf.ThreadPoolExecutor(3) as ex:
+    with cf.ThreadPoolExecutor(2) as ex:
         for s, d in ex.map(one, syms):
             if d: out[s] = d
     print(len(out), "F&O stocks of", len(syms), ERR, file=sys.stderr)
