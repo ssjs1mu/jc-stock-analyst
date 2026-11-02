@@ -153,6 +153,7 @@ def mood_of(c):
     avg = sum(vals) / len(vals) if vals else 0.0
     sc = (nif if nif is not None else avg) * 0.6 + avg * 0.4
     PIC[0] = c.get("mood_pic")
+    EDN[0] = c.get("edition") or (c.get("book") or {}).get("edition")
     if c.get("mood_score") is not None:          # morning reports: mood = expected opening, not the past session
         sc = float(c["mood_score"]) * 1.4
     return ("bull" if sc > 0.35 else ("bear" if sc < -0.35 else "neutral")), sc
@@ -400,6 +401,7 @@ def mover_pill(m, kind, t):
             % (col, e(mono), e(sym[:11]), col, "&#9650;" if kind == "up" else "&#9660;", e(chg_txt(m["pct"]).replace("+", "").replace("-", ""))))
 
 
+EDN = [None]   # 'evening' = closing report (dusk / night scenes); anything else = opening (sunrise / dawn scenes)
 PIC = [None]   # explicit picture key chosen by the report builder (overrides the score thresholds)
 
 
@@ -414,6 +416,13 @@ def mood_photo(sc):
         for ext in (".jpg", ".jpeg", ".png", ".webp"):
             f = os.path.join(d, nm + ext)
             if os.path.exists(f):
+                try:
+                    import mood_scene
+                    g = mood_scene.graded_jpeg(f, EDN[0], key, _dt.date.today().toordinal())
+                    if g:
+                        return "data:image/jpeg;base64,%s" % base64.b64encode(g[0]).decode()
+                except Exception:
+                    pass
                 mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[ext[1:]]
                 return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
     return None

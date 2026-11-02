@@ -539,6 +539,7 @@ def render(cfg, png_base):
     try:
         import render_pulse_board as _r
         _r.PIC[0] = cfg.get("mood_pic")
+        _r.EDN[0] = cfg.get("edition")
     except Exception:
         pass
     pages = [p1(b, p, total, photo(cfg, sc))]
