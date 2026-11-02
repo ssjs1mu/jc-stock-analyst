@@ -1602,6 +1602,8 @@ function printPDF() {
   const d = f.contentWindow.document; d.open(); d.write(html); d.close();
   setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { alert('Print failed: ' + e.message); } }, 600);
 }
+function runSelected() { const v = ($('rptSel') || {}).value || 'summary'; if (v === 'xray') { const s = $('symbolInput').value.trim(); if (!s) { alert('Type a symbol first.'); return; } const ex = $('exchangeInput').value; window.jcXray(/\.(NS|BO)$/.test(s.toUpperCase()) || /^[\^]/.test(s) ? s : (ex === 'BO' ? 'BSE:' : '') + s); return; } if (v === 'deep') { window.open('deep/?sym=' + encodeURIComponent(($('symbolInput').value || '').trim()) + '&ex=' + $('exchangeInput').value, '_blank'); return; } runAnalysis(v); }
+window.runSelected = runSelected;
 function loadSymbol(sym) { $('symbolInput').value = symBase(sym); $('exchangeInput').value = symEx(sym); showTab('pSummary'); window.scrollTo({ top: 0, behavior: 'smooth' }); runAnalysis(); }
 async function feed(name, fn) { const tr = {}; try { const d = await fn(tr); return { name, ok: d != null, data: d, via: tr.via }; } catch (e) { return { name, ok: false, data: null, err: (e && e.message) || String(e) }; } }
 function upProgress(msg, label, d, t) {
@@ -1679,35 +1681,63 @@ async function wlAdd() {
 function wlRemove(sym) { const l = wlList(); l.syms = l.syms.filter((s) => s !== sym); wlSave(); wlRenderBar(); wlRenderBody(); }
 function wlToggleAuto() { WL.auto = !!$('wlAuto').checked; }
 function wlTick() { if (window.__curTab !== 'pWatch' || !WL.auto || document.hidden || !WL.store) return; if (marketClock(Date.now()).open) wlRefreshAll(false); }
-async function runAnalysis() {
+/* ---- one report at a time: each report fetches only the feeds it needs, reuses feeds already fetched (10 min; 60 s for live 5-min bars) and shows a processing meter ---- */
+const RPT = {
+  intraday: { label: 'Intraday report', feeds: ['daily', 'daily2', 'intra'], tab: 'pIntraday' },
+  swing: { label: 'Short-term report', feeds: ['daily', 'daily2', 'weekly', 'bench', 'summary', 'deliv'], tab: 'pSwing' },
+  long: { label: 'Long-term report', feeds: ['daily', 'daily2', 'weekly', 'bench', 'summary', 'ts', 'tsq', 'deliv', 'news'], tab: 'pLong' },
+  summary: { label: 'Quick summary', feeds: ['daily', 'daily2', 'intra', 'weekly', 'bench'], tab: 'pSummary' },
+};
+const FEED_NAMES = { daily: 'Daily OHLCV (2Y)', daily2: 'Daily cross-check (1M)', intra: 'Intraday 5-min OHLCV (5D)', weekly: 'Weekly OHLCV (10Y)', bench: 'Nifty 50 benchmark (2Y)', summary: 'Fundamentals & ratios (Yahoo quoteSummary)', ts: 'Annual financial statements (Yahoo timeseries)', tsq: 'Quarterly results (Yahoo timeseries)', deliv: 'NSE bundle — result dates, filed results, holding, delivery, DPR (Apps Script)', news: 'News (Google News RSS)' };
+const FC = {};   // feed cache: FC[ySym][key] = { t, f }
+function meter(pct, label) {
+  const el = $('statusLine'); el.className = 'statusline show'; pct = Math.max(0, Math.min(100, Math.round(pct)));
+  $('statusText').innerHTML = `<span style="display:inline-flex;align-items:center;gap:10px;vertical-align:middle;flex-wrap:wrap">${esc(label)}<span style="display:inline-block;width:240px;height:11px;border-radius:6px;background:rgba(120,130,160,.35);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#c99a1c,#2f8f5b);transition:width .25s"></span></span><b>${pct}%</b></span>`;
+}
+const feedFresh = (ySym, k, nowMs) => { const c = FC[ySym] && FC[ySym][k]; if (!c || !c.f.ok) return false; const ttl = k === 'intra' && marketClock(nowMs).open ? 60e3 : 600e3; return nowMs - c.t < ttl; };
+async function runAnalysis(kind) {
+  kind = RPT[kind] ? kind : 'summary';
   const sym = $('symbolInput').value.trim().toUpperCase().replace(/\.(NS|BO)$/, ''), exch = $('exchangeInput').value;
   if (!sym) { alert('Enter a symbol first.'); return; }
   const btn = $('goBtn'); btn.disabled = true; $('errArea').innerHTML = '';
+  const spec = RPT[kind], now0 = Date.now();
   try {
-    setStatus('Fetching daily history…');
-    let usedExch = exch, daily = await feed('Daily OHLCV (2Y)', (tr) => fetchChart(`${sym}.${exch}`, '2y', '1d', tr));
-    if (!daily.ok) { const alt = exch === 'NS' ? 'BO' : 'NS'; setStatus(`No data on ${exch === 'NS' ? 'NSE' : 'BSE'} — trying ${alt === 'NS' ? 'NSE' : 'BSE'}…`); const d2 = await feed('Daily OHLCV (2Y)', (tr) => fetchChart(`${sym}.${alt}`, '2y', '1d', tr)); if (d2.ok) { daily = d2; usedExch = alt; } }
-    if (!daily.ok) throw new Error(daily.err || 'No daily data');
-    const ySym = `${sym}.${usedExch}`;
-    setStatus('Pulling intraday, weekly, results, fundamentals, NSE filings & news in parallel…');
-    const [daily2, intra, weekly, bench, summary, ts, tsq, deliv] = await Promise.all([
-      feed('Daily cross-check (1M)', (tr) => fetchChart(ySym, '1mo', '1d', tr)),
-      feed('Intraday 5-min OHLCV (5D)', (tr) => fetchChart(ySym, '5d', '5m', tr)), feed('Weekly OHLCV (10Y)', (tr) => fetchChart(ySym, '10y', '1wk', tr)), feed('Nifty 50 benchmark (2Y)', (tr) => fetchChart('^NSEI', '2y', '1d', tr)),
-      feed('Fundamentals & ratios (Yahoo quoteSummary)', (tr) => fetchSummary(ySym, tr)),
-      feed('Annual financial statements (Yahoo timeseries)', (tr) => fetchTimeseries(ySym, TS_TYPES, 6, tr)),
-      feed('Quarterly results (Yahoo timeseries)', (tr) => fetchTimeseries(ySym, TSQ_TYPES, 3.5, tr)),
-      usedExch === 'NS' ? feed('NSE bundle — result dates, filed results, holding, delivery, DPR (Apps Script)', () => fetchDelivery(sym)) : Promise.resolve({ name: 'NSE bundle', ok: false, err: 'NSE-listed symbols only' }),
-    ]);
-    const nm = summary.data?.price?.longName || daily.data.meta.longName || daily.data.meta.shortName || sym, news = await feed('News (Google News RSS)', (tr) => fetchNews(nm, tr));
-    setStatus('Computing indicators, results analysis, levels and the call matrix…');
-    const feeds = [daily, daily2, intra, weekly, bench, summary, ts, tsq, deliv, news].map((f) => ({ name: f.name, ok: f.ok, via: f.via, err: f.err }));
-    const R = buildReport({ sym, exch: usedExch, daily: daily.data, daily2: daily2.data, intra: intra.data, weekly: weekly.data, bench: bench.data, summary: summary.data, ts: ts.data, tsq: tsq.data, deliv: deliv.data, news: news.data || [], feeds, nowMs: Date.now() });
+    const need = spec.feeds.length; let done = 0; const tick = (lbl) => { done++; meter(done * 100 / (need + 1), `${spec.label} — ${lbl}`); };
+    meter(2, `${spec.label} — starting`);
+    let usedExch = exch, ySym = `${sym}.${exch}`;
+    const put = (k, f) => { (FC[ySym] = FC[ySym] || {})[k] = { t: Date.now(), f }; return f; };
+    let dailyF;
+    if (feedFresh(`${sym}.${exch}`, 'daily', now0)) { dailyF = FC[`${sym}.${exch}`].daily.f; tick('daily history (saved)'); }
+    else {
+      dailyF = await feed(FEED_NAMES.daily, (tr) => fetchChart(`${sym}.${exch}`, '2y', '1d', tr));
+      if (!dailyF.ok) { const alt = exch === 'NS' ? 'BO' : 'NS'; meter(done * 100 / (need + 1), `No data on ${exch === 'NS' ? 'NSE' : 'BSE'} — trying ${alt === 'NS' ? 'NSE' : 'BSE'}`); const d2 = await feed(FEED_NAMES.daily, (tr) => fetchChart(`${sym}.${alt}`, '2y', '1d', tr)); if (d2.ok) { dailyF = d2; usedExch = alt; ySym = `${sym}.${alt}`; } }
+      if (!dailyF.ok) throw new Error(dailyF.err || 'No daily data');
+      put('daily', dailyF); tick('daily history');
+    }
+    const DEF = {
+      daily2: (tr) => fetchChart(ySym, '1mo', '1d', tr), intra: (tr) => fetchChart(ySym, '5d', '5m', tr), weekly: (tr) => fetchChart(ySym, '10y', '1wk', tr), bench: (tr) => fetchChart('^NSEI', '2y', '1d', tr),
+      summary: (tr) => fetchSummary(ySym, tr), ts: (tr) => fetchTimeseries(ySym, TS_TYPES, 6, tr), tsq: (tr) => fetchTimeseries(ySym, TSQ_TYPES, 3.5, tr),
+      deliv: () => (usedExch === 'NS' ? fetchDelivery(sym) : Promise.resolve(null)), news: async () => { const sf = FC[ySym] && FC[ySym].summary; const nm0 = (sf && sf.f.data?.price?.longName) || dailyF.data.meta.longName || dailyF.data.meta.shortName || sym; return fetchNews(nm0, {}); },
+    };
+    const todo = spec.feeds.filter((k) => k !== 'daily');
+    await Promise.all(todo.map(async (k) => {
+      if (feedFresh(ySym, k, now0)) { tick(FEED_NAMES[k].split(' (')[0].toLowerCase() + ' (saved)'); return; }
+      const f = await feed(FEED_NAMES[k], DEF[k]); put(k, f); tick(FEED_NAMES[k].split(' (')[0].toLowerCase());
+    }));
+    meter(done * 100 / (need + 1), `${spec.label} — computing`);
+    const g = (k) => { const c = FC[ySym] && FC[ySym][k]; return c && c.f.ok ? c.f : { name: FEED_NAMES[k], ok: false, data: null, err: 'Not fetched for this report (saves quota)' }; };
+    const all = Object.keys(FEED_NAMES), F = {}; all.forEach((k) => { F[k] = g(k); });
+    const feeds = all.map((k) => ({ name: F[k].name, ok: F[k].ok, via: F[k].via, err: F[k].err }));
+    const R = buildReport({ sym, exch: usedExch, daily: F.daily.data, daily2: F.daily2.data, intra: F.intra.data, weekly: F.weekly.data, bench: F.bench.data, summary: F.summary.data, ts: F.ts.data, tsq: F.tsq.data, deliv: F.deliv.data, news: F.news.data || [], feeds, nowMs: Date.now() });
     window.__R = R; $('titlebar').classList.remove('hidden');
     $('asOfTag').textContent = 'data as of ' + R.lastDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + (R.live ? ' · market live' : ' · market closed'); $('coName').textContent = `${R.name} (${R.sym})`;
-    $('pSummary').innerHTML = htmlSummary(R); $('pIntraday').innerHTML = htmlIntradayTab(R); $('pSwing').innerHTML = htmlSwingTab(R); $('pLong').innerHTML = htmlLongTab(R); $('pDataBody').innerHTML = htmlData(R);
-    if (window.JCProj) window.JCProj.run(R);
-    refreshChips(); showTab(window.__curTab === 'pUpcoming' ? 'pUpcoming' : window.__curTab === 'pSummary' || !$(window.__curTab) ? 'pSummary' : window.__curTab);
-    setStatus('Report generated · ' + new Date().toLocaleTimeString('en-IN') + (usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''), 'ok');
+    const have = (k) => RPT[k].feeds.every((x) => FC[ySym] && FC[ySym][x] && FC[ySym][x].f.ok);
+    const ph = (k) => `<div class="note">${esc(RPT[k].label)} not generated yet for <b>${esc(sym)}</b>. Choose “${esc(RPT[k].label)}” in the report dropdown at the top and press Generate. Reports are fetched one at a time to save data quota.</div>`;
+    $('pSummary').innerHTML = have('summary') ? htmlSummary(R) : ph('summary');
+    $('pIntraday').innerHTML = have('intraday') ? htmlIntradayTab(R) : ph('intraday'); $('pSwing').innerHTML = have('swing') ? htmlSwingTab(R) : ph('swing'); $('pLong').innerHTML = have('long') ? htmlLongTab(R) : ph('long'); $('pDataBody').innerHTML = htmlData(R);
+    const pp = $('projPanel'); if (kind === 'intraday' && window.JCProj) window.JCProj.run(R); else if (pp) pp.style.display = 'none';
+    refreshChips(); showTab(spec.tab);
+    meter(100, `${spec.label} ready · ${new Date().toLocaleTimeString('en-IN')}${usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''}`);
   } catch (e) {
     console.error(e); setStatus('Report failed', 'err');
     const be = getBackend(), onFile = typeof location !== 'undefined' && location.protocol === 'file:';
@@ -1719,7 +1749,7 @@ if (IS_BROWSER) {
   const tick = () => { const now = new Date(); $('clockTime').textContent = now.toLocaleTimeString('en-IN', { hour12: true }); $('clockDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }); };
   setInterval(tick, 1000); tick(); setInterval(wlTick, 60000);
   document.addEventListener('DOMContentLoaded', () => {
-    $('symbolInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') (window.genReport || runAnalysis)(); });
+    $('symbolInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') window.runSelected(); });
     $('viewSel').addEventListener('change', (e) => showTab(e.target.value));
     $('upBody').innerHTML = htmlUpcoming(null); refreshChips(); showTab('pSummary');
     const be = $('backendInput'); be.value = getBackend();

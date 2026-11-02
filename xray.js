@@ -378,7 +378,7 @@
     });
   }
   function addTopButton() {
-    const go = document.querySelector('button.goBtn, #goBtn, button[onclick*="runAnalysis"]'); if (!go || $('xrTop')) return;
+    if ($('rptSel')) return; const go = document.querySelector('button.goBtn, #goBtn, button[onclick*="runAnalysis"]'); if (!go || $('xrTop')) return;
     const b = document.createElement('button'); b.id = 'xrTop'; b.type = 'button'; b.className = 'ghostBtn'; b.textContent = 'X-ray'; b.title = 'Live X-ray of the symbol typed here'; b.style.marginLeft = '6px';
     b.onclick = () => { const s = $('symbolInput') ? $('symbolInput').value.trim() : ''; const ex = $('exchangeInput') ? $('exchangeInput').value : 'NS'; if (!s) { alert('Type a symbol first.'); return; } window.jcXray(/\.(NS|BO)$/.test(s.toUpperCase()) || /^[\^]/.test(s) ? s : (ex === 'BO' ? 'BSE:' : '') + s); };
     go.insertAdjacentElement('afterend', b);
