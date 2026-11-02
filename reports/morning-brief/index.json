@@ -2,6 +2,27 @@
  "schedule_id": "morning-brief",
  "runs": [
   {
+   "generated_at": "2026-11-02T08:14:01+05:30",
+   "date": "2026-11-02",
+   "status": "ok",
+   "caption": "Morning Brief 02 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Brief_2026-11-02.pdf",
+     "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-11-02.pdf",
+     "type": "pdf",
+     "bytes": 364770
+    },
+    {
+     "name": "JCGG_Morning_Updates_Brief_2026-11-02.json",
+     "path": "reports/morning-brief/JCGG_Morning_Updates_Brief_2026-11-02.json",
+     "type": "json",
+     "bytes": 5300
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T11:06:43+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -220,5 +241,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T11:06:43+05:30"
+ "updated_at": "2026-11-02T08:14:01+05:30"
 }
