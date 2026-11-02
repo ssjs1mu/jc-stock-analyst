@@ -6,11 +6,17 @@ UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
 def num(x):
     try: return float(x.replace(",", ""))
     except ValueError: return None
+ERR = {}
 def one(sym):
-    try:
-        h = urllib.request.urlopen(urllib.request.Request("https://www.topstockresearch.com/rt/ViewOptionChain/" + sym.replace("&", "%26"), headers=UA), timeout=30).read().decode("utf-8", "replace")
-    except Exception:
-        return sym, None
+    h = None
+    for a in range(4):
+        try:
+            h = urllib.request.urlopen(urllib.request.Request("https://www.topstockresearch.com/rt/ViewOptionChain/" + sym.replace("&", "%26"), headers=UA), timeout=30).read().decode("utf-8", "replace"); break
+        except Exception as ex:
+            ERR[str(ex)[:40]] = ERR.get(str(ex)[:40], 0) + 1
+            if "404" in str(ex): return sym, None        # not an F&O stock
+            time.sleep(3 * (a + 1))
+    if h is None: return sym, None
     tx = re.sub(r"\s+", " ", re.sub(r"&nbsp;", " ", re.sub(r"<[^>]+>", " ", h)))
     m = re.search(r"Spot Close\s*:\s*([\d.]+)", tx); e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", tx)
     if not m: return sym, None
@@ -30,10 +36,10 @@ def one(sym):
 def main():
     c = json.load(open("data/constituents.json"))["idx"]; syms = sorted(set(c.get("^CNX200", []) + c.get("NIFTY_MIDCAP_100.NS", []) + c.get("^NSEI", []) + c.get("^NSEBANK", [])))
     out = {}
-    with cf.ThreadPoolExecutor(6) as ex:
+    with cf.ThreadPoolExecutor(3) as ex:
         for s, d in ex.map(one, syms):
             if d: out[s] = d
-    print(len(out), "F&O stocks of", len(syms), file=sys.stderr)
-    if len(out) < 30: sys.exit("too few chains parsed - keeping the old file")
+    print(len(out), "F&O stocks of", len(syms), ERR, file=sys.stderr)
+    if len(out) < 40: sys.exit("too few chains parsed - keeping the old file")
     json.dump({"asof": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"), "source": "public option-chain page (OI as of last close, nearest expiry)", "stocks": out}, open("data/fno_oi.json", "w"), separators=(",", ":"))
 main()
