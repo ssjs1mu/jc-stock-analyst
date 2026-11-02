@@ -1,0 +1,14 @@
+name: Projection strategy research (read-only, nothing published)
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install numpy scikit-learn && python pipeline/proj_research.py
+      - run: |
+          mkdir -p /tmp/pv && cp /tmp/research.md /tmp/pv/research.md && cd /tmp/pv && git init -q && git checkout -q -b research && git add -A && git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm research && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" research
