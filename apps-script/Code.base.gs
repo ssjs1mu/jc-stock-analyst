@@ -23,7 +23,10 @@ var ALLOW = [/^https:\/\/query[12]\.finance\.yahoo\.com\//, /^https:\/\/news\.go
 function doGet(e) {
   var p = (e && e.parameter) || {}, out;
   try {
-    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 15, ts: new Date().toISOString() });
+    if (p.action === 'ping') out = JSON.stringify({ ok: true, v: 16, ts: new Date().toISOString() });
+    else if (p.action === 'hit') out = vcHit_(p);
+    else if (p.action === 'vstats') out = vcStats_(p);
+    else if (p.action === 'usage') out = vcUsage_(p);
     else if (p.action === 'earn') out = earnDates_(p.symbols);
     else if (p.action === 'dash') out = dashQuotes_(p.symbols);
     else if (p.action === 'in10y') out = in10y_();
