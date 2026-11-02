@@ -1,0 +1,450 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "02 Nov 2026",
+  "date_iso": "2026-11-02",
+  "mood": {
+   "key": "bull",
+   "label": "Positive close",
+   "sub": "Nifty +1.68% in the session"
+  },
+  "label": "Positive close",
+  "headline": "Nifty gains 1.68%, Banks lag",
+  "summary": "Nifty 50 closed at 23,440.80 (+1.68%) and Sensex at 75,692.78 (+1.66%). Banks: Bank Nifty +0.58%. India VIX 15.50 (+1.31%). Brent crude -7.43%, USD/INR 94.900. 36 of 50 Nifty stocks advanced and 13 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "23,440.80",
+    "pct": "+1.68%",
+    "pts": "+387.70"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "75,692.78",
+    "pct": "+1.66%",
+    "pts": "+1233.25"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "55,002.20",
+    "pct": "+0.58%",
+    "pts": "+315.25"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "22,241.40",
+    "pct": "+1.58%",
+    "pts": "+345.50"
+   }
+  ],
+  "spark": [
+   22603.05078125,
+   22231.80078125,
+   22520.44921875,
+   22363.349609375,
+   22721.94921875,
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125
+  ],
+  "flows": {
+   "date": "30 Oct",
+   "fii": 3598.54,
+   "dii": -817.51
+  },
+  "breadth": {
+   "up": 36,
+   "dn": 13
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "23,129 - 23,285",
+    "r": "23,519 - 23,597",
+    "note": "A close above 23,519 opens up 23,597; a slide below 23,285 would expose 23,129."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "54,412 - 54,707",
+    "r": "55,172 - 55,341",
+    "note": "A close above 55,172 opens up 55,341; a slide below 54,707 would expose 54,412."
+   }
+  ],
+  "events": [
+   "Nifty weekly expiry today (Tue 03 Nov 2026)."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "51,770.31",
+    "pct": "-1.09%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,580.07",
+    "pct": "-1.82%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "25,437.00",
+    "pct": "-2.86%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,709.47",
+    "pct": "-0.19%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "25,796.22",
+    "pct": "-0.09%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "63,081.86",
+    "pct": "-0.33%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "23,393.32",
+    "pct": "+0.42%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,638.03",
+    "pct": "+1.08%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,859.08",
+    "pct": "+2.24%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "108.90",
+    "pct": "-7.43%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "99.72",
+    "pct": "-4.23%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,911.40",
+    "pct": "+0.32%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.900",
+    "pct": "-0.27%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.60",
+    "pct": "-0.27%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.93",
+    "pct": "-1.20%"
+   }
+  ],
+  "vix": {
+   "level": "15.50",
+   "pct": "+1.31%",
+   "gauge": 0.725,
+   "text": "India VIX 15.50."
+  },
+  "headlines": [
+   "Sensex soars 1,233 points; Nifty nears 23,450 as markets extend rally for third straight session",
+   "Oil prices sink on US-Iran war hope ahead of midterms",
+   "Stock Market Today (Nov. 2, 2026): Nasdaq futures rise ahead of Apple\u2019s earnings report",
+   "Tech Rebound, Crude Slide Lift Wall Street Pre-Bell; Asia Mixed, Europe Up",
+   "Sensex Surges 1,233 Points as Nifty Crosses 23,440",
+   "Share Market Today: Nifty 50, Bank Nifty",
+   "Indian stock market rally: Sensex surges 1,233 points, Nifty jumps 388 points to close at 23,440",
+   "Reliance-led rally, falling crude oil prices drive Sensex up 1,233 points"
+  ],
+  "gainers": [
+   [
+    "RELIANCE",
+    "1,300.00",
+    "+11.60%"
+   ],
+   [
+    "TATASTEEL",
+    "177.37",
+    "+5.83%"
+   ],
+   [
+    "JSWSTEEL",
+    "1,309.90",
+    "+5.13%"
+   ],
+   [
+    "COALINDIA",
+    "408.00",
+    "+4.88%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "863.35",
+    "+4.88%"
+   ]
+  ],
+  "losers": [
+   [
+    "INFY",
+    "1,161.00",
+    "-2.03%"
+   ],
+   [
+    "WIPRO",
+    "196.40",
+    "-0.96%"
+   ],
+   [
+    "ICICIBANK",
+    "1,387.40",
+    "-0.76%"
+   ],
+   [
+    "DRREDDY",
+    "1,342.00",
+    "-0.74%"
+   ],
+   [
+    "KOTAKBANK",
+    "458.35",
+    "-0.70%"
+   ]
+  ],
+  "shock": [
+   [
+    "RELIANCE",
+    "1,300.00",
+    "5.8x avg vol",
+    "+11.60%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,770.00",
+    "2.1x avg vol",
+    "-0.43%"
+   ],
+   [
+    "COALINDIA",
+    "408.00",
+    "1.8x avg vol",
+    "+4.88%"
+   ],
+   [
+    "JSWSTEEL",
+    "1,309.90",
+    "1.6x avg vol",
+    "+5.13%"
+   ]
+  ],
+  "opening": {
+   "label": "Flat to marginally mixed start",
+   "zone": "23,380 - 23,450",
+   "headline": "Flat to marginally mixed start: Wall Street weak, Asia positive, crude easing",
+   "drivers": [
+    "GIFT Nifty 23,414.0 (-27 pts, -0.11% vs Nifty's last close).",
+    "US: S&P 500 -1.82%, Nasdaq -2.86%, Dow -1.09%.",
+    "Asia this morning: Nikkei -0.33%, Hang Seng +0.42%, Kospi +2.24%.",
+    "Currency, crude and volatility: Brent 108.90 (-7.43%); USD/INR 94.900 (-0.27%); India VIX 15.50 (+1.31%)."
+   ],
+   "next": "Tuesday, 03 November 2026",
+   "mood": "neutral",
+   "gift": {
+    "last": "23,414.0",
+    "pct": "+0.05%",
+    "premium": "-27 pts",
+    "vs": "-0.11%",
+    "asof": "02 Nov 18:00"
+   },
+   "anchored": true
+  },
+  "nextday": {
+   "date": "Tuesday, 03 November 2026",
+   "results": [
+    "BAJAJFINSV",
+    "BAJAJHLDNG",
+    "LUPIN",
+    "SBIN",
+    "SOLARINDS",
+    "AARNAV",
+    "AARTIDRUGS",
+    "ABINFRA",
+    "ADSL",
+    "ADVENTHTL",
+    "AIAENG",
+    "AIIL",
+    "AJMERA",
+    "ALKYLAMINE"
+   ],
+   "results_n": 179,
+   "actions": [
+    {
+     "sym": "GRAVITA",
+     "what": "Interim Dividend - Rs   7.70 Per Share"
+    },
+    {
+     "sym": "INFY",
+     "what": "Interim Dividend - Rs 26 Per Share"
+    },
+    {
+     "sym": "SASKEN",
+     "what": "Interim Dividend - Rs 12 Per Share"
+    },
+    {
+     "sym": "MAZDOCK",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "RRKABEL",
+     "what": "Interim Dividend - Rs 6.50 Per Share"
+    },
+    {
+     "sym": "IRBINVIT",
+     "what": "Distribution - Rs 1.625 Per Unit Consists Of Rs 1.475 Per Unit As Inte"
+    }
+   ],
+   "due": [
+    {
+     "t": "20:46",
+     "ccy": "USD",
+     "title": "Congressional Elections",
+     "hi": true,
+     "fc": ""
+    },
+    {
+     "t": "20:30",
+     "ccy": "USD",
+     "title": "JOLTS Job Openings",
+     "hi": false,
+     "fc": "7.11M"
+    }
+   ]
+  },
+  "story": [
+   "Nifty 50 opened at 23,239, a gap-up of 0.81% from the previous close of 23,053.",
+   "The index dipped to a low of 23,207 (+0.67%) around 1:40 PM and touched a high of 23,441 (+1.68%) around 3:30 PM.",
+   "It settled at 23,441 (+1.68%), near the top of the day's range, so buyers held control into the close.",
+   "The final hour added +150 points.",
+   "36 of the 50 Nifty stocks advanced and 13 declined; Bank Nifty lagged (+0.58%).",
+   "Latest institutional data (30 Oct): FII/FPI net +3599 Cr, DII net -818 Cr."
+  ],
+  "risks": [
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,580.07 (-1.82%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$108.90 (-7.43%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 94.900 (-0.27%), US 10-year yield 4.93% (-1.20%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 23,414.0 (-0.11% vs Nifty's close): the best live read on the next opening.",
+   "Nifty 50 results due on Tuesday: BAJAJFINSV, SBIN."
+  ],
+  "vol_movers": [
+   [
+    "RELIANCE",
+    "1,300.00",
+    "6.6%",
+    "+11.60%"
+   ],
+   [
+    "JSWSTEEL",
+    "1,309.90",
+    "5.0%",
+    "+5.13%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "863.35",
+    "4.8%",
+    "+4.88%"
+   ],
+   [
+    "TATASTEEL",
+    "177.37",
+    "4.2%",
+    "+5.83%"
+   ],
+   [
+    "INFY",
+    "1,161.00",
+    "3.7%",
+    "-2.03%"
+   ],
+   [
+    "ONGC",
+    "234.83",
+    "3.7%",
+    "+4.19%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "RELIANCE",
+    "1,300.00",
+    "5.8x vol",
+    "+11.60%"
+   ],
+   [
+    "COALINDIA",
+    "408.00",
+    "1.8x vol",
+    "+4.88%"
+   ],
+   [
+    "JSWSTEEL",
+    "1,309.90",
+    "1.6x vol",
+    "+5.13%"
+   ],
+   [
+    "GRASIM",
+    "3,057.10",
+    "1.6x vol",
+    "+2.54%"
+   ]
+  ],
+  "pv_dn": [],
+  "asof": "06:10 PM IST"
+ },
+ "title": "Evening Breeze (02 Nov 2026)",
+ "headline": "Nifty gains 1.68%, Banks lag",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +1.68% in the session"
+ },
+ "mood_score": 2.354484428654735,
+ "mood_pic": "bull_roar",
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}

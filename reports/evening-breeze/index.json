@@ -2,6 +2,69 @@
  "schedule_id": "evening-breeze",
  "runs": [
   {
+   "generated_at": "2026-11-02T18:11:07+05:30",
+   "date": "2026-11-02",
+   "status": "ok",
+   "caption": "Evening Breeze 02 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_1.png",
+     "type": "png",
+     "bytes": 952732
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_2.png",
+     "type": "png",
+     "bytes": 675284
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_3.png",
+     "type": "png",
+     "bytes": 757393
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_4.png",
+     "type": "png",
+     "bytes": 845111
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_5.png",
+     "type": "png",
+     "bytes": 791230
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_6.png",
+     "type": "png",
+     "bytes": 802575
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_7.png",
+     "type": "png",
+     "bytes": 626472
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-02_8.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-02_8.png",
+     "type": "png",
+     "bytes": 1456682
+    },
+    {
+     "name": "JCGG_Evening_Breeze_2026-11-02.json",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_2026-11-02.json",
+     "type": "json",
+     "bytes": 9206
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T17:20:11+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -671,5 +734,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T17:20:11+05:30"
+ "updated_at": "2026-11-02T18:11:07+05:30"
 }
