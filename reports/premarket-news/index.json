@@ -2,6 +2,27 @@
  "schedule_id": "premarket-news",
  "runs": [
   {
+   "generated_at": "2026-11-02T08:13:57+05:30",
+   "date": "2026-11-02",
+   "status": "ok",
+   "caption": "Premarket News 02 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "Market_News_2026-11-02.pdf",
+     "path": "reports/premarket-news/Market_News_2026-11-02.pdf",
+     "type": "pdf",
+     "bytes": 367471
+    },
+    {
+     "name": "Market_News_2026-11-02.json",
+     "path": "reports/premarket-news/Market_News_2026-11-02.json",
+     "type": "json",
+     "bytes": 5110
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T09:02:45+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -199,5 +220,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T09:02:45+05:30"
+ "updated_at": "2026-11-02T08:13:57+05:30"
 }
