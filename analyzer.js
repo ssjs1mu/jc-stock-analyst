@@ -390,7 +390,7 @@
     }
     h += '</thead><tbody>';
     const nextDay = (d) => { const x = new Date(d + 'T00:00:00Z'); do { x.setUTCDate(x.getUTCDate() + 1); } while ([0, 6].includes(x.getUTCDay())); return x.toISOString().slice(0, 10); };
-    for (let i = 0; i < n; i++) {
+    for (let i = n - 1; i >= 0; i--) {
       const last = i === n - 1, ed = ST.edits[b.d[i]] || {};
       h += `<tr${last ? ' class="last"' : ''}><td class="d">${dmy(b.d[i])}</td>`;
       plan.groups.forEach((g) => g.cols.forEach((c) => {
@@ -446,7 +446,7 @@
       <button class="ghostBtn" id="anCsv"${hasT ? '' : ' disabled'}>⬇ CSV</button><button class="ghostBtn" id="anTsv"${hasT ? '' : ' disabled'}>Copy for Excel</button><button class="ghostBtn" id="anHelp">? Help</button><button class="ghostBtn" id="anReset">Reset rules</button></div>
       <div class="note anMsg">${ST.busy ? '<span class="spin"></span> ' : ''}${esc(ST.msg || 'Type a symbol and press Load - or select a stock above and open this view.')}</div>
       ${ST.help ? helpHtml() : ''}${hasT ? summaryHtml() : ''}<div class="anWrap">${hasT ? tableHtml() : ''}</div>`;
-    const w = p.querySelector('.anWrap'); if (w) { if (keepScroll && st) { w.scrollTop = st[0]; w.scrollLeft = st[1]; } else w.scrollTop = w.scrollHeight; }
+    const w = p.querySelector('.anWrap'); if (w) { if (keepScroll && st) { w.scrollTop = st[0]; w.scrollLeft = st[1]; } else w.scrollTop = 0; }
   }
   function refresh() { recompute(); paint(true); }
 
