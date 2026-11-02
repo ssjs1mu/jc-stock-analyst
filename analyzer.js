@@ -234,7 +234,9 @@
     ['VOLATILITY / LEVELS', '#e6f4f8', [['atr14', 'ATR14', f2], ['atrpct', 'ATR %', f2], ['bbpct', 'BB %b', f2], ['bbw', 'BB width %', f2], ['hh20', '20d high', px], ['ll20', '20d low', px], ['hh52', '52w high', px], ['ll52', '52w low', px], ['near52h', 'vs 52w high %', f2], ['near52l', 'vs 52w low %', f2], ['obv', 'OBV', inr], ['obvema', 'OBV EMA20', inr]]],
   ];
   const MKT_CAT = (cols) => [['MARKET & GLOBAL', '#fbeaea', cols.flatMap((k) => { const nm = (GLOB.find((g) => g[0] === k) || [0, 0, k])[2]; return [[k, nm, f2], [k + 'chg', nm + ' Δ%', f2]]; })]];
-  const NEXT_CAT = ['NEXT DAY (RESULT)', '#dfe7f5', [['nxto', 'Next open', px], ['nxth', 'Next high', px], ['nxtl', 'Next low', px], ['nxtc', 'Next close', px], ['nxtgap', 'Next gap %', f2], ['nxtchg', 'Next chg %', f2], ['nxtdir', 'Next', (v) => (isN(v) ? (v > 0 ? 'UP' : v < 0 ? 'DOWN' : 'FLAT') : '')]]];
+  const PRED_CAT = ['PREDICTED NEXT DAY (today + N-day averages)', '#d8f0dc', [['pdir', 'Trend', (v) => (isN(v) ? (v > 0 ? 'UP' : v < 0 ? 'DOWN' : '') : '')], ['popen', 'Pred open', px], ['phigh', 'Pred high', px], ['plow', 'Pred low', px], ['pclose', 'Pred close', px], ['avgGap', 'Avg gap %', f2], ['avgUp', 'Avg open→high %', f2], ['avgDn', 'Avg open→low %', f2], ['avgBody', 'Avg body %', f2]]];
+  const NEXT_CAT = ['ACTUAL NEXT DAY (only to check the prediction)', '#dfe7f5', [['nxto', 'Actual open', px], ['nxth', 'Actual high', px], ['nxtl', 'Actual low', px], ['nxtc', 'Actual close', px], ['nxtgap', 'Actual gap %', f2], ['nxtchg', 'Actual chg %', f2], ['nxtdir', 'Actual', (v) => (isN(v) ? (v > 0 ? 'UP' : v < 0 ? 'DOWN' : 'FLAT') : '')]]];
+  const ERR_CAT = ['ERROR: actual vs predicted %', '#fbeee0', [['eo', 'Open err %', f2], ['eh', 'High err %', f2], ['el', 'Low err %', f2], ['ec', 'Close err %', f2]]];
 
   const PRESETS = [
     ['Open = High (sold from the open)', 'open = high'], ['Open = Low (bought from the open)', 'open = low'], ['Gap up > 1%', 'gap > 1'], ['Gap down < -1%', 'gap < -1'],
@@ -247,7 +249,32 @@
     { f: 'rsi14 < 30', dir: 1, w: 1 }, { f: 'rsi14 > 70', dir: -1, w: 1 }, { f: 'volratio > 2 and chg > 0', dir: 1, w: 1 }, { f: 'delratio > 1.3 and chg > 0', dir: 1, w: 1 },
   ];
 
-  const core = { parse, evalAst, build, evalConds, predict, condStats, tokenize, sma, ema, rsi, PRESETS, GLOB };
+  /* next-day OHLC from the last N sessions' average gap / open->high / open->low / body */
+  function ohlcPred(T, N, calls, tol) {
+    const n = T.n, S = T.S, o = () => mk(n);
+    const R = { pdir: o(), popen: o(), phigh: o(), plow: o(), pclose: o(), eo: o(), eh: o(), el: o(), ec: o(), avgGap: o(), avgUp: o(), avgDn: o(), avgBody: o() };
+    N = Math.max(2, Math.round(N) || 5);
+    for (let i = N; i < n; i++) {
+      let g = 0, u = 0, d = 0, b = 0, ab = 0, ok = true;
+      for (let k = i - N + 1; k <= i; k++) {
+        const O = S.open[k], H = S.high[k], L = S.low[k], C = S.close[k], pc = S.close[k - 1];
+        if (![O, H, L, C, pc].every(isN) || !O || !pc) { ok = false; break; }
+        g += (O / pc - 1) * 100; u += ((H - O) / O) * 100; d += ((O - L) / O) * 100; b += ((C - O) / O) * 100; ab += (Math.abs(C - O) / O) * 100;
+      }
+      if (!ok) continue;
+      g /= N; u /= N; d /= N; b /= N; ab /= N;
+      const dir = calls && calls[i] ? calls[i] : b > 0 ? 1 : b < 0 ? -1 : 0, c0 = S.close[i];
+      const po = c0 * (1 + g / 100), pc2 = po * (1 + (dir * ab) / 100);
+      const ph = Math.max(po * (1 + u / 100), po, pc2), pl = Math.min(po * (1 - d / 100), po, pc2);
+      R.pdir[i] = dir; R.popen[i] = po; R.phigh[i] = ph; R.plow[i] = pl; R.pclose[i] = pc2; R.avgGap[i] = g; R.avgUp[i] = u; R.avgDn[i] = d; R.avgBody[i] = b;
+      if (i < n - 1) { R.eo[i] = (S.nxto[i] / po - 1) * 100; R.eh[i] = (S.nxth[i] / ph - 1) * 100; R.el[i] = (S.nxtl[i] / pl - 1) * 100; R.ec[i] = (S.nxtc[i] / pc2 - 1) * 100; }
+    }
+    const st = {}; [['Open', 'eo'], ['High', 'eh'], ['Low', 'el'], ['Close', 'ec']].forEach(([nm, k]) => { let c = 0, w = 0, a = 0; R[k].forEach((v) => { if (!isN(v)) return; c++; a += Math.abs(v); if (Math.abs(v) <= tol) w++; }); st[nm] = { n: c, within: c ? (w / c) * 100 : NA, mae: c ? a / c : NA }; });
+    let dh = 0, dn = 0; for (let i = 0; i < n - 1; i++) if (isN(R.pdir[i]) && R.pdir[i] && isN(S.nxtdir[i]) && S.nxtdir[i]) { dn++; if (R.pdir[i] === S.nxtdir[i]) dh++; } st.dir = { n: dn, hit: dn ? (dh / dn) * 100 : NA };
+    let rg = 0, rn = 0; for (let i = 0; i < n - 1; i++) if (isN(R.phigh[i]) && isN(S.nxth[i])) { rn++; if (S.nxth[i] <= R.phigh[i] && S.nxtl[i] >= R.plow[i]) rg++; } st.inside = { n: rn, pct: rn ? (rg / rn) * 100 : NA };
+    return { R, st };
+  }
+  const core = { ohlcPred, parse, evalAst, build, evalConds, predict, condStats, tokenize, sma, ema, rsi, PRESETS, GLOB };
   root.JCAn = Object.assign(root.JCAn || {}, { core });
   if (typeof document === 'undefined') return;
 
@@ -256,10 +283,10 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const day = (t) => new Date((t + 19800) * 1000).toISOString().slice(0, 10);
   const dmy = (d) => { const x = new Date(d + 'T00:00:00Z'); return String(x.getUTCDate()).padStart(2, '0') + '-' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][x.getUTCMonth()] + '-' + String(x.getUTCFullYear()).slice(2); };
-  const ST = { sym: '', busy: false, msg: '', base: null, raw: null, edits: {}, conds: [], thr: 1, mkt: null, mktOn: false, T: null, P: null, lastSync: '', dl: null, help: false, stats: true };
-  try { const j = JSON.parse(localStorage.getItem('jc_an_v1') || 'null'); if (j && Array.isArray(j.conds)) { ST.conds = j.conds.map((c) => ({ f: String(c.f || ''), dir: +c.dir || 0, w: isN(+c.w) ? +c.w : 1 })); ST.thr = isN(+j.thr) ? +j.thr : 1; } } catch (e) { /* ignore */ }
+  const ST = { sym: '', busy: false, msg: '', base: null, raw: null, edits: {}, conds: [], thr: 1, N: 5, tol: 1, Q: null, mkt: null, mktOn: false, T: null, P: null, lastSync: '', dl: null, help: false, stats: true };
+  try { const j = JSON.parse(localStorage.getItem('jc_an_v1') || 'null'); if (j && Array.isArray(j.conds)) { ST.conds = j.conds.map((c) => ({ f: String(c.f || ''), dir: +c.dir || 0, w: isN(+c.w) ? +c.w : 1 })); ST.thr = isN(+j.thr) ? +j.thr : 1; ST.N = isN(+j.N) && +j.N >= 2 ? Math.round(+j.N) : 5; ST.tol = isN(+j.tol) && +j.tol > 0 ? +j.tol : 1; } } catch (e) { /* ignore */ }
   if (!ST.conds.length) ST.conds = DEFAULT_CONDS.map((c) => ({ ...c }));
-  const saveCols = () => { try { localStorage.setItem('jc_an_v1', JSON.stringify({ conds: ST.conds.map((c) => ({ f: c.f, dir: c.dir, w: c.w })), thr: ST.thr })); } catch (e) { /* ignore */ } };
+  const saveCols = () => { try { localStorage.setItem('jc_an_v1', JSON.stringify({ conds: ST.conds.map((c) => ({ f: c.f, dir: c.dir, w: c.w })), thr: ST.thr, N: ST.N, tol: ST.tol })); } catch (e) { /* ignore */ } };
   const saveEdits = () => { try { localStorage.setItem('jc_an_e_' + ST.sym, JSON.stringify(ST.edits)); } catch (e) { /* ignore */ } };
 
   async function loadDelivJson() {
@@ -275,6 +302,7 @@
   }
   function recompute() {
     if (!ST.base) return; ST.T = build(ST.base, ST.mktOn ? ST.mkt : null); evalConds(ST.conds, ST.T); ST.P = predict(ST.conds, ST.T, ST.thr);
+    ST.Q = ohlcPred(ST.T, ST.N, ST.P.calls, ST.tol); Object.keys(ST.Q.R).forEach((k) => { ST.T.S[k] = ST.Q.R[k]; });
   }
 
   async function load(sym) {
@@ -312,7 +340,8 @@
   function allGroups() { const T = ST.T; const g = CATALOG.slice(); if (T && T.mcols.length) g.push(MKT_CAT(T.mcols)[0]); return g; }
   function columnPlan() {
     const groups = allGroups().map((g) => ({ name: g[0], bg: g[1], cols: g[2].map((c) => ({ key: c[0], label: c[1], fmt: c[2], edit: !!c[3] })) }));
-    return { groups, next: { name: NEXT_CAT[0], bg: NEXT_CAT[1], cols: NEXT_CAT[2].map((c) => ({ key: c[0], label: c[1], fmt: c[2] })) } };
+    const sub = [PRED_CAT, NEXT_CAT, ERR_CAT].map((g) => ({ name: g[0], bg: g[1], cols: g[2].map((c) => ({ key: c[0], label: c[1], fmt: c[2], bg: g[1] })) }));
+    return { groups, next: { name: 'NEXT DAY', bg: '#eef1f8', sub, cols: sub.flatMap((g) => g.cols) } };
   }
   const H1 = 18, H2 = 26, H3 = 22, H4 = 16;
   function tableHtml() {
@@ -323,13 +352,13 @@
     const gcell = (name, span, bg) => `<th colspan="${span}" style="background:${bg};top:${tops[0]}px;height:${H1}px" class="g">${esc(name)}</th>`;
     h += '<tr><th class="d" style="top:0;height:' + H1 + 'px;background:#dfe5f3">SHEET</th>';
     plan.groups.forEach((g) => { h += gcell(g.name, g.cols.length, g.bg); });
-    h += gcell('YOUR RULES (type the rule in the header)', Math.max(1, nC), '#fff4cf'); h += gcell('NEXT-DAY CALL', 4, '#d8f0dc'); h += gcell(plan.next.name, plan.next.cols.length, plan.next.bg) + '</tr>';
+    h += gcell('YOUR RULES (type the rule in the header)', Math.max(1, nC), '#fff4cf'); h += gcell('NEXT-DAY CALL', 4, '#d8f0dc'); plan.next.sub.forEach((g) => { h += gcell(g.name, g.cols.length, g.bg); }); h += '</tr>';
     h += '<tr><th class="d" style="top:' + tops[1] + 'px;height:' + H2 + 'px;background:#eef1f8">Date</th>';
     plan.groups.forEach((g) => g.cols.forEach((c) => { h += `<th style="top:${tops[1]}px;height:${H2}px;background:${g.bg}" title="${esc(c.key)}">${esc(c.label)}</th>`; }));
     ST.conds.forEach((c, j) => { h += `<th class="cond${c.err ? ' bad' : ''}" style="top:${tops[1]}px;height:${H2}px" title="${esc(c.err || ('x' + (j + 1) + ' - ' + c.f))}"><input class="fx" data-j="${j}" value="${esc(c.f)}" spellcheck="false" placeholder="e.g. open = high"><button class="rm" data-rm="${j}" title="Remove column">×</button></th>`; });
     if (!nC) h += `<th style="top:${tops[1]}px;height:${H2}px;background:#fff9e3">(add a column)</th>`;
     ['Score', 'Call', 'Actual', 'Hit?'].forEach((x) => { h += `<th style="top:${tops[1]}px;height:${H2}px;background:#e6f6e9">${x}</th>`; });
-    plan.next.cols.forEach((c) => { h += `<th style="top:${tops[1]}px;height:${H2}px;background:${plan.next.bg}">${esc(c.label)}</th>`; });
+    plan.next.cols.forEach((c) => { h += `<th style="top:${tops[1]}px;height:${H2}px;background:${c.bg}" title="${esc(c.key)}">${esc(c.label)}</th>`; });
     h += '</tr>';
     // row 3: direction + weight
     const nBase = plan.groups.reduce((a, g) => a + g.cols.length, 0);
@@ -373,10 +402,16 @@
       if (!nC) h += '<td></td>';
       const sc = P.score[i], cl = P.calls[i], ac = S.nxtdir[i];
       h += `<td class="sc">${sc ? sc.toFixed(sc % 1 ? 1 : 0) : ''}</td><td class="call ${cl > 0 ? 'up' : cl < 0 ? 'dn' : ''}">${cl > 0 ? 'UP' : cl < 0 ? 'DOWN' : '—'}${last ? ' ▶' : ''}</td><td class="${ac > 0 ? 'pos' : ac < 0 ? 'neg' : ''}">${isN(ac) ? (ac > 0 ? 'UP' : ac < 0 ? 'DOWN' : 'FLAT') : last ? 'next ' + dmy(nextDay(b.d[i])) : ''}</td><td class="hit">${cl && isN(ac) && ac !== 0 ? (cl === ac ? '✓' : '✗') : ''}</td>`;
-      plan.next.cols.forEach((c) => { const v = S[c.key][i]; const cc = c.key === 'nxtchg' || c.key === 'nxtgap' ? (isN(v) ? (v > 0 ? ' pos' : v < 0 ? ' neg' : '') : '') : c.key === 'nxtdir' ? (v > 0 ? ' pos' : v < 0 ? ' neg' : '') : ''; h += `<td class="${cc.trim()}">${esc(c.fmt(v))}</td>`; });
+      plan.next.cols.forEach((c) => { const v = S[c.key][i]; const cc = c.key === 'nxtchg' || c.key === 'nxtgap' ? (isN(v) ? (v > 0 ? ' pos' : v < 0 ? ' neg' : '') : '') : c.key === 'nxtdir' || c.key === 'pdir' ? (v > 0 ? ' pos' : v < 0 ? ' neg' : '') : /^e[ohlc]$/.test(c.key) && isN(v) ? (Math.abs(v) <= ST.tol ? ' pos' : '') : ''; h += `<td class="${cc.trim()}">${esc(c.fmt(v))}</td>`; });
       h += '</tr>';
     }
     return h + '</tbody></table>';
+  }
+  function ohlcHtml() {
+    const Q = ST.Q; if (!Q) return ''; const s = Q.st, i = ST.T.n - 1, R = Q.R, f = (v) => (isN(v) ? v.toFixed(2) : '—');
+    const row = (nm) => `<tr><th>${nm}</th><td>${s[nm].n ? s[nm].within.toFixed(0) + '%' : '—'}</td><td>${isN(s[nm].mae) ? s[nm].mae.toFixed(2) + '%' : '—'}</td></tr>`;
+    return `<div class="anAcc"><table><tr><th>Price (N=${ST.N} days)</th><th>within ±${ST.tol}%</th><th>avg miss</th></tr>${['Open', 'High', 'Low', 'Close'].map(row).join('')}</table>
+      <div class="anNx"><b>Next session</b>: trend <b>${R.pdir[i] > 0 ? 'UP ▲' : R.pdir[i] < 0 ? 'DOWN ▼' : '—'}</b> · open ≈ <b>${f(R.popen[i])}</b> · high ≈ <b>${f(R.phigh[i])}</b> · low ≈ <b>${f(R.plow[i])}</b> · close ≈ <b>${f(R.pclose[i])}</b><br><span>Trend = the rule call (if none, the sign of the ${ST.N}-day average body). Open = today's close + ${ST.N}-day average gap; high/low = open + ${ST.N}-day average open→high / open→low; close = open ± average body. Next actual high-low stayed inside the predicted range on <b>${isN(s.inside.pct) ? s.inside.pct.toFixed(0) + '%' : '—'}</b> of days. Change <i>Avg days</i> above to compare 5, 10, 20…</span></div></div>`;
   }
   function summaryHtml() {
     const T = ST.T, P = ST.P; if (!T) return '';
@@ -385,7 +420,7 @@
     const pct = (a, b) => (b ? ((a / b) * 100).toFixed(1) + '%' : '—');
     return `<div class="anSum"><div class="big ${cl > 0 ? 'up' : cl < 0 ? 'dn' : ''}"><small>CALL FOR THE NEXT SESSION</small>${cl > 0 ? 'UP ▲' : cl < 0 ? 'DOWN ▼' : 'NO CALL'}<small>score ${sc ? sc : 0} · needs ±${ST.thr}</small></div>
       <div class="kv"><div><b>${pct(P.hit, P.tot)}</b><span>right over all ${P.tot} calls</span></div><div><b>${pct(P.hitO, P.totO)}</b><span>right on the last 30% (${P.totO}) - the honest number</span></div><div><b>${isN(P.base) ? P.base.toFixed(1) + '%' : '—'}</b><span>days that closed UP (always-UP baseline)</span></div><div><b>${pct(P.tot, n - 1)}</b><span>of days had a call</span></div></div>
-      <div class="why">${on.length ? 'Rules TRUE on the last row: ' + on.join(' · ') : 'No scored rule is TRUE on the last row.'}</div></div>`;
+      ${ohlcHtml()}<div class="why">${on.length ? 'Rules TRUE on the last row: ' + on.join(' · ') : 'No scored rule is TRUE on the last row.'}</div></div>`;
   }
   function helpHtml() {
     return `<div class="anHelp"><b>How it works.</b> Every row is one trading day. Grey-blue columns are data and indicators; the yellow header cells are <b>your rules</b> - type a condition and each row becomes TRUE or FALSE.
@@ -403,6 +438,7 @@
     const opts = PRESETS.map((x, i) => `<option value="${i}">${esc(x[0])}</option>`).join('');
     const hasT = !!ST.T;
     p.innerHTML = `<div class="anBar"><b>🧮 Data analyzer</b><input id="anSym" value="${esc(ST.sym)}" placeholder="Symbol e.g. BEL" autocomplete="off"><button class="ghostBtn" id="anGo">Load 2 years</button>
+      <label class="anP">Avg days <input class="wt" id="anN" value="${esc(ST.N)}" title="Number of past sessions used for the average gap / open-high / open-low / body"></label><label class="anP">Tolerance % <input class="wt" id="anTol" value="${esc(ST.tol)}" title="A predicted price counts as right if the actual is within this % of it"></label>
       <button class="ghostBtn" id="anAdd"${hasT ? '' : ' disabled'}>+ Rule column</button><select id="anPre"${hasT ? '' : ' disabled'}><option value="">Add a ready-made rule…</option>${opts}</select>
       <button class="ghostBtn" id="anMkt"${hasT && !ST.mktOn ? '' : ' disabled'}>${ST.mktOn ? 'Market columns on' : '+ Market & global columns'}</button>
       <button class="ghostBtn" id="anAuto"${hasT ? '' : ' disabled'} title="Set every rule to UP or DOWN by what it did historically">Auto-direction</button>
@@ -423,7 +459,7 @@
       const r = [b.d[i]]; cols.forEach((c) => { const v = T.S[c.key][i]; r.push(isN(v) ? (c.key === 'dow' ? DOW[v] : Math.round(v * 10000) / 10000) : ''); });
       ST.conds.forEach((c) => r.push(c.vals && c.vals[i] != null ? (c.vals[i] ? 'TRUE' : 'FALSE') : ''));
       r.push(P.score[i], P.calls[i] > 0 ? 'UP' : P.calls[i] < 0 ? 'DOWN' : '', T.S.nxtdir[i] > 0 ? 'UP' : T.S.nxtdir[i] < 0 ? 'DOWN' : '');
-      plan.next.cols.forEach((c) => { const v = T.S[c.key][i]; r.push(isN(v) ? (c.key === 'nxtdir' ? (v > 0 ? 'UP' : v < 0 ? 'DOWN' : 'FLAT') : Math.round(v * 10000) / 10000) : ''); });
+      plan.next.cols.forEach((c) => { const v = T.S[c.key][i]; r.push(isN(v) ? (c.key === 'nxtdir' || c.key === 'pdir' ? (v > 0 ? 'UP' : v < 0 ? 'DOWN' : 'FLAT') : Math.round(v * 10000) / 10000) : ''); });
       rows.push(r.map(q).join(sep));
     }
     return rows.join('\n');
@@ -453,17 +489,20 @@
       if (t.classList.contains('fx')) { ST.conds[+t.getAttribute('data-j')].f = t.value.trim(); saveCols(); refresh(); return; }
       const dj = t.getAttribute && t.getAttribute('data-dir'); if (dj != null) { ST.conds[+dj].dir = +t.value; saveCols(); refresh(); return; }
       const wj = t.getAttribute && t.getAttribute('data-w'); if (wj != null) { ST.conds[+wj].w = isN(parseFloat(t.value)) ? parseFloat(t.value) : 1; saveCols(); refresh(); return; }
+      if (t.id === 'anN') { ST.N = Math.max(2, Math.round(parseFloat(t.value)) || 5); saveCols(); refresh(); return; }
+      if (t.id === 'anTol') { ST.tol = Math.max(0.05, parseFloat(t.value) || 1); saveCols(); refresh(); return; }
       if (t.id === 'anThr') { ST.thr = Math.max(0.1, isN(parseFloat(t.value)) ? parseFloat(t.value) : 1); saveCols(); refresh(); }
     });
     p.addEventListener('focusout', (e) => { const t = e.target; if (t.matches && t.matches('td.e[contenteditable]')) commitCell(t); });
     p.addEventListener('keydown', (e) => {
-      const t = e.target; if (e.key === 'Enter') { if (t.id === 'anSym') { load(t.value); e.preventDefault(); } else if (t.isContentEditable || (t.classList && (t.classList.contains('fx') || t.classList.contains('wt')))) { e.preventDefault(); t.blur(); } }
+      const t = e.target; if (e.key === 'Enter') { if (t.id === 'anSym') { load(t.value); e.preventDefault(); } else if (t.isContentEditable || (t.classList && (t.classList.contains('fx') || t.classList.contains('wt') || t.id === 'anN' || t.id === 'anTol'))) { e.preventDefault(); t.blur(); } }
     });
   }
   const CSS = `#pAn .anBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}#pAn .anBar input#anSym{width:110px;text-transform:uppercase;padding:4px 6px}#pAn .anBar select{max-width:190px;padding:3px}
   #pAn .anMsg{margin:4px 0}#pAn .anHelp{font-size:12px;border:1px solid #dde3f0;background:#fafbff;border-radius:6px;padding:8px 12px;margin:6px 0}#pAn .anHelp ul{margin:4px 0 0 16px;padding:0}#pAn .anHelp code{background:#eef1f8;padding:0 3px;border-radius:3px;font-size:11px}
   #pAn .anSum{display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;border:1px solid #dde3f0;border-radius:8px;padding:8px 12px;margin:6px 0;background:#fff}#pAn .anSum .big{min-width:150px;font-size:22px;font-weight:800;color:#52607f;display:flex;flex-direction:column;justify-content:center}#pAn .anSum .big small{font-size:10px;font-weight:600;color:#52607f}#pAn .anSum .big.up{color:#12894b}#pAn .anSum .big.dn{color:#c11d3d}
   #pAn .anSum .kv{display:flex;gap:16px;flex-wrap:wrap}#pAn .anSum .kv div{display:flex;flex-direction:column}#pAn .anSum .kv b{font-size:17px}#pAn .anSum .kv span{font-size:10.5px;color:#52607f;max-width:170px}#pAn .anSum .why{flex-basis:100%;font-size:11.5px;color:#14213d}
+  #pAn .anP{font-size:11px;display:inline-flex;gap:3px;align-items:center;font-weight:600}#pAn .anAcc{flex-basis:100%;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}#pAn .anAcc table{border-collapse:collapse;font-size:11px}#pAn .anAcc th,#pAn .anAcc td{border:1px solid #dde3f0;padding:1px 8px;text-align:right}#pAn .anAcc th:first-child{text-align:left}#pAn .anNx{font-size:12px;flex:1;min-width:260px}#pAn .anNx span{font-size:10.5px;color:#52607f}
   #pAn .anWrap{overflow:auto;max-height:72vh;border:1px solid #dde3f0;border-radius:6px;background:#fff}
   table.anT{border-collapse:separate;border-spacing:0;font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}table.anT th,table.anT td{border-right:1px solid #e3e8f2;border-bottom:1px solid #e3e8f2;padding:1px 6px;text-align:right;line-height:16px}
   table.anT thead th{position:sticky;z-index:3;font-weight:600;color:#14213d;text-align:center;overflow:hidden}table.anT th.g{font-size:10px;letter-spacing:.04em;text-align:left}
