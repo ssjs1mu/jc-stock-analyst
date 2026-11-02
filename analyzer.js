@@ -290,7 +290,7 @@
       try { ST.edits = JSON.parse(localStorage.getItem('jc_an_e_' + sym) || '{}') || {}; } catch (e) { ST.edits = {}; }
       applyEdits(); recompute(); const nd = r.dp.filter(isN).length; ST.msg = sym + ': ' + r.d.length + ' sessions (' + dmy(r.d[0]) + ' to ' + dmy(r.d[r.d.length - 1]) + '), delivery % on ' + nd + ' of them' + (nd < r.d.length ? ' (the delivery feed only goes back to ' + (Object.keys((ST.dl && ST.dl.d) || {}).sort()[0] || 'its start') + ')' : '') + '.';
     } catch (e) { ST.msg = 'Could not load ' + sym + ': ' + (e && e.message ? e.message : e); }
-    ST.busy = false; paint(true);
+    ST.busy = false; paint(false);
     if (ST.raw && typeof getBackend === 'function' && getBackend() && typeof fetchDelivery === 'function') backendDel(sym);
   }
   async function backendDel(sym) {
