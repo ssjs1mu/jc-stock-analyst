@@ -1736,6 +1736,7 @@ async function runAnalysis(kind) {
     $('pSummary').innerHTML = have('summary') ? htmlSummary(R) : ph('summary');
     $('pIntraday').innerHTML = have('intraday') ? htmlIntradayTab(R) : ph('intraday'); $('pSwing').innerHTML = have('swing') ? htmlSwingTab(R) : ph('swing'); $('pLong').innerHTML = have('long') ? htmlLongTab(R) : ph('long'); $('pDataBody').innerHTML = htmlData(R);
     const pp = $('projPanel'); if (kind === 'intraday' && window.JCProj) window.JCProj.run(R); else if (pp) pp.style.display = 'none';
+    if (window.JCSetup) window.JCSetup.run(R);
     refreshChips(); showTab(spec.tab);
     meter(100, `${spec.label} ready · ${new Date().toLocaleTimeString('en-IN')}${usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''}`);
   } catch (e) {
