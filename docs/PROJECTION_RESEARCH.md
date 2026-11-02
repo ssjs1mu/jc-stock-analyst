@@ -17,3 +17,11 @@ Best band method: daily-range (avg of last 20 sessions) × √(time left), multi
 
 ## Caveats
 Only 57 sessions (10 Aug–30 Oct 2026): one market regime. Constants should be re-fitted monthly (rerun `proj-research.yml`, commit `projection_cal.js`). "Broken again" accuracy is partly structural (a stock sitting at its high at 10:15 usually makes another); the confident-bucket numbers are the useful ones.
+
+## Round 3-5: the owner's multi-factor framework (3 Nov 2026)
+Factors: importance-weighted mirrored technicals (intraday-strength + delivery levels), accumulation (OBV / close-location x volume), market + global regime (Nifty, VIX, rupee, crude, US yields, dollar index, world markets) with the "bearish market needs strong accumulation" gate. 88 stocks, 2 years, rules fixed in advance, train on the first 60 % of days, test on the rest, 20 random held-out stocks.
+- Next-day direction: 46-50 % (V1-V4), strongest-signal bucket is *worse* than a coin (mean reversion). 5-day 48-52 %.
+- Iteration (momentum vs reversal picked on train only): next-day 50-51 %, 5-day 48-49 %, 20-day 52-53 % (base rate 45 %), trade outcome (+1xATR before -1xATR) 49 % (base 46 %).
+- Conclusion: no tradeable edge for direction from this factor family on daily history; further tuning would only overfit. F&O OI and news cannot be back-tested (no history), so they are shown as reasons, not scored for accuracy.
+- Measured, usable: range limits (73-82 % held) and day-high/low break calls (73-80 %, 90 %+ when confident).
+- OI collector: the public source throttles after ~30 pages per run; `fno-oi.yml` is manual-only until a resumable/backend fetch is built.
