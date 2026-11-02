@@ -82,4 +82,6 @@ def main():
     te = [r for r in rows if r[0] >= split and r[1] == 36]
     out.append("Used for the 80% projected band; model = recent daily range scaled by time left vs. naive flat band.\n")
     open("/tmp/research.md", "w").write("\n".join(out)); print("\n".join(out))
-main()
+if __name__ == "__main__":
+    main()
+
