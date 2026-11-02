@@ -1,0 +1,280 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "02 Nov 2026",
+ "report_time": "08:14 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 23,224 - 23,293"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-up opening likely: Wall Street weak, Asia positive, crude easing. Expected Nifty opening zone: 23,224 - 23,293 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 23,259.0 (+206 pts, +0.89% vs Nifty's last close).",
+      "US: S&P 500 -1.82%, Nasdaq -2.86%, Dow -1.09%.",
+      "Asia this morning: Nikkei -0.31%, Hang Seng +0.24%, Kospi +1.43%.",
+      "Currency, crude and volatility: Brent 110.39 (-6.16%); USD/INR 94.940 (-0.22%); India VIX 15.30 (+1.19%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 03 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
+      "Results today (133 companies): ITC, AAKASH, AEROPLANE, AKUMS, ALANKIT, ARE&M, ARVINDFASN, AVONMORE, BAJAJINDEF, BALAMINES, BALMLAWRIE and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "ITC",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "RELIANCE",
+       "In the news",
+       "Top stocks to watch today: Reliance Industries, Jio Platforms, NTPC, ITC shares in focus o"
+      ],
+      [
+       "HDFCBANK",
+       "In the news",
+       "Monday Watchlist: HDFC Bank, ICICI, DLF in focus as private banks, realty signal reversal"
+      ],
+      [
+       "BHARTIARTL",
+       "In the news",
+       "Q2 Results This Week: ITC, Bharti Airtel, NSE, BSE, LIC, among 350 companies report number"
+      ],
+      [
+       "KOTAKBANK",
+       "Setup: BUY (A+)",
+       "Entry 463.2, stop 459.2, target 469.8"
+      ],
+      [
+       "DIVISLAB",
+       "Setup: BUY (A+)",
+       "Entry 9,872.4, stop 9,743.1, target 10,133.0"
+      ],
+      [
+       "ACUTAAS",
+       "Setup: BUY (A+)",
+       "Entry 4,029.4, stop 3,957.8, target 4,167.5"
+      ],
+      [
+       "PERSISTENT",
+       "Setup: BUY (A+)",
+       "Entry 6,054.2, stop 5,978.3, target 6,267.5"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex options volumes soar to record highs as oil boils",
+      "Bulls back, but global clouds refuse to clear",
+      "Gold lingers near one-year low as Fed hike expectations firm",
+      "Stocks To Buy Today: Four Top Stock Picks By Motilal Oswal's Chandan Taparia"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,770.31",
+        "-1.09%"
+       ],
+       [
+        "S&P 500",
+        "7,580.07",
+        "-1.82%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,437.00",
+        "-2.86%"
+       ],
+       [
+        "FTSE 100",
+        "10,729.80",
+        "+0.07%"
+       ],
+       [
+        "DAX",
+        "25,818.21",
+        "-0.85%"
+       ],
+       [
+        "Nikkei 225",
+        "63,092.18",
+        "-0.31%"
+       ],
+       [
+        "Hang Seng",
+        "23,350.40",
+        "+0.24%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,612.53",
+        "+0.38%"
+       ],
+       [
+        "Kospi",
+        "5,812.47",
+        "+1.43%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "110.39",
+        "-6.16%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "101.08",
+        "-2.92%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,918.00",
+        "+0.49%"
+       ],
+       [
+        "USD/INR",
+        "94.94",
+        "-0.22%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.98",
+        "+0.09%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.93",
+        "-1.20%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "22,933",
+       "23,146"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "22,812",
+       "23,238"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
