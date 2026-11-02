@@ -284,7 +284,6 @@
       const yf = typeof symYf === 'function' ? symYf(sym) : sym + '.NS';
       const ch = await fetchChart(yf, '2y', '1d'); const bars = (ch && ch.bars) || []; if (bars.length < 30) throw new Error('Not enough price history for ' + sym);
       const dl = await loadDelivJson(); const dm = {}; if (dl && dl.d) Object.keys(dl.d).forEach((d) => { const x = dl.d[d][sym]; if (x) dm[d] = x; });
-      if (typeof getBackend === 'function' && getBackend() && typeof fetchDelivery === 'function') { try { const j = await fetchDelivery(sym); ((j && j.hist) || []).forEach((h) => { if (h.date && !dm[h.date] && isN(h.del)) dm[h.date] = [h.del, h.traded]; }); } catch (e) { /* optional */ } }
       const r = { d: [], o: [], h: [], l: [], c: [], v: [], dq: [], dp: [] };
       bars.forEach((b) => { const d = day(b.t); if (r.d.length && r.d[r.d.length - 1] === d) return; const x = dm[d]; r.d.push(d); r.o.push(r2(b.o)); r.h.push(r2(b.h)); r.l.push(r2(b.l)); r.c.push(r2(b.c)); r.v.push(b.v || 0); const dq = x ? x[0] : NA, tq = x ? x[1] : NA; r.dq.push(isN(dq) ? dq : NA); r.dp.push(isN(dq) && isN(tq) && tq > 0 ? Math.round((dq / tq) * 1000) / 10 : isN(dq) && b.v > 0 ? Math.round((dq / b.v) * 1000) / 10 : NA); });
       ST.raw = r; ST.mkt = null; ST.mktOn = false;
@@ -292,6 +291,15 @@
       applyEdits(); recompute(); const nd = r.dp.filter(isN).length; ST.msg = sym + ': ' + r.d.length + ' sessions (' + dmy(r.d[0]) + ' to ' + dmy(r.d[r.d.length - 1]) + '), delivery % on ' + nd + ' of them' + (nd < r.d.length ? ' (the delivery feed only goes back to ' + (Object.keys((ST.dl && ST.dl.d) || {}).sort()[0] || 'its start') + ')' : '') + '.';
     } catch (e) { ST.msg = 'Could not load ' + sym + ': ' + (e && e.message ? e.message : e); }
     ST.busy = false; paint(true);
+    if (ST.raw && typeof getBackend === 'function' && getBackend() && typeof fetchDelivery === 'function') backendDel(sym);
+  }
+  async function backendDel(sym) {
+    try {
+      const j = await Promise.race([fetchDelivery(sym), new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), 20000))]); if (ST.sym !== sym || !ST.raw || !j) return;
+      const r = ST.raw, idx = {}; r.d.forEach((d, i) => { idx[d] = i; }); let add = 0;
+      (j.hist || []).forEach((h) => { const i = idx[h.date]; if (i == null || isN(r.dp[i]) || !isN(h.del)) return; r.dq[i] = h.del; r.dp[i] = isN(h.pct) ? Math.round(h.pct * 10) / 10 : isN(h.traded) && h.traded > 0 ? Math.round((h.del / h.traded) * 1000) / 10 : NA; add++; });
+      if (add) { applyEdits(); recompute(); ST.msg += ' Older delivery % merged from the backend for ' + add + ' more days.'; paint(true); }
+    } catch (e) { /* optional */ }
   }
   async function loadMarket() {
     if (!ST.raw || ST.busy) return; ST.busy = true; ST.msg = 'Loading Nifty, VIX, crude, USD/INR, dollar index, US 10y and S&P 500…'; paint();
