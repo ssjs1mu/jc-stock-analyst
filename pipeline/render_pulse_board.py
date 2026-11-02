@@ -405,27 +405,50 @@ EDN = [None]   # 'evening' = closing report (dusk / night scenes); anything else
 PIC = [None]   # explicit picture key chosen by the report builder (overrides the score thresholds)
 
 
+# hand-picked scene pictures per (edition, mood): opening = sunrise / dawn light, closing = sunset / night / storm.
+# file names live in branding/mood/. Older dark photos (key.jpg, key_2.jpg) join the pool, painted with a matching scene by mood_scene.py.
+SCENES = {
+    ("open", "bull_roar"): ["open_bull_roar"], ("open", "bull_calm"): ["open_bull_calm"], ("open", "bull_over_bear"): ["open_flat", "any_bull_over_bear"],
+    ("open", "bear_over_bull"): ["open_flat"], ("open", "bear_calm"): ["open_bear_calm"], ("open", "bear_roar"): ["any_bear_roar"],
+    ("close", "bull_roar"): ["close_bull_roar"], ("close", "bull_calm"): ["close_bull_calm"], ("close", "bull_over_bear"): ["any_bull_over_bear"],
+    ("close", "bear_over_bull"): ["close_bear_over_bull"], ("close", "bear_calm"): [], ("close", "bear_roar"): ["any_bear_roar"],
+}
+
+
+def _img_file(d, nm):
+    for ext in (".jpg", ".jpeg", ".png", ".webp"):
+        f = os.path.join(d, nm + ext)
+        if os.path.exists(f):
+            return f
+    return None
+
+
+def _data_uri(f):
+    mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[f.rsplit(".", 1)[1].lower()]
+    return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
+
+
 def mood_photo(sc):
     key = PIC[0] or ("bull_roar" if sc > 1.0 else "bull_calm" if sc > 0.35 else "bear_roar" if sc < -1.0 else "bear_calm" if sc < -0.35
            else ("bull_over_bear" if sc >= 0 else "bear_over_bull"))
     d = os.path.join(HERE, "branding", "mood")
     import datetime as _dt
-    alt = _dt.date.today().toordinal() % 2  # two pictures per mood, rotated daily
-    names = [key + "_2", key] if alt else [key, key + "_2"]
-    for nm in names:
-        for ext in (".jpg", ".jpeg", ".png", ".webp"):
-            f = os.path.join(d, nm + ext)
-            if os.path.exists(f):
-                try:
-                    import mood_scene
-                    g = mood_scene.graded_jpeg(f, EDN[0], key, _dt.date.today().toordinal())
-                    if g:
-                        return "data:image/jpeg;base64,%s" % base64.b64encode(g[0]).decode()
-                except Exception:
-                    pass
-                mt = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp"}[ext[1:]]
-                return "data:image/%s;base64,%s" % (mt, base64.b64encode(open(f, "rb").read()).decode())
-    return None
+    day = _dt.date.today().toordinal()
+    ed = "close" if EDN[0] == "evening" else "open"
+    pool = [("raw", f) for f in (_img_file(d, n) for n in SCENES.get((ed, key), [])) if f]
+    pool += [("scene", f) for f in (_img_file(d, n) for n in (key, key + "_2")) if f]
+    if not pool:
+        return None
+    kind, f = pool[day % len(pool)]            # rotate through the whole pool day by day, new scene pictures first
+    if kind == "scene":
+        try:
+            import mood_scene
+            g = mood_scene.graded_jpeg(f, EDN[0], key, day)
+            if g:
+                return "data:image/jpeg;base64,%s" % base64.b64encode(g[0]).decode()
+        except Exception:
+            pass
+    return _data_uri(f)
 
 
 def top_art(c, t, mood, sc=0.0, banner=True):
