@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-02T21:40:37+05:30",
+   "date": "2026-11-02",
+   "status": "ok",
+   "caption": "Circuit Watch - session of Mon 2 Nov 2026: ITI upper lock; Hero Motors, Atlanta Electricals lower locks",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-02.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-02.pdf",
+     "type": "pdf",
+     "bytes": 9395
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T21:15:59+05:30",
    "date": "2026-10-30",
    "status": "ok",
@@ -160,5 +175,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T21:15:59+05:30"
+ "updated_at": "2026-11-02T21:40:37+05:30"
 }
