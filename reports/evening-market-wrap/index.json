@@ -2,6 +2,27 @@
  "schedule_id": "evening-market-wrap",
  "runs": [
   {
+   "generated_at": "2026-11-02T18:11:16+05:30",
+   "date": "2026-11-02",
+   "status": "ok",
+   "caption": "Evening Market Wrap 02 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "Evening_Market_Wrap_2026-11-02.pdf",
+     "path": "reports/evening-market-wrap/Evening_Market_Wrap_2026-11-02.pdf",
+     "type": "pdf",
+     "bytes": 368000
+    },
+    {
+     "name": "Evening_Market_Wrap_2026-11-02.json",
+     "path": "reports/evening-market-wrap/Evening_Market_Wrap_2026-11-02.json",
+     "type": "json",
+     "bytes": 6314
+    }
+   ]
+  },
+  {
    "generated_at": "2026-10-30T00:08:56+05:30",
    "date": "2026-10-30",
    "status": "holiday",
@@ -132,5 +153,5 @@
    ]
   }
  ],
- "updated_at": "2026-10-30T00:08:56+05:30"
+ "updated_at": "2026-11-02T18:11:16+05:30"
 }
