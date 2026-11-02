@@ -14,11 +14,16 @@
 
   async function place() {
     try { const c = JSON.parse(LS('jcvc_place') || 'null'); if (c && Date.now() - c.t < 43200000) return c.p; } catch (e) {}
-    try {
-      const c = new AbortController(), t = setTimeout(() => c.abort(), 4000);
-      const j = await (await fetch('https://ipwho.is/?fields=success,city,region,country', { signal: c.signal })).json(); clearTimeout(t);
-      if (j && j.success !== false) { const p = { city: j.city || '', region: j.region || '', country: j.country || '' }; LS('jcvc_place', JSON.stringify({ t: Date.now(), p })); return p; }
-    } catch (e) {}
+    const srcs = [['https://ipwho.is/?fields=success,city,region,country', (j) => j.success !== false && { city: j.city, region: j.region, country: j.country }],
+      ['https://get.geojs.io/v1/ip/geo.json', (j) => ({ city: j.city, region: j.region, country: j.country })],
+      ['https://ipapi.co/json/', (j) => !j.error && { city: j.city, region: j.region, country: j.country_name }]];
+    for (const [u, f] of srcs) {
+      try {
+        const c = new AbortController(), t = setTimeout(() => c.abort(), 4000);
+        const j = await (await fetch(u, { signal: c.signal })).json(); clearTimeout(t);
+        const p = f(j); if (p && (p.city || p.region || p.country)) { const q2 = { city: p.city || '', region: p.region || '', country: p.country || '' }; LS('jcvc_place', JSON.stringify({ t: Date.now(), p: q2 })); return q2; }
+      } catch (e) {}
+    }
     return { city: '', region: '', country: '' };
   }
   async function hit() {
