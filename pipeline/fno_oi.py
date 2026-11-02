@@ -22,7 +22,7 @@ def one(sym, depth=0):
     m = re.search(r"Spot Close\s*:\s*([\d.]+)", tx)
     if not m:
         ERR["nospot:" + str(len(h))[:2]] = ERR.get("nospot:" + str(len(h))[:2], 0) + 1
-        if depth < 2 and "Option Chain" not in h[:20000]: time.sleep(6); return one(sym, depth + 1)
+        if depth < 1 and len(h) < 20000: time.sleep(8); return one(sym, depth + 1)
     e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", tx)
     if not m: return sym, None
     spot = float(m.group(1)); rows = []
@@ -40,10 +40,11 @@ def one(sym, depth=0):
                  "nearRes": nr[0][0] if nr else None, "nearSup": ns[0][0] if ns else None}
 def main():
     c = json.load(open("data/constituents.json"))["idx"]; syms = sorted(set(c.get("^CNX200", []) + c.get("NIFTY_MIDCAP_100.NS", []) + c.get("^NSEI", []) + c.get("^NSEBANK", [])))
-    out = {}
-    with cf.ThreadPoolExecutor(2) as ex:
+    out = {}; t0 = time.time()
+    with cf.ThreadPoolExecutor(1) as ex:
         for s, d in ex.map(one, syms):
             if d: out[s] = d
+            if time.time() - t0 > 1200: print('time budget reached', file=sys.stderr); break
     print(len(out), "F&O stocks of", len(syms), ERR, file=sys.stderr)
     if len(out) < 40: sys.exit("too few chains parsed - keeping the old file")
     json.dump({"asof": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"), "source": "public option-chain page (OI as of last close, nearest expiry)", "stocks": out}, open("data/fno_oi.json", "w"), separators=(",", ":"))
