@@ -38,13 +38,13 @@
   window.JCVC = { fb(kind, n) { if (kind === 'r') fbc.r += n || 1; else fbc.w += n || 1; } };
 
   /* ---- widget ---- */
-  const css = '#jcvc{position:fixed;left:10px;bottom:10px;z-index:40;font-family:Inter,"Segoe UI",Arial,sans-serif;color:#14306e}' +
+  const css = '#jcvc{position:fixed;right:12px;bottom:12px;z-index:40;font-family:Inter,"Segoe UI",Arial,sans-serif;color:#14306e}' +
     '#jcvc .pill{display:flex;align-items:baseline;gap:7px;background:#fffdf5;border:1.5px solid #c99a1c;border-radius:22px;padding:4px 14px 5px;cursor:pointer;box-shadow:0 4px 14px -6px rgba(0,0,0,.35);user-select:none}' +
     '#jcvc .n{font-size:26px;font-weight:900;line-height:1}#jcvc .l{font-size:11px;font-weight:700;color:#5b6b8c}' +
-    '#jcvc .pan{display:none;position:absolute;left:0;bottom:44px;width:310px;max-width:calc(100vw - 24px);background:#fff;border:1.5px solid #c99a1c;border-radius:12px;padding:10px 12px;box-shadow:0 14px 34px -12px rgba(0,0,0,.45);font-size:11px}' +
+    '#jcvc .pan{display:none;position:absolute;right:0;bottom:46px;width:310px;max-width:calc(100vw - 24px);background:#fff;border:1.5px solid #c99a1c;border-radius:12px;padding:10px 12px;box-shadow:0 14px 34px -12px rgba(0,0,0,.45);font-size:11px}' +
     '#jcvc.open .pan{display:block}#jcvc table{width:100%;border-collapse:collapse;margin:4px 0}#jcvc td{padding:2px 3px;border-bottom:1px solid #eef1f8;font-size:11px}#jcvc td.r{text-align:right;font-weight:700}' +
     '#jcvc h6{margin:6px 0 2px;font-size:10px;letter-spacing:.6px;color:#8a6a10;text-transform:uppercase}#jcvc .qb{height:5px;border-radius:3px;background:#e6ebf5;overflow:hidden;margin:2px 0 5px}#jcvc .qb i{display:block;height:100%;background:#2f8f5b}' +
-    '#jcvc .qb i.w{background:#d98e04}#jcvc .qb i.h{background:#c0102e}#jcvc .row{display:flex;justify-content:space-between;gap:8px;font-size:10.5px}#jcvc .mut{color:#5b6b8c}@media print{#jcvc{display:none}}';
+    '#jcvc .qb i.w{background:#d98e04}#jcvc .qb i.h{background:#c0102e}#jcvc .row{display:flex;justify-content:space-between;gap:8px;font-size:10.5px}#jcvc .mut{color:#5b6b8c}@media(max-width:820px){#jcvc{bottom:' + (SITE === 'jcgg' ? 74 : 12) + 'px}}@media print{#jcvc{display:none}}';
   function mount() {
     const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
     const w = document.createElement('div'); w.id = 'jcvc';
