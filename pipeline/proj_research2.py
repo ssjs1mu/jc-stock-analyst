@@ -8,7 +8,7 @@ for s in SYMS:
     try: ses = fetch(s)
     except Exception as e: print("skip", s, e, file=sys.stderr); continue
     if len(ses) >= 30: data[s] = ses
-CUTS = [12, 24, 36, 48]; R = []
+REP = [12, 24, 36, 48]; CUTS = list(range(6, 70, 6)); R = []
 for sname, ses in data.items():
     for i in range(2, len(ses)):
         d, cur = ses[i]
@@ -21,7 +21,7 @@ for sname, ses in data.items():
 ds = sorted({r['d'] for r in R}); sp = ds[int(len(ds) * .55)]; tr = [r for r in R if r['d'] < sp]; te = [r for r in R if r['d'] >= sp]
 out = [f"# Part 2 - what is predictable ({len(data)} stocks, train < {sp})\n", "## Remaining HIGH / LOW band (target 80% coverage each)\n",
        "| Cut-off | Method | High covered % | Low covered % | Avg band width % | MAE high % | MAE low % |", "|---|---|---|---|---|---|---|"]
-for k in CUTS:
+for k in REP:
     a = [r for r in tr if r['k'] == k]; b = [r for r in te if r['k'] == k]
     th = np.array([r['H'] for r in b]); tl = np.array([r['L'] for r in b])
     def ev(nm, fh, fl):
@@ -35,7 +35,7 @@ for k in CUTS:
     qh = np.quantile([r['H'] / g(r) for r in a], .8); ql = np.quantile([r['L'] / g(r) for r in a], .2)
     ev("Blend (daily range x today's vol), calibrated", lambda r: qh * g(r), lambda r: ql * g(r))
 out += ["\n## Will the day's HIGH / LOW be broken again before the close?\n", "| Cut-off | Question | Base rate yes % | Accuracy % | Accuracy when sure (top 30%) % | n |", "|---|---|---|---|---|---|"]
-for k in CUTS:
+for k in REP:
     a = [r for r in tr if r['k'] == k]; b = [r for r in te if r['k'] == k]
     for q, key, dk in (("New day-high", "bh", "dhi"), ("New day-low", "bl", "dlo")):
         f = lambda r: [abs(r[dk]) / (r['sd'] + 1e-9), abs(r[dk]) / (r['sv'] + 1e-9), r['pos'], r['rs'] / (r['dr'] + 1e-9)]
@@ -43,6 +43,28 @@ for k in CUTS:
         mu, sd = Xa.mean(0), Xa.std(0) + 1e-9; p = LogisticRegression(max_iter=500).fit((Xa - mu) / sd, ya).predict_proba((Xb - mu) / sd)[:, 1]
         pr = p > .5; cf = np.abs(p - .5) >= np.quantile(np.abs(p - .5), .7)
         out.append(f"| {tm(k)} | {q} | {yb.mean() * 100:.0f} | {(pr == yb).mean() * 100:.0f} | {(pr[cf] == yb[cf]).mean() * 100:.0f} | {len(yb)} |")
+import json
+cal = {"bands": {}, "brk": {}, "slots": None, "n_stocks": len(data), "sessions": len(ds), "from": str(ds[0]), "to": str(ds[-1])}
+for k in CUTS:
+    A = [r for r in R if r['k'] == k]
+    cal["bands"][k] = [float(np.quantile([r['H'] / r['sd'] for r in A], .8)), float(np.quantile([r['L'] / r['sd'] for r in A], .2))]
+    cal["brk"][k] = {}
+    for key, dk in (("bh", "dhi"), ("bl", "dlo")):
+        f = lambda r: [abs(r[dk]) / (r['sd'] + 1e-9), abs(r[dk]) / (r['sv'] + 1e-9), r['pos'], r['rs'] / (r['dr'] + 1e-9)]
+        X = np.array([f(r) for r in A]); y = np.array([r[key] for r in A]); mu, sd = X.mean(0), X.std(0) + 1e-9
+        m = LogisticRegression(max_iter=500).fit((X - mu) / sd, y)
+        cal["brk"][k][key] = dict(mu=mu.round(5).tolist(), sd=sd.round(5).tolist(), w=m.coef_[0].round(4).tolist(), b=round(float(m.intercept_[0]), 4))
+# full-day band from the previous close (used when the market is closed)
+Z = []
+for sname, ses in data.items():
+    for i in range(2, len(ses)):
+        d, cur = ses[i]; pc = ses[i - 1][1][-1, 3]
+        dr = np.mean([(x[1][:, 1].max() - x[1][:, 2].min()) / x[1][0, 0] for x in ses[max(0, i - 20):i]])
+        Z.append((cur[:, 1].max() / pc - 1) / dr); Z.append((cur[:, 2].min() / pc - 1) / dr)
+Zh = Z[0::2]; Zl = Z[1::2]; cal["day"] = [float(np.quantile(Zh, .8)), float(np.quantile(Zl, .2))]
+ex = [(int(np.argmax(a[:, 1])), int(np.argmin(a[:, 2]))) for ses in data.values() for _, a in ses]
+cal["hiHist"] = np.bincount([e[0] for e in ex], minlength=75).tolist(); cal["loHist"] = np.bincount([e[1] for e in ex], minlength=75).tolist()
+json.dump(cal, open("/tmp/calib.json", "w"))
 out += ["\n## When does the day's extreme print? (all stock-days)\n", "| Slot | Day HIGH % | Day LOW % |", "|---|---|---|"]
 ex = [(int(np.argmax(a[:, 1])), int(np.argmin(a[:, 2]))) for ses in data.values() for _, a in ses]
 for lo_, hi_ in ((0, 6), (6, 12), (12, 24), (24, 36), (36, 48), (48, 60), (60, 75)):
