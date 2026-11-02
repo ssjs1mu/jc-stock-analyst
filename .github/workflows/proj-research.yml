@@ -1,5 +1,8 @@
 name: Projection strategy research (read-only, nothing published)
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      script: { description: 'script in pipeline/', default: 'proj_research2.py' }
 permissions:
   contents: write
 jobs:
@@ -9,6 +12,6 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install numpy scikit-learn && cd pipeline && python proj_research2.py && cd ..
+      - run: pip install numpy scikit-learn && cd pipeline && python ${{ github.event.inputs.script }} && cd ..
       - run: |
           mkdir -p /tmp/pv && cp /tmp/research.md /tmp/calib.json /tmp/pv/ && cd /tmp/pv && git init -q && git checkout -q -b research && git add -A && git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm research && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" research
