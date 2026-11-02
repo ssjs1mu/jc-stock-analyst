@@ -125,7 +125,7 @@
     return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block;max-width:${w}px" role="img">${g}</svg>`;
   }
   function timingSvg(R) {
-    const w = 940, h = 96, pad = { l: 64, r: 120, t: 6, b: 18 }, T = R.tim, mx = Math.max.apply(null, T.map((c) => Math.max(c.hi, c.lo))) || 1, bwid = (w - pad.l - pad.r) / T.length;
+    const w = 940, h = 110, pad = { l: 64, r: 120, t: 20, b: 18 }, T = R.tim, mx = Math.max.apply(null, T.map((c) => Math.max(c.hi, c.lo))) || 1, bwid = (w - pad.l - pad.r) / T.length;
     let g = '';
     T.forEach((c, i) => { const x = pad.l + bwid * i, hh = (c.hi / mx) * (h - pad.t - pad.b), hl = (c.lo / mx) * (h - pad.t - pad.b);
       g += `<rect x="${(x + 3).toFixed(1)}" y="${(h - pad.b - hh).toFixed(1)}" width="${(bwid / 2 - 4).toFixed(1)}" height="${hh.toFixed(1)}" fill="${UP}" opacity=".75"/><rect x="${(x + bwid / 2 + 1).toFixed(1)}" y="${(h - pad.b - hl).toFixed(1)}" width="${(bwid / 2 - 4).toFixed(1)}" height="${hl.toFixed(1)}" fill="${DN}" opacity=".75"/>`;
