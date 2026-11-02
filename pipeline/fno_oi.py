@@ -11,7 +11,8 @@ def one(sym):
         h = urllib.request.urlopen(urllib.request.Request("https://www.topstockresearch.com/rt/ViewOptionChain/" + sym.replace("&", "%26"), headers=UA), timeout=30).read().decode("utf-8", "replace")
     except Exception:
         return sym, None
-    m = re.search(r"Spot Close\s*:\s*([\d.]+)", h); e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", h)
+    tx = re.sub(r"\s+", " ", re.sub(r"&nbsp;", " ", re.sub(r"<[^>]+>", " ", h)))
+    m = re.search(r"Spot Close\s*:\s*([\d.]+)", tx); e = re.search(r"Expiry date\s*:\s*(\d{2}/\d{2}/\d{4})", tx)
     if not m: return sym, None
     spot = float(m.group(1)); rows = []
     for r in re.findall(r"<tr[\s\S]*?</tr>", h):
