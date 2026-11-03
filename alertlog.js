@@ -9,6 +9,7 @@
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const dFmt = (d) => d.slice(8, 10) + '-' + MON[+d.slice(5, 7) - 1] + '-' + d.slice(0, 4);
   const f2 = (v) => (typeof v === 'number' && isFinite(v) ? v.toFixed(2) : '');
+  const pf = (v) => parseFloat(String(v == null ? '' : v).replace(/,/g, ''));
   const plain = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, '');
   let L = [], seen = {}, F = { sym: '', src: '', day: '', q: '' };
   try { L = JSON.parse(localStorage.getItem(LS) || '[]') || []; } catch (e) { L = []; }
@@ -35,7 +36,7 @@
       if (M && M.log) M.log.forEach((x) => {
         if (!x || x.who === 'TEST' || x.kind === 'TEST') return;
         const lv = {}; (x.lv || []).forEach((p) => { lv[p[0]] = p[1]; });
-        if (add({ k: 'm:' + x.who + x.kind + x.t, t: x.t, sym: x.who, src: 'Trade desk', call: plain(x.title).replace(/^[^A-Za-z]+/, '').replace(/ — .*$/, ''), px: parseFloat(lv.LTP), sl: parseFloat(lv['NEW STOP']), why: plain(x.msg) + (x.lv && x.lv.length ? ' · ' + x.lv.map((p) => p[0] + ' ' + p[1]).join(' · ') : '') })) n++;
+        if (add({ k: 'm:' + x.who + x.kind + x.t, t: x.t, sym: x.who, src: 'Trade desk', call: plain(x.title).replace(/^[^A-Za-z]+/, '').replace(/ — .*$/, ''), px: pf(lv.LTP), sl: pf(lv['NEW STOP']), why: plain(x.msg) + (x.lv && x.lv.length ? ' · ' + x.lv.map((p) => p[0] + ' ' + p[1]).join(' · ') : '') })) n++;
       });
     } catch (e) { }
     if (n) paint();
