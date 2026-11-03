@@ -2,6 +2,14 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-03T08:15:09+05:30",
+   "date": "2026-11-03",
+   "status": "failed",
+   "caption": "",
+   "note": "Auto pipeline could not fetch index data (market data unavailable).",
+   "files": []
+  },
+  {
    "generated_at": "2026-11-02T08:14:34+05:30",
    "date": "2026-11-02",
    "status": "ok",
@@ -1156,5 +1164,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-02T08:14:34+05:30"
+ "updated_at": "2026-11-03T08:15:09+05:30"
 }
