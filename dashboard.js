@@ -516,7 +516,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn${S.busy ? ' busy' : ''}" id="jdRf" type="button" onclick="window.jdRefresh()">${S.busy ? '⟳ Refreshing…' : '⟳ Refresh now'}</button></div>`
-      + tiles3d(ms) + callTiles()
+      + tiles3d(ms) + `<div class="jd-card jd-pos"><h3><span class="jd-ic">🧭</span>Open radar positions <small>trail &amp; carry / exit · newest first · 6 rows visible, scroll for more</small></h3>${window.jcMgr && window.jcMgr.posHTML ? window.jcMgr.posHTML() : ''}</div>` + callTiles()
       + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}</div><div class="jd-col jd-c3">${window.jcFD ? window.jcFD.html(ms) : ''}${catButtons(ms)}</div><div class="jd-newsrow">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
@@ -550,6 +550,7 @@
   .jd-status{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink2);margin:0 2px 8px}.jd-er{color:var(--red)}
   .jd-ring{width:12px;height:12px;border-radius:50%;border:2px solid #b7c3e0;border-top-color:var(--navy)}.jd-ring.spin{animation:jdspin .8s linear infinite}@keyframes jdspin{to{transform:rotate(360deg)}}
   .jd-btn{border:1px solid #c3cde6;background:#fff;color:var(--navy);border-radius:8px;padding:4px 10px;font-weight:800;font-size:11.5px;cursor:pointer;margin-left:auto}
+  .jd-pos{margin:0 0 10px}.jd-pos .bf-sc{border:0;padding:0}.jd-pos .bf-t{min-width:1250px}
   .jd-board{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1.05fr) minmax(0,1.05fr) minmax(0,.95fr);gap:10px;align-items:start}.jd-col{display:flex;flex-direction:column;gap:10px;min-width:0}
   .jd-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 1px 4px rgba(20,48,110,.07);margin:0}
   .jd-card h3{margin:0 0 6px;font-size:13.5px;color:var(--navy);display:flex;align-items:center;gap:6px;flex-wrap:wrap}.jd-card h3 small{font-size:10.5px;color:var(--ink2);font-weight:600}.jd-ic{font-size:15px}
