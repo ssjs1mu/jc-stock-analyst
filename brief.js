@@ -177,7 +177,7 @@
   function curPx(k, C) { const o = k === 'IN10Y' ? read(k, C) : k === 'PCR' ? { px: C.pcrVal() } : { px: (C.S.q[k] || {}).p }; return o.px; }
   function check(C) {
     const A = alerts(); if (!A.length) return; let ch = false;
-    A.forEach((a) => { if (a.fired) return; const px = curPx(a.k, C); if (px == null) return; if ((a.dir === 'above' && px >= a.lvl) || (a.dir === 'below' && px <= a.lvl)) { a.fired = Date.now(); ch = true; const K = KEYS[a.k]; const m = `${K.n} crossed ${a.dir === 'above' ? 'above' : 'below'} ${C.fmtN(a.lvl, K.dp)} (now ${C.fmtN(px, K.dp)}) — ${E(a.note || '')}`; toast(m); try { if ('Notification' in window && Notification.permission === 'granted') new Notification("Joshi's Corner alert", { body: m.replace(/<[^>]+>/g, '') }); } catch (e) { } } });
+    A.forEach((a) => { if (a.fired) return; const px = curPx(a.k, C); if (px == null) return; if ((a.dir === 'above' && px >= a.lvl) || (a.dir === 'below' && px <= a.lvl)) { a.fired = Date.now(); ch = true; const K = KEYS[a.k]; const m = `${K.n} crossed ${a.dir === 'above' ? 'above' : 'below'} ${C.fmtN(a.lvl, K.dp)} (now ${C.fmtN(px, K.dp)}) — ${E(a.note || '')}`; toast(m); try { if (window.jcAlog) window.jcAlog.levelAlert({ t: Date.now(), name: K.n, dir: a.dir, px, msg: m + ' (level ' + C.fmtN(a.lvl, K.dp) + ')' }); } catch (e) { } try { if ('Notification' in window && Notification.permission === 'granted') new Notification("Joshi's Corner alert", { body: m.replace(/<[^>]+>/g, '') }); } catch (e) { } } });
     if (ch) saveA(A);
   }
   function toggleAlert(k, lvl, dir, note) {
