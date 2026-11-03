@@ -1,0 +1,74 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "03 Nov 2026",
+ "report_time": "23:07 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +1.58% in the session"
+ },
+ "report_title": "Evening News Wrap",
+ "sections": [
+  {
+   "heading": "Market Movers",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "BRITANNIA +6.36% (Rs 4,930.00)",
+      "NESTLEIND +4.47% (Rs 1,248.40)",
+      "TATACONSUM +4.29% (Rs 1,073.00)",
+      "POWERGRID -3.04% (Rs 259.55)",
+      "SBIN -1.70% (Rs 970.25)",
+      "ONGC -1.13% (Rs 232.17)"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines That Moved Markets",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Markets extend gains for fourth day; FPI buying highest in a year",
+      "Wall Street opens mixed on US midterm elections day",
+      "Ahead of Market: 10 things that will decide stock market action on Wednesday",
+      "Dividend Stocks To Watch As The Fed Signals Higher For Longer",
+      "Nov 3: Sensex Surges 1,225 Pts, Nifty Reclaims 23,800 as Rally Extends to Fourth Session",
+      "US Midterm Election Results 2026 date today! What Trump's loss mean for gold, Sensex, Nifty, global markets, US bonds?",
+      "Stocks are at their highest in two months; why are analysts flagging caution?",
+      "Sensex hits two-month high"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Calendar for Wednesday, 04 Nov",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Mon 09 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
+      "Pre-market global cues arrive in the 8:00 AM Pre-Market News."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "What to Watch",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty 50 pivot support 23,592 / 23,373, resistance 23,920 / 24,030 from the last session.",
+      "Top Nifty gainers: BRITANNIA +6.36%, NESTLEIND +4.47%, TATACONSUM +4.29%.",
+      "Top Nifty losers: POWERGRID -3.04%, SBIN -1.70%, ONGC -1.13%."
+     ]
+    }
+   ]
+  }
+ ]
+}
