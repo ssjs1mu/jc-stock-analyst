@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-03T21:12:37+05:30",
+   "date": "2026-11-03",
+   "status": "ok",
+   "caption": "Circuit Watch - session of 3 Nov 2026: Sensex +1.62%, Nifty +1.58%; one confirmed lower-circuit lock",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-03.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-03.pdf",
+     "type": "pdf",
+     "bytes": 9762
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-02T21:40:37+05:30",
    "date": "2026-11-02",
    "status": "ok",
@@ -175,5 +190,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-02T21:40:37+05:30"
+ "updated_at": "2026-11-03T21:12:37+05:30"
 }
