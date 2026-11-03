@@ -1,0 +1,284 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "03 Nov 2026",
+ "report_time": "08:13 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 23,492 - 23,563"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Positive start likely: Wall Street weak, Asia negative, crude easing. Expected Nifty opening zone: 23,492 - 23,563 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 23,527.5 (+87 pts, +0.37% vs Nifty's last close).",
+      "US: S&P 500 -0.51%, Nasdaq -1.07%, Dow +0.41%.",
+      "Asia this morning: Nikkei -0.33%, Hang Seng +0.43%, Kospi -2.36%.",
+      "Currency, crude and volatility: Brent 104.78 (-10.93%); USD/INR 94.905 (-0.26%); India VIX 15.50 (+1.31%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's +1.68% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today (Tue 03 Nov 2026).",
+      "Results today (179 companies): BAJAJFINSV, SBIN, AARNAV, AARTIDRUGS, ABINFRA, ADSL, ADVENTHTL, AIAENG, AIIL, AJMERA, ALKYLAMINE, ALLCARGO and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "BAJAJFINSV",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "SBIN",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "ITC",
+       "In the news",
+       "Stocks to watch: ITC, Lupin, NBCC, SBI, Dr Reddy's, Bosch, Ola Electric"
+      ],
+      [
+       "ICICIBANK",
+       "In the news",
+       "Market wrap: RIL, Tata Steel, Infosys, ICICI Bank top gainers and losers on Nifty and Sens"
+      ],
+      [
+       "AMBER",
+       "Setup: SELL (A+)",
+       "Entry 5,848.9, stop 5,946.7, target 5,657.4"
+      ],
+      [
+       "DEEPAKFERT",
+       "Setup: SELL (A+)",
+       "Entry 1,092.6, stop 1,120.7, target 1,044.6"
+      ],
+      [
+       "KOTAKBANK",
+       "Setup: BUY (A+)",
+       "Entry 463.2, stop 459.2, target 469.8"
+      ],
+      [
+       "IRFC",
+       "Setup: SELL (A+)",
+       "Entry 73.0, stop 73.9, target 71.4"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Stocks to watch: ITC, Lupin, NBCC, SBI, Dr Reddy's, Bosch, Ola Electric",
+      "Asian stocks retreat ahead of US midterms, oil steadies",
+      "GIFT Nifty Jumps 110 Points, Signals Positive Start For Sensex, Nifty; Crude Oil, Iran War In Focus",
+      "GIFT NIFTY futures indicate gap-up opening on November 3; key things to know before stock market opens"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,983.98",
+        "+0.41%"
+       ],
+       [
+        "S&P 500",
+        "7,541.40",
+        "-0.51%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,164.36",
+        "-1.07%"
+       ],
+       [
+        "FTSE 100",
+        "10,761.30",
+        "+0.29%"
+       ],
+       [
+        "DAX",
+        "25,981.09",
+        "+0.63%"
+       ],
+       [
+        "Nikkei 225",
+        "63,081.86",
+        "-0.33%"
+       ],
+       [
+        "Hang Seng",
+        "23,493.02",
+        "+0.43%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,616.70",
+        "-0.59%"
+       ],
+       [
+        "Kospi",
+        "5,720.85",
+        "-2.36%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "104.78",
+        "-10.93%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "96.67",
+        "-7.16%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,955.00",
+        "+1.44%"
+       ],
+       [
+        "USD/INR",
+        "94.90",
+        "-0.26%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.86",
+        "+0.11%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.89",
+        "-0.71%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "23,285",
+       "23,519"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "23,129",
+       "23,597"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
