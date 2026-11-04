@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import brand  # noqa: E402
 
 BASE = "https://ssjs1mu.github.io/jc-stock-analyst/"
+SHORT = "https://tinyurl.com/JoshisCorner-Reports"   # short link to the updates/ page
 IST = timezone(timedelta(hours=5, minutes=30))
 REP = [  # key, schedule id, name, icon, url folder, due text, accent
     ("sunrise", "morning-pulse", "Morning Sunrise", "\U0001F305", "morning/", "8:45 AM", "#F5A623"),
@@ -63,7 +64,7 @@ def build():
     if not items:
         return None
     msg = ("Joshi's Corner - daily reports (Mon-Fri, NSE trading days)\n\n" + "\n\n".join(lines) +
-           "\n\nAll reports in one place: " + BASE + "updates/")
+           "\n\nBoth reports in one place: " + SHORT)
     open(os.path.join(out, "message.txt"), "w").write(msg)
     # ---- preview card 1200x630 with both thumbnails ----
     cards = "".join(
