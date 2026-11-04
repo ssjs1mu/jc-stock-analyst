@@ -102,7 +102,7 @@ def deco_html(theme):
     elif theme == "diwali":
         g += _bulbs(cols)
         g += "".join(_spark(x, y, r) for x, y, r in [(70, 150, 13), (1010, 190, 15), (44, 520, 10), (1038, 640, 12), (60, 980, 14), (1024, 1180, 11), (48, 1400, 12), (1030, 1500, 13)])
-        g += _diya(60, 1790, .72) + _diya(1020, 1790, .72)
+        g += "".join(_diya(x, 1790, .72) for x in (60, 140, 220, 860, 940, 1020))
     elif theme == "holi":
         blobs = [(0, 0, 150, "#ff2e93"), (95, 40, 80, "#00d4ff"), (30, 130, 70, "#ffe600"), (1080, 0, 150, "#7cff3a"), (985, 40, 80, "#ff8a00"), (1050, 130, 70, "#b14bff"),
                  (0, 1800, 95, "#00d4ff"), (70, 1740, 52, "#ff2e93"), (20, 1690, 44, "#7cff3a"), (1080, 1800, 95, "#ffe600"), (1010, 1740, 52, "#b14bff"), (1060, 1690, 44, "#ff8a00")]
@@ -126,7 +126,7 @@ def deco_html(theme):
             g += _marigold(x, 13)
         for y in range(56, 1750, 42):
             g += _marigold(13, y) + _marigold(1067, y)
-        g += _diya(60, 1790, .72) + _diya(1020, 1790, .72)
+        g += "".join(_diya(x, 1790, .72) for x in (60, 140, 220, 860, 940, 1020))
         g += "".join(_spark(x, y, r, "#ffd98a") for x, y, r in [(60, 170, 11), (1020, 260, 12), (52, 700, 10), (1030, 900, 11)])
     return '<svg style="position:absolute;left:0;top:0;width:1080px;height:1800px;z-index:6;pointer-events:none" viewBox="0 0 1080 1800" xmlns="http://www.w3.org/2000/svg">%s%s</svg>' % (defs, g)
 
