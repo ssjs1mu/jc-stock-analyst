@@ -1,0 +1,369 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "04 Nov 2026",
+ "report_time": "18:09 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +0.63% in the session"
+ },
+ "report_title": "Evening Market Wrap",
+ "sections": [
+  {
+   "heading": "Today's Close in Brief",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Nifty 50 at 23,960.60 (+0.63%) and Sensex at 77,301.40 (+0.50%) in the latest session; Bank Nifty 55,913.60 (+0.67%), India VIX 15.19 (-3.39%). Brent crude 101.52 (-2.01%), gold 4,056.90 (+2.96%), USD/INR 94.64 (-0.09%). Global cues: Dow 51,786.72 (-0.38%), Nasdaq 25,372.01 (+0.83%), Nikkei 62,188.63 (-1.42%)."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Indian Markets & Key Levels",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Index",
+       "Close",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Nifty 50",
+        "23,960.60",
+        "+0.63%"
+       ],
+       [
+        "Sensex",
+        "77,301.40",
+        "+0.50%"
+       ],
+       [
+        "Bank Nifty",
+        "55,913.60",
+        "+0.67%"
+       ],
+       [
+        "Nifty 500",
+        "22,769.20",
+        "+1.10%"
+       ],
+       [
+        "India VIX",
+        "15.19",
+        "-3.39%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.44,
+       0.28,
+       0.28
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Nifty levels",
+       "Support",
+       "Resistance"
+      ],
+      "rows": [
+       [
+        "Nifty 50",
+        "23,784",
+        "24,049"
+       ],
+       [
+        "Nifty 50 (2nd)",
+        "23,608",
+        "24,137"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.42,
+       0.29,
+       0.29
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Global Markets, Currencies & Commodities",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,786.72",
+        "-0.38%"
+       ],
+       [
+        "S&P 500",
+        "7,568.92",
+        "+0.36%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,372.01",
+        "+0.83%"
+       ],
+       [
+        "FTSE 100",
+        "10,790.81",
+        "+1.43%"
+       ],
+       [
+        "DAX",
+        "26,253.47",
+        "+1.50%"
+       ],
+       [
+        "Nikkei 225",
+        "62,188.63",
+        "-1.42%"
+       ],
+       [
+        "Hang Seng",
+        "23,919.50",
+        "+1.67%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,686.17",
+        "+2.16%"
+       ],
+       [
+        "Kospi",
+        "5,683.80",
+        "+0.62%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "101.52",
+        "-2.01%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "94.60",
+        "-1.55%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,056.90",
+        "+2.96%"
+       ],
+       [
+        "USD/INR",
+        "94.64",
+        "-0.09%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.27",
+        "-0.59%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.95",
+        "+1.19%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Stocks in Focus (Nifty 50)",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Top gainers",
+       "Close (Rs)",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "ADANIENT",
+        "2,709.20",
+        "+4.47%"
+       ],
+       [
+        "TITAN",
+        "4,754.40",
+        "+4.22%"
+       ],
+       [
+        "SHRIRAMFIN",
+        "908.75",
+        "+2.71%"
+       ],
+       [
+        "BPCL",
+        "304.70",
+        "+2.63%"
+       ],
+       [
+        "BAJFINANCE",
+        "994.00",
+        "+2.47%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.4,
+       0.32,
+       0.28
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Top losers",
+       "Close (Rs)",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "TCS",
+        "2,436.00",
+        "-2.52%"
+       ],
+       [
+        "HCLTECH",
+        "1,405.00",
+        "-2.37%"
+       ],
+       [
+        "COALINDIA",
+        "399.65",
+        "-2.05%"
+       ],
+       [
+        "WIPRO",
+        "194.55",
+        "-1.74%"
+       ],
+       [
+        "INFY",
+        "1,128.20",
+        "-1.73%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.4,
+       0.32,
+       0.28
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Volume Shockers - Watch for Tomorrow",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Close (Rs)",
+      "Volume",
+      "% Chg"
+     ],
+     "rows": [
+      [
+       "SUNPHARMA",
+       "1,773.40",
+       "2.8x avg vol",
+       "+0.20%"
+      ],
+      [
+       "GRASIM",
+       "3,138.00",
+       "2.2x avg vol",
+       "+1.55%"
+      ],
+      [
+       "ITC",
+       "280.00",
+       "1.9x avg vol",
+       "+2.23%"
+      ],
+      [
+       "BAJFINANCE",
+       "994.00",
+       "1.8x avg vol",
+       "+2.47%"
+      ]
+     ],
+     "trend": true,
+     "col_widths": [
+      0.3,
+      0.25,
+      0.25,
+      0.2
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Outlook & Next Session",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty 50 pivot support 23,784 / 23,608, resistance 24,049 / 24,137 from the last session.",
+      "Top Nifty gainers: ADANIENT +4.47%, TITAN +4.22%, SHRIRAMFIN +2.71%.",
+      "Sensex weekly expiry today (Thu 05 Nov 2026)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
