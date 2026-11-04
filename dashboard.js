@@ -516,7 +516,7 @@
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
       + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn${S.busy ? ' busy' : ''}" id="jdRf" type="button" onclick="window.jdRefresh()">${S.busy ? '⟳ Refreshing…' : '⟳ Refresh now'}</button></div>`
-      + tiles3d(ms) + `<div class="jd-card jd-pos"><h3><span class="jd-ic">🧭</span>Open radar positions <small>trail &amp; carry / exit · newest first · 6 rows visible, scroll for more</small></h3>${window.jcMgr && window.jcMgr.posHTML ? window.jcMgr.posHTML() : ''}</div>` + callTiles()
+      + tiles3d(ms) + `<div class="jd-card jd-pos"><h3><span class="jd-ic">🧭</span>Open radar positions <small>trail &amp; carry / exit · newest first · 6 rows visible, scroll for more</small><button type="button" class="jd-btn" id="jdPosRf" onclick="window.jdPosRefresh()" title="Reload the table if it looks stuck">⟳ Refresh table</button></h3>${window.jcMgr && window.jcMgr.posHTML ? window.jcMgr.posHTML() : ''}</div>` + callTiles()
       + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}</div><div class="jd-col jd-c3">${window.jcFD ? window.jcFD.html(ms) : ''}${catButtons(ms)}</div><div class="jd-newsrow">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()
       + `<div class="legal">Delayed market data from Yahoo Finance and headlines from Google News, for information only — not investment advice. MCX prices and GIFT Nifty are not available on this feed (see the morning &amp; evening reports).</div>`;
@@ -1060,6 +1060,15 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (window.__curTab || '') === 'pDash') refresh(false); });
   function init() { build(); const h = (location.hash || '').slice(1); if (h === 'dashboard' || !h) window.showTab('pDash'); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  window.jdPosRefresh = async () => {
+    const b = $('jdPosRf'); if (b) { b.disabled = true; b.textContent = '⟳ Refreshing…'; }
+    try {
+      const R = window.jcRadar && window.jcRadar.state; if (R && R.busy && Date.now() - (R.last || 0) > 60000) R.busy = false; // a stuck sweep would block the refresh
+      if (window.jcRadar && window.jcRadar.sweep) await Promise.race([window.jcRadar.sweep(true), new Promise((r) => setTimeout(r, 25000))]);
+      if (window.jcMgr && window.jcMgr.run) window.jcMgr.run();
+    } catch (e) { }
+    try { const w = document.querySelector('#pDash .jd-pos .bf-sc'); if (w) w.scrollTop = 0; paint(); } catch (e) { }
+  };
   window.__jdS = S; window.jdRepaint = () => { try { paint(); } catch (e) { } };
   window.__jd = { indiaState, mktDef, isOpen, moodScore };
 })();
