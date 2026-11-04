@@ -55,19 +55,117 @@ tr+tr td{border-top:1px solid #ffffff1c}td.r,th.r{text-align:right;white-space:n
 """ % dict(W=W, H=H, gold=GOLD, script=brand.SCRIPT_STACK, **p)
 
 
+
+# ---------------------------------------------------------------- festival decoration (rules in pipeline/festivals.py)
+FEST = [None]   # {"cel": celebration dict or None, "strip": (this_week, next_week)} for the report date being rendered
+
+
+def _bulbs(cols):
+    out, k = [], 0
+    for x in range(34, 1060, 50):                       # top string
+        out.append((x, 12, k)); k += 1
+    for y in range(62, 1760, 50):                       # left and right strings
+        out.append((13, y, k)); out.append((1067, y, k + 1)); k += 1
+    g = "".join('<circle cx="%d" cy="%d" r="15" fill="url(#bg%d)"/><circle cx="%d" cy="%d" r="5.5" fill="%s"/>' % (x, y, i % len(cols), x, y, cols[i % len(cols)]) for x, y, i in out)
+    return g
+
+
+def _diya(cx, cy, s=1.0):
+    return ('<g transform="translate(%d %d) scale(%.2f)"><ellipse cx="0" cy="-26" rx="34" ry="44" fill="url(#flameglow)"/>'
+            '<path d="M0 -62 C14 -40 16 -26 0 -14 C-16 -26 -14 -40 0 -62Z" fill="#ffe27a"/><path d="M0 -50 C7 -38 8 -30 0 -22 C-8 -30 -7 -38 0 -50Z" fill="#fff6c8"/>'
+            '<path d="M-34 -10 Q0 26 34 -10 Q22 6 0 8 Q-22 6 -34 -10Z" fill="#c4521a"/><path d="M-34 -10 Q0 -2 34 -10 Q0 6 -34 -10Z" fill="#f0903a"/><ellipse cx="0" cy="-10" rx="34" ry="5" fill="#8a2f0c" opacity=".55"/></g>' % (cx, cy, s))
+
+
+def _spark(x, y, r, col="#ffe9a8"):
+    return '<path d="M%d %d L%.1f %.1f L%d %d L%.1f %.1f Z" fill="%s" opacity=".9"/>' % (x, y - r, x + r * .22, y - r * .22, x + r, y, x + r * .22, y + r * .22, col) + \
+           '<path d="M%d %d L%.1f %.1f L%d %d L%.1f %.1f Z" fill="%s" opacity=".9"/>' % (x, y + r, x - r * .22, y + r * .22, x - r, y, x - r * .22, y - r * .22, col)
+
+
+def _marigold(x, y, r=11):
+    return '<circle cx="%d" cy="%d" r="%d" fill="#f59f00"/><circle cx="%d" cy="%d" r="%d" fill="#ffcf4a"/><circle cx="%d" cy="%d" r="%d" fill="#d9480f"/>' % (x, y, r, x, y, r * .68, x, y, r * .28)
+
+
+def deco_html(theme):
+    """Absolutely-positioned festive overlay (borders / corners only, never over the text area)."""
+    defs = ('<defs><radialGradient id="flameglow"><stop offset="0" stop-color="#ffd54a" stop-opacity=".85"/><stop offset="1" stop-color="#ff8a00" stop-opacity="0"/></radialGradient>'
+            + "".join('<radialGradient id="bg%d"><stop offset="0" stop-color="%s" stop-opacity=".95"/><stop offset="1" stop-color="%s" stop-opacity="0"/></radialGradient>' % (i, c, c)
+                      for i, c in enumerate(["#ffd166", "#ff9f1c", "#ff5d8f", "#7dffb0"])) + '</defs>')
+    cols = ["#ffd166", "#ff9f1c", "#ff5d8f", "#7dffb0"]
+    g = ""
+    if theme == "diwali":
+        g += _bulbs(cols[:3])
+        g += "".join(_spark(x, y, r) for x, y, r in [(70, 150, 13), (1010, 190, 15), (44, 520, 10), (1038, 640, 12), (60, 980, 14), (1024, 1180, 11), (48, 1400, 12), (1030, 1500, 13)])
+        g += _diya(60, 1790, .72) + _diya(1020, 1790, .72)
+    elif theme == "holi":
+        blobs = [(0, 0, 150, "#ff2e93"), (95, 40, 80, "#00d4ff"), (30, 130, 70, "#ffe600"), (1080, 0, 150, "#7cff3a"), (985, 40, 80, "#ff8a00"), (1050, 130, 70, "#b14bff"),
+                 (0, 1800, 95, "#00d4ff"), (70, 1740, 52, "#ff2e93"), (20, 1690, 44, "#7cff3a"), (1080, 1800, 95, "#ffe600"), (1010, 1740, 52, "#b14bff"), (1060, 1690, 44, "#ff8a00")]
+        g += "".join('<circle cx="%d" cy="%d" r="%d" fill="%s" opacity=".78"/>' % b for b in blobs)
+        import random
+        rnd = random.Random(7)
+        pal = ["#ff2e93", "#00d4ff", "#ffe600", "#7cff3a", "#ff8a00", "#b14bff"]
+        for _ in range(120):
+            x = rnd.choice([rnd.randint(4, 40), rnd.randint(1040, 1076), rnd.randint(4, 1076)]); y = rnd.randint(4, 1796) if x < 40 or x > 1040 else rnd.choice([rnd.randint(4, 30), rnd.randint(1768, 1796)])
+            g += '<circle cx="%d" cy="%d" r="%d" fill="%s" opacity=".85"/>' % (x, y, rnd.randint(3, 8), rnd.choice(pal))
+    elif theme == "tricolor":
+        for y, h in ((0, 5), (1795, 5)):
+            g += '<rect x="0" y="%d" width="360" height="%d" fill="#ff9933"/><rect x="360" y="%d" width="360" height="%d" fill="#ffffff"/><rect x="720" y="%d" width="360" height="%d" fill="#138808"/>' % (y, h, y, h, y, h)
+        g += '<rect x="0" y="0" width="5" height="600" fill="#ff9933"/><rect x="0" y="600" width="5" height="600" fill="#ffffff"/><rect x="0" y="1200" width="5" height="600" fill="#138808"/>'
+        g += '<rect x="1075" y="0" width="5" height="600" fill="#ff9933"/><rect x="1075" y="600" width="5" height="600" fill="#ffffff"/><rect x="1075" y="1200" width="5" height="600" fill="#138808"/>'
+        for cx in (1022, 58):
+            g += '<g transform="translate(%d 1744)"><circle r="30" fill="none" stroke="#2a4bd7" stroke-width="3"/>%s<circle r="5" fill="#2a4bd7"/></g>' % (cx, "".join('<line x1="0" y1="0" x2="%.1f" y2="%.1f" stroke="#2a4bd7" stroke-width="1.6"/>' % (30 * __import__("math").cos(i * 3.14159 / 12), 30 * __import__("math").sin(i * 3.14159 / 12)) for i in range(24)))
+        g += "".join('<rect x="%d" y="%d" width="22" height="3" fill="%s" opacity=".9"/>' % (x, y, c) for x, y, c in [(40, 14, "#ff9933"), (1018, 14, "#138808")])
+    else:   # marigold garland border (other Hindu festivals)
+        for x in range(30, 1060, 42):
+            g += _marigold(x, 13)
+        for y in range(56, 1750, 42):
+            g += _marigold(13, y) + _marigold(1067, y)
+        g += _diya(60, 1790, .72) + _diya(1020, 1790, .72)
+        g += "".join(_spark(x, y, r, "#ffd98a") for x, y, r in [(60, 170, 11), (1020, 260, 12), (52, 700, 10), (1030, 900, 11)])
+    return '<svg style="position:absolute;left:0;top:0;width:1080px;height:1800px;z-index:6;pointer-events:none" viewBox="0 0 1080 1800" xmlns="http://www.w3.org/2000/svg">%s%s</svg>' % (defs, g)
+
+
+FEST_ICON = {"diwali": "&#129684;", "holi": "&#127752;", "tricolor": "&#127470;&#127475;", "marigold": "&#127802;"}
+
+
+def fest_extras(cover):
+    """-> (overlay svg, header/cover chip, holiday strip html, extra css)"""
+    F = FEST[0] or {}
+    cel, strip = F.get("cel"), F.get("strip")
+    svg = chip = ""
+    css_x = ""
+    if cel:
+        svg = deco_html(cel["theme"])
+        ic = FEST_ICON.get(cel["theme"], "")
+        label = "%s %s" % (ic, e(cel["line"]))
+        if cover:
+            chip = '<div class="fest" style="position:absolute;left:50%%;top:34px;transform:translateX(-50%%);z-index:7;white-space:nowrap">%s</div>' % label
+        else:
+            chip = '<div class="fest" style="margin-left:auto;white-space:nowrap">%s</div>' % label
+        css_x = (".fest{font-size:25px;font-weight:800;color:#2b1600;background:linear-gradient(135deg,#ffe08a,#ffb347);border:2px solid #fff3c4;border-radius:26px;padding:6px 20px;box-shadow:0 4px 18px #0008}"
+                 ".hd .fest+.n{margin-left:14px}.ft{padding:0 92px;font-size:17px}")
+    hol = ""
+    if cover and strip:
+        a, b2 = strip
+        hol = ('<div style="position:absolute;left:46px;right:46px;bottom:96px;z-index:7;text-align:center;font-size:23px;font-weight:700;color:#efe9d6;background:#0000004d;border:1.5px solid #ffffff2e;border-radius:16px;padding:9px 14px;line-height:1.35">'
+               '<span style="color:%s;letter-spacing:1px;font-weight:900">TRADING HOLIDAYS</span> &nbsp;This week: <b>%s</b> &nbsp;&middot;&nbsp; Next week: <b>%s</b></div>'
+               % (GOLD, e("; ".join(a) if a else "none"), e("; ".join(b2) if b2 else "none")))
+    return svg, chip, hol, css_x
+
+
 CUR = [None]
 
 
 def shell(p, inner, n, total, title, cover=False):
     n = CUR[0] or n
+    svg, chip, hol, cx = fest_extras(cover)
     head = ("" if cover else
-            '<div class="hd"><img src="%s"><div><div class="brand">%s</div><div class="sub">%s</div></div><div class="n">%d / %d</div></div>'
-            % (brand.logo_original(), e(brand.BRAND), title, n, total))
+            '<div class="hd"><img src="%s"><div><div class="brand">%s</div><div class="sub">%s</div></div>%s<div class="n">%d / %d</div></div>'
+            % (brand.logo_original(), e(brand.BRAND), title, chip, n, total))
     return ('<!doctype html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">'
-            '<style>%s</style></head><body><div class="smoke"><i></i><i></i><i></i></div><div class="grain"></div>'
+            '<style>%s%s</style></head><body><div class="smoke"><i></i><i></i><i></i></div><div class="grain"></div>%s%s%s'
             '<div class="pg">%s<div class="bd" id="bd">%s</div><div class="ft">%s</div></div>'
             '<script>(function(){var b=document.getElementById("bd"),z=1;while(b.scrollHeight>b.clientHeight+1&&z>0.7){z-=0.02;b.style.zoom=z;}})();</script></body></html>'
-            % (css(p), head, inner, e(brand.SHORT_DISCLAIMER)))
+            % (css(p), cx, svg, (chip if cover else ""), hol, head, inner, e(brand.SHORT_DISCLAIMER)))
 
 
 def pc(x):
@@ -542,6 +640,12 @@ def render(cfg, png_base):
         _r.EDN[0] = cfg.get("edition")
     except Exception:
         pass
+    try:
+        import festivals as _f
+        FEST[0] = {"cel": _f.celebration(b["date_iso"]), "strip": _f.holiday_strip(b["date_iso"])}
+    except Exception as ex:
+        print("festival decoration skipped:", ex)
+        FEST[0] = None
     pages = [p1(b, p, total, photo(cfg, sc))]
     for k, f in enumerate(pagelist):
         CUR[0] = k + 2
