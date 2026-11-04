@@ -92,13 +92,18 @@ def main():
                         mood = (cj.get("mood") or {}).get("key", "neutral")
                 make_book.build(entry["date"], pages, head, mood, kind=kind)
                 book_added = True
+                try:   # one combined message: Morning Sunrise + Evening Breeze thumbnails, links and update times
+                    import make_updates
+                    make_updates.build()
+                except Exception as ex2:
+                    print("updates card not built:", ex2)
             except Exception as ex:
                 print("booklet not built:", ex)
     git("config", "user.name", "Joshi's Corner scheduler", check=False)
     git("config", "user.email", "joshiscorner.group@gmail.com", check=False)
     git("add", f"reports/{a.schedule_id}")
     if book_added:
-        git("add", "evening" if a.schedule_id == "evening-breeze" else "morning")
+        git("add", "evening" if a.schedule_id == "evening-breeze" else "morning", "updates")
     msg = f"report: {a.schedule_id} {entry['date']} ({a.status})"
     git("commit", "-m", msg)
     branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
