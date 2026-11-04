@@ -87,13 +87,20 @@ def _marigold(x, y, r=11):
 
 def deco_html(theme):
     """Absolutely-positioned festive overlay (borders / corners only, never over the text area)."""
+    cols = {"xmas": ["#ff4d4d", "#3ddc84", "#ffd166", "#ffffff"], "lights": ["#ffd166", "#ffb347", "#fff2b0"]}.get(theme, ["#ffd166", "#ff9f1c", "#ff5d8f"])
     defs = ('<defs><radialGradient id="flameglow"><stop offset="0" stop-color="#ffd54a" stop-opacity=".85"/><stop offset="1" stop-color="#ff8a00" stop-opacity="0"/></radialGradient>'
             + "".join('<radialGradient id="bg%d"><stop offset="0" stop-color="%s" stop-opacity=".95"/><stop offset="1" stop-color="%s" stop-opacity="0"/></radialGradient>' % (i, c, c)
-                      for i, c in enumerate(["#ffd166", "#ff9f1c", "#ff5d8f", "#7dffb0"])) + '</defs>')
-    cols = ["#ffd166", "#ff9f1c", "#ff5d8f", "#7dffb0"]
+                      for i, c in enumerate(cols)) + '</defs>')
     g = ""
-    if theme == "diwali":
-        g += _bulbs(cols[:3])
+    if theme in ("xmas", "lights"):
+        g += _bulbs(cols)
+        sp = [(70, 150, 13), (1010, 190, 15), (44, 520, 10), (1038, 640, 12), (60, 980, 14), (1024, 1180, 11), (48, 1400, 12), (1030, 1500, 13)]
+        g += "".join(_spark(x, y, r, "#ffffff" if theme == "xmas" else "#ffe9a8") for x, y, r in sp)
+    elif theme == "soft":
+        g += '<rect x="9" y="9" width="1062" height="1782" rx="22" fill="none" stroke="#f3e2a9" stroke-width="3" opacity=".8"/><rect x="21" y="21" width="1038" height="1758" rx="16" fill="none" stroke="#f3e2a9" stroke-width="1.2" opacity=".6"/>'
+        g += "".join(_spark(x, y, r, "#fff1c4") for x, y, r in [(70, 150, 12), (1010, 190, 12), (60, 1700, 12), (1020, 1690, 12)])
+    elif theme == "diwali":
+        g += _bulbs(cols)
         g += "".join(_spark(x, y, r) for x, y, r in [(70, 150, 13), (1010, 190, 15), (44, 520, 10), (1038, 640, 12), (60, 980, 14), (1024, 1180, 11), (48, 1400, 12), (1030, 1500, 13)])
         g += _diya(60, 1790, .72) + _diya(1020, 1790, .72)
     elif theme == "holi":
@@ -124,7 +131,7 @@ def deco_html(theme):
     return '<svg style="position:absolute;left:0;top:0;width:1080px;height:1800px;z-index:6;pointer-events:none" viewBox="0 0 1080 1800" xmlns="http://www.w3.org/2000/svg">%s%s</svg>' % (defs, g)
 
 
-FEST_ICON = {"diwali": "&#129684;", "holi": "&#127752;", "tricolor": "&#127470;&#127475;", "marigold": "&#127802;"}
+FEST_ICON = {"diwali": "&#129684;", "holi": "&#127752;", "tricolor": "&#127470;&#127475;", "marigold": "&#127802;", "xmas": "&#127876;", "lights": "&#10024;", "soft": "&#10024;"}
 
 
 def fest_extras(cover):
@@ -142,7 +149,7 @@ def fest_extras(cover):
         else:
             chip = '<div class="fest" style="margin-left:auto;white-space:nowrap">%s</div>' % label
         css_x = (".fest{font-size:25px;font-weight:800;color:#2b1600;background:linear-gradient(135deg,#ffe08a,#ffb347);border:2px solid #fff3c4;border-radius:26px;padding:6px 20px;box-shadow:0 4px 18px #0008}"
-                 ".hd .fest+.n{margin-left:14px}.ft{padding:0 92px;font-size:17px}")
+                 ".hd .fest+.n{margin-left:14px}.hd .n{white-space:nowrap}.ft{padding:0 92px;font-size:17px}")
     hol = ""
     if cover and strip:
         a, b2 = strip
@@ -623,6 +630,30 @@ def e_open(b, p, total):
     return shell(p, inner, 6, total, "Next session &middot; " + e(b["date_txt"]))
 
 
+def pm(b, p, total):
+    """Special-session page (Diwali Muhurat trading): page 2 of the booklet until the session day."""
+    m = (FEST[0] or {}).get("muhurat") or {}
+    a, z = m.get("main", ["", ""])
+    rows = "".join('<tr%s><td style="white-space:nowrap;font-weight:800">%s</td><td>%s</td></tr>'
+                   % (' style="background:%s33;"' % GOLD if r[2] else "", e(r[0]), ("<b>%s</b>" % e(r[1])) if r[2] else e(r[1])) for r in m.get("rows", []))
+    dto = m.get("days_to", 0)
+    when = "TODAY" if dto == 0 else "TOMORROW" if dto == 1 else "IN %d DAYS" % dto
+    strip = (FEST[0] or {}).get("strip") or ([], [])
+    hol = [x for x in strip[0] + strip[1] if "Muhurat" not in x]
+    inner = ('<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="chip" style="background:%s;color:#2b1600">SPECIAL SESSION</span><span class="chip" style="background:#ff5d8f;color:#fff">%s</span></div>'
+             '<div style="font-size:62px;font-weight:900;line-height:1.08">%s</div>'
+             '<div style="font-size:30px;line-height:1.35;opacity:.92">%s</div>'
+             '<div class="card" style="text-align:center;border:2.5px solid %s;background:linear-gradient(135deg,#ffd16638,#ff9f1c1f)"><div class="small" style="letter-spacing:2px;font-size:22px">NORMAL MARKET &middot; LIVE TRADING</div>'
+             '<div style="font-size:88px;font-weight:900;color:%s;line-height:1.1">%s &ndash; %s</div><div style="font-size:26px;opacity:.9">Sunday 8 November 2026 &middot; afternoon (IST)</div></div>'
+             '<h2 class="s">Full timetable</h2><table>%s</table>'
+             '<h2 class="s">Good to know</h2>%s'
+             '%s'
+             % (GOLD, when, e(m.get("title", "")), e(m.get("sub", "")), GOLD, GOLD, e(a), e(z), rows,
+                "".join(('<div style="font-size:27px;line-height:1.38;margin-top:9px;display:flex;gap:12px"><span style="color:%s;font-weight:900">&#9679;</span><span>%s</span></div>' % (GOLD, e(x))) if not x.startswith("Source") else '<div class="small" style="margin-top:12px;font-size:22px;opacity:.75">%s</div>' % e(x) for x in m.get("notes", [])),
+                ('<div class="card" style="margin-top:6px"><div class="small" style="letter-spacing:1.4px">MARKET HOLIDAYS NEARBY</div><div style="font-size:27px;font-weight:800;margin-top:4px">%s</div></div>' % " &middot; ".join(e(x) for x in hol)) if hol else ""))
+    return shell(p, inner, 2, total, "Diwali Muhurat session")
+
+
 PAGES = [p2, p3, p4, p5, p6]
 
 
@@ -632,6 +663,14 @@ def render(cfg, png_base):
     p = PAL.get((b.get("mood") or {}).get("key", "neutral"), PAL["neutral"])
     evening = b.get("edition") == "evening"
     pagelist = [e2, e3, e4, e_news, e_open, p5, p6] if evening else PAGES
+    mh = None
+    try:
+        import festivals as _f0
+        mh = _f0.muhurat(b["date_iso"])
+    except Exception as ex:
+        print("muhurat page skipped:", ex)
+    if mh:
+        pagelist = [pm] + list(pagelist)
     total = 1 + len(pagelist)
     sc = float(cfg.get("mood_score") or 0) * 1.4
     try:
@@ -642,7 +681,7 @@ def render(cfg, png_base):
         pass
     try:
         import festivals as _f
-        FEST[0] = {"cel": _f.celebration(b["date_iso"]), "strip": _f.holiday_strip(b["date_iso"])}
+        FEST[0] = {"cel": _f.celebration(b["date_iso"]), "strip": _f.holiday_strip(b["date_iso"]), "muhurat": mh}
     except Exception as ex:
         print("festival decoration skipped:", ex)
         FEST[0] = None

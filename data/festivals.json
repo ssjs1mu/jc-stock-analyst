@@ -1,30 +1,233 @@
 {
- "note": "Festival and holiday calendar used by the Morning Sunrise / Evening Breeze booklets. kind: hindu (celebrated from 2 days before), national (from 1 day before), muslim (NEVER celebrated - only listed if it is a trading holiday), other (Sikh/Christian/Jain/state: listed if a trading holiday, not decorated). trading_holiday = NSE equity market closed on a weekday. Extend each December together with NSE_HOLIDAYS in pipeline/auto_reports.py.",
+ "note": "Festival and holiday calendar used by the Morning Sunrise / Evening Breeze booklets. kind: hindu (decorated from 2 days before through the day), national and other (Sikh/Christian/Jain/state days: decorated on the day only), muslim (NEVER decorated - only listed if it is a trading holiday), civic (listed only, e.g. elections). trading_holiday = NSE equity market closed on a weekday. muhurat = special session page shown as page 2 until that day. Extend each December together with NSE_HOLIDAYS in pipeline/auto_reports.py.",
  "source": "NSE equity trading holidays 2026 (exchange circular); festival dates from the published 2026 Hindu calendar.",
  "days": [
-  {"date": "2026-01-15", "name": "Maharashtra municipal elections", "kind": "other", "trading_holiday": true},
-  {"date": "2026-01-26", "name": "Republic Day", "kind": "national", "theme": "tricolor", "trading_holiday": true},
-  {"date": "2026-03-03", "name": "Holi", "kind": "hindu", "theme": "holi", "trading_holiday": true},
-  {"date": "2026-03-26", "name": "Ram Navami", "kind": "hindu", "theme": "marigold", "trading_holiday": true},
-  {"date": "2026-03-31", "name": "Mahavir Jayanti", "kind": "other", "trading_holiday": true},
-  {"date": "2026-04-03", "name": "Good Friday", "kind": "other", "trading_holiday": true},
-  {"date": "2026-04-14", "name": "Dr. Ambedkar Jayanti", "kind": "national", "theme": "tricolor", "trading_holiday": true},
-  {"date": "2026-05-01", "name": "Maharashtra Day", "kind": "other", "trading_holiday": true},
-  {"date": "2026-05-28", "name": "Bakri Id", "kind": "muslim", "trading_holiday": true},
-  {"date": "2026-06-26", "name": "Muharram", "kind": "muslim", "trading_holiday": true},
-  {"date": "2026-09-14", "name": "Ganesh Chaturthi", "kind": "hindu", "theme": "marigold", "trading_holiday": true},
-  {"date": "2026-10-02", "name": "Mahatma Gandhi Jayanti", "kind": "national", "theme": "tricolor", "trading_holiday": true},
-  {"date": "2026-10-20", "name": "Dussehra", "kind": "hindu", "theme": "marigold", "trading_holiday": true},
-  {"date": "2026-11-06", "name": "Dhanteras", "kind": "hindu", "theme": "diwali", "trading_holiday": false},
-  {"date": "2026-11-07", "name": "Naraka Chaturdashi", "kind": "hindu", "theme": "diwali", "trading_holiday": false},
-  {"date": "2026-11-08", "name": "Diwali - Laxmi Pujan", "kind": "hindu", "theme": "diwali", "trading_holiday": false, "special": "Muhurat trading Sun 8 Nov (timing per NSE)"},
-  {"date": "2026-11-10", "name": "Diwali Balipratipada", "kind": "hindu", "theme": "diwali", "trading_holiday": true},
-  {"date": "2026-11-11", "name": "Bhai Dooj", "kind": "hindu", "theme": "diwali", "trading_holiday": false},
-  {"date": "2026-11-15", "name": "Chhath Puja", "kind": "hindu", "theme": "marigold", "trading_holiday": false},
-  {"date": "2026-11-24", "name": "Guru Nanak Jayanti", "kind": "other", "trading_holiday": true},
-  {"date": "2026-11-24", "name": "Kartik Purnima (Dev Diwali)", "kind": "hindu", "theme": "diwali", "trading_holiday": false},
-  {"date": "2026-12-25", "name": "Christmas", "kind": "other", "trading_holiday": true},
-  {"date": "2027-01-14", "name": "Makar Sankranti", "kind": "hindu", "theme": "marigold", "trading_holiday": false},
-  {"date": "2027-01-26", "name": "Republic Day", "kind": "national", "theme": "tricolor", "trading_holiday": true}
+  {
+   "date": "2026-01-15",
+   "name": "Maharashtra municipal elections",
+   "kind": "civic",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-01-26",
+   "name": "Republic Day",
+   "kind": "national",
+   "theme": "tricolor",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-03-03",
+   "name": "Holi",
+   "kind": "hindu",
+   "theme": "holi",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-03-26",
+   "name": "Ram Navami",
+   "kind": "hindu",
+   "theme": "marigold",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-03-31",
+   "name": "Mahavir Jayanti",
+   "kind": "other",
+   "trading_holiday": true,
+   "theme": "lights"
+  },
+  {
+   "date": "2026-04-03",
+   "name": "Good Friday",
+   "kind": "other",
+   "trading_holiday": true,
+   "theme": "soft"
+  },
+  {
+   "date": "2026-04-14",
+   "name": "Dr. Ambedkar Jayanti",
+   "kind": "national",
+   "theme": "tricolor",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-05-01",
+   "name": "Maharashtra Day",
+   "kind": "other",
+   "trading_holiday": true,
+   "theme": "marigold"
+  },
+  {
+   "date": "2026-05-28",
+   "name": "Bakri Id",
+   "kind": "muslim",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-06-26",
+   "name": "Muharram",
+   "kind": "muslim",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-09-14",
+   "name": "Ganesh Chaturthi",
+   "kind": "hindu",
+   "theme": "marigold",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-10-02",
+   "name": "Mahatma Gandhi Jayanti",
+   "kind": "national",
+   "theme": "tricolor",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-10-20",
+   "name": "Dussehra",
+   "kind": "hindu",
+   "theme": "marigold",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-11-06",
+   "name": "Dhanteras",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": false
+  },
+  {
+   "date": "2026-11-07",
+   "name": "Naraka Chaturdashi",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": false
+  },
+  {
+   "date": "2026-11-08",
+   "name": "Diwali - Laxmi Pujan",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": false,
+   "special": "Diwali Muhurat trading Sun 8 Nov, 2:20-3:30 PM",
+   "muhurat": {
+    "title": "Diwali Muhurat Trading 2026",
+    "date": "2026-11-08",
+    "sub": "Special live trading session on Sunday 8 November 2026 (afternoon, NSE and BSE)",
+    "main": [
+     "2:20 PM",
+     "3:30 PM"
+    ],
+    "rows": [
+     [
+      "1:15 PM - 1:50 PM",
+      "Trading members log in",
+      0
+     ],
+     [
+      "1:50 PM - 2:05 PM",
+      "Block deal window",
+      0
+     ],
+     [
+      "2:05 PM - 2:20 PM",
+      "Pre-open session",
+      0
+     ],
+     [
+      "2:20 PM - 3:30 PM",
+      "Normal market: continuous trading (Muhurat session)",
+      1
+     ],
+     [
+      "2:25 PM - 3:20 PM",
+      "Periodic call auction",
+      0
+     ],
+     [
+      "3:15 PM - 3:35 PM",
+      "Closing auction",
+      0
+     ],
+     [
+      "3:30 PM - 3:50 PM",
+      "Closing session (non-CAS securities)",
+      0
+     ],
+     [
+      "3:35 PM - 3:50 PM",
+      "Closing buffer (CAS securities)",
+      0
+     ],
+     [
+      "3:50 PM - 4:00 PM",
+      "Post-closing session",
+      0
+     ]
+    ],
+    "notes": [
+     "Trades in this session are real and carry normal settlement obligations.",
+     "The session is symbolic of a prosperous new Samvat year; volumes are usually light and swings can be sharp, so keep order sizes small.",
+     "Source: NSE and BSE circulars as reported in Oct 2026. Please confirm the final timings on nseindia.com before trading."
+    ]
+   }
+  },
+  {
+   "date": "2026-11-10",
+   "name": "Diwali Balipratipada",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": true
+  },
+  {
+   "date": "2026-11-11",
+   "name": "Bhai Dooj",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": false
+  },
+  {
+   "date": "2026-11-15",
+   "name": "Chhath Puja",
+   "kind": "hindu",
+   "theme": "marigold",
+   "trading_holiday": false
+  },
+  {
+   "date": "2026-11-24",
+   "name": "Guru Nanak Jayanti",
+   "kind": "other",
+   "trading_holiday": true,
+   "theme": "lights"
+  },
+  {
+   "date": "2026-11-24",
+   "name": "Dev Diwali",
+   "kind": "hindu",
+   "theme": "diwali",
+   "trading_holiday": false
+  },
+  {
+   "date": "2026-12-25",
+   "name": "Christmas",
+   "kind": "other",
+   "trading_holiday": true,
+   "theme": "xmas"
+  },
+  {
+   "date": "2027-01-14",
+   "name": "Makar Sankranti",
+   "kind": "hindu",
+   "theme": "marigold",
+   "trading_holiday": false
+  },
+  {
+   "date": "2027-01-26",
+   "name": "Republic Day",
+   "kind": "national",
+   "theme": "tricolor",
+   "trading_holiday": true
+  }
  ]
 }

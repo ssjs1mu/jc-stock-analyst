@@ -86,7 +86,51 @@ document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text
   if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
   msg+=' <span style="opacity:.8">(No report is issued on market holidays.)</span>';o.innerHTML=msg;o.style.display='block'}})();
 z();setTimeout(function(){document.getElementById('hint').style.opacity=0},6000)})();
-</script></body></html>"""
+</script>%(fx)s</body></html>"""
+
+FX_JS = r"""<script>(function(){
+var T='__THEME__';if(!T)return;
+try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return}catch(e){}
+var bk=document.getElementById('book');if(!bk)return;
+var cv=document.createElement('canvas');cv.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:3000';bk.appendChild(cv);
+var cx=cv.getContext('2d'),W=1080,H=1800,s=1,dpr=Math.min(2,window.devicePixelRatio||1),PI2=Math.PI*2;
+function size(){var r=bk.getBoundingClientRect();cv.width=Math.max(2,Math.round(r.width*dpr));cv.height=Math.max(2,Math.round(r.height*dpr));s=cv.width/W}
+size();addEventListener('resize',size);
+function R(a,b){return a+Math.random()*(b-a)}
+var BP={diwali:['#ffd166','#ff9f1c','#ff5d8f'],xmas:['#ff4d4d','#3ddc84','#ffd166','#ffffff'],lights:['#ffd166','#ffb347','#fff2b0']},BC=BP[T],bulbs=[];
+if(BC){var k=0,x,y;for(x=34;x<1060;x+=50){bulbs.push([x,12,k++])}for(y=62;y<1760;y+=50){bulbs.push([13,y,k]);bulbs.push([1067,y,k+1]);k++}}
+var rise=(T==='diwali'||T==='lights'||T==='soft'),fall=(T==='tricolor'||T==='marigold'||T==='xmas');
+var CL={tricolor:['#ff9933','#ffffff','#138808'],marigold:['#f59f00','#ffcf4a','#d9480f'],xmas:['#ffffff','#e8f4ff']}[T]||['#ffe9a8','#ffd166','#fff6d0'];
+var N={diwali:34,tricolor:36,marigold:28,xmas:60,lights:28,soft:20}[T]||0,P=[];
+function mk(init){return{x:R(0,W),y:init?R(0,H):(rise?H+20:-30),r:R(3,8),v:R(35,95),ph:R(0,PI2),c:CL[Math.floor(Math.random()*CL.length)],rot:R(0,PI2),vr:R(-2,2),a:R(.55,1)}}
+for(var i=0;i<N;i++)P.push(mk(true));
+var PUF=[],HC=['#ff2e93','#00d4ff','#ffe600','#7cff3a','#ff8a00','#b14bff'];
+function star(x,y,r){cx.beginPath();cx.moveTo(x,y-r);cx.lineTo(x+r*.2,y-r*.2);cx.lineTo(x+r,y);cx.lineTo(x+r*.2,y+r*.2);cx.lineTo(x,y+r);cx.lineTo(x-r*.2,y+r*.2);cx.lineTo(x-r,y);cx.lineTo(x-r*.2,y-r*.2);cx.closePath();cx.fill()}
+var last=performance.now(),t=0,acc=0;
+function frame(now){requestAnimationFrame(frame);if(document.hidden){last=now;return}
+ var dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+ cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.setTransform(s,0,0,s,0,0);
+ cx.globalCompositeOperation='lighter';
+ for(var i=0;i<bulbs.length;i++){var b=bulbs[i],a=.12+.6*Math.pow(.5+.5*Math.sin(t*2.6+b[2]*1.9),2);
+  cx.globalAlpha=a;cx.fillStyle=BC[b[2]%BC.length];cx.beginPath();cx.arc(b[0],b[1],16,0,PI2);cx.fill();
+  cx.globalAlpha=Math.min(1,a*1.3);cx.fillStyle='#fff';cx.beginPath();cx.arc(b[0],b[1],4.5,0,PI2);cx.fill()}
+ if(T==='diwali'||T==='marigold'){[60,1020].forEach(function(dx){var f=.4+.22*Math.sin(t*9+dx)+.1*Math.sin(t*23+dx*.3),g=cx.createRadialGradient(dx,1763,2,dx,1763,52);
+  g.addColorStop(0,'rgba(255,214,90,'+f+')');g.addColorStop(1,'rgba(255,140,0,0)');cx.globalAlpha=1;cx.fillStyle=g;cx.beginPath();cx.arc(dx,1763,52,0,PI2);cx.fill()})}
+ if(T==='holi'){acc+=dt;if(acc>.35){acc=0;var e=Math.floor(Math.random()*4),px=e<2?R(0,170):R(910,1080),py=(e%2)?R(1630,1800):R(0,170);PUF.push({x:px,y:py,r:10,m:R(55,105),c:HC[Math.floor(Math.random()*HC.length)],l:0})}
+  for(var j=PUF.length-1;j>=0;j--){var q=PUF[j];q.l+=dt/1.1;if(q.l>=1){PUF.splice(j,1);continue}
+   q.r=10+q.m*Math.sin(q.l*1.4);cx.globalAlpha=.62*(1-q.l);cx.fillStyle=q.c;cx.beginPath();cx.arc(q.x,q.y,q.r,0,PI2);cx.fill();
+   for(var m=0;m<6;m++){var an=m*1.047+q.l,rr=q.r*(1+.9*q.l);cx.beginPath();cx.arc(q.x+Math.cos(an)*rr,q.y+Math.sin(an)*rr,4,0,PI2);cx.fill()}}}
+ cx.globalCompositeOperation='source-over';
+ for(var n=0;n<P.length;n++){var p=P[n];
+  if(rise){p.y-=p.v*dt;p.x+=Math.sin(t+p.ph)*18*dt;if(p.y<-20)P[n]=mk(false);
+   var fl=Math.max(0,Math.min(1,p.y/H))*.9+.1,tw=.5+.5*Math.sin(t*5+p.ph);cx.globalCompositeOperation='lighter';cx.globalAlpha=p.a*fl*(.35+.65*tw);cx.fillStyle=p.c;star(p.x,p.y,p.r*2.2)}
+  else if(fall){p.y+=p.v*dt*(T==='xmas'?.7:1);p.x+=Math.sin(t*1.2+p.ph)*28*dt;p.rot+=p.vr*dt;if(p.y>H+20)P[n]=mk(false);
+   cx.globalAlpha=p.a;cx.fillStyle=p.c;
+   if(T==='xmas'){cx.beginPath();cx.arc(p.x,p.y,p.r*.7,0,PI2);cx.fill()}
+   else{cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);if(T==='tricolor'){cx.fillRect(-p.r*1.3,-p.r*.7,p.r*2.6,p.r*1.4);}else{cx.beginPath();cx.ellipse(0,0,p.r*1.6,p.r*.8,0,0,PI2);cx.fill()}cx.restore()}}
+  else if(T==='holi'){p.y-=p.v*dt*.3;if(p.y<-20)P[n]=mk(false)}}
+ cx.globalAlpha=1;cx.globalCompositeOperation='source-over'}
+requestAnimationFrame(frame)})();</script>"""
 
 
 def _thumb(path):
@@ -149,6 +193,13 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
         admin = "".join(ch for ch in str(json.load(open(os.path.join(ROOT, "data", "admin.json"))).get("whatsapp", "")) if ch.isdigit())
     except Exception:
         admin = ""
+    theme = ""
+    try:   # festive animated overlay (rules in pipeline/festivals.py): same theme as the decorated pages
+        import festivals
+        _c = festivals.celebration(date)
+        theme = _c["theme"] if _c else ""
+    except Exception as ex:
+        print("festive animation skipped:", ex)
     out = {}
     for sub in ("", date + "/"):
         folder = os.path.join(ROOT, kind, sub)
@@ -160,7 +211,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
         og_path = os.path.join(folder, "og.jpg")
         _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
-                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin)
+                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin, fx=FX_JS.replace('__THEME__', theme) if theme else '')
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)
         out[sub or "latest"] = url

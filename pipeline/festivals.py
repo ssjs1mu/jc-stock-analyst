@@ -2,17 +2,18 @@
 
 Rules (owner's instruction):
   * Hindu festivals  - celebrate from 2 days before, through the festival day.
-  * National days    - celebrate from 1 day before, through the day.
+  * National days and other communities' holidays (Sikh, Christian, Jain, state) - celebrate on the day itself.
   * Muslim holidays  - NEVER any celebration/decoration (they are only listed as trading holidays).
-  * Other communities' holidays (Sikh, Christian, Jain, state) - listed as trading holidays, not decorated.
+  * Civic days (elections) - listed only.
   * Every booklet lists the trading holidays from the start of its week (Monday) to the end of the next week.
+  * A special-session page (Diwali Muhurat trading) is page 2 of the booklet until the session day.
 """
 import datetime as dt
 import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LEAD = {"hindu": 2, "national": 1}
+LEAD = {"hindu": 2, "national": 0, "other": 0}
 _DAYS = None
 
 
@@ -36,15 +37,32 @@ def celebration(date_iso):
     best = None
     for x in days():
         lead = LEAD.get(x["kind"])
-        if lead is None:          # muslim / other: strictly no celebration
+        if lead is None:          # muslim / civic: strictly no celebration
             continue
         n = (_d(x["date"]) - d).days
-        if 0 <= n <= lead and (best is None or n < best["days_to"]):
-            fd = _d(x["date"])
-            when = fd.strftime("%a %d %b").replace(" 0", " ")
-            line = ("Happy %s!" % x["name"]) if n == 0 else ("%s %s" % (x["name"], "tomorrow, " + when if n == 1 else "in 2 days, " + when))
+        if not (0 <= n <= lead):
+            continue
+        fd = _d(x["date"])
+        when = fd.strftime("%a %d %b").replace(" 0", " ")
+        line = ("Happy %s!" % x["name"]) if n == 0 else ("%s %s" % (x["name"], "tomorrow, " + when if n == 1 else "in 2 days, " + when))
+        if best is not None and n == best["days_to"] and n == 0 and x["date"] == best["date"]:   # two festivals on one day
+            best["name"] += " & " + x["name"]
+            best["line"] = "Happy %s!" % best["name"]
+        elif best is None or n < best["days_to"]:
             best = dict(name=x["name"], date=x["date"], theme=x.get("theme", "marigold"), days_to=n, line=line)
     return best
+
+
+def muhurat(date_iso):
+    """Special-session page data (Diwali Muhurat trading) while date <= the session day, within 6 days of it; else None."""
+    d = _d(date_iso)
+    for x in days():
+        m = x.get("muhurat")
+        if m:
+            n = (_d(m["date"]) - d).days
+            if 0 <= n <= 6:
+                return dict(m, days_to=n)
+    return None
 
 
 def holiday_strip(date_iso):
