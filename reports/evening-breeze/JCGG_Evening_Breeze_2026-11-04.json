@@ -1,0 +1,513 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "04 Nov 2026",
+  "date_iso": "2026-11-04",
+  "mood": {
+   "key": "bull",
+   "label": "Positive close",
+   "sub": "Nifty +0.63% in the session"
+  },
+  "label": "Positive close",
+  "headline": "Nifty gains 0.63%",
+  "summary": "Nifty 50 closed at 23,960.60 (+0.63%) and Sensex at 77,301.40 (+0.50%). Banks: Bank Nifty +0.67%. India VIX 15.19 (-3.39%). Brent crude -2.05%, USD/INR 94.640. 34 of 50 Nifty stocks advanced and 15 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "23,960.60",
+    "pct": "+0.63%",
+    "pts": "+149.75"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "77,301.40",
+    "pct": "+0.50%",
+    "pts": "+383.55"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "55,913.60",
+    "pct": "+0.67%",
+    "pts": "+373.55"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "22,769.20",
+    "pct": "+1.10%",
+    "pts": "+248.85"
+   }
+  ],
+  "spark": [
+   22520.44921875,
+   22363.349609375,
+   22721.94921875,
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375
+  ],
+  "flows": {
+   "date": "03 Nov",
+   "fii": 6836.81,
+   "dii": -3678.85
+  },
+  "breadth": {
+   "up": 34,
+   "dn": 15
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "23,608 - 23,784",
+    "r": "24,049 - 24,137",
+    "note": "A close above 24,049 opens up 24,137; a slide below 23,784 would expose 23,608."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "55,066 - 55,490",
+    "r": "56,142 - 56,371",
+    "note": "A close above 56,142 opens up 56,371; a slide below 55,490 would expose 55,066."
+   }
+  ],
+  "events": [
+   "Sensex weekly expiry today (Thu 05 Nov 2026)."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "51,786.72",
+    "pct": "-0.38%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,568.92",
+    "pct": "+0.36%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "25,372.01",
+    "pct": "+0.83%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,791.16",
+    "pct": "+1.44%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "26,253.84",
+    "pct": "+1.50%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "62,188.63",
+    "pct": "-1.42%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "23,919.50",
+    "pct": "+1.67%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,686.17",
+    "pct": "+2.16%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,683.80",
+    "pct": "+0.62%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "101.48",
+    "pct": "-2.05%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "94.59",
+    "pct": "-1.56%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "4,057.00",
+    "pct": "+2.96%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.640",
+    "pct": "-0.09%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.28",
+    "pct": "-0.58%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.95",
+    "pct": "+1.19%"
+   }
+  ],
+  "vix": {
+   "level": "15.19",
+   "pct": "-3.39%",
+   "gauge": 0.740625,
+   "text": "India VIX 15.19."
+  },
+  "headlines": [
+   "Indian markets defy mixed Asian cues, Sensex and Nifty extend winning streak",
+   "Sensex gains 384 points, Nifty rises 150 as FMCG and metal stocks rally",
+   "Festive cheer on D-Street: Sensex rallies for 5th day on foreign fund inflows, easing crude oil prices",
+   "Stock Futures Rally, Treasurys Strengthen After Democratic Sweep",
+   "US Midterm Election Results Impact Decoded: Can Sensex, Nifty hit new peak? Gold, silver rates rebound with Trump loss",
+   "Sensex, Nifty Extend Winning Streak for Fifth Day as FMCG, Metal and Realty Stocks Rally",
+   "Share Market Today: Nifty 50, Bank Nifty",
+   "US Elections, Tech Optimism Lift Wall Street Pre-Bell; Asia Mixed, Europe Up"
+  ],
+  "gainers": [
+   [
+    "ADANIENT",
+    "2,709.20",
+    "+4.47%"
+   ],
+   [
+    "TITAN",
+    "4,754.40",
+    "+4.22%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "908.75",
+    "+2.71%"
+   ],
+   [
+    "BPCL",
+    "304.70",
+    "+2.63%"
+   ],
+   [
+    "BAJFINANCE",
+    "994.00",
+    "+2.47%"
+   ]
+  ],
+  "losers": [
+   [
+    "TCS",
+    "2,436.00",
+    "-2.52%"
+   ],
+   [
+    "HCLTECH",
+    "1,405.00",
+    "-2.37%"
+   ],
+   [
+    "COALINDIA",
+    "399.65",
+    "-2.05%"
+   ],
+   [
+    "WIPRO",
+    "194.55",
+    "-1.74%"
+   ],
+   [
+    "INFY",
+    "1,128.20",
+    "-1.73%"
+   ]
+  ],
+  "shock": [
+   [
+    "SUNPHARMA",
+    "1,773.40",
+    "2.8x avg vol",
+    "+0.20%"
+   ],
+   [
+    "GRASIM",
+    "3,138.00",
+    "2.2x avg vol",
+    "+1.55%"
+   ],
+   [
+    "ITC",
+    "280.00",
+    "1.9x avg vol",
+    "+2.23%"
+   ],
+   [
+    "BAJFINANCE",
+    "994.00",
+    "1.8x avg vol",
+    "+2.47%"
+   ]
+  ],
+  "opening": {
+   "label": "Positive start likely",
+   "zone": "23,999 - 24,071",
+   "headline": "Positive start likely: Wall Street firm, Asia mixed, crude easing",
+   "drivers": [
+    "GIFT Nifty 24,036.0 (+75 pts, +0.31% vs Nifty's last close).",
+    "US: S&P 500 +0.36%, Nasdaq +0.83%, Dow -0.38%.",
+    "Asia this morning: Nikkei -1.42%, Hang Seng +1.67%, Kospi +0.62%.",
+    "Currency, crude and volatility: Brent 101.48 (-2.05%); USD/INR 94.640 (-0.09%); India VIX 15.19 (-3.39%)."
+   ],
+   "next": "Thursday, 05 November 2026",
+   "mood": "bull",
+   "gift": {
+    "last": "24,036.0",
+    "pct": "+0.36%",
+    "premium": "+75 pts",
+    "vs": "+0.31%",
+    "asof": "04 Nov 18:00"
+   },
+   "anchored": true
+  },
+  "nextday": {
+   "date": "Thursday, 05 November 2026",
+   "results": [
+    "ASTRAL",
+    "BHARATFORG",
+    "BHARTIARTL",
+    "BRITANNIA",
+    "FORTIS",
+    "GLENMARK",
+    "GODFRYPHLP",
+    "LGEINDIA",
+    "LICI",
+    "M&M",
+    "MOTHERSON",
+    "MPHASIS",
+    "ONGC",
+    "PRESTIGE"
+   ],
+   "results_n": 251,
+   "actions": [
+    {
+     "sym": "BAGMANE",
+     "what": "Distribution - Rs 1.55 Per Unit Consists Of Rs 1.22 Per Unit As Divide"
+    },
+    {
+     "sym": "BIRET",
+     "what": "Distribution - Rs 5.70 Per Unit Consists Of Rs 1.72 Per Unit As Divide"
+    },
+    {
+     "sym": "BSOFT",
+     "what": "Interim Dividend - Rs 3 Per Share"
+    },
+    {
+     "sym": "ENGINERSIN",
+     "what": "Interim Dividend - Rs 1.50 Per Share"
+    },
+    {
+     "sym": "GNRL",
+     "what": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per"
+    },
+    {
+     "sym": "INDTONER",
+     "what": "Interim Dividend - Rs 1.20 Per Share"
+    },
+    {
+     "sym": "VBL",
+     "what": "Interim Dividend - Re 0.50 Per Share"
+    },
+    {
+     "sym": "MINDSPACE",
+     "what": "Distribution - Rs 6.67 Per Unit Consisting Of Dividend - Rs 4.17 Per U"
+    },
+    {
+     "sym": "NAVINFLUOR",
+     "what": "Interim Dividend - Rs 8 Per Share"
+    },
+    {
+     "sym": "SANOFI",
+     "what": "Interim Dividend - Rs 75 Per Share"
+    },
+    {
+     "sym": "SHAREINDIA",
+     "what": "Interim Dividend - Re 0.40 Per Share"
+    },
+    {
+     "sym": "SUNTV",
+     "what": "Interim Dividend - Rs 3.75 Per Share"
+    },
+    {
+     "sym": "KRISHNADEF",
+     "what": "Interim Dividend - Re 0.75 Per Share"
+    }
+   ],
+   "due": [
+    {
+     "t": "17:30",
+     "ccy": "GBP",
+     "title": "BOE Monetary Policy Report",
+     "hi": true,
+     "fc": ""
+    },
+    {
+     "t": "17:30",
+     "ccy": "GBP",
+     "title": "Monetary Policy Summary",
+     "hi": true,
+     "fc": ""
+    },
+    {
+     "t": "17:30",
+     "ccy": "GBP",
+     "title": "MPC Official Bank Rate Votes",
+     "hi": true,
+     "fc": "7-0-2"
+    },
+    {
+     "t": "17:30",
+     "ccy": "GBP",
+     "title": "Official Bank Rate",
+     "hi": true,
+     "fc": "4.00%"
+    },
+    {
+     "t": "18:00",
+     "ccy": "GBP",
+     "title": "BOE Gov Bailey Speaks",
+     "hi": true,
+     "fc": ""
+    },
+    {
+     "t": "19:00",
+     "ccy": "USD",
+     "title": "Unemployment Claims",
+     "hi": false,
+     "fc": "197K"
+    },
+    {
+     "t": "23:30",
+     "ccy": "EUR",
+     "title": "ECB President Lagarde Speaks",
+     "hi": false,
+     "fc": ""
+    }
+   ]
+  },
+  "story": [
+   "Nifty 50 opened at 23,734, a gap-down of 0.32% from the previous close of 23,811.",
+   "The index dipped to a low of 23,701 (-0.46%) around 9:15 AM and touched a high of 23,961 (+0.63%) around 3:30 PM.",
+   "It settled at 23,961 (+0.63%), near the top of the day's range, so buyers held control into the close.",
+   "The final hour added +61 points.",
+   "34 of the 50 Nifty stocks advanced and 15 declined; Bank Nifty moved in line (+0.67%).",
+   "Latest institutional data (03 Nov): FII/FPI net +6837 Cr, DII net -3679 Cr."
+  ],
+  "risks": [
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,568.92 (+0.36%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$101.48 (-2.05%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 94.640 (-0.09%), US 10-year yield 4.95% (+1.19%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 24,036.0 (+0.31% vs Nifty's close): the best live read on the next opening.",
+   "Nifty 50 results due on Thursday: BHARTIARTL, BRITANNIA, M&M, ONGC, TITAN."
+  ],
+  "vol_movers": [
+   [
+    "TITAN",
+    "4,754.40",
+    "6.0%",
+    "+4.22%"
+   ],
+   [
+    "BAJAJFINSV",
+    "1,756.50",
+    "5.1%",
+    "+2.24%"
+   ],
+   [
+    "ADANIENT",
+    "2,709.20",
+    "4.9%",
+    "+4.47%"
+   ],
+   [
+    "ITC",
+    "280.00",
+    "4.1%",
+    "+2.23%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "908.75",
+    "3.9%",
+    "+2.71%"
+   ],
+   [
+    "NESTLEIND",
+    "1,248.00",
+    "3.6%",
+    "-0.03%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "GRASIM",
+    "3,138.00",
+    "2.2x vol",
+    "+1.55%"
+   ],
+   [
+    "ITC",
+    "280.00",
+    "1.9x vol",
+    "+2.23%"
+   ],
+   [
+    "BAJFINANCE",
+    "994.00",
+    "1.8x vol",
+    "+2.47%"
+   ],
+   [
+    "HDFCBANK",
+    "736.70",
+    "1.8x vol",
+    "+1.54%"
+   ]
+  ],
+  "pv_dn": [],
+  "asof": "06:09 PM IST"
+ },
+ "title": "Evening Breeze (04 Nov 2026)",
+ "headline": "Nifty gains 0.63%",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +0.63% in the session"
+ },
+ "mood_score": 0.8804809716552696,
+ "mood_pic": "bull_over_bear",
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
