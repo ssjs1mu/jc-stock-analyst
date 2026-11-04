@@ -1,0 +1,74 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "04 Nov 2026",
+ "report_time": "23:21 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive close",
+  "sub": "Nifty +0.63% in the session"
+ },
+ "report_title": "Evening News Wrap",
+ "sections": [
+  {
+   "heading": "Market Movers",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "ADANIENT +4.47% (Rs 2,709.20)",
+      "TITAN +4.22% (Rs 4,754.40)",
+      "SHRIRAMFIN +2.71% (Rs 908.75)",
+      "TCS -2.52% (Rs 2,436.00)",
+      "HCLTECH -2.37% (Rs 1,405.00)",
+      "COALINDIA -2.05% (Rs 399.65)"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines That Moved Markets",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Trade Setup For Nov 5: Can Nifty Cross 24,100? Sub-$100 Oil Likely To Fuel Bulls' Charge",
+      "Global Markets Rally: U.S. Stocks Surge, Bitcoin Rebounds, and Ethena\u2026",
+      "Ahead of Market: 10 things that will decide stock market action on Thursday",
+      "Dow Soars More Than 1,000 Points as Wall Street Cheers Gridlock After Democrats Win Congress in Midterm Sweep",
+      "Nifty 50 Rises as Asian Chip Stocks Fall After US Midterm Elections",
+      "US stocks rally, and the Dow soars more than 1,000 points",
+      "India rupee seen set to resume slide as foreign inflows remain weak",
+      "Nov 4: Sensex, Nifty Extend Winning Streak to Five Sessions as Crude Eases"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Calendar for Thursday, 05 Nov",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex weekly expiry today (Thu 05 Nov 2026).",
+      "Pre-market global cues arrive in the 8:00 AM Pre-Market News."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "What to Watch",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty 50 pivot support 23,784 / 23,608, resistance 24,049 / 24,137 from the last session.",
+      "Top Nifty gainers: ADANIENT +4.47%, TITAN +4.22%, SHRIRAMFIN +2.71%.",
+      "Top Nifty losers: TCS -2.52%, HCLTECH -2.37%, COALINDIA -2.05%."
+     ]
+    }
+   ]
+  }
+ ]
+}

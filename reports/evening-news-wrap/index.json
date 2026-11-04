@@ -2,6 +2,27 @@
  "schedule_id": "evening-news-wrap",
  "runs": [
   {
+   "generated_at": "2026-11-04T23:22:03+05:30",
+   "date": "2026-11-04",
+   "status": "ok",
+   "caption": "Evening News Wrap 04 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "Evening_News_Wrap_2026-11-04.pdf",
+     "path": "reports/evening-news-wrap/Evening_News_Wrap_2026-11-04.pdf",
+     "type": "pdf",
+     "bytes": 356832
+    },
+    {
+     "name": "Evening_News_Wrap_2026-11-04.json",
+     "path": "reports/evening-news-wrap/Evening_News_Wrap_2026-11-04.json",
+     "type": "json",
+     "bytes": 2157
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-03T23:07:33+05:30",
    "date": "2026-11-03",
    "status": "ok",
@@ -153,5 +174,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-03T23:07:33+05:30"
+ "updated_at": "2026-11-04T23:22:03+05:30"
 }
