@@ -1,0 +1,265 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "04 Nov 2026",
+ "report_time": "08:14 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 23,675 - 23,747"
+ },
+ "report_title": "JCGG - Morning Updates (Brief)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Weak start likely: Wall Street firm, Asia negative. Expected Nifty opening zone: 23,675 - 23,747 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 23,711.0 (-100 pts, -0.42% vs Nifty's last close).",
+      "US: S&P 500 +0.36%, Nasdaq +0.83%, Dow -0.38%.",
+      "Asia this morning: Nikkei -3.55%, Hang Seng -0.43%, Kospi -2.17%.",
+      "Currency, crude and volatility: Brent 102.74 (-0.83%); USD/INR 94.730 (+0.00%); India VIX 15.72 (+1.42%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's +1.58% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "APOLLOHOSP",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "SBIN",
+       "In the news",
+       "Top stocks to watch today: BSE, Nykaa, NSE, SBI, IEX shares in focus on Wednesday, 4 Nov |"
+      ],
+      [
+       "ADANIPORTS",
+       "Setup: BUY (A+)",
+       "Entry 1,865.5, stop 1,845.3, target 1,913.3"
+      ],
+      [
+       "GRASIM",
+       "Setup: BUY (A+)",
+       "Entry 3,059.0, stop 3,033.2, target 3,099.5"
+      ],
+      [
+       "BOSCHLTD",
+       "Setup: BUY (A+)",
+       "Entry 48,253.1, stop 47,811.3, target 49,320.0"
+      ],
+      [
+       "DIVISLAB",
+       "Setup: BUY (A+)",
+       "Entry 9,997.3, stop 9,899.8, target 10,180.2"
+      ],
+      [
+       "BRITANNIA",
+       "Volume surge (last session)",
+       "2.7x average volume, +6.36%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Mon 09 Nov 2026; next Sensex weekly expiry: Thu 05 Nov 2026.",
+      "Results today (214 companies): APOLLOHOSP, 63MOONS, AARVI, ADROITINFO, ADVANCE, AEROENTER, AFCONS, AGOL, AIFL, ALLTIME, AMNPLST and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,786.72",
+        "-0.38%"
+       ],
+       [
+        "S&P 500",
+        "7,568.92",
+        "+0.36%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,372.01",
+        "+0.83%"
+       ],
+       [
+        "FTSE 100",
+        "10,638.40",
+        "-1.14%"
+       ],
+       [
+        "DAX",
+        "25,864.62",
+        "-0.45%"
+       ],
+       [
+        "Nikkei 225",
+        "60,844.25",
+        "-3.55%"
+       ],
+       [
+        "Hang Seng",
+        "23,425.38",
+        "-0.43%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,601.02",
+        "-0.20%"
+       ],
+       [
+        "Kospi",
+        "5,526.20",
+        "-2.17%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "102.74",
+        "-0.83%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "95.12",
+        "-1.01%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,951.20",
+        "+0.27%"
+       ],
+       [
+        "USD/INR",
+        "94.73",
+        "+0.00%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.38",
+        "-0.49%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.95",
+        "+1.19%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "23,592",
+       "23,920"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "23,373",
+       "24,030"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
