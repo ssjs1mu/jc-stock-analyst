@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-04T21:11:07+05:30",
+   "date": "2026-11-04",
+   "status": "ok",
+   "caption": "Circuit Watch, session of 4 Nov 2026: Sensex 77,301 (+0.50%), Nifty 23,961 (+0.63%); no confirmed lower circuits",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-04.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-04.pdf",
+     "type": "pdf",
+     "bytes": 8424
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-03T21:12:37+05:30",
    "date": "2026-11-03",
    "status": "ok",
@@ -190,5 +205,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-03T21:12:37+05:30"
+ "updated_at": "2026-11-04T21:11:07+05:30"
 }
