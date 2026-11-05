@@ -56,8 +56,12 @@ jobs:
           plan = [("premarket-news", 7*60+40, 15*60), ("morning-brief", 8*60+10, 15*60), ("morning-detailed", 8*60+10, 15*60),
                   ("morning-pulse", 8*60+10, 15*60), ("evening-breeze", 16*60+5, 23*60+59), ("evening-market-wrap", 17*60+40, 23*60+59), ("evening-news-wrap", 18*60+40, 23*60+59)]
           left = []
+          try:
+              susp = set(json.load(open("data/suspended.json")).get("ids", []))
+          except Exception:
+              susp = set()
           for i, lo, hi in plan:
-              if ist.weekday() > 4 or not (lo <= hm <= hi):
+              if i in susp or ist.weekday() > 4 or not (lo <= hm <= hi):
                   continue
               try:
                   runs = json.load(open("reports/%s/index.json" % i)).get("runs", [])

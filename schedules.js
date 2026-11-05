@@ -39,6 +39,7 @@
   function todayStatus(s) {
     const now = istNow(); const today = istDate(now); const dow = now.getUTCDay();
     const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes(); const slot = minsOf(s.time);
+    if (s.suspended) return { cls: 'mute', text: 'Suspended since 5 Nov 2026' };
     if (s.kind === 'artifact') return { cls: 'info', text: 'Dashboard refresh · no PDF' };
     if (!runsOnDay(s, dow)) return { cls: 'mute', text: 'No run today (weekend)' };
     const runs = (S.idx[s.id] && S.idx[s.id].runs) || [];
@@ -80,7 +81,7 @@
       <div class="sckp">
         <div class="kpi"><span class="cap">Schedule</span><b>${fmt12(s.time)} IST</b><small>${daysLabel(s)}</small></div>
         <div class="kpi"><span class="cap">Next run</span><b data-cd="${esc(s.id)}">${nx ? fmtLeft(nx - istNow()) : '—'}</b><small>${nx ? fmtDay(nx) + ' · ' + fmt12(s.time) : ''}</small></div>
-        <div class="kpi"><span class="cap">Today</span><span class="scst ${st.cls}">${esc(st.text)}</span><small>${s.telegram ? 'Also posted to Telegram' : s.kind === 'artifact' ? 'Updates the dashboard' : 'Terminal + chat only'}</small></div>
+        <div class="kpi"><span class="cap">Today</span><span class="scst ${st.cls}">${esc(st.text)}</span><small>${s.suspended ? 'Not built · not posted to Telegram' : s.telegram ? 'Also posted to Telegram' : s.kind === 'artifact' ? 'Updates the dashboard' : 'Terminal + chat only'}</small></div>
       </div></div>`;
     if (s.kind === 'artifact') {
       return head + `<div class="card"><div class="note">This scheduled task refreshes the <b>Joshi's Desk</b> dashboard rather than producing a PDF.

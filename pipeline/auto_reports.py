@@ -966,6 +966,12 @@ def main():
     ap.add_argument("--out", default="/tmp/auto_reports")
     ap.add_argument("--dry", action="store_true", help="fetch real data and render, but do not publish")
     a = ap.parse_args()
+    try:   # reports the owner has suspended (data/suspended.json): never build, publish or post them
+        if a.sid in json.load(open(os.path.join(ROOT, "data", "suspended.json"))).get("ids", []) and os.environ.get("ALLOW_SUSPENDED") != "1":
+            print("%s is suspended (data/suspended.json) - nothing built." % a.sid)
+            return
+    except FileNotFoundError:
+        pass
     mock = os.environ.get("AUTO_MOCK") == "1"
     now = dt.datetime.now(IST)
     if a.sid.startswith("evening") and now.hour < 6 and not a.force:

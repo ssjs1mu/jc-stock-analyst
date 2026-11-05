@@ -1,0 +1,10 @@
+{
+ "note": "Reports suspended by the owner on 2026-11-05 (not linked to the Morning Sunrise / Evening Breeze booklets). Nothing builds, publishes or posts to Telegram for these ids. To resume: remove the id here (and re-add it to TG_IDS / GH_DUE in apps-script/Telegram.server.gs, rebuild Code.gs, redeploy).",
+ "ids": [
+  "premarket-news",
+  "morning-brief",
+  "evening-market-wrap",
+  "evening-news-wrap"
+ ],
+ "since": "2026-11-05"
+}

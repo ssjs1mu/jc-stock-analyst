@@ -780,7 +780,8 @@ function installCallsTriggers() {
      3. Run installTelegramTrigger() once (authorise when asked). Run tgTest() to send a test line.            */
 var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
 var TG_MORNING = { 'premarket-news': 480, 'morning-brief': 510, 'morning-detailed': 510, 'morning-pulse': 525 }; // fixed post times (minutes after midnight IST) on trading days: 08:00, 08:30, 08:30, 08:45 - never earlier
-var TG_IDS = ['premarket-news', 'morning-brief', 'morning-detailed', 'morning-pulse', 'evening-market-wrap', 'evening-news-wrap', 'circuit-watch'];
+// SUSPENDED 2026-11-05 (not in the booklets): premarket-news, morning-brief, evening-market-wrap, evening-news-wrap
+var TG_IDS = ['morning-detailed', 'morning-pulse', 'circuit-watch'];
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
 function installTelegramTrigger() {
@@ -795,7 +796,7 @@ var TG_HOLIDAYS = {
 function tgTradingDay_(ymd, dow) { return dow >= 1 && dow <= 5 && !TG_HOLIDAYS[ymd]; }
 // Watchdog: GitHub's own cron is often hours late. If GH_TOKEN (fine-grained token, repo ssjs1mu/jc-stock-analyst, Actions: read & write only)
 // is set in Script properties, this asks GitHub to build any report that is due but not yet published today. No token = does nothing.
-var GH_DUE = [['premarket-news', 460, 900], ['morning-brief', 490, 900], ['morning-detailed', 490, 900], ['morning-pulse', 505, 900], ['evening-market-wrap', 1060, 1439], ['evening-news-wrap', 1120, 1439]];
+var GH_DUE = [['morning-detailed', 490, 900], ['morning-pulse', 505, 900]];
 function ghWatchdog_() {
   try {
     var p = PropertiesService.getScriptProperties(), tok = p.getProperty('GH_TOKEN'); if (!tok) return;
