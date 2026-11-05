@@ -1,0 +1,256 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "05 Nov 2026",
+ "report_time": "08:13 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 24,246 - 24,318"
+ },
+ "report_title": "JCGG - Morning Updates (Brief)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-up opening likely: Wall Street firm, Asia mixed, crude easing. Expected Nifty opening zone: 24,246 - 24,318 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 24,282.0 (+321 pts, +1.34% vs Nifty's last close).",
+      "US: S&P 500 +1.58%, Nasdaq +1.44%, Dow +3.03%.",
+      "Asia this morning: Nikkei -0.35%, Hang Seng +2.95%, Kospi -2.88%.",
+      "Currency, crude and volatility: Brent 94.12 (-9.15%); USD/INR 94.530 (-0.23%); India VIX 15.19 (-3.37%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "BHARTIARTL",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "BRITANNIA",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "M&M",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "ONGC",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "TITAN",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "SUNPHARMA",
+       "Volume surge (last session)",
+       "2.8x average volume, +0.20%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex weekly expiry today (Thu 05 Nov 2026).",
+      "Results today (252 companies): BHARTIARTL, BRITANNIA, M&M, ONGC, TITAN, AADHARHFC, ABFRL, ADFFOODS, AGARWALEYE, ALPINETEX, AMAGI, AMBICAAGAR, ANTGRAPHIC, APOLLOPIPE, ARMEE and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "53,356.12",
+        "+3.03%"
+       ],
+       [
+        "S&P 500",
+        "7,688.62",
+        "+1.58%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,736.51",
+        "+1.44%"
+       ],
+       [
+        "FTSE 100",
+        "10,829.20",
+        "+1.79%"
+       ],
+       [
+        "DAX",
+        "26,437.67",
+        "+2.22%"
+       ],
+       [
+        "Nikkei 225",
+        "61,968.58",
+        "-0.35%"
+       ],
+       [
+        "Hang Seng",
+        "24,624.81",
+        "+2.95%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,694.71",
+        "+0.23%"
+       ],
+       [
+        "Kospi",
+        "5,519.97",
+        "-2.88%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "94.12",
+        "-9.15%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "87.43",
+        "-0.78%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,134.50",
+        "+1.51%"
+       ],
+       [
+        "USD/INR",
+        "94.53",
+        "-0.23%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.29",
+        "-0.21%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.89",
+        "-1.17%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "23,784",
+       "24,049"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "23,608",
+       "24,137"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
