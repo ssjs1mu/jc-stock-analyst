@@ -141,6 +141,12 @@
         if (j && Array.isArray(j.rows)) { S.mode = 'backend batch'; return j.rows; }
       } catch (e) { /* old backend or timeout: fall through */ }
     }
+    /* backend out of quota / down: use the GitHub-built snapshot of the same Yahoo quotes (real data, a few minutes old, never invented) */
+    try {
+      const sn = JSON.parse(await fetchWithTimeoutRaw('data/dash_snapshot.json?x=' + Math.floor(Date.now() / 120000), 10000));
+      const want = new Set(syms), rows = (sn.rows || []).filter((r) => want.has(r.s));
+      if (rows.length) { S.mode = 'GitHub snapshot'; S.snapAt = sn.ts; return rows; }
+    } catch (e) { /* no snapshot yet: fall through to direct / proxy */ }
     const out = []; let i = 0; const run = async () => {
       while (i < syms.length) {
         const s = syms[i++];
@@ -515,7 +521,7 @@
     const keep = window.scrollY, sc = [...el.querySelectorAll('.jd-scroll,.jd-nlist')].map((n) => n.scrollTop), act = document.activeElement;
     if (act && act.classList && act.classList.contains('jd-man') && act.value) return; if (act && act.tagName === 'SELECT' && el.contains(act)) return; // don't wipe a value being typed
     el.innerHTML = heroHTML(w, ms)
-      + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) : 'Loading live quotes…'}</span><button class="jd-btn${S.busy ? ' busy' : ''}" id="jdRf" type="button" onclick="window.jdRefresh()">${S.busy ? '⟳ Refreshing…' : '⟳ Refresh now'}</button></div>`
+      + `<div class="jd-status"><span class="jd-ring ${S.busy ? 'spin' : ''}"></span><span id="jdSt">${S.err ? '<b class="jd-er">' + esc(S.err) + '</b>' : S.last ? 'Updated ' + new Date(S.last).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST · via ' + esc(S.mode) + (S.mode === 'GitHub snapshot' && S.snapAt ? ' (delayed, quotes as of ' + new Date(S.snapAt).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST)' : '') : 'Loading live quotes…'}</span><button class="jd-btn${S.busy ? ' busy' : ''}" id="jdRf" type="button" onclick="window.jdRefresh()">${S.busy ? '⟳ Refreshing…' : '⟳ Refresh now'}</button></div>`
       + tiles3d(ms) + `<div class="jd-card jd-pos"><h3><span class="jd-ic">🧭</span>Open radar positions <small>trail &amp; carry / exit · newest first · 6 rows visible, scroll for more</small><button type="button" class="jd-btn" id="jdPosRf" onclick="window.jdPosRefresh()" title="Reload the table if it looks stuck">⟳ Refresh table</button></h3>${window.jcMgr && window.jcMgr.posHTML ? window.jcMgr.posHTML() : ''}</div>` + callTiles()
       + `<div class="jd-board"><div class="jd-col jd-c1">${colIndia(ms)}</div><div class="jd-col jd-c2">${heatHTML(ms)}</div><div class="jd-col jd-c3">${window.jcFD ? window.jcFD.html(ms) : ''}${catButtons(ms)}</div><div class="jd-newsrow">${colNews(ms)}</div></div>`
       + timetableHTML(ms) + hoursHTML(ms) + legendHTML()

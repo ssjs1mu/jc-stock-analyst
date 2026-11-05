@@ -1,0 +1,30 @@
+name: Dashboard quote snapshot (free fallback when the Apps Script quota is used up)
+on:
+  schedule:
+    - cron: '*/10 3-11 * * 1-5'   # 08:30-17:30 IST, every 10 min
+    - cron: '7,37 0-2,12-23 * * 1-5'   # rest of the weekday (world markets), every 30 min
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: dash-snapshot
+  cancel-in-progress: true
+jobs:
+  snap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python pipeline/dash_snapshot.py
+      - name: Commit if changed
+        run: |
+          git diff --quiet -- data/dash_snapshot.json && git ls-files --error-unmatch data/dash_snapshot.json >/dev/null 2>&1 && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dash_snapshot.json
+          git commit -m "data: dashboard snapshot $(date -u +%FT%TZ)"
+          for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done
+          exit 1
