@@ -77,15 +77,17 @@
   "levels": [
    {
     "name": "Nifty 50",
-    "s": "23,608 - 23,784",
-    "r": "24,049 - 24,137",
-    "note": "A sustained move above 24,049 opens up 24,137; a slide below 23,784 would expose 23,608."
+    "s": "24,049 - 24,137",
+    "r": "24,400 - 24,500",
+    "note": "Gap up expected: yesterday's resistance levels now act as support. Support R2 24,137 / R1 24,049; a hold above 24,400 targets 24,500. (R3 inside the open zone.)",
+    "flag": "Re-anchored to GIFT open zone"
    },
    {
     "name": "Bank Nifty",
-    "s": "55,066 - 55,490",
-    "r": "56,142 - 56,371",
-    "note": "A sustained move above 56,142 opens up 56,371; a slide below 55,490 would expose 55,066."
+    "s": "56,142 - 56,370",
+    "r": "56,794 - 57,000",
+    "note": "Gap up expected: yesterday's resistance levels now act as support. Support R2 56,370 / R1 56,142; a hold above 56,794 targets 57,000. Estimated from the Nifty gap.",
+    "flag": "Re-anchored to GIFT open zone"
    }
   ],
   "bench": [

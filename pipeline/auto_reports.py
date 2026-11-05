@@ -34,6 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import brand
 import outlook_rules as OR
 import gift as GIFT
+import levels as LV
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -718,13 +719,23 @@ def build(sid, qs, heads, now):
     cmd = [row(n, qs.get(s)) for n, s in CMDTY.items()]
     lv = ([["Nifty 50", f2(pv["s1"], 0), f2(pv["r1"], 0)]] if pv else []) + \
          ([["Nifty 50 (2nd)", f2(pv["s2"], 0), f2(pv["r2"], 0)]] if pv else [])
+    anch_note = ""
+    if morning and ov and ov.get("zone") and qs.get("^NSEI"):   # re-anchor on the GIFT open zone when it lies outside the pivot band
+        try:
+            _a = LV.anchored(qs["^NSEI"], LV.parse_zone(ov["zone"]))
+            if _a and _a["re_anchored"]:
+                (b1, b2), (a1, a2) = _a["below"], _a["above"]
+                lv = [["Nifty 50 (1st)", f2(b1[0], 0), f2(a1[0], 0)], ["Nifty 50 (2nd)", f2(b2[0], 0), f2(a2[0], 0)]]
+                anch_note = " Because GIFT Nifty points to an open (%s) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone." % ov["zone"]
+        except Exception as ex:
+            print("anchored levels:", ex)
     nxt = next_trading_day(now.date())
     exp = expiry_text(nxt if sid.startswith("evening") else now.date())
     bias = cm["bias"]
     cm["news"] = list(dict.fromkeys(cut(x, 140) for x in cm["news"] if x))
     headl = cm["news"] or ["No fresh headlines could be fetched."]
     lvl_note = {"type": "note", "text": "Levels are classic pivot points computed from the last session's high, low "
-                "and close, not a recommendation."}
+                "and close, not a recommendation." + anch_note}
     if sid == "evening-market-wrap":
         return dict(base, report_title="Evening Market Wrap", sections=[
             sec("Today's Close in Brief", [P(bias)], "framed"),
@@ -788,14 +799,34 @@ def build(sid, qs, heads, now):
             lo, hi = sorted([a, b_])
             return "%s - %s" % (f2(lo, 0), f2(hi, 0))
         levels = []
-        for nm, q in (("Nifty 50", n), ("Bank Nifty", bn)):
+        zN = LV.parse_zone(ov["zone"]) if ov and ov.get("zone") else None
+        for nm, q, stp in (("Nifty 50", n, 100), ("Bank Nifty", bn, 500)):
+            zq, est = zN, False
+            if zN and nm == "Bank Nifty" and n and q:   # no GIFT feed for Bank Nifty: carry the Nifty gap across
+                rr = (zN[0] + zN[1]) / 2 / float(n["last"])
+                zq, est = (float(q["last"]) * rr * (zN[0] / ((zN[0] + zN[1]) / 2)), float(q["last"]) * rr * (zN[1] / ((zN[0] + zN[1]) / 2))), True
+            row_ = LV.level_row(nm, q, zq, stp, est) if (q and zq) else None
+            if row_:
+                levels.append(row_)
+                continue
             p = lv(q)
             if p:
-                levels.append({"name": nm.replace(" ", "\n", 1) if False else nm, "s": zone(p["s2"], p["s1"]), "r": zone(p["r1"], p["r2"]),
+                levels.append({"name": nm, "s": zone(p["s2"], p["s1"]), "r": zone(p["r1"], p["r2"]),
                                "note": "A sustained move above %s opens up %s; a slide below %s would expose %s."
-                                       % (f2(p["r1"], 0), f2(p["r2"], 0), f2(p["s1"], 0), f2(p["s2"], 0))})
+                                       % (f2(p["r1"], 0), f2(p["r2"], 0), f2(p["s1"], 0), f2(p["s2"], 0)), "flag": ""})
             else:
-                levels.append({"name": nm, "s": "n/a", "r": "n/a", "note": "Levels not available."})
+                levels.append({"name": nm, "s": "n/a", "r": "n/a", "note": "Levels not available.", "flag": ""})
+        try:   # daily watch of the GIFT opening zone against the pivot band (data/gift_watch.json)
+            wp = os.path.join(ROOT, "data", "gift_watch.json")
+            wj = json.load(open(wp)) if os.path.exists(wp) else {"days": {}}
+            pvw = pivots(n)
+            wj["days"][now.strftime("%Y-%m-%d")] = {"gift": gift["last"] if gift else None, "zone": ov.get("zone") if ov else None,
+                "nifty_prev_close": n["last"] if n else None, "pivot_band": [round(pvw["s1"]), round(pvw["r1"])] if pvw else None,
+                "re_anchored": bool(levels and levels[0].get("flag"))}
+            wj["days"] = dict(sorted(wj["days"].items())[-120:])
+            json.dump(wj, open(wp, "w"), indent=1)
+        except Exception as ex:
+            print("gift watch:", ex)
         vv = vix["last"] if vix else None
         gfrac = 0.5 if vv is None else min(1, max(0, 1 - (vv - 10) / 20))  # low VIX = calm = right side
         spark_vals = []

@@ -149,7 +149,7 @@ def fest_extras(cover):
         else:
             chip = '<div class="fest" style="margin-left:auto;white-space:nowrap">%s</div>' % label
         css_x = (".fest{font-size:25px;font-weight:800;color:#2b1600;background:linear-gradient(135deg,#ffe08a,#ffb347);border:2px solid #fff3c4;border-radius:26px;padding:6px 20px;box-shadow:0 4px 18px #0008}"
-                 ".hd .fest+.n{margin-left:14px}.hd .n{white-space:nowrap}.ft{padding:0 92px;font-size:17px}")
+                 ".hd .fest+.n{margin-left:14px}.hd .n{white-space:nowrap}.hd .sub{white-space:nowrap}.hd .brand{white-space:nowrap}.hd .fest{font-size:21px;padding:5px 14px;border-width:1.5px}.ft{padding:0 92px;font-size:17px}")
     hol = ""
     if cover and strip:
         a, b2 = strip
@@ -165,6 +165,8 @@ CUR = [None]
 def shell(p, inner, n, total, title, cover=False):
     n = CUR[0] or n
     svg, chip, hol, cx = fest_extras(cover)
+    if chip and not cover:
+        title = title.split(" &middot; ")[0]       # the festival chip needs the room
     head = ("" if cover else
             '<div class="hd"><img src="%s"><div><div class="brand">%s</div><div class="sub">%s</div></div>%s<div class="n">%d / %d</div></div>'
             % (brand.logo_original(), e(brand.BRAND), title, chip, n, total))
@@ -319,7 +321,8 @@ def p2(b, p, total):
     lv = "".join('<div class="card"><div style="display:flex;align-items:center;gap:18px"><div style="font-size:29px;font-weight:900;width:190px">%s</div>'
                  '<div style="flex:1"><div class="small">Support zone</div><div class="up" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div>'
                  '<div style="flex:1"><div class="small">Resistance zone</div><div class="dn" style="font-size:31px;font-weight:900;white-space:nowrap">%s</div></div></div>'
-                 '<div class="small" style="margin-top:6px;font-size:21px">%s</div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]), e(l["note"])) for l in b["levels"][:2])
+                 '<div class="small" style="margin-top:6px;font-size:21px">%s%s</div></div>' % (e(l["name"]), e(l["s"]), e(l["r"]),
+                 ('<span style="background:#ffb454;color:#2b1600;font-weight:800;border-radius:12px;padding:2px 10px;margin-right:8px;font-size:19px">%s</span>' % e(l["flag"])) if l.get("flag") else "", e(l["note"])) for l in b["levels"][:2])
     yd = ""
     g = b.get("gift")
     gcard = ""
