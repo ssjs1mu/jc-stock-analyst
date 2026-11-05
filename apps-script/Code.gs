@@ -199,15 +199,26 @@ function liveQRaw_(syms) {
 }
 function dailyBatch_(symbols, range) {
   var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo|1y|2y)$/.test(range) ? range : '3mo', out = {};
-  var reqs = syms.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
-  var rs = UrlFetchApp.fetchAll(reqs);
-  rs.forEach(function (r, i) {
-    try {
-      var j = JSON.parse(r.getContentText()), res = j.chart.result[0], q = res.indicators.quote[0], t = res.timestamp, o = { t: [], o: [], h: [], l: [], c: [], v: [] };
-      for (var k = 0; k < t.length; k++) { if (q.close[k] == null || q.high[k] == null || q.low[k] == null || q.open[k] == null) continue; o.t.push(t[k]); o.o.push(q.open[k]); o.h.push(q.high[k]); o.l.push(q.low[k]); o.c.push(q.close[k]); o.v.push(q.volume[k] || 0); }
-      if (o.t.length) out[syms[i]] = o;
-    } catch (e) {}
-  });
+  /* per-symbol cache shared by every tab, device and trigger: a symbol's daily bars are fetched from Yahoo at most once per 30 min (1mo/3mo/5d only - the 6mo+ series are too big for the cache).
+     Before this every page load re-fetched the whole universe (hundreds of URL-fetches) and exhausted the free daily quota. */
+  var cc = CacheService.getScriptCache(), small = /^(5d|1mo|3mo)$/.test(rg), miss = syms;
+  if (small) {
+    var got = {}; try { got = cc.getAll(syms.map(function (s) { return 'db:' + rg + ':' + s; })); } catch (e) { got = {}; }
+    miss = [];
+    syms.forEach(function (s) { var h = got['db:' + rg + ':' + s]; if (h) { try { out[s] = JSON.parse(h); return; } catch (e) {} } miss.push(s); });
+  }
+  if (miss.length) {
+    var reqs = miss.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
+    var rs = UrlFetchApp.fetchAll(reqs), put = {};
+    rs.forEach(function (r, i) {
+      try {
+        var j = JSON.parse(r.getContentText()), res = j.chart.result[0], q = res.indicators.quote[0], t = res.timestamp, o = { t: [], o: [], h: [], l: [], c: [], v: [] };
+        for (var k = 0; k < t.length; k++) { if (q.close[k] == null || q.high[k] == null || q.low[k] == null || q.open[k] == null) continue; o.t.push(t[k]); o.o.push(q.open[k]); o.h.push(q.high[k]); o.l.push(q.low[k]); o.c.push(q.close[k]); o.v.push(q.volume[k] || 0); }
+        if (o.t.length) { out[miss[i]] = o; if (small) put['db:' + rg + ':' + miss[i]] = JSON.stringify(o); }
+      } catch (e) {}
+    });
+    if (small) { try { cc.putAll(put, 1800); } catch (e) {} }
+  }
   return JSON.stringify({ n: Object.keys(out).length, bars: out });
 }
 /* current live video id of a YouTube channel (the live_stream?channel= embed is refused for several Indian news channels, the watch-id embed is not) */
@@ -823,9 +834,11 @@ function tgPostReports() {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), n = 0;
   var ist0 = new Date(Date.now() + 19800000), dow0 = ist0.getUTCDay(), min0 = ist0.getUTCHours() * 60 + ist0.getUTCMinutes(), tradingDay = tgTradingDay_(today, dow0);
   var dayP = {}; try { dayP = JSON.parse(s.p.getProperty('TG_DAY') || '{}'); } catch (e) { } if (dayP.d !== today) { dayP = { d: today, ids: {} }; Object.keys(sent).forEach(function (k) { if (String(sent[k]).slice(0, 10) === today) dayP.ids[k] = 1; }); } // each report is posted ONCE per day, later rebuilds are never re-posted
+  /* reports only exist on trading days, between 07:30 and 23:59 IST: outside that the 5-minute poll skips the GitHub index fetches (saves ~1,500 URL-fetches a day) */
+  var lookReports = tradingDay && min0 >= 450;
   TG_IDS.forEach(function (id) {
     try {
-      if (dayP.ids[id]) return; if (TG_MORNING[id] && tradingDay && min0 < TG_MORNING[id]) return; // fixed post time
+      if (!lookReports) return; if (dayP.ids[id]) return; if (TG_MORNING[id] && tradingDay && min0 < TG_MORNING[id]) return; // fixed post time
       var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + id + '/index.json?t=' + Date.now(), { muteHttpExceptions: true });
       if (r.getResponseCode() !== 200) return;
       var runs = (JSON.parse(r.getContentText()).runs || []).filter(function (x) { return x.date === today && x.status === 'ok' && x.files && x.files.length; });

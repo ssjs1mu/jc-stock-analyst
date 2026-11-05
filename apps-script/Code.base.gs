@@ -199,15 +199,26 @@ function liveQRaw_(syms) {
 }
 function dailyBatch_(symbols, range) {
   var syms = String(symbols || '').split(',').filter(String).slice(0, 40), rg = /^(5d|1mo|3mo|6mo|1y|2y)$/.test(range) ? range : '3mo', out = {};
-  var reqs = syms.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
-  var rs = UrlFetchApp.fetchAll(reqs);
-  rs.forEach(function (r, i) {
-    try {
-      var j = JSON.parse(r.getContentText()), res = j.chart.result[0], q = res.indicators.quote[0], t = res.timestamp, o = { t: [], o: [], h: [], l: [], c: [], v: [] };
-      for (var k = 0; k < t.length; k++) { if (q.close[k] == null || q.high[k] == null || q.low[k] == null || q.open[k] == null) continue; o.t.push(t[k]); o.o.push(q.open[k]); o.h.push(q.high[k]); o.l.push(q.low[k]); o.c.push(q.close[k]); o.v.push(q.volume[k] || 0); }
-      if (o.t.length) out[syms[i]] = o;
-    } catch (e) {}
-  });
+  /* per-symbol cache shared by every tab, device and trigger: a symbol's daily bars are fetched from Yahoo at most once per 30 min (1mo/3mo/5d only - the 6mo+ series are too big for the cache).
+     Before this every page load re-fetched the whole universe (hundreds of URL-fetches) and exhausted the free daily quota. */
+  var cc = CacheService.getScriptCache(), small = /^(5d|1mo|3mo)$/.test(rg), miss = syms;
+  if (small) {
+    var got = {}; try { got = cc.getAll(syms.map(function (s) { return 'db:' + rg + ':' + s; })); } catch (e) { got = {}; }
+    miss = [];
+    syms.forEach(function (s) { var h = got['db:' + rg + ':' + s]; if (h) { try { out[s] = JSON.parse(h); return; } catch (e) {} } miss.push(s); });
+  }
+  if (miss.length) {
+    var reqs = miss.map(function (s) { return { url: 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(s) + '?range=' + rg + '&interval=1d&includePrePost=false', muteHttpExceptions: true, headers: { 'User-Agent': UA, 'Accept': '*/*' } }; });
+    var rs = UrlFetchApp.fetchAll(reqs), put = {};
+    rs.forEach(function (r, i) {
+      try {
+        var j = JSON.parse(r.getContentText()), res = j.chart.result[0], q = res.indicators.quote[0], t = res.timestamp, o = { t: [], o: [], h: [], l: [], c: [], v: [] };
+        for (var k = 0; k < t.length; k++) { if (q.close[k] == null || q.high[k] == null || q.low[k] == null || q.open[k] == null) continue; o.t.push(t[k]); o.o.push(q.open[k]); o.h.push(q.high[k]); o.l.push(q.low[k]); o.c.push(q.close[k]); o.v.push(q.volume[k] || 0); }
+        if (o.t.length) { out[miss[i]] = o; if (small) put['db:' + rg + ':' + miss[i]] = JSON.stringify(o); }
+      } catch (e) {}
+    });
+    if (small) { try { cc.putAll(put, 1800); } catch (e) {} }
+  }
   return JSON.stringify({ n: Object.keys(out).length, bars: out });
 }
 /* current live video id of a YouTube channel (the live_stream?channel= embed is refused for several Indian news channels, the watch-id embed is not) */

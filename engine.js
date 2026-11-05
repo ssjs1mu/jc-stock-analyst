@@ -45,9 +45,25 @@ const BE_QK = 'jc_be_quota_v1';
 function beQuotaUntil() { try { return +localStorage.getItem(BE_QK) || 0; } catch (e) { return 0; } }
 function beQuotaOut() { return Date.now() < beQuotaUntil(); }
 function beQuotaMark() { try { localStorage.setItem(BE_QK, String(Date.now() + 30 * 60000)); } catch (e) { } } // re-test every 30 min
+/* Backend calls that spend the daily URL-fetch quota. While the quota is used up they are refused instantly (no 11 s wait, no extra load); chart-heavy screens re-test every 30 min.
+   Identical backend GETs made together (dashboard, radar, signals, manager all ask for the same symbols) share ONE request, and repeats inside a short window reuse the answer. */
+const BE_FETCHY = /[?&]action=(fetch|dash|liveq|dailyb|in10y|pcr|ytlive|earn|nse\w*|n500|qstat|qfund)\b/;
+const BE_TTL = { dash: 20e3, liveq: 20e3, dailyb: 15 * 60e3, in10y: 15 * 60e3, pcr: 120e3, ytlive: 240e3 };
+const BE_MEM = new Map(), BE_INF = new Map();
+const beAct = (u) => { const m = /[?&]action=([a-z0-9_]+)/i.exec(u); return m ? m[1].toLowerCase() : ''; };
 async function fetchWithTimeout(url, ms = 9000) {
+  const gated = isBackendUrl(url), act = gated ? beAct(url) : '', ttl = BE_TTL[act] || 0;
+  if (gated && beQuotaOut() && BE_FETCHY.test(url)) throw new Error('backend daily quota used up');
+  if (ttl) {
+    const c = BE_MEM.get(url); if (c && c.exp > Date.now()) return c.tx;
+    const f = BE_INF.get(url); if (f) return f;
+    const p = fetchWithTimeoutRaw(url, ms).then((tx) => { if (tx.length > 2 && tx.length < 300000 && !/^\s*\{\s*"error"/.test(tx)) { BE_MEM.set(url, { tx, exp: Date.now() + ttl }); if (BE_MEM.size > 40) BE_MEM.delete(BE_MEM.keys().next().value); } BE_INF.delete(url); return tx; }, (e) => { BE_INF.delete(url); throw e; });
+    BE_INF.set(url, p); return p;
+  }
+  return fetchWithTimeoutRaw(url, ms);
+}
+async function fetchWithTimeoutRaw(url, ms) {
   const gated = isBackendUrl(url);
-  if (gated && beQuotaOut() && /[?&]action=(fetch|dash)\b/.test(url)) throw new Error('backend daily quota used up');
   if (gated) await beAcquire(); // the timeout starts only once this request actually goes out
   const ctl = new AbortController(); const id = setTimeout(() => ctl.abort(), ms);
   try { const r = await fetch(url, { cache: 'no-store', signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); const tx = await r.text(); if (gated && tx.length < 400 && /Service invoked too many times/i.test(tx)) { beQuotaMark(); throw new Error('backend daily quota used up'); } return tx; }

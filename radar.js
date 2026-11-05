@@ -64,7 +64,8 @@
       rs.forEach((j) => { if (j && j.ok) { ok = true; Object.keys(j.q).forEach((k) => { out[k.replace(/\.NS$/, '')] = j.q[k]; }); } });
       if (ok && Object.keys(out).length > syms.length * 0.5) { R.src = 'live quotes'; return out; }
     } catch (e) { }
-    if (R.tries++ % 3) return null; // the heavier fallback only every third minute
+    if (typeof beQuotaOut === 'function' && beQuotaOut()) return null; // backend quota used up: do not spend more
+    if (R.tries++ % 6) return null; // the heavier fallback only every sixth sweep
     const bt = []; for (let i = 0; i < yf.length; i += 30) bt.push(yf.slice(i, i + 30)); let i = 0; const today = istToday();
     await Promise.all([0, 1, 2].map(async () => { while (i < bt.length) { const b = bt[i++]; try { const j = await be('action=dailyb&range=1mo&symbols=' + encodeURIComponent(b.join(',')), 60000); Object.keys(j.bars || {}).forEach((k) => { const x = j.bars[k], n = x.t.length; if (n < 8 || new Date((x.t[n - 1] + 19800) * 1000).toISOString().slice(0, 10) !== today) return; let v = 0; for (let q = n - 6; q < n - 1; q++) v += x.v[q]; out[k.replace(/\.NS$/, '')] = [x.c[n - 1], x.c[n - 2], x.o[n - 1], x.h[n - 1], x.l[n - 1], x.v[n - 1], v / 5, x.t[n - 1]]; }); } catch (e) { } } }));
     R.src = 'daily-bar fallback (slower)'; return Object.keys(out).length ? out : null;
