@@ -2,6 +2,75 @@
  "schedule_id": "evening-breeze",
  "runs": [
   {
+   "generated_at": "2026-11-05T18:10:04+05:30",
+   "date": "2026-11-05",
+   "status": "ok",
+   "caption": "Evening Breeze 05 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_1.png",
+     "type": "png",
+     "bytes": 1099745
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_2.png",
+     "type": "png",
+     "bytes": 805585
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_3.png",
+     "type": "png",
+     "bytes": 809002
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_4.png",
+     "type": "png",
+     "bytes": 907003
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_5.png",
+     "type": "png",
+     "bytes": 980349
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_6.png",
+     "type": "png",
+     "bytes": 931202
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_7.png",
+     "type": "png",
+     "bytes": 953571
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_8.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_8.png",
+     "type": "png",
+     "bytes": 800736
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-05_9.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-05_9.png",
+     "type": "png",
+     "bytes": 1569904
+    },
+    {
+     "name": "JCGG_Evening_Breeze_2026-11-05.json",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_2026-11-05.json",
+     "type": "json",
+     "bytes": 12135
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-04T18:09:53+05:30",
    "date": "2026-11-04",
    "status": "ok",
@@ -866,5 +935,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-04T18:09:53+05:30"
+ "updated_at": "2026-11-05T18:10:04+05:30"
 }
