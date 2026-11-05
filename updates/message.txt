@@ -2,7 +2,7 @@ Joshi's Corner - daily reports (Mon-Fri, NSE trading days)
 
 🌅 Morning Sunrise - ready by 8:45 AM IST on every trading day
 https://ssjs1mu.github.io/jc-stock-analyst/morning/
-Latest: Wed 4 Nov, 8:15 AM IST
+Latest: Thu 5 Nov, 8:14 AM IST
 
 🌇 Evening Breeze - ready by 4:30 PM IST on every trading day
 https://ssjs1mu.github.io/jc-stock-analyst/evening/

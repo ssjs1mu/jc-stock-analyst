@@ -2,6 +2,75 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-05T08:14:28+05:30",
+   "date": "2026-11-05",
+   "status": "ok",
+   "caption": "Morning Pulse 05 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-05.pdf",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-05.pdf",
+     "type": "pdf",
+     "bytes": 653552
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-05.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-05.png",
+     "type": "png",
+     "bytes": 1165949
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_1.png",
+     "type": "png",
+     "bytes": 1109035
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_2.png",
+     "type": "png",
+     "bytes": 806104
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_3.png",
+     "type": "png",
+     "bytes": 781669
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_4.png",
+     "type": "png",
+     "bytes": 1043966
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_5.png",
+     "type": "png",
+     "bytes": 941432
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_6.png",
+     "type": "png",
+     "bytes": 772722
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-05_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-05_7.png",
+     "type": "png",
+     "bytes": 1572974
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-05.json",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-05.json",
+     "type": "json",
+     "bytes": 11147
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-04T08:15:27+05:30",
    "date": "2026-11-04",
    "status": "ok",
@@ -1282,5 +1351,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-04T08:15:27+05:30"
+ "updated_at": "2026-11-05T08:14:28+05:30"
 }

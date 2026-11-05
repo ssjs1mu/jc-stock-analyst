@@ -1,0 +1,547 @@
+{
+ "book": {
+  "flows": {
+   "date": "03 Nov",
+   "fii": 6836.81,
+   "dii": -3678.85
+  },
+  "pcr": {
+   "pcr": 1.0752266789611185,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "05 Nov 2026",
+  "date_iso": "2026-11-05",
+  "mood": {
+   "key": "bull",
+   "label": "Gap-up opening likely",
+   "sub": "Indicative Nifty opening zone 24,246 - 24,318"
+  },
+  "label": "Gap-up opening likely",
+  "zone": "24,246 - 24,318",
+  "headline": "Gap-up opening likely - Nifty zone 24,246 - 24,318",
+  "open_text": "Wall Street firm, Asia mixed, crude easing. Opening call anchored on GIFT Nifty.",
+  "yday": null,
+  "spark": [
+   22520.44921875,
+   22363.349609375,
+   22721.94921875,
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375
+  ],
+  "proj": 24281.7,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "23,960.60",
+    "pct": "+0.63%",
+    "pts": "+149.75"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "77,301.40",
+    "pct": "+0.50%",
+    "pts": "+383.55"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "55,913.60",
+    "pct": "+0.67%",
+    "pts": "+373.55"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "22,769.20",
+    "pct": "+1.10%",
+    "pts": "+248.85"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "23,608 - 23,784",
+    "r": "24,049 - 24,137",
+    "note": "A sustained move above 24,049 opens up 24,137; a slide below 23,784 would expose 23,608."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "55,066 - 55,490",
+    "r": "56,142 - 56,371",
+    "note": "A sustained move above 56,142 opens up 56,371; a slide below 55,490 would expose 55,066."
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "53,356.12",
+    "pct": "+3.03%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,688.62",
+    "pct": "+1.58%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "25,736.51",
+    "pct": "+1.44%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,829.20",
+    "pct": "+1.79%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "26,437.67",
+    "pct": "+2.22%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "61,977.31",
+    "pct": "-0.34%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "24,629.27",
+    "pct": "+2.97%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,694.01",
+    "pct": "+0.21%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "5,519.68",
+    "pct": "-2.89%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "94.19",
+    "pct": "-9.08%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "87.47",
+    "pct": "-0.74%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "4,133.30",
+    "pct": "+1.48%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.530",
+    "pct": "-0.23%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.29",
+    "pct": "-0.22%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.89",
+    "pct": "-1.17%"
+   }
+  ],
+  "vix": {
+   "level": "15.19",
+   "pct": "-3.37%",
+   "gauge": 0.740500020980835,
+   "text": "India VIX 15.19 (-3.37%); USD/INR 94.53 (-0.23%); US 10-yr yield 4.89 (-1.17%). India VIX eased 3.4% - volatility expectations cooling."
+  },
+  "events": [
+   "Sensex weekly expiry today (Thu 05 Nov 2026).",
+   "Results today (252 companies): BHARTIARTL, BRITANNIA, M&M, ONGC, TITAN, AADHARHFC, ABFRL, ADFFOODS, AGARWALEYE, ALPINETEX, AMAGI, AMBICAAGAR, ANTGRAPHIC, APOLLOPIPE, ARMEE and others."
+  ],
+  "watch": [
+   [
+    "BHARTIARTL",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "BRITANNIA",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "M&M",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "ONGC",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "TITAN",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "SUNPHARMA",
+    "Volume surge (last session)",
+    "2.8x average volume, +0.20%"
+   ]
+  ],
+  "headlines": [
+   "Trade Setup for Today: Wall Street Surge and FII Buying Set Stage for Gap-Up Opening as of November 5, 2026",
+   "Religare's Ajit Mishra says 24,700 in sight for Nifty; bets on GAIL, HAL",
+   "Will Sensex, Nifty scale new highs in Samvat 2083? What tech analysts say",
+   "Top stocks to watch today: Bharti Airtel, LIC, Nykaa, Torrent Power shares in focus on Thursday, 5 Nov",
+   "Diwali cheer ahead? Analysts see Sensex, Nifty at new highs in next Samvat",
+   "Nifty eyes 300-point leap as crude crashes 9%, Dow surges 1,569 points after Trump's election rout",
+   "Markets in Samvat 2083: 6 key risks D-St should watch out for in new year",
+   "Fee defaults push Sebi to pull the plug on 8 investment advisers"
+  ],
+  "calls": {
+   "buy": [],
+   "sell": [],
+   "watch_buy": []
+  },
+  "gift": {
+   "last": "24,282.0",
+   "pct": "+0.38%",
+   "premium": "+321 pts",
+   "vs": "+1.34%",
+   "asof": "05 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "BRITANNIA",
+    "4,930.00",
+    "+6.36%"
+   ],
+   [
+    "ADANIENT",
+    "2,709.20",
+    "+4.47%"
+   ],
+   [
+    "TATACONSUM",
+    "1,073.00",
+    "+4.29%"
+   ],
+   [
+    "TITAN",
+    "4,754.40",
+    "+4.22%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "908.75",
+    "+2.71%"
+   ]
+  ],
+  "losers": [
+   [
+    "TCS",
+    "2,436.00",
+    "-2.52%"
+   ],
+   [
+    "COALINDIA",
+    "399.65",
+    "-2.05%"
+   ],
+   [
+    "WIPRO",
+    "194.55",
+    "-1.74%"
+   ],
+   [
+    "INFY",
+    "1,128.20",
+    "-1.73%"
+   ],
+   [
+    "KOTAKBANK",
+    "459.40",
+    "-1.13%"
+   ]
+  ],
+  "shock": [
+   [
+    "SUNPHARMA",
+    "1,773.40",
+    "2.8x avg vol",
+    "+0.20%"
+   ],
+   [
+    "BRITANNIA",
+    "4,930.00",
+    "2.7x avg vol",
+    "+6.36%"
+   ],
+   [
+    "GRASIM",
+    "3,138.00",
+    "2.2x avg vol",
+    "+1.55%"
+   ],
+   [
+    "ITC",
+    "280.00",
+    "1.9x avg vol",
+    "+2.23%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "23,608",
+     "23,784",
+     "23,872",
+     "24,049",
+     "24,137"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "55,066",
+     "55,490",
+     "55,718",
+     "56,142",
+     "56,371"
+    ]
+   }
+  ],
+  "est": 1.34
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (05 Nov 2026)",
+ "headline": "Gap-up opening likely - Nifty zone 24,246 - 24,318",
+ "bias_text": "GIFT Nifty 24,282.0 (+321 pts, +1.34% vs Nifty's last close). US: S&P 500 +1.58%, Nasdaq +1.44%, Dow +3.03%. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street firm, Asia mixed, crude easing. Opening call anchored on GIFT Nifty.",
+ "proj": 24281.7,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 24,246 - 24,318"
+ },
+ "mood_score": 1.34,
+ "mood_pic": "bull_roar",
+ "spark": [
+  22520.44921875,
+  22363.349609375,
+  22721.94921875,
+  22622.69921875,
+  22997.349609375,
+  23146.150390625,
+  22888.94921875,
+  22811.349609375,
+  22687.650390625,
+  22600.0,
+  22753.19921875,
+  22749.75,
+  22698.849609375,
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.740500020980835,
+  "headline": "India VIX 15.19 (-3.37%)",
+  "text": "India VIX 15.19 (-3.37%); USD/INR 94.53 (-0.23%); US 10-yr yield 4.89 (-1.17%). India VIX eased 3.4% - volatility expectations cooling."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "23,960.60",
+   "pct": "+0.63%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "94.19",
+   "pct": "-9.08%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "4,133.30",
+   "pct": "+1.48%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "15.19",
+   "pct": "-3.37%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "94.530",
+   "pct": "-0.23%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "4.89",
+   "pct": "-1.17%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "53,356.12",
+   "pct": "+3.03%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,688.62",
+   "pct": "+1.58%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "25,736.51",
+   "pct": "+1.44%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,829.20",
+   "pct": "+1.79%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "26,437.67",
+   "pct": "+2.22%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "61,977.31",
+   "pct": "-0.34%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "24,629.27",
+   "pct": "+2.97%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,694.01",
+   "pct": "+0.21%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "5,519.68",
+   "pct": "-2.89%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 61,977.31 (-0.34%), Hang Seng 24,629.27 (+2.97%), Shanghai 3,694.01 (+0.21%), Kospi 5,519.68 (-2.89%). Wall Street: Dow 53,356.12 (+3.03%), S&P 500 7,688.62 (+1.58%), Nasdaq 25,736.51 (+1.44%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "23,608 - 23,784",
+   "r": "24,049 - 24,137",
+   "note": "A sustained move above 24,049 opens up 24,137; a slide below 23,784 would expose 23,608."
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "55,066 - 55,490",
+   "r": "56,142 - 56,371",
+   "note": "A sustained move above 56,142 opens up 56,371; a slide below 55,490 would expose 55,066."
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Sensex weekly expiry today (Thu 05 Nov 2026). Results today (252 companies): BHARTIARTL, BRITANNIA, M&M, ONGC, TITAN, AADHARHFC, ABFRL, ADFFOODS, AGARWALEYE, ALPINETEX, AMAGI, AMBICAAGAR, ANTGRAPHIC, APOLLOPIPE, ARMEE and others."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "BHARTIARTL (Results today); BRITANNIA (Results today); M&M (Results today); ONGC (Results today); TITAN (Results today); SUNPHARMA (Volume surge (last session))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "Trade Setup for Today: Wall Street Surge and FII Buying Set Stage for Gap | Religare's Ajit Mishra says 24,700 in sight for Nifty; bets on GAIL, HAL"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "BRITANNIA",
+    "pct": "+6.36%"
+   },
+   {
+    "sym": "ADANIENT",
+    "pct": "+4.47%"
+   },
+   {
+    "sym": "TATACONSUM",
+    "pct": "+4.29%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "TCS",
+    "pct": "-2.52%"
+   },
+   {
+    "sym": "COALINDIA",
+    "pct": "-2.05%"
+   },
+   {
+    "sym": "WIPRO",
+    "pct": "-1.74%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
