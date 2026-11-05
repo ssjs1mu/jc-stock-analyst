@@ -33,19 +33,27 @@ def one(sym, depth=0):
     if len(rows) < 8: return sym, None
     ce, pe = sum(r[1] for r in rows), sum(r[2] for r in rows)
     ab = sorted([r for r in rows if r[0] >= spot and r[1] > 0], key=lambda r: -r[1])[:3]; be = sorted([r for r in rows if r[0] <= spot and r[2] > 0], key=lambda r: -r[2])[:3]
+    act = sorted(rows, key=lambda r: -(r[1] + r[2]))[:3]
     near = lambda side, up: sorted([r for r in rows if (r[0] >= spot if up else r[0] <= spot) and r[side] >= 0.35 * max(x[side] for x in rows)], key=lambda r: abs(r[0] - spot))[:1]
     nr, ns = near(1, True), near(2, False)
     return sym, {"spot": spot, "expiry": e.group(1) if e else None, "pcr": round(pe / ce, 2) if ce else None, "ce": ce, "pe": pe,
                  "callWall": ab[0][0] if ab else None, "putWall": be[0][0] if be else None, "callOi": [[a[0], a[1]] for a in ab], "putOi": [[b[0], b[2]] for b in be],
-                 "nearRes": nr[0][0] if nr else None, "nearSup": ns[0][0] if ns else None}
+                 "nearRes": nr[0][0] if nr else None, "nearSup": ns[0][0] if ns else None,
+                 "act": [[a[0], a[1], a[2]] for a in act]}
 def main():
     c = json.load(open("data/constituents.json"))["idx"]; syms = sorted(set(c.get("^CNX200", []) + c.get("NIFTY_MIDCAP_100.NS", []) + c.get("^NSEI", []) + c.get("^NSEBANK", [])))
-    out = {}; t0 = time.time()
-    with cf.ThreadPoolExecutor(1) as ex:
-        for s, d in ex.map(one, syms):
-            if d: out[s] = d
-            if time.time() - t0 > 1200: print('time budget reached', file=sys.stderr); break
-    print(len(out), "F&O stocks of", len(syms), ERR, file=sys.stderr)
-    if len(out) < 40: sys.exit("too few chains parsed - keeping the old file")
+    try: old = json.load(open("data/fno_oi.json")); prev = old.get("stocks", {}); pasof = old.get("asof", "")
+    except Exception: prev, pasof = {}, ""
+    today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    # resume: names never fetched or missing the 'act' field first, then the oldest; so successive runs cover the whole list and merge into the file
+    stamp = {s: (prev[s].get("ts", "") if s in prev else "") for s in syms}
+    order = sorted(syms, key=lambda s: (s in prev and "act" in prev[s], stamp[s], s))
+    out = dict(prev); t0 = time.time(); got = 0
+    for sy in order:                                   # plain loop: the budget check really stops the run (an executor would wait for every queued name)
+        if time.time() - t0 > 1500: print('time budget reached', file=sys.stderr); break
+        s, d = one(sy)
+        if d: d["ts"] = today; out[s] = d; got += 1
+    print(got, "refreshed;", len(out), "F&O stocks of", len(syms), ERR, file=sys.stderr)
+    if got < 5: sys.exit("too few chains parsed - keeping the old file")
     json.dump({"asof": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"), "source": "public option-chain page (OI as of last close, nearest expiry)", "stocks": out}, open("data/fno_oi.json", "w"), separators=(",", ":"))
 main()
