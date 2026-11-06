@@ -1,0 +1,682 @@
+{
+ "book": {
+  "flows": {
+   "date": "03 Nov",
+   "fii": 6836.81,
+   "dii": -3678.85
+  },
+  "pcr": {
+   "pcr": 1.3928395339991835,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "06 Nov 2026",
+  "date_iso": "2026-11-06",
+  "mood": {
+   "key": "bear",
+   "label": "Weak start likely",
+   "sub": "Indicative Nifty opening zone 24,382 - 24,456"
+  },
+  "label": "Weak start likely",
+  "zone": "24,382 - 24,456",
+  "headline": "Weak start likely - Nifty zone 24,382 - 24,456",
+  "open_text": "Wall Street weak, Asia negative, crude rising. Carry-over: Nifty's +2.40% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+  "yday": "Nifty's +2.40% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour.",
+  "spark": [
+   22363.349609375,
+   22721.94921875,
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375
+  ],
+  "proj": 24418.8,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "24,536.60",
+    "pct": "+2.40%",
+    "pts": "+576.00"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "79,310.01",
+    "pct": "+2.60%",
+    "pts": "+2008.61"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "57,773.65",
+    "pct": "+3.33%",
+    "pts": "+1860.05"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "23,224.70",
+    "pct": "+2.00%",
+    "pts": "+455.50"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "24,187 - 24,362",
+    "r": "24,646 - 24,755",
+    "note": "A sustained move above 24,646 opens up 24,755; a slide below 24,362 would expose 24,187.",
+    "flag": ""
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "56,317 - 57,045",
+    "r": "58,175 - 58,576",
+    "note": "A sustained move above 58,175 opens up 58,576; a slide below 57,045 would expose 56,317.",
+    "flag": ""
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "51,523.06",
+    "pct": "-3.44%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,353.73",
+    "pct": "-4.36%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "24,315.00",
+    "pct": "-5.52%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,782.70",
+    "pct": "-0.43%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "26,325.01",
+    "pct": "-0.43%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "57,858.61",
+    "pct": "-5.27%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "24,696.45",
+    "pct": "-0.41%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,656.69",
+    "pct": "-0.90%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "5,174.84",
+    "pct": "-3.88%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "99.91",
+    "pct": "+1.65%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "91.66",
+    "pct": "+1.26%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "4,077.60",
+    "pct": "-0.87%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.465",
+    "pct": "-0.05%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.66",
+    "pct": "+0.11%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.84",
+    "pct": "-1.16%"
+   }
+  ],
+  "vix": {
+   "level": "15.58",
+   "pct": "+2.57%",
+   "gauge": 0.7210000038146973,
+   "text": "India VIX 15.58 (+2.57%); USD/INR 94.46 (-0.05%); US 10-yr yield 4.84 (-1.16%). India VIX rose 2.6% - hedging demand up."
+  },
+  "events": [
+   "Next Nifty weekly expiry: Mon 09 Nov 2026; next Sensex weekly expiry: Thu 12 Nov 2026.",
+   "Results today (118 companies): HINDALCO, 3MINDIA, AGIIL, AGOL, AGROPHOS, AJAXENGG, AJRINFRA, AKASH, AKI, ALEMBICLTD, ANUP and others."
+  ],
+  "watch": [
+   [
+    "HINDALCO",
+    "Results today",
+    "Reaction to earnings at the open"
+   ],
+   [
+    "BHARTIARTL",
+    "In the news",
+    "Top stocks to watch today: Hindalco, Bharti Airtel, LIC, ONGC shares in focus on Friday, 6"
+   ],
+   [
+    "ONGC",
+    "In the news",
+    "ONGC Q2 profit jumps 57% to Rs 15,489 crore on higher oil prices, rupee depreciation"
+   ],
+   [
+    "GAIL",
+    "Setup: BUY (A+)",
+    "Entry 186.5, stop 184.7, target 189.7"
+   ],
+   [
+    "PVRINOX",
+    "Setup: BUY (A+)",
+    "Entry 1,583.6, stop 1,561.7, target 1,623.1"
+   ],
+   [
+    "PETRONET",
+    "Setup: BUY (A+)",
+    "Entry 312.2, stop 309.1, target 316.9"
+   ],
+   [
+    "M&M",
+    "Volume surge (last session)",
+    "3.8x average volume, +5.59%"
+   ],
+   [
+    "BPCL",
+    "Volume surge (last session)",
+    "3.5x average volume, +4.07%"
+   ]
+  ],
+  "headlines": [
+   "AI sell-off wipes out Wall Streets post-election rally; major Asian markets also plunge up to 8%",
+   "Stock Market Today: Sensex, Nifty likely to open lower as global selloff rattles US, Asian markets",
+   "Trade Setup for Today: Wall Street Slump and Nikkei Plunge Contrast with FII Buying Surge as of November 6, 2026",
+   "Asia-Pacific Markets Tumble as Tech Sell-Off Accelerates, Tracking Heavy Losses on Wall Street",
+   "Fireworks on D-Street: Sensex, Nifty log biggest single-day gains in seven months",
+   "Sensex up 6,064 pts in six days; eyes strongest pre-Diwali rally in 35 yrs",
+   "Wall Street Highlights: S&P 500 Sinks 4%, Nasdaq Tumbles As AI Washout Rattles Markets",
+   "Top stocks to watch today: Hindalco, Bharti Airtel, LIC, ONGC shares in focus on Friday, 6 Nov"
+  ],
+  "calls": {
+   "buy": [
+    {
+     "sym": "GAIL",
+     "side": "BUY",
+     "entry": "186.48",
+     "sl": "184.67",
+     "t1": "189.71",
+     "t2": "192.41",
+     "rr": "1.8",
+     "risk": "1.81",
+     "riskpct": "0.97%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 27: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "PVRINOX",
+     "side": "BUY",
+     "entry": "1,583.65",
+     "sl": "1,561.67",
+     "t1": "1,623.10",
+     "t2": "1,664.20",
+     "rr": "1.8",
+     "risk": "21.98",
+     "riskpct": "1.39%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 48: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "PETRONET",
+     "side": "BUY",
+     "entry": "312.23",
+     "sl": "309.15",
+     "t1": "316.93",
+     "t2": "321.87",
+     "rr": "1.5",
+     "risk": "3.08",
+     "riskpct": "0.99%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 19: developing trend"
+     ]
+    },
+    {
+     "sym": "BHARTIARTL",
+     "side": "BUY",
+     "entry": "2,069.93",
+     "sl": "2,052.18",
+     "t1": "2,102.07",
+     "t2": "2,128.70",
+     "rr": "1.8",
+     "risk": "17.75",
+     "riskpct": "0.86%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 9,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 33: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "ADANIPORTS",
+     "side": "BUY",
+     "entry": "1,922.81",
+     "sl": "1,898.08",
+     "t1": "1,960.20",
+     "t2": "1,999.10",
+     "rr": "1.5",
+     "risk": "24.73",
+     "riskpct": "1.29%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 9,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 22: developing trend"
+     ]
+    }
+   ],
+   "sell": [],
+   "watch_buy": [
+    {
+     "sym": "BOSCHLTD",
+     "conv": 49,
+     "S": 10,
+     "why": "first target too close for the risk (R:R 1.42 < 1.5)"
+    },
+    {
+     "sym": "BEML",
+     "conv": 49,
+     "S": 10,
+     "why": "first target too close for the risk (R:R 1.26 < 1.5)"
+    },
+    {
+     "sym": "TITAN",
+     "conv": 49,
+     "S": 9,
+     "why": "first target too close for the risk (R:R 1.22 < 1.5)"
+    },
+    {
+     "sym": "JSWSTEEL",
+     "conv": 49,
+     "S": 9,
+     "why": "first target too close for the risk (R:R 1.38 < 1.5)"
+    }
+   ]
+  },
+  "gift": {
+   "last": "24,418.0",
+   "pct": "+0.25%",
+   "premium": "-119 pts",
+   "vs": "-0.48%",
+   "asof": "06 Nov 08:15"
+  },
+  "gainers": [
+   [
+    "BAJFINANCE",
+    "1,070.00",
+    "+7.65%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "964.00",
+    "+6.08%"
+   ],
+   [
+    "M&M",
+    "3,127.50",
+    "+5.59%"
+   ],
+   [
+    "MARUTI",
+    "12,652.00",
+    "+5.48%"
+   ],
+   [
+    "INDUSINDBK",
+    "911.45",
+    "+5.35%"
+   ]
+  ],
+  "losers": [
+   [
+    "APOLLOHOSP",
+    "8,371.00",
+    "-2.66%"
+   ],
+   [
+    "ONGC",
+    "230.00",
+    "-2.13%"
+   ],
+   [
+    "NTPC",
+    "316.70",
+    "-1.63%"
+   ],
+   [
+    "COALINDIA",
+    "394.30",
+    "-1.34%"
+   ],
+   [
+    "ADANIPORTS",
+    "1,884.60",
+    "-1.33%"
+   ]
+  ],
+  "shock": [
+   [
+    "M&M",
+    "3,127.50",
+    "3.8x avg vol",
+    "+5.59%"
+   ],
+   [
+    "BPCL",
+    "317.10",
+    "3.5x avg vol",
+    "+4.07%"
+   ],
+   [
+    "GRASIM",
+    "3,227.60",
+    "3.5x avg vol",
+    "+2.86%"
+   ],
+   [
+    "INDUSINDBK",
+    "911.45",
+    "3.5x avg vol",
+    "+5.35%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "24,187",
+     "24,362",
+     "24,471",
+     "24,646",
+     "24,755"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "56,317",
+     "57,045",
+     "57,446",
+     "58,175",
+     "58,576"
+    ]
+   }
+  ],
+  "est": -0.48
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (06 Nov 2026)",
+ "headline": "Weak start likely - Nifty zone 24,382 - 24,456",
+ "bias_text": "GIFT Nifty 24,418.0 (-119 pts, -0.48% vs Nifty's last close). US: S&P 500 -4.36%, Nasdaq -5.52%, Dow -3.44%. Carry-over: Nifty's +2.40% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street weak, Asia negative, crude rising. Carry-over: Nifty's +2.40% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "proj": 24418.8,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 24,382 - 24,456"
+ },
+ "mood_score": -0.48,
+ "mood_pic": "bear_over_bull",
+ "spark": [
+  22363.349609375,
+  22721.94921875,
+  22622.69921875,
+  22997.349609375,
+  23146.150390625,
+  22888.94921875,
+  22811.349609375,
+  22687.650390625,
+  22600.0,
+  22753.19921875,
+  22749.75,
+  22698.849609375,
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.7210000038146973,
+  "headline": "India VIX 15.58 (+2.57%)",
+  "text": "India VIX 15.58 (+2.57%); USD/INR 94.46 (-0.05%); US 10-yr yield 4.84 (-1.16%). India VIX rose 2.6% - hedging demand up."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "24,536.60",
+   "pct": "+2.40%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "99.91",
+   "pct": "+1.65%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "4,077.60",
+   "pct": "-0.87%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "15.58",
+   "pct": "+2.57%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "94.465",
+   "pct": "-0.05%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "4.84",
+   "pct": "-1.16%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "51,523.06",
+   "pct": "-3.44%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,353.73",
+   "pct": "-4.36%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "24,315.00",
+   "pct": "-5.52%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,782.70",
+   "pct": "-0.43%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "26,325.01",
+   "pct": "-0.43%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "57,858.61",
+   "pct": "-5.27%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "24,696.45",
+   "pct": "-0.41%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,656.69",
+   "pct": "-0.90%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "5,174.84",
+   "pct": "-3.88%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 57,858.61 (-5.27%), Hang Seng 24,696.45 (-0.41%), Shanghai 3,656.69 (-0.90%), Kospi 5,174.84 (-3.88%). Wall Street: Dow 51,523.06 (-3.44%), S&P 500 7,353.73 (-4.36%), Nasdaq 24,315.00 (-5.52%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "24,187 - 24,362",
+   "r": "24,646 - 24,755",
+   "note": "A sustained move above 24,646 opens up 24,755; a slide below 24,362 would expose 24,187.",
+   "flag": ""
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "56,317 - 57,045",
+   "r": "58,175 - 58,576",
+   "note": "A sustained move above 58,175 opens up 58,576; a slide below 57,045 would expose 56,317.",
+   "flag": ""
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Next Nifty weekly expiry: Mon 09 Nov 2026; next Sensex weekly expiry: Thu 12 Nov 2026. Results today (118 companies): HINDALCO, 3MINDIA, AGIIL, AGOL, AGROPHOS, AJAXENGG, AJRINFRA, AKASH, AKI, ALEMBICLTD, ANUP and others."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "HINDALCO (Results today); BHARTIARTL (In the news); ONGC (In the news); GAIL (Setup: BUY (A+)); PVRINOX (Setup: BUY (A+)); PETRONET (Setup: BUY (A+))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "AI sell-off wipes out Wall Streets post-election rally; major Asian markets also | Stock Market Today: Sensex, Nifty likely to open lower as global selloff rattles"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "BAJFINANCE",
+    "pct": "+7.65%"
+   },
+   {
+    "sym": "SHRIRAMFIN",
+    "pct": "+6.08%"
+   },
+   {
+    "sym": "M&M",
+    "pct": "+5.59%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "APOLLOHOSP",
+    "pct": "-2.66%"
+   },
+   {
+    "sym": "ONGC",
+    "pct": "-2.13%"
+   },
+   {
+    "sym": "NTPC",
+    "pct": "-1.63%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
