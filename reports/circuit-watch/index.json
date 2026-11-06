@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-06T21:16:20+05:30",
+   "date": "2026-11-06",
+   "status": "ok",
+   "caption": "Circuit Watch - session of Fri 6 Nov 2026: Sensex 81,028 / Nifty 25,030 after a 7-day rally; Tips Films, Banka Bioloo, Neelamalai at upper circuit, HFCL lower.",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-06.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-06.pdf",
+     "type": "pdf",
+     "bytes": 9483
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-05T21:11:10+05:30",
    "date": "2026-11-05",
    "status": "ok",
@@ -220,5 +235,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-05T21:11:10+05:30"
+ "updated_at": "2026-11-06T21:16:20+05:30"
 }
