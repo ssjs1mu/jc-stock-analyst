@@ -1,0 +1,284 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "06 Nov 2026",
+ "report_time": "08:20 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 24,382 - 24,456"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Weak start likely: Wall Street weak, Asia negative, crude rising. Expected Nifty opening zone: 24,382 - 24,456 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 24,418.0 (-119 pts, -0.48% vs Nifty's last close).",
+      "US: S&P 500 -4.36%, Nasdaq -5.52%, Dow -3.44%.",
+      "Asia this morning: Nikkei -5.27%, Hang Seng -0.40%, Kospi -3.87%.",
+      "Currency, crude and volatility: Brent 99.91 (+1.65%); USD/INR 94.465 (-0.05%); India VIX 15.58 (+2.57%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's +2.40% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Mon 09 Nov 2026; next Sensex weekly expiry: Thu 12 Nov 2026.",
+      "Results today (118 companies): HINDALCO, 3MINDIA, AGIIL, AGOL, AGROPHOS, AJAXENGG, AJRINFRA, AKASH, AKI, ALEMBICLTD, ANUP and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "HINDALCO",
+       "Results today",
+       "Reaction to earnings at the open"
+      ],
+      [
+       "BHARTIARTL",
+       "In the news",
+       "Top stocks to watch today: Hindalco, Bharti Airtel, LIC, ONGC shares in focus on Friday, 6"
+      ],
+      [
+       "ONGC",
+       "In the news",
+       "ONGC Q2 profit jumps 57% to Rs 15,489 crore on higher oil prices, rupee depreciation"
+      ],
+      [
+       "GAIL",
+       "Setup: BUY (A+)",
+       "Entry 186.5, stop 184.7, target 189.7"
+      ],
+      [
+       "PVRINOX",
+       "Setup: BUY (A+)",
+       "Entry 1,583.6, stop 1,561.7, target 1,623.1"
+      ],
+      [
+       "PETRONET",
+       "Setup: BUY (A+)",
+       "Entry 312.2, stop 309.1, target 316.9"
+      ],
+      [
+       "M&M",
+       "Volume surge (last session)",
+       "3.8x average volume, +5.59%"
+      ],
+      [
+       "BPCL",
+       "Volume surge (last session)",
+       "3.5x average volume, +4.07%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "AI sell-off wipes out Wall Streets post-election rally; major Asian markets also plunge up to 8%",
+      "Stock Market Today: Sensex, Nifty likely to open lower as global selloff rattles US, Asian markets",
+      "Trade Setup for Today: Wall Street Slump and Nikkei Plunge Contrast with FII Buying Surge as of November 6, 2026",
+      "Asia-Pacific Markets Tumble as Tech Sell-Off Accelerates, Tracking Heavy Losses on Wall Street"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,523.06",
+        "-3.44%"
+       ],
+       [
+        "S&P 500",
+        "7,353.73",
+        "-4.36%"
+       ],
+       [
+        "Nasdaq Composite",
+        "24,315.00",
+        "-5.52%"
+       ],
+       [
+        "FTSE 100",
+        "10,782.70",
+        "-0.43%"
+       ],
+       [
+        "DAX",
+        "26,325.01",
+        "-0.43%"
+       ],
+       [
+        "Nikkei 225",
+        "57,858.61",
+        "-5.27%"
+       ],
+       [
+        "Hang Seng",
+        "24,696.89",
+        "-0.40%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,656.75",
+        "-0.90%"
+       ],
+       [
+        "Kospi",
+        "5,175.45",
+        "-3.87%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "99.91",
+        "+1.65%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "91.67",
+        "+1.27%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,078.10",
+        "-0.86%"
+       ],
+       [
+        "USD/INR",
+        "94.46",
+        "-0.05%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "101.66",
+        "+0.11%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.84",
+        "-1.16%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "24,362",
+       "24,646"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "24,187",
+       "24,755"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
