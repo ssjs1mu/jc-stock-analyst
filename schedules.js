@@ -16,7 +16,7 @@
   const istNow = () => new Date(Date.now() + IST_MS); // read with getUTC* = IST wall clock
   const istDate = (d) => d.toISOString().slice(0, 10);
   const minsOf = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
-  const runsOnDay = (s, dow) => s.days === 'daily' || (dow >= 1 && dow <= 5);
+  const runsOnDay = (s, dow) => s.days !== 'once' && (s.days === 'daily' || (dow >= 1 && dow <= 5));
   function nextRun(s, from) {
     const base = from || istNow();
     for (let k = 0; k < 8; k++) {
@@ -41,6 +41,7 @@
     const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes(); const slot = minsOf(s.time);
     if (s.suspended) return { cls: 'mute', text: 'Suspended since 5 Nov 2026' };
     if (s.kind === 'artifact') return { cls: 'info', text: 'Dashboard refresh · no PDF' };
+    if (s.days === 'once') { const r1 = ((S.idx[s.id] && S.idx[s.id].runs) || [])[0]; return r1 ? { cls: 'ok', text: 'Special edition published', run: r1 } : { cls: 'info', text: 'One-off special edition' }; }
     if (!runsOnDay(s, dow)) return { cls: 'mute', text: 'No run today (weekend)' };
     const runs = (S.idx[s.id] && S.idx[s.id].runs) || [];
     const r = runs.find((x) => x.date === today);
@@ -68,7 +69,7 @@
   }
 
   // ---- rendering ------------------------------------------------------------
-  const daysLabel = (s) => (s.days === 'daily' ? 'Every day' : 'Mon–Fri (trading days)');
+  const daysLabel = (s) => (s.days === 'once' ? 'One-off special' : s.days === 'daily' ? 'Every day' : 'Mon–Fri (trading days)');
   function fileLinks(run) {
     return (run.files || []).map((f) => `<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}</a>`).join(' ');
   }
@@ -99,7 +100,9 @@
         ${last.caption ? `<span class="sccap">${esc(last.caption)}</span>` : ''}<span class="spacer"></span>${fileLinks(last)}
         ${pdf ? `<a class="goBtn sclinkbtn" href="${esc(pdf.path)}" download>⬇ Download PDF</a>` : ''}</div>`;
       // Picture first when there is one (renders everywhere); phones can't embed PDFs reliably, so give them a button.
-      const body = png ? `<img class="scpng" src="${esc(png.path)}" alt="${esc(s.name)}">`
+      const pngs = last.files.filter((f) => f.type === 'png');
+      const body = pdf && png && window.innerWidth >= 700 ? `<iframe class="scpdf" src="${esc(pdf.path)}#view=FitH" title="${esc(s.name)} PDF"></iframe>`
+        : png ? pngs.map((p) => `<img class="scpng" src="${esc(p.path)}" alt="${esc(s.name)}">`).join('')
         : pdf && window.innerWidth < 700 ? `<a class="goBtn sclinkbtn scbig" href="${esc(pdf.path)}" target="_blank" rel="noopener">📄 Open ${esc(s.name)} PDF</a>`
         : pdf ? `<iframe class="scpdf" src="${esc(pdf.path)}#view=FitH" title="${esc(s.name)} PDF"></iframe>` : '';
       viewer = bar + body;
