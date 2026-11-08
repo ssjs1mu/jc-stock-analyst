@@ -67,6 +67,90 @@
      "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-06.json",
      "type": "json",
      "bytes": 14636
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_1.png",
+     "type": "png",
+     "bytes": 1133855
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_2.png",
+     "type": "png",
+     "bytes": 813533
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_3.png",
+     "type": "png",
+     "bytes": 828276
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_4.png",
+     "type": "png",
+     "bytes": 1027476
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_5.png",
+     "type": "png",
+     "bytes": 1018576
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_6.png",
+     "type": "png",
+     "bytes": 753212
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-06_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-06_7.png",
+     "type": "png",
+     "bytes": 1559890
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_1.png",
+     "type": "png",
+     "bytes": 1117573
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_2.png",
+     "type": "png",
+     "bytes": 775427
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_3.png",
+     "type": "png",
+     "bytes": 787210
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_4.png",
+     "type": "png",
+     "bytes": 1018960
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_5.png",
+     "type": "png",
+     "bytes": 974709
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_6.png",
+     "type": "png",
+     "bytes": 697751
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-06_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-06_7.png",
+     "type": "png",
+     "bytes": 1559318
     }
    ]
   },
