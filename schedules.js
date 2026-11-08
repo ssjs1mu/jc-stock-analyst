@@ -81,7 +81,7 @@
     if (fl.some((f) => langOf(f) !== 'en')) {   // grouped: one link per edition (page 1) instead of every page
       const out = [];
       ['en', 'hi', 'bn'].forEach((l) => { const g = fl.filter((f) => f.type === 'png' && langOf(f) === l && /_Mobile_/.test(f.name)); if (g.length) out.push(`<a class="sclink" href="${esc(g[0].path)}" target="_blank" rel="noopener">🖼 ${LGN[l]} (${g.length})</a>`); });
-      fl.filter((f) => f.type !== 'png' || !/_Mobile_/.test(f.name)).forEach((f) => out.push(`<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}</a>`));
+      fl.filter((f) => f.type !== 'png' || !/_Mobile_/.test(f.name)).forEach((f) => out.push(`<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}${langOf(f) !== 'en' ? ' ' + LGN[langOf(f)] : ''}</a>`));
       return out.join(' ');
     }
     return (run.files || []).map((f) => `<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}</a>`).join(' ');
