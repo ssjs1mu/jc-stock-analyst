@@ -4,7 +4,7 @@ Builds updates/index.html (page with both thumbnails, links, update times, Whats
 updates/og.jpg (one preview card showing both thumbnails - what WhatsApp/Telegram show for the link),
 updates/sunrise.jpg + breeze.jpg thumbnails and updates/message.txt (the plain-text message).
 Run automatically by publish.py after Morning Sunrise or Evening Breeze is published; or by hand: python3 pipeline/make_updates.py"""
-import html, json, os, sys, urllib.parse
+import html, json, os, re, sys, urllib.parse
 from datetime import datetime, timezone, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,6 +17,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 REP = [  # key, schedule id, name, icon, url folder, due text, accent
     ("sunrise", "morning-pulse", "Morning Sunrise", "\U0001F305", "morning/", "8:45 AM", "#F5A623"),
     ("breeze", "evening-breeze", "Evening Breeze", "\U0001F307", "evening/", "4:30 PM", "#7C6CF0"),
+    ("muhurat", "muhurat-special", "Muhurat Trading 2026 (special)", "\U0001FA94", "muhurat/", "", "#E8508F"),   # one-off special edition
 ]
 
 
@@ -27,7 +28,7 @@ def latest(sid):
         return None
     for r in runs:
         if r.get("status") == "ok":
-            pngs = sorted(f["path"] for f in r["files"] if "_Mobile_" in f["name"] and f["type"] == "png")
+            pngs = sorted(f["path"] for f in r["files"] if "_Mobile_" in f["name"] and f["type"] == "png" and not re.search(r"_Mobile_(HI|BN)_", f["name"]))
             return {"date": r["date"], "gen": datetime.fromisoformat(r["generated_at"]), "page1": pngs[0] if pngs else None}
     return None
 
@@ -60,24 +61,27 @@ def build():
         thumb(L["page1"], os.path.join(out, key + ".jpg"))
         fresh = L["date"] == now.strftime("%Y-%m-%d")
         items.append(dict(key=key, name=name, icon=icon, url=BASE + folder, due=due, acc=acc, gen=L["gen"], date=L["date"], fresh=fresh))
-        lines.append("%s %s - ready by %s IST on every trading day\n%s\nLatest: %s" % (icon, name, due, BASE + folder, fmt_gen(L["gen"])))
+        if due:
+            lines.append("%s %s - ready by %s IST on every trading day\n%s\nLatest: %s" % (icon, name, due, BASE + folder, fmt_gen(L["gen"])))
+        else:
+            lines.append("%s %s - special edition, English / Hindi / Bengali\n%s\nPublished: %s" % (icon, name, BASE + folder, fmt_gen(L["gen"])))
     if not items:
         return None
     msg = ("Joshi's Corner - daily reports (Mon-Fri, NSE trading days)\n\n" + "\n\n".join(lines) +
-           "\n\nBoth reports in one place: " + SHORT)
+           "\n\nAll reports in one place: " + SHORT)
     open(os.path.join(out, "message.txt"), "w").write(msg)
     # ---- preview card 1200x630 with both thumbnails ----
     cards = "".join(
-        "<div class='c' style='border-color:%s'><img src='%s'><div><div class='n' style='color:%s'>%s %s</div><div class='d'>Ready by <b>%s IST</b></div>"
+        "<div class='c' style='border-color:%s'><img src='%s'><div><div class='n' style='color:%s'>%s %s</div><div class='d'>%s</div>"
         "<div class='g'>Latest: %s</div><div class='go'>Tap the link &rarr;</div></div></div>"
-        % (i["acc"], _b64(os.path.join(out, i["key"] + ".jpg")), i["acc"], i["icon"], html.escape(i["name"]), i["due"], html.escape(fmt_gen(i["gen"])))
+        % (i["acc"], _b64(os.path.join(out, i["key"] + ".jpg")), i["acc"], i["icon"], html.escape(i["name"]), ("Ready by <b>%s IST</b>" % i["due"]) if i["due"] else "Special edition", html.escape(fmt_gen(i["gen"])))
         for i in items)
     page = ("<html><head><style>%s*{margin:0;box-sizing:border-box}body{width:1200px;height:630px;background:linear-gradient(135deg,#17306b,#0d0a18 75%%);font-family:Inter,Arial,sans-serif;color:#f4efe0;padding:26px 44px;overflow:hidden}"
             ".top{display:flex;align-items:baseline;gap:22px}.b{font-family:%s;font-size:60px;font-weight:700;color:#E2B84A}.s{font-size:26px;font-weight:700;color:#efe9d6}"
             ".row{display:flex;gap:26px;margin-top:14px}.c{flex:1;min-width:0;display:flex;gap:18px;align-items:center;background:#ffffff14;border:3px solid;border-radius:20px;padding:16px}"
-            ".c img{height:420px;flex:none;border-radius:12px;border:2px solid #E2B84A;box-shadow:0 12px 30px #000a}.n{font-size:29px;font-weight:800;line-height:1.15}.d{font-size:22px;margin-top:12px}.g{font-size:16px;color:#d9d2bd;margin-top:10px}.go{margin-top:16px;font-size:19px;color:#E2B84A;font-weight:800}"
+            ".c img{height:%%dpx;flex:none;border-radius:12px;border:2px solid #E2B84A;box-shadow:0 12px 30px #000a}.n{font-size:29px;font-weight:800;line-height:1.15}.d{font-size:22px;margin-top:12px}.g{font-size:16px;color:#d9d2bd;margin-top:10px}.go{margin-top:16px;font-size:19px;color:#E2B84A;font-weight:800}"
             "</style></head><body><div class='top'><div class='b'>Joshi's Corner</div><div class='s'>Daily reports &middot; Mon-Fri trading days</div></div><div class='row'>%s</div></body></html>"
-            % (brand.font_css(), brand.SCRIPT_STACK, cards))
+            % (brand.font_css(), brand.SCRIPT_STACK, cards)).replace('.c img{height:%dpx;', '.c img{height:%dpx;' % (420 if len(items) < 3 else 330), 1).replace('.n{font-size:29px', '.n{font-size:%dpx' % (29 if len(items) < 3 else 22), 1)
     from playwright.sync_api import sync_playwright
     tmp = os.path.join(out, "og.png")
     with sync_playwright() as p:
@@ -101,9 +105,9 @@ def build():
     os.remove(tmp)
     # ---- the page ----
     tiles = "".join(
-        "<a class='t' href='%s' style='--a:%s'><img src='%s.jpg' alt='%s'><div class='tx'><h2>%s %s</h2><p>Ready by <b>%s IST</b> every trading day</p><p class='g'>Latest: %s%s</p><span class='btn'>Open the report &rarr;</span></div></a>"
-        % (i["url"], i["acc"], i["key"], html.escape(i["name"]), i["icon"], html.escape(i["name"]), i["due"], html.escape(fmt_gen(i["gen"])),
-           "" if i["fresh"] else " <em>(next update on the next trading day)</em>") for i in items)
+        "<a class='t' href='%s' style='--a:%s'><img src='%s.jpg' alt='%s'><div class='tx'><h2>%s %s</h2><p>%s</p><p class='g'>Latest: %s%s</p><span class='btn'>Open the report &rarr;</span></div></a>"
+        % (i["url"], i["acc"], i["key"], html.escape(i["name"]), i["icon"], html.escape(i["name"]), ("Ready by <b>%s IST</b> every trading day" % i["due"]) if i["due"] else "Special edition &middot; English / हिन्दी / বাংলা", html.escape(fmt_gen(i["gen"])),
+           "" if (i["fresh"] or not i["due"]) else " <em>(next update on the next trading day)</em>") for i in items)
     wa = "https://wa.me/?text=" + urllib.parse.quote(msg)
     title = "Joshi's Corner - Morning Sunrise & Evening Breeze"
     doc = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

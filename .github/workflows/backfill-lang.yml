@@ -1,0 +1,30 @@
+name: Backfill Hindi / Bengali editions (published reports)
+# Touch .backfill-lang (one "schedule-id date" per line) to add the Hindi + Bengali editions to reports already published.
+on:
+  push:
+    paths: ['.backfill-lang']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: auto-reports
+  cancel-in-progress: false
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Build and commit
+        run: |
+          grep -E '^(morning-pulse|evening-breeze) [0-9-]+$' .backfill-lang | while read sid d; do python pipeline/backfill_lang.py "$sid" "$d"; done
+          git config user.name "Joshi's Corner scheduler"; git config user.email "joshiscorner.group@gmail.com"
+          git add reports morning evening updates data/i18n_cache.json
+          git commit -m "backfill: Hindi/Bengali editions" || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
