@@ -101,7 +101,7 @@ G = {
     "US 10-YR": ("अमेरिकी 10-वर्ष", "মার্কিন 10-বছর"), "DOLLAR INDEX": ("डॉलर इंडेक्स", "ডলার সূচক"), "GOLD $/oz": ("सोना $/औंस", "সোনা $/আউন্স"),
     "BRENT": ("ब्रेंट", "ব্রেন্ট"), "GOLD": ("सोना", "সোনা"), "SILVER": ("चाँदी", "রুপো"), "USD/INR": ("डॉलर/रुपया", "ডলার/টাকা"),
 }
-UNITS = {"cr": ("करोड़", "কোটি"), "Wk": ("सप्ताह", "সপ্তাহ"), "wk": ("सप्ताह", "সপ্তাহ"), "bp": ("बीपी", "বিপি"), "pts": ("अंक", "পয়েন্ট"), "vol": ("वॉल्यूम", "ভলিউম"), "avg vol": ("औसत वॉल्यूम", "গড় ভলিউম"), "range": ("रेंज", "পরিসর")}
+UNITS = {"cr": ("करोड़", "কোটি"), "Cr": ("करोड़", "কোটি"), "Wk": ("सप्ताह", "সপ্তাহ"), "wk": ("सप्ताह", "সপ্তাহ"), "bp": ("बीपी", "বিপি"), "pts": ("अंक", "পয়েন্ট"), "vol": ("वॉल्यूम", "ভলিউম"), "avg vol": ("औसत वॉल्यूम", "গড় ভলিউম"), "range": ("रेंज", "পরিসর")}
 KEEP = {"Joshi's Corner", "Connecting People Thru Services...", "S", ".", "I", "R", "hares  •", "nsurance  •", "estaurant", "·", "•", "●", "✓", "!", "★"}
 TOKEN_FALLBACK = {"AM": ("पूर्वाह्न", "পূর্বাহ্ণ"), "PM": ("अपराह्न", "অপরাহ্ণ"), "IST": ("IST", "IST"), "Cr": ("करोड़", "কোটি"), "pts": ("अंक", "পয়েন্ট"),
                   "vs": ("बनाम", "বনাম"), "and": ("और", "ও"), "and more": ("और अन्य", "এবং আরও")}
@@ -203,7 +203,7 @@ def _fixed(t, lang):
 
 def _units(t, lang):
     k = 0 if lang == "hi" else 1
-    t = re.sub(r"(?<![A-Za-z])(avg vol|cr|Wk|wk|bp|pts|vol|range)(?![A-Za-z])", lambda m: UNITS[m.group(1)][k], t)
+    t = re.sub(r"(?<![A-Za-z])(avg vol|cr|Cr|Wk|wk|bp|pts|vol|range)(?![A-Za-z])", lambda m: UNITS[m.group(1)][k], t)
     m = re.match(r"^at (\d{1,2}:\d{2}) (AM|PM) ET\.?$", t.strip())
     if m:
         t = ("%s %s ET पर" if lang == "hi" else "ET %s %s-এ") % (m.group(1), TOKEN_FALLBACK[m.group(2)][k])
