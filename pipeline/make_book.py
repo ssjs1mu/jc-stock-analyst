@@ -222,7 +222,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%A, %d %B %Y")
-    name = "Evening Breeze" if kind == "evening" else "Morning Sunrise"
+    name = {"evening": "Evening Breeze", "muhurat": "Muhurat Trading 2026"}.get(kind, "Morning Sunrise")
     title = "Joshi's Corner - %s for %s" % (name, dtxt)
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
     from datetime import timezone, timedelta
@@ -257,7 +257,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
         og_path = os.path.join(folder, "og.jpg")
         _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
-                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin, chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
+                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=("9999-12-31" if kind == "muhurat" else date), kind=kind, admin=admin, chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)
         out[sub or "latest"] = url
