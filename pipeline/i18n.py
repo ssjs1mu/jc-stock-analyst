@@ -135,7 +135,38 @@ def digits(s, lang):
     return s if not d else re.sub(r"[0-9]", lambda m: d[int(m.group())], s)
 
 
+def _clients5(text, lang):
+    """Google's browser-extension endpoint: keyless, and (unlike translate_a/single) not blocked for GitHub's runners."""
+    url = "https://clients5.google.com/translate_a/t?" + urllib.parse.urlencode({"client": "dict-chrome-ex", "sl": "en", "tl": lang, "q": text})
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    d = json.loads(urllib.request.urlopen(req, timeout=15).read().decode("utf-8"))
+    r = d[0] if isinstance(d, list) else d
+    if isinstance(r, list):
+        r = r[0]
+    return str(r).strip()
+
+
+def _mymemory(text, lang):
+    url = "https://api.mymemory.translated.net/get?" + urllib.parse.urlencode({"q": text[:480], "langpair": "en|" + lang})
+    d = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=15).read().decode("utf-8"))
+    r = (d.get("responseData") or {}).get("translatedText", "")
+    if not r or "MYMEMORY WARNING" in r.upper() or d.get("quotaFinished"):
+        raise RuntimeError("mymemory refused")
+    return r.strip()
+
+
 def _gtx(text, lang):
+    for fn in (_clients5, _mymemory, _gtx_single):
+        try:
+            r = fn(text, lang)
+            if r:
+                return r
+        except Exception:
+            continue
+    raise RuntimeError("no translator reachable")
+
+
+def _gtx_single(text, lang):
     url = "https://translate.googleapis.com/translate_a/single?" + urllib.parse.urlencode({"client": "gtx", "sl": "en", "tl": lang, "dt": "t", "q": text})
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     d = json.loads(urllib.request.urlopen(req, timeout=15).read().decode("utf-8"))
