@@ -2,56 +2,140 @@
  "schedule_id": "muhurat-special",
  "runs": [
   {
-   "generated_at": "2026-11-08T11:52:51+05:30",
+   "generated_at": "2026-11-08T12:19:03+05:30",
    "date": "2026-11-08",
    "status": "ok",
-   "caption": "Muhurat Trading 2026 \u00b7 Samvat 2083 \u2014 Diwali special",
+   "caption": "Muhurat Trading 2026 \u00b7 Samvat 2083 \u00b7 English / \u0939\u093f\u0928\u094d\u0926\u0940 / \u09ac\u09be\u0982\u09b2\u09be",
    "note": "",
    "files": [
     {
      "name": "Muhurat_Trading_2026_Joshis_Corner.pdf",
      "path": "reports/muhurat-special/Muhurat_Trading_2026_Joshis_Corner.pdf",
      "type": "pdf",
-     "bytes": 4687696
+     "bytes": 4687708
     },
     {
-     "name": "Muhurat_p1.png",
-     "path": "reports/muhurat-special/Muhurat_p1.png",
-     "type": "png",
-     "bytes": 1318628
+     "name": "Muhurat_Trading_2026_Joshis_Corner_HI.pdf",
+     "path": "reports/muhurat-special/Muhurat_Trading_2026_Joshis_Corner_HI.pdf",
+     "type": "pdf",
+     "bytes": 4358027
     },
     {
-     "name": "Muhurat_p2.png",
-     "path": "reports/muhurat-special/Muhurat_p2.png",
-     "type": "png",
-     "bytes": 1099603
+     "name": "Muhurat_Trading_2026_Joshis_Corner_BN.pdf",
+     "path": "reports/muhurat-special/Muhurat_Trading_2026_Joshis_Corner_BN.pdf",
+     "type": "pdf",
+     "bytes": 4495014
     },
     {
-     "name": "Muhurat_p3.png",
-     "path": "reports/muhurat-special/Muhurat_p3.png",
+     "name": "Muhurat_Mobile_2026-11-08_1.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_1.png",
      "type": "png",
-     "bytes": 1350959
+     "bytes": 1242746
     },
     {
-     "name": "Muhurat_p4.png",
-     "path": "reports/muhurat-special/Muhurat_p4.png",
+     "name": "Muhurat_Mobile_2026-11-08_2.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_2.png",
      "type": "png",
-     "bytes": 1410411
+     "bytes": 1111589
     },
     {
-     "name": "Muhurat_p5.png",
-     "path": "reports/muhurat-special/Muhurat_p5.png",
+     "name": "Muhurat_Mobile_2026-11-08_3.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_3.png",
      "type": "png",
-     "bytes": 1389652
+     "bytes": 1237355
     },
     {
-     "name": "Muhurat_p6.png",
-     "path": "reports/muhurat-special/Muhurat_p6.png",
+     "name": "Muhurat_Mobile_2026-11-08_4.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_4.png",
      "type": "png",
-     "bytes": 1451199
+     "bytes": 1401762
+    },
+    {
+     "name": "Muhurat_Mobile_2026-11-08_5.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_5.png",
+     "type": "png",
+     "bytes": 1274062
+    },
+    {
+     "name": "Muhurat_Mobile_2026-11-08_6.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_2026-11-08_6.png",
+     "type": "png",
+     "bytes": 1414603
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_1.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_1.png",
+     "type": "png",
+     "bytes": 1211784
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_2.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_2.png",
+     "type": "png",
+     "bytes": 1055542
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_3.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_3.png",
+     "type": "png",
+     "bytes": 1226987
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_4.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_4.png",
+     "type": "png",
+     "bytes": 1401424
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_5.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_5.png",
+     "type": "png",
+     "bytes": 1270679
+    },
+    {
+     "name": "Muhurat_Mobile_BN_2026-11-08_6.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_BN_2026-11-08_6.png",
+     "type": "png",
+     "bytes": 1402570
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_1.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_1.png",
+     "type": "png",
+     "bytes": 1177648
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_2.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_2.png",
+     "type": "png",
+     "bytes": 1018540
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_3.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_3.png",
+     "type": "png",
+     "bytes": 1208653
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_4.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_4.png",
+     "type": "png",
+     "bytes": 1361631
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_5.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_5.png",
+     "type": "png",
+     "bytes": 1251670
+    },
+    {
+     "name": "Muhurat_Mobile_HI_2026-11-08_6.png",
+     "path": "reports/muhurat-special/Muhurat_Mobile_HI_2026-11-08_6.png",
+     "type": "png",
+     "bytes": 1377773
     }
    ]
   }
  ],
- "updated_at": "2026-11-08T11:52:51+05:30"
+ "updated_at": "2026-11-08T12:19:03+05:30"
 }
