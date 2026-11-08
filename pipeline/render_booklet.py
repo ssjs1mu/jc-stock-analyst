@@ -14,6 +14,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import brand  # noqa: E402
+import i18n as _i18n  # noqa: E402
 
 W, H = 1080, 1800
 e = lambda s: html.escape(str(s if s is not None else ""))
@@ -660,7 +661,7 @@ def pm(b, p, total):
 PAGES = [p2, p3, p4, p5, p6]
 
 
-def render(cfg, png_base):
+def render(cfg, png_base, langs=("en",)):
     from playwright.sync_api import sync_playwright
     b = cfg["book"]
     p = PAL.get((b.get("mood") or {}).get("key", "neutral"), PAL["neutral"])
@@ -697,15 +698,19 @@ def render(cfg, png_base):
     with sync_playwright() as pw:
         br = pw.chromium.launch()
         pg = br.new_page(viewport={"width": W, "height": H})
-        for i, doc in enumerate(pages, 1):
-            pg.set_content(doc, wait_until="load")
-            try:
-                pg.wait_for_load_state("networkidle", timeout=6000)
-            except Exception:
-                pass
-            f = png_base[:-4] + "_%d.png" % i
-            pg.screenshot(path=f)
-            outs.append(f)
+        for lang in langs:
+            docs = pages if lang == "en" else [_i18n.localize(d, lang) for d in pages]
+            # English keeps its file names; Hindi / Bengali add _HI_ / _BN_ after "Mobile" (book builder and app read that tag)
+            base = png_base if lang == "en" else png_base.replace("_Mobile_", "_Mobile_%s_" % lang.upper())
+            for i, doc in enumerate(docs, 1):
+                pg.set_content(doc, wait_until="load")
+                try:
+                    pg.wait_for_load_state("networkidle", timeout=6000)
+                except Exception:
+                    pass
+                f = base[:-4] + "_%d.png" % i
+                pg.screenshot(path=f)
+                outs.append(f)
         br.close()
     return outs
 
@@ -715,5 +720,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--langs", default="en", help="comma list of en,hi,bn")
     a = ap.parse_args()
-    print(render(json.load(open(a.config)), a.out))
+    print(render(json.load(open(a.config)), a.out, tuple(x for x in a.langs.split(",") if x)))

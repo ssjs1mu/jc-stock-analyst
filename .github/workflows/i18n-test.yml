@@ -1,0 +1,35 @@
+name: i18n test (Hindi / Bengali booklet, preview only)
+# Renders one saved report in Hindi + Bengali on the runner (this is where the free translator is reachable)
+# and pushes the pictures to the `i18n-preview` branch. Touch .i18n-test to run it; nothing is published.
+on:
+  push:
+    paths: ['.i18n-test']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Render
+        run: |
+          mkdir -p /tmp/pv
+          python pipeline/render_booklet.py --config reports/evening-breeze/JCGG_Evening_Breeze_2026-11-05.json --out /tmp/pv/JCGG_Evening_Breeze_Mobile_2026-11-05.png --langs hi,bn 2>&1 | tail -5
+          python - <<'PY'
+          import json
+          c = json.load(open("data/i18n_cache.json"))
+          print({k: len(v) for k, v in c.items()})
+          PY
+          cp data/i18n_cache.json /tmp/pv/
+      - name: Push preview
+        run: |
+          cd /tmp/pv && git init -q && git checkout -q -b i18n-preview && git add -A && \
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm preview && \
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" i18n-preview

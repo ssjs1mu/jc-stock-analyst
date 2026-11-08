@@ -37,6 +37,15 @@ import gift as GIFT
 import levels as LV
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def _book_pages(mpng):
+    """all booklet page files for one report: English first, then the Hindi / Bengali editions."""
+    out = sorted(glob.glob(mpng[:-4] + "_*.png"))
+    for L in ("HI", "BN"):
+        out += sorted(glob.glob(mpng.replace("_Mobile_", "_Mobile_%s_" % L)[:-4] + "_*.png"))
+    return out
+BOOK_LANGS = os.environ.get("BOOK_LANGS", "en,hi,bn")   # picture-booklet editions (Hindi / Bengali via pipeline/i18n.py)
 ROOT = os.path.dirname(HERE)
 IST = ZoneInfo("Asia/Kolkata")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; JoshisCornerBot/1.0)"}
@@ -1014,13 +1023,13 @@ def main():
     mpng = os.path.join(a.out, "JCGG_Morning_Pulse_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
     if a.sid == "evening-breeze":
         mpng = os.path.join(a.out, "JCGG_Evening_Breeze_Mobile_%s.png" % now.strftime("%Y-%m-%d"))
-        subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng])
+        subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng, "--langs", BOOK_LANGS])
         open(pdf, "wb").close()
         png = None
     elif a.sid == "morning-pulse":
         subprocess.check_call([sys.executable, os.path.join(HERE, "render_pulse_board.py"), "--config", cj, "--png", png, "--pdf", pdf])
         try:   # 4-page opening booklet, portrait 1080x1350, for phones / Instagram / Facebook / WhatsApp
-            subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng])
+            subprocess.check_call([sys.executable, os.path.join(HERE, "render_booklet.py"), "--config", cj, "--out", mpng, "--langs", BOOK_LANGS])
         except Exception as ex:
             print("mobile render failed:", ex)
     else:
@@ -1034,10 +1043,10 @@ def main():
     js = pdf[:-4] + ".json"
     shutil.copyfile(cj, js)
     if a.sid == "evening-breeze":
-        files = [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] + ["--file", js]
+        files = [x for f in _book_pages(mpng) for x in ("--file", f)] + ["--file", js]
         subprocess.check_call(pub + files + ["--caption", "Evening Breeze %s" % now.strftime("%d %b")])
         return
-    files = ["--file", pdf] + (["--file", png] + [x for f in sorted(glob.glob(mpng[:-4] + "_*.png")) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
+    files = ["--file", pdf] + (["--file", png] + [x for f in _book_pages(mpng) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
     subprocess.check_call(pub + files + ["--caption", "%s %s" % (a.sid.replace("-", " ").title(), now.strftime("%d %b"))])
 
 

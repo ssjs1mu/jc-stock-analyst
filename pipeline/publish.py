@@ -15,6 +15,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -79,7 +80,9 @@ def main():
     book_added = False
     if a.schedule_id in ("morning-pulse", "evening-breeze") and a.status == "ok":
         kind = "evening" if a.schedule_id == "evening-breeze" else "morning"
-        pages = sorted(x["path"] for x in files if "_Mobile_" in x["name"] and x["type"] == "png")
+        pages = sorted(x["path"] for x in files if "_Mobile_" in x["name"] and x["type"] == "png" and not re.search(r"_Mobile_(HI|BN)_", x["name"]))
+        lang_pages = {L.lower(): sorted(x["path"] for x in files if x["type"] == "png" and ("_Mobile_%s_" % L) in x["name"]) for L in ("HI", "BN")}
+        lang_pages = {k: v for k, v in lang_pages.items() if v}
         if pages:
             try:   # booklet page (flip-book) + preview card, so a shared link shows as a picture card
                 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -90,7 +93,7 @@ def main():
                         cj = json.load(open(src))
                         head = cj.get("headline", "")
                         mood = (cj.get("mood") or {}).get("key", "neutral")
-                make_book.build(entry["date"], pages, head, mood, kind=kind)
+                make_book.build(entry["date"], pages, head, mood, kind=kind, lang_pages=lang_pages)
                 book_added = True
                 try:   # one combined message: Morning Sunrise + Evening Breeze thumbnails, links and update times
                     import make_updates
@@ -102,6 +105,8 @@ def main():
     git("config", "user.name", "Joshi's Corner scheduler", check=False)
     git("config", "user.email", "joshiscorner.group@gmail.com", check=False)
     git("add", f"reports/{a.schedule_id}")
+    if os.path.exists(os.path.join(ROOT, "data", "i18n_cache.json")):
+        git("add", "data/i18n_cache.json", check=False)   # translation memory (Hindi / Bengali), so each phrase is translated once
     if book_added:
         git("add", "evening" if a.schedule_id == "evening-breeze" else "morning", "updates")
     msg = f"report: {a.schedule_id} {entry['date']} ({a.status})"

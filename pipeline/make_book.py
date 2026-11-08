@@ -57,16 +57,19 @@ html,body{height:100%%;background:radial-gradient(120%% 90%% at 50%% 0%%,#2a2140
 .stat{position:fixed;left:0;right:0;bottom:64px;z-index:49;text-align:center;font-size:12.5px;color:#d9d2bd;padding:0 10px;line-height:1.3}
 .stat b{color:#E2B84A}.old{background:#7a1020;color:#fff;border-radius:10px;margin:0 10px 4px;padding:6px 10px;font-size:12.5px;display:none}.old a{color:#ffd36a;font-weight:800}
 @media (max-width:700px){.stat{bottom:56px}}
+.lg{display:flex;gap:5px;margin-left:8px}.lg button{background:#ffffff1f;color:#f4efe0;border:1px solid #ffffff38;border-radius:14px;padding:4px 10px;font:700 12.5px 'Noto Sans Devanagari','Noto Sans Bengali',Inter,system-ui,sans-serif;cursor:pointer}
+.lg button.on{background:#E2B84A;color:#241a05;border-color:#E2B84A}
+@media (max-width:480px){.top .b{font-size:23px}.lg{margin-left:4px;gap:4px}.lg button{padding:3px 8px;font-size:12px}}
 </style></head><body>
-<div class="top"><span class="b">Joshi's Corner</span></div>
+<div class="top"><span class="b">Joshi's Corner</span>%(chips)s</div>
 <div class="stage"><div class="book" id="book"><div class="spine"></div>%(leaves)s</div></div>
 <div class="hint" id="hint">Tap the page to turn it</div>
 <div class="stat"><div class="old" id="old"></div><span id="gen">Report generated <b>%(gen)s</b></span></div>
 <div class="bar"><button class="g" id="prev" aria-label="Previous page">&#8249;</button><div class="dots" id="dots"></div><button id="next" aria-label="Next page">Next page &#8250;</button><button class="g" id="share">Share</button></div>
-<script>
+%(langjs)s<script>
 (function(){var L=[].slice.call(document.querySelectorAll('.leaf')),n=L.length,i=0,D=document.getElementById('dots');
 for(var k=0;k<n;k++){D.insertAdjacentHTML('beforeend','<i></i>')}
-function dots(){[].forEach.call(D.children,function(d,k){d.className=k===i?'on':''});document.getElementById('next').textContent=i>=n-1?'Back to cover':'Next page \\u203a'}
+function dots(){[].forEach.call(D.children,function(d,k){d.className=k===i?'on':''});document.getElementById('next').textContent=i>=n-1?(window.JT?JT('back'):'Back to cover'):(window.JT?JT('next'):'Next page \\u203a')}
 function z(){L.forEach(function(l,k){l.style.zIndex=k<i?k:(n-k)+n});dots()}
 function go(d){var j=i+d;if(j<0)return;if(j>n-1){i=0;L.forEach(function(l){l.classList.remove('turned')});z();return}
  var lf=d>0?L[i]:L[j];lf.classList.add('anim');setTimeout(function(){lf.classList.remove('anim')},2200);if(d>0){lf.classList.add('turned')}else{lf.classList.remove('turned')}i=j;dots();lf.style.zIndex=999;setTimeout(z,2150);document.getElementById('hint').style.opacity=0}
@@ -87,6 +90,34 @@ document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text
   msg+=' <span style="opacity:.8">(No report is issued on market holidays.)</span>';o.innerHTML=msg;o.style.display='block'}})();
 z();setTimeout(function(){document.getElementById('hint').style.opacity=0},6000)})();
 </script>%(fx)s</body></html>"""
+
+LANG_JS = r'''<script>(function(){
+var LP=__LP__,DEF=document.documentElement.lang||'en',cur='en';
+var DG={hi:'०१२३४५६७८९',bn:'০১২৩৪৫৬৭৮৯'};
+var UI={en:{hint:'Tap the page to turn it',next:'Next page ›',back:'Back to cover',share:'Share',copied:'Link copied',gen:'Report generated'},
+ hi:{hint:'पन्ना पलटने के लिए टैप करें',next:'अगला पन्ना ›',back:'कवर पर वापस',share:'शेयर',copied:'लिंक कॉपी हुआ',gen:'रिपोर्ट तैयार'},
+ bn:{hint:'পাতা ওল্টাতে ট্যাপ করুন',next:'পরের পাতা ›',back:'প্রচ্ছদে ফিরুন',share:'শেয়ার',copied:'লিঙ্ক কপি হয়েছে',gen:'রিপোর্ট তৈরি'}};
+var MO={hi:['जन','फ़र','मार्च','अप्रै','मई','जून','जुला','अग','सित','अक्टू','नव','दिस'],bn:['জানু','ফেব','মার্চ','এপ্রি','মে','জুন','জুলা','আগ','সেপ্টে','অক্টো','নভে','ডিসে']};
+var M3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DY={hi:['सोम','मंगल','बुध','गुरु','शुक्र','शनि','रवि'],bn:['সোম','মঙ্গল','বুধ','বৃহ','শুক্র','শনি','রবি']},D3=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var AP={hi:['पूर्वाह्न','अपराह्न'],bn:['পূর্বাহ্ণ','অপরাহ্ণ']};
+function loc(t,l){if(!DG[l])return t;t=t.replace(/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g,function(m){return DY[l][D3.indexOf(m)]}).replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/g,function(m){return MO[l][M3.indexOf(m)]}).replace(/\b(AM|PM)\b/g,function(m){return AP[l][m==='AM'?0:1]});return t.replace(/[0-9]/g,function(d){return DG[l][+d]})}
+window.JT=function(k){return (UI[cur]||UI.en)[k]||UI.en[k]};
+var GEN=(document.getElementById('gen')||{}).textContent||'';var GB=(GEN.match(/Report generated\s*(.*)/)||[0,''])[1];
+function apply(l){if(!LP[l])l='en';cur=l;
+ var im=document.querySelectorAll('.leaf img');for(var k=0;k<im.length;k++){var src=(LP[l]||LP.en)[k]||LP.en[k];if(src)im[k].setAttribute('src',src)}
+ document.documentElement.setAttribute('lang',l);
+ var h=document.getElementById('hint');if(h)h.textContent=JT('hint');
+ var sh=document.getElementById('share');if(sh)sh.textContent=JT('share');
+ var g=document.getElementById('gen');if(g)g.innerHTML=JT('gen')+' <b>'+loc(GB,l)+'</b>';
+ var nx=document.getElementById('next');var dots=document.getElementById('dots');var on=-1;for(var q=0;q<dots.children.length;q++){if(dots.children[q].className==='on')on=q}
+ if(nx)nx.textContent=on>=dots.children.length-1?JT('back'):JT('next');
+ [].forEach.call(document.querySelectorAll('.lg button'),function(b){b.className=b.getAttribute('data-l')===l?'on':''});
+ try{localStorage.setItem('jc_lang',l)}catch(e){}}
+[].forEach.call(document.querySelectorAll('.lg button'),function(b){b.addEventListener('click',function(e){e.stopPropagation();apply(b.getAttribute('data-l'))})});
+var want='en';try{want=(location.search.match(/[?&]lang=(en|hi|bn)/)||[0,localStorage.getItem('jc_lang')||'en'])[1]}catch(e){}
+apply(want);setTimeout(function(){var h=document.getElementById('hint');if(h)h.style.opacity=0},6000);
+})();</script>'''
 
 FX_JS = r"""<script>(function(){
 var T='__THEME__';if(!T)return;
@@ -187,7 +218,7 @@ def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise", gen="
     os.remove(tmp)
 
 
-def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
+def build(date, pages, headline="", mood="neutral", caption="", kind="morning", lang_pages=None):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%A, %d %B %Y")
@@ -215,11 +246,18 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning"):
         up = "../" * (1 + (1 if sub else 0))
         leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div><div class="shade"></div></div>'
                          % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
+        lp = {"en": [up + p for p in pages]}
+        for _l, _pp in (lang_pages or {}).items():
+            if len(_pp) == len(pages):
+                lp[_l] = [up + p for p in _pp]
+        _names = {"en": "English", "hi": "हिन्दी", "bn": "বাংলা"}
+        chips = ('<span class="lg">%s</span>' % "".join('<button data-l="%s">%s</button>' % (k, _names[k]) for k in ("en", "hi", "bn") if k in lp)) if len(lp) > 1 else ""
+        langjs = LANG_JS.replace("__LP__", json.dumps(lp)) if len(lp) > 1 else ""
         url = BASE + kind + "/" + sub
         og_path = os.path.join(folder, "og.jpg")
         _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
-                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin, fx=FX_JS.replace('__THEME__', theme) if theme else '')
+                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=date, kind=kind, admin=admin, chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)
         out[sub or "latest"] = url

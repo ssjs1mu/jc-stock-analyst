@@ -113,13 +113,13 @@
     {
       "id": "muhurat-special",
       "task_id": "",
-      "name": "Muhurat Trading 2026 (special)",
+      "name": "Muhurat Trading 2026 (special · EN / हिन्दी / বাংলা)",
       "icon": "🪔",
       "time": "18:15",
       "days": "once",
       "session": "evening",
       "kind": "pdf",
-      "file_pattern": "Muhurat_Trading_2026_Joshis_Corner.pdf",
+      "file_pattern": "Muhurat_Mobile_<lang>_2026-11-08_<page>.png",
       "summary": "Diwali Muhurat trading special: Samvat 2083 outlook, levels, sectors, picks. One-off edition, 8 Nov 2026.",
       "telegram": false
     }

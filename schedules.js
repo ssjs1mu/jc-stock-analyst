@@ -70,7 +70,20 @@
 
   // ---- rendering ------------------------------------------------------------
   const daysLabel = (s) => (s.days === 'once' ? 'One-off special' : s.days === 'daily' ? 'Every day' : 'Mon–Fri (trading days)');
+  // ---- language (English / Hindi / Bengali editions are separate picture files tagged _HI_ / _BN_) ----
+  const LGN = { en: 'English', hi: 'हिन्दी', bn: 'বাংলা' };
+  const langOf = (f) => (/_(HI|BN)(?=[_.])/.exec(f.name || '') || [0, 'en'])[1].toLowerCase();
+  const getLang = () => { try { return localStorage.getItem('jc_lang') || 'en'; } catch (e) { return 'en'; } };
+  const setLang = (l) => { try { localStorage.setItem('jc_lang', l); } catch (e) { /* private mode */ } };
+  const DG = { hi: '०१२३४५६७८९', bn: '০১২৩৪৫৬৭৮৯' };
   function fileLinks(run) {
+    const fl = run.files || [];
+    if (fl.some((f) => langOf(f) !== 'en')) {   // grouped: one link per edition (page 1) instead of every page
+      const out = [];
+      ['en', 'hi', 'bn'].forEach((l) => { const g = fl.filter((f) => f.type === 'png' && langOf(f) === l && /_Mobile_/.test(f.name)); if (g.length) out.push(`<a class="sclink" href="${esc(g[0].path)}" target="_blank" rel="noopener">🖼 ${LGN[l]} (${g.length})</a>`); });
+      fl.filter((f) => f.type !== 'png' || !/_Mobile_/.test(f.name)).forEach((f) => out.push(`<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}</a>`));
+      return out.join(' ');
+    }
     return (run.files || []).map((f) => `<a class="sclink" href="${esc(f.path)}" target="_blank" rel="noopener">${f.type === 'png' ? '🖼' : '📄'} ${esc(f.type.toUpperCase())}</a>`).join(' ');
   }
   function latestOk(id) { return ((S.idx[id] && S.idx[id].runs) || []).find((r) => r.status === 'ok' && r.files && r.files.length); }
@@ -94,14 +107,18 @@
     if (!last) {
       viewer = `<div class="note">No report has been published here yet. The first one appears after the next run (${nx ? fmtDay(nx) + ', ' + fmt12(s.time) + ' IST' : '—'}). Expected file: <code>${esc(s.file_pattern || '')}</code></div>`;
     } else {
-      const pdf = last.files.find((f) => f.type === 'pdf'); const png = last.files.find((f) => f.type === 'png');
+      const LG = getLang(); const hasL = last.files.some((f) => langOf(f) !== 'en');
+      const pdf = last.files.find((f) => f.type === 'pdf' && langOf(f) === LG) || last.files.find((f) => f.type === 'pdf'); const png = last.files.find((f) => f.type === 'png');
+      const langPngs = hasL && LG !== 'en' ? last.files.filter((f) => f.type === 'png' && langOf(f) === LG && /_Mobile_/.test(f.name)) : [];
+      const chips = hasL ? `<span class="sclang">${['en', 'hi', 'bn'].map((l) => `<button type="button" data-lang="${l}" class="${l === LG ? 'on' : ''}">${LGN[l]}</button>`).join('')}</span>` : '';
       const stale = last.date !== istDate(istNow());
       const bar = `<div class="scbar"><b>Latest:</b> ${esc(fmtStamp(last.generated_at))}${stale ? ' <span class="scst mute">older report</span>' : ''}
-        ${last.caption ? `<span class="sccap">${esc(last.caption)}</span>` : ''}<span class="spacer"></span>${fileLinks(last)}
+        ${last.caption ? `<span class="sccap">${esc(last.caption)}</span>` : ''}${chips}<span class="spacer"></span>${fileLinks(last)}
         ${pdf ? `<a class="goBtn sclinkbtn" href="${esc(pdf.path)}" download>⬇ Download PDF</a>` : ''}</div>`;
       // Picture first when there is one (renders everywhere); phones can't embed PDFs reliably, so give them a button.
-      const pngs = last.files.filter((f) => f.type === 'png');
-      const body = pdf && png && window.innerWidth >= 700 ? `<iframe class="scpdf" src="${esc(pdf.path)}#view=FitH" title="${esc(s.name)} PDF"></iframe>`
+      const pngs = last.files.filter((f) => f.type === 'png' && (!hasL || langOf(f) === 'en'));
+      const body = langPngs.length ? langPngs.map((p) => `<img class="scpng" src="${esc(p.path)}" alt="${esc(s.name)}">`).join('')
+        : pdf && png && window.innerWidth >= 700 ? `<iframe class="scpdf" src="${esc(pdf.path)}#view=FitH" title="${esc(s.name)} PDF"></iframe>`
         : png ? pngs.map((p) => `<img class="scpng" src="${esc(p.path)}" alt="${esc(s.name)}">`).join('')
         : pdf && window.innerWidth < 700 ? `<a class="goBtn sclinkbtn scbig" href="${esc(pdf.path)}" target="_blank" rel="noopener">📄 Open ${esc(s.name)} PDF</a>`
         : pdf ? `<iframe class="scpdf" src="${esc(pdf.path)}#view=FitH" title="${esc(s.name)} PDF"></iframe>` : '';
@@ -212,6 +229,7 @@
   };
 
   document.addEventListener('click', (e) => {
+    const lb = e.target.closest('.sclang button'); if (lb) { setLang(lb.dataset.lang); const cur = window.__curTab || ''; if (cur.startsWith('pS_')) renderPanel(cur); return; }
     const a = e.target.closest('[data-go]'); if (!a) return;
     e.preventDefault(); window.showTab(a.getAttribute('data-go'));
   });
