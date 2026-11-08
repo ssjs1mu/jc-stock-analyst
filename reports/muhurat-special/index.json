@@ -1,0 +1,57 @@
+{
+ "schedule_id": "muhurat-special",
+ "runs": [
+  {
+   "generated_at": "2026-11-08T11:52:51+05:30",
+   "date": "2026-11-08",
+   "status": "ok",
+   "caption": "Muhurat Trading 2026 \u00b7 Samvat 2083 \u2014 Diwali special",
+   "note": "",
+   "files": [
+    {
+     "name": "Muhurat_Trading_2026_Joshis_Corner.pdf",
+     "path": "reports/muhurat-special/Muhurat_Trading_2026_Joshis_Corner.pdf",
+     "type": "pdf",
+     "bytes": 4687696
+    },
+    {
+     "name": "Muhurat_p1.png",
+     "path": "reports/muhurat-special/Muhurat_p1.png",
+     "type": "png",
+     "bytes": 1318628
+    },
+    {
+     "name": "Muhurat_p2.png",
+     "path": "reports/muhurat-special/Muhurat_p2.png",
+     "type": "png",
+     "bytes": 1099603
+    },
+    {
+     "name": "Muhurat_p3.png",
+     "path": "reports/muhurat-special/Muhurat_p3.png",
+     "type": "png",
+     "bytes": 1350959
+    },
+    {
+     "name": "Muhurat_p4.png",
+     "path": "reports/muhurat-special/Muhurat_p4.png",
+     "type": "png",
+     "bytes": 1410411
+    },
+    {
+     "name": "Muhurat_p5.png",
+     "path": "reports/muhurat-special/Muhurat_p5.png",
+     "type": "png",
+     "bytes": 1389652
+    },
+    {
+     "name": "Muhurat_p6.png",
+     "path": "reports/muhurat-special/Muhurat_p6.png",
+     "type": "png",
+     "bytes": 1451199
+    }
+   ]
+  }
+ ],
+ "updated_at": "2026-11-08T11:52:51+05:30"
+}
