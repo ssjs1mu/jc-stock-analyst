@@ -1,0 +1,264 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "09 Nov 2026",
+ "report_time": "09:15 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "neutral",
+  "label": "Flat to marginally mixed start",
+  "sub": "Indicative Nifty opening zone 24,989 - 25,064"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Flat to marginally mixed start: Wall Street firm, Asia positive, rupee firmer. Expected Nifty opening zone: 24,989 - 25,064 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,026.5 (-20 pts, -0.08% vs Nifty's last close).",
+      "US: S&P 500 +0.31%, Nasdaq +1.09%, Dow -0.46%.",
+      "Asia this morning: Nikkei +3.44%, Hang Seng +0.13%, Kospi +1.09%.",
+      "Currency, crude and volatility: Brent 98.16 (-0.16%); USD/INR 93.692 (-0.81%); India VIX 18.13 (+3.78%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty closed within 0.3% of its resistance pivot (25,068), so that level decides the early direction."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today (Mon 09 Nov 2026) (moved from Tuesday's holiday).",
+      "Results today (6 companies): MEDICO, OLECTRA, PARKHOSPS, RMDRIP, SVPGLOB, WHIRLPOOL."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "ADANIENT",
+       "In the news",
+       "Top stocks to watch today: Tata Steel, Adani Enterprises, Marico shares in focus on Monday"
+      ],
+      [
+       "WIPRO",
+       "In the news",
+       "Stocks in news: M&M, BHEL, Adani Enterprises, Wipro, Tata Steel, Siemens and Divi's Labs"
+      ],
+      [
+       "HDFCLIFE",
+       "Volume surge (last session)",
+       "2.7x average volume, +3.95%"
+      ],
+      [
+       "MARUTI",
+       "Volume surge (last session)",
+       "1.9x average volume, +0.77%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Stock Market Today: Sensex, Nifty Rise 0.6% Pre-Open",
+      "Sensex & Nifty 50 | Stock Market Live Updates Today: GIFT Nifty Signals Positive Start, Q2 Earnings and FII Flows in Focus",
+      "GIFT Nifty up 55 pts, signals firm start for Sensex, Nifty as Asian markets rebound, crude oil falls",
+      "Muhurat Trading 2026: Indian Stock Market Opens Today for D\u2026"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,285.73",
+        "-0.46%"
+       ],
+       [
+        "S&P 500",
+        "7,376.86",
+        "+0.31%"
+       ],
+       [
+        "Nasdaq Composite",
+        "24,579.43",
+        "+1.09%"
+       ],
+       [
+        "FTSE 100",
+        "10,673.90",
+        "-1.01%"
+       ],
+       [
+        "DAX",
+        "25,820.36",
+        "-1.92%"
+       ],
+       [
+        "Nikkei 225",
+        "59,411.34",
+        "+3.44%"
+       ],
+       [
+        "Hang Seng",
+        "24,512.70",
+        "+0.13%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,665.51",
+        "+0.45%"
+       ],
+       [
+        "Kospi",
+        "5,114.80",
+        "+1.09%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "98.16",
+        "-0.16%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "91.15",
+        "+0.35%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,126.80",
+        "+1.27%"
+       ],
+       [
+        "USD/INR",
+        "93.69",
+        "-0.81%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "102.18",
+        "-0.12%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.86",
+        "+0.45%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "24,900",
+       "25,068"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "24,800",
+       "25,101"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (24,989 - 25,064) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
