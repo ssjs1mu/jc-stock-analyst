@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-09T21:13:20+05:30",
+   "date": "2026-11-09",
+   "status": "ok",
+   "caption": "Circuit Watch, session of Mon 9 Nov 2026: Sensex 81,106.65, Nifty 25,044.65; no confirmed lower-circuit locks, small-cap upper-circuit data flagged unverified",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-09.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-09.pdf",
+     "type": "pdf",
+     "bytes": 8401
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-06T21:16:20+05:30",
    "date": "2026-11-06",
    "status": "ok",
@@ -235,5 +250,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-06T21:16:20+05:30"
+ "updated_at": "2026-11-09T21:13:20+05:30"
 }
