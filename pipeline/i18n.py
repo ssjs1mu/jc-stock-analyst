@@ -273,7 +273,7 @@ def _needs(t):
         return False
     if t in G or _date_for.match(t) or _gen.match(t) or _exp.match(t):
         return True
-    if len(re.findall(r"\b[A-Za-z]{3,}\b", t)) >= 2 and re.search(r"[A-Z]{3,}", t) and _ticker.match(t):
+    if len(re.findall(r"\b[A-Za-z]{3,}\b", t)) >= 2 and re.search(r"[A-Z]{3,}", t) and _ticker.match(t) and "," not in t:
         return True                       # shouty label such as "FLAT TO MARGINALLY MIXED START" (not a lone ticker)
     return bool(re.search(r"[A-Za-z]{3,}", t)) and not _ticker.match(t)
 
