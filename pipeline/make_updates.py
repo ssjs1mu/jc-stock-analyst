@@ -123,7 +123,7 @@ def build():
 .act a,.act button{border:0;border-radius:22px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none;color:#fff}.wa{background:#25D366}.cp{background:#E2B84A;color:#2a1c00!important}</style></head><body><div class="w">
 <div class="b">Joshi's Corner</div><div class="sub">Daily reports &middot; Mon-Fri, NSE trading days</div><div class="grid">%(tiles)s</div>
 <div class="m" id="msg">%(msg)s</div><div class="act"><a class="wa" href="%(wa)s" target="_blank" rel="noopener">Share on WhatsApp</a><button class="cp" onclick="navigator.clipboard.writeText(document.getElementById('msg').innerText).then(function(){this.textContent='Copied'}.bind(this))">Copy message</button></div>
-<p class="sub" style="margin-top:18px;font-size:12.5px">Updated %(now)s. Not investment advice.</p></div></body></html>""" % dict(
+<p class="sub" style="margin-top:18px;font-size:12.5px">Updated %(now)s. Not investment advice.</p></div><script src="https://ssjs1mu.github.io/jc-stock-analyst/analytics.js?v=1" defer></script></body></html>""" % dict(
         title=html.escape(title), base=BASE, font=brand.font_css(), script=brand.SCRIPT_STACK.replace('"', "'"), tiles=tiles, msg=html.escape(msg), wa=wa, now=fmt_gen(now))
     open(os.path.join(out, "index.html"), "w").write(doc)
     return BASE + "updates/"

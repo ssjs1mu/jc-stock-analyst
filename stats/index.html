@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Joshi's Corner - Report readership</title>
+<style>body{font-family:Inter,system-ui,Arial,sans-serif;background:#0d0a18;color:#f4efe0;margin:0;padding:14px}h1{font-size:19px;color:#E2B84A;margin:0 0 4px}
+.s{font-size:12.5px;opacity:.75;margin-bottom:10px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #ffffff2a;padding:6px 8px;text-align:right}th{background:#241a3a;color:#E2B84A;position:sticky;top:0}td:first-child,th:first-child{text-align:left}
+.w{overflow-x:auto}tr:nth-child(even) td{background:#ffffff08}</style></head><body>
+<h1>Report readership &amp; feedback</h1><div class="s" id="s">Loading...</div>
+<div class="w"><table id="t"><thead><tr><th>Report</th><th>Views today</th><th>Unique today</th><th>Views month</th><th>Unique month</th><th>Views YTD</th><th>Unique YTD</th><th>Rating (avg)</th><th>Ratings</th><th>Useful %</th><th>EN / HI / BN</th></tr></thead><tbody></tbody></table></div>
+<script>
+var ENDPOINT=""; /* same Apps Script URL as in analytics.js */
+var NAME={morning:"Morning Sunrise",evening:"Evening Breeze",muhurat:"Muhurat Trading",updates:"All-reports card",app:"Reports tab / app"};
+var s=document.getElementById("s");
+if(!ENDPOINT){s.textContent="Not connected yet: paste the Apps Script URL into ENDPOINT (apps_script/README.md)."}
+else fetch(ENDPOINT+"?action=stats").then(function(r){return r.json()}).then(function(d){
+ s.textContent="As of "+d.generated+" (IST). Unique = distinct devices.";var b=document.querySelector("#t tbody");
+ Object.keys(d.reports).sort().forEach(function(k){var x=d.reports[k],L=x.by_lang||{};
+  b.insertAdjacentHTML("beforeend","<tr><td>"+(NAME[k]||k)+"</td><td>"+x.day+"</td><td>"+x.unique_day+"</td><td>"+x.month+"</td><td>"+x.unique_month+"</td><td>"+x.ytd+"</td><td>"+x.unique_ytd+"</td><td>"+(x.avg_rating==null?"-":x.avg_rating+" / 5")+"</td><td>"+x.rate_n+"</td><td>"+(x.useful_n?Math.round(100*x.useful_yes/x.useful_n)+"%":"-")+"</td><td>"+(L.en||0)+" / "+(L.hi||0)+" / "+(L.bn||0)+"</td></tr>")})
+}).catch(function(e){s.textContent="Could not load stats: "+e});
+</script></body></html>
