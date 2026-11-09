@@ -14,8 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       ids:
-        description: 'Space-separated schedule ids (e.g. "evening-market-wrap")'
-        required: true
+        description: 'Space-separated schedule ids (e.g. "evening-market-wrap"); empty = build whatever is due now'
+        required: false
+        default: ''
       force:
         description: 'Rebuild even if already published today'
         type: boolean
@@ -47,7 +48,7 @@ jobs:
         id: pick
         run: |
           IDS="${{ github.event.inputs.ids }}"
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ -z "$IDS" ]; then
             IDS=$(python3 - <<'PY'
           import json, datetime as dt
           ist = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=5, minutes=30)

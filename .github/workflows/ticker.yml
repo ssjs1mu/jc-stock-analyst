@@ -1,0 +1,41 @@
+name: Ticker (free self-running clock, no Claude / no subscription)
+
+# GitHub's own cron is often late or skipped. This workflow is a clock that lives entirely inside
+# GitHub: once started it loops for ~5h50m, and every 5 minutes (07:30-21:00 IST, Mon-Fri) it
+# starts "Auto reports" with no ids, which builds whatever is due and not yet published. Just before
+# its own time limit it starts the next ticker, so the chain continues by itself. A sparse cron
+# restarts the chain if it ever breaks. Nothing here needs a Claude session, token or paid API.
+on:
+  schedule:
+    - cron: '7,37 1-14 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ticker
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - name: Tick every 5 minutes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          end=$(( $(date +%s) + 5*3600 + 50*60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            ist=$(TZ=Asia/Kolkata date +%u%H%M)   # weekday(1-7) HH MM
+            dow=${ist:0:1}; hm=$((10#${ist:1:4}))
+            if [ "$dow" -le 5 ] && [ "$hm" -ge 730 ] && [ "$hm" -le 2100 ]; then
+              gh workflow run auto-reports.yml --ref main || echo "dispatch failed (will retry next tick)"
+            fi
+            sleep 300
+          done
+          # hand over to the next ticker (queued behind this one by the concurrency group)
+          gh workflow run ticker.yml --ref main || true
