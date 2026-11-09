@@ -16,7 +16,7 @@ function doPost(e) {
   try {
     var ev = JSON.parse(e.postData.contents).events || [], by = {};
     ev.forEach(function (x) { if (SHEETS[x.type]) (by[x.type] = by[x.type] || []).push(SHEETS[x.type].map(function (c) { return String(x[c] === undefined ? '' : x[c]).slice(0, 500); })); });
-    Object.keys(by).forEach(function (t) { var sh = sheet_(t); sh.getRange(sh.getLastRow() + 1, 1, by[t].length, SHEETS[t].length).setValues(by[t]); });
+    Object.keys(by).forEach(function (t) { var sh = sheet_(t); sh.getRange(sh.getLastRow() + 1, 1, by[t].length, SHEETS[t].length).setNumberFormat('@').setValues(by[t]); });
   } finally { lock.release(); }
   return ContentService.createTextOutput('ok');
 }
@@ -25,7 +25,7 @@ function doGet(e) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), mon = today.slice(0, 7), yr = today.slice(0, 4), out = {generated: today, reports: {}};
   function R(k) { return out.reports[k] = out.reports[k] || {day: 0, month: 0, ytd: 0, total: 0, uday: {}, umon: {}, uytd: {}, rate_n: 0, rate_sum: 0, useful_yes: 0, useful_n: 0, by_lang: {}, series: {}}; }
   rows_('view').forEach(function (r) {
-    var d = String(r[0]).slice(0, 10), x = R(r[1]); x.total++;
+    var d = (r[0] instanceof Date ? Utilities.formatDate(r[0], 'Asia/Kolkata', 'yyyy-MM-dd') : String(r[0]).slice(0, 10)), x = R(r[1]); x.total++;
     if (d === today) { x.day++; x.uday[r[4]] = 1; } if (d.slice(0, 7) === mon) { x.month++; x.umon[r[4]] = 1; } if (d.slice(0, 4) === yr) { x.ytd++; x.uytd[r[4]] = 1; }
     x.by_lang[r[3]] = (x.by_lang[r[3]] || 0) + 1; x.series[d] = (x.series[d] || 0) + 1;
   });
