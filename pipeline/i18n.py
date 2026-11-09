@@ -264,10 +264,18 @@ _prot = re.compile(r"(<style\b.*?</style>|<script\b.*?</script>|<svg\b.*?</svg>)
 _node = re.compile(r">([^<>]+)<")
 
 
+_tag = re.compile(r"^(hares|nsurance|estaurant)\b")   # pieces of the S.I.R tagline: brand text, never translated
+
+
 def _needs(t):
+    t = re.sub(r"\s+", " ", t.replace("\xa0", " ")).strip()
+    if _tag.match(t) or t in KEEP:
+        return False
     if t in G or _date_for.match(t) or _gen.match(t) or _exp.match(t):
         return True
-    return bool(re.search(r"[A-Za-z]{3,}", t)) and t not in KEEP and not _ticker.match(t)
+    if len(re.findall(r"\b[A-Za-z]{3,}\b", t)) >= 2 and re.search(r"[A-Z]{3,}", t) and _ticker.match(t):
+        return True                       # shouty label such as "FLAT TO MARGINALLY MIXED START" (not a lone ticker)
+    return bool(re.search(r"[A-Za-z]{3,}", t)) and not _ticker.match(t)
 
 
 def font_css(lang):
