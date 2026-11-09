@@ -1,0 +1,500 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "09 Nov 2026",
+  "date_iso": "2026-11-09",
+  "mood": {
+   "key": "neutral",
+   "label": "Range-bound close",
+   "sub": "Nifty +0.06% in the session"
+  },
+  "label": "Range-bound close",
+  "headline": "Nifty ends little changed, Banks lead",
+  "summary": "Nifty 50 closed at 25,044.65 (+0.06%) and Sensex at 81,106.65 (+0.10%). Banks: Bank Nifty +1.11%. India VIX 17.42 (-0.29%). Brent crude -1.36%, USD/INR 93.927. 24 of 50 Nifty stocks advanced and 25 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "25,044.65",
+    "pct": "+0.06%",
+    "pts": "+14.30"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "81,106.65",
+    "pct": "+0.10%",
+    "pts": "+78.62"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "59,741.25",
+    "pct": "+1.11%",
+    "pts": "+655.25"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "23,567.00",
+    "pct": "+0.47%",
+    "pts": "+110.05"
+   }
+  ],
+  "spark": [
+   22622.69921875,
+   22997.349609375,
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625
+  ],
+  "flows": {
+   "date": "05 Nov",
+   "fii": 14974.68,
+   "dii": -10444.54
+  },
+  "breadth": {
+   "up": 24,
+   "dn": 25
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "24,744 - 24,894",
+    "r": "25,140 - 25,234",
+    "note": "A close above 25,140 opens up 25,234; a slide below 24,894 would expose 24,744."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "58,590 - 59,166",
+    "r": "60,029 - 60,317",
+    "note": "A close above 60,029 opens up 60,317; a slide below 59,166 would expose 58,590."
+   }
+  ],
+  "events": [
+   "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 12 Nov 2026."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "51,285.73",
+    "pct": "-0.46%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,376.86",
+    "pct": "+0.31%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "24,579.43",
+    "pct": "+1.09%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,739.11",
+    "pct": "+0.61%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "25,999.85",
+    "pct": "+0.70%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "58,775.50",
+    "pct": "+2.33%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "24,448.95",
+    "pct": "-0.13%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,660.79",
+    "pct": "+0.32%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,018.85",
+    "pct": "-0.81%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "96.98",
+    "pct": "-1.36%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "89.88",
+    "pct": "-1.05%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "4,108.20",
+    "pct": "+0.82%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "93.927",
+    "pct": "-0.56%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "101.83",
+    "pct": "-0.45%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.86",
+    "pct": "+0.45%"
+   }
+  ],
+  "vix": {
+   "level": "17.42",
+   "pct": "-0.29%",
+   "gauge": 0.6289999961853028,
+   "text": "India VIX 17.42."
+  },
+  "headlines": [
+   "Sensex Today Ends 107 Points Higher",
+   "Sensex, Nifty Close Higher After Roller-Coaster Session, Late Recovery Erases Sharp Intraday Losses",
+   "Sensex, Nifty end flat after range-bound trade; PSU Bank stocks lead gains",
+   "Sensex Closes 107 Points Higher, Nifty Reclaims 25,000 as PSU Banks Surge 3.7% While IT Slides",
+   "Sensex, Nifty end higher: 3 reasons why PSU banks, defence stocks rallied today",
+   "Stock Market Holiday: NSE And BSE To Remain Shut On November 10 For Diwali-Balipratipada",
+   "Is stock market closed tomorrow in India? Holiday in NSE, BSE or trading of shares allowed? Check exchange calendar",
+   "Sensex Falls 141 Points, Nifty 50 Slips Below 24,950 as Investors Assess U.S.-Iran Talks"
+  ],
+  "gainers": [
+   [
+    "DIVISLAB",
+    "11,565.50",
+    "+12.06%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,904.50",
+    "+2.39%"
+   ],
+   [
+    "SBIN",
+    "1,042.00",
+    "+2.31%"
+   ],
+   [
+    "NTPC",
+    "328.75",
+    "+1.64%"
+   ],
+   [
+    "LT",
+    "4,185.00",
+    "+1.63%"
+   ]
+  ],
+  "losers": [
+   [
+    "INFY",
+    "1,154.10",
+    "-2.31%"
+   ],
+   [
+    "HCLTECH",
+    "1,407.00",
+    "-2.29%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,064.85",
+    "-2.11%"
+   ],
+   [
+    "SBILIFE",
+    "1,748.00",
+    "-2.02%"
+   ],
+   [
+    "HEROMOTOCO",
+    "5,410.50",
+    "-1.86%"
+   ]
+  ],
+  "shock": [
+   [
+    "DIVISLAB",
+    "11,565.50",
+    "3.8x avg vol",
+    "+12.06%"
+   ],
+   [
+    "GRASIM",
+    "3,169.70",
+    "2.5x avg vol",
+    "-1.78%"
+   ],
+   [
+    "TATASTEEL",
+    "184.85",
+    "2.2x avg vol",
+    "-0.78%"
+   ],
+   [
+    "SBIN",
+    "1,042.00",
+    "2.1x avg vol",
+    "+2.31%"
+   ]
+  ],
+  "opening": {
+   "label": "Flat to marginally mixed start",
+   "zone": "24,997 - 25,072",
+   "headline": "Flat to marginally mixed start: Wall Street firm, Asia positive, crude easing",
+   "drivers": [
+    "GIFT Nifty 25,035.5 (-9 pts, -0.04% vs Nifty's last close).",
+    "US: S&P 500 +0.31%, Nasdaq +1.09%, Dow -0.46%.",
+    "Asia this morning: Nikkei +2.33%, Hang Seng -0.13%, Kospi -0.81%.",
+    "Currency, crude and volatility: Brent 96.98 (-1.36%); USD/INR 93.927 (-0.56%); India VIX 17.42 (-0.29%)."
+   ],
+   "next": "Wednesday, 11 November 2026",
+   "mood": "neutral",
+   "gift": {
+    "last": "25,035.5",
+    "pct": "+0.18%",
+    "premium": "-9 pts",
+    "vs": "-0.04%",
+    "asof": "09 Nov 16:00"
+   },
+   "anchored": true
+  },
+  "nextday": {
+   "date": "Wednesday, 11 November 2026",
+   "results": [
+    "HINDCOPPER",
+    "TATAPOWER",
+    "AFSL",
+    "AIRAN",
+    "AMBIKCO",
+    "AVTNPL",
+    "BAFNAPH",
+    "BAJAJHIND",
+    "BALPHARMA",
+    "BANARISUG",
+    "BASML",
+    "BURNPUR",
+    "CUPID",
+    "DCXINDIA"
+   ],
+   "results_n": 46,
+   "actions": [
+    {
+     "sym": "CHAMBLFERT",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "BALRAMCHIN",
+     "what": "Interim Dividend - Rs 4 Per Share"
+    },
+    {
+     "sym": "GALAXYSURF",
+     "what": "Interim Dividend - Rs 18 Per Share"
+    },
+    {
+     "sym": "GPTINFRA",
+     "what": "Interim Dividend - Re 1 Per Share"
+    },
+    {
+     "sym": "HUDCO",
+     "what": "Interim Dividend - Rs 1.35 Per Share"
+    },
+    {
+     "sym": "JMFINANCIL",
+     "what": "Interim Dividend - Rs 1.65 Per Share"
+    },
+    {
+     "sym": "JYOTHYLAB",
+     "what": "Buy Back"
+    },
+    {
+     "sym": "LALPATHLAB",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "NAVNETEDUL",
+     "what": "Special Dividend - Rs 1.50 Per Share/ Interim Dividend - Rs 1.50 Per S"
+    },
+    {
+     "sym": "NBCC",
+     "what": "Interim Dividend - Re 0.25 Per Share"
+    },
+    {
+     "sym": "NRBBEARING",
+     "what": "Interim Dividend - Rs 2.50 Per Share"
+    },
+    {
+     "sym": "PDSL",
+     "what": "Interim Dividend - Rs 2.20 Per Share"
+    },
+    {
+     "sym": "PREMIERENE",
+     "what": "Interim Dividend - Re 0.50 Per Share"
+    },
+    {
+     "sym": "RITES",
+     "what": "Interim Dividend - Rs 1.90 Per Share"
+    },
+    {
+     "sym": "SONATSOFTW",
+     "what": "Interim Dividend - Rs 1.25 Per Share"
+    },
+    {
+     "sym": "ADFFOODS",
+     "what": "Interim Dividend - Re 0.60 Per Share"
+    },
+    {
+     "sym": "AUROPHARMA",
+     "what": "Interim Dividend - Rs 7 Per Share"
+    },
+    {
+     "sym": "BALKRISIND",
+     "what": "Interim Dividend - Rs 4 Per Share"
+    },
+    {
+     "sym": "CONCOR",
+     "what": "Interim Dividend - Rs 1.90 Per Share"
+    }
+   ],
+   "due": []
+  },
+  "story": [
+   "Nifty 50 opened at 25,074, a gap-up of 0.17% from the previous close of 25,030.",
+   "The index dipped to a low of 24,839 (-0.76%) around 10:40 AM and touched a high of 25,081 (+0.20%) around 9:15 AM.",
+   "It settled at 25,045 (+0.06%), near the top of the day's range, so buyers held control into the close.",
+   "The final hour added +49 points.",
+   "24 of the 50 Nifty stocks advanced and 25 declined; Bank Nifty outperformed (+1.11%).",
+   "Latest institutional data (05 Nov): FII/FPI net +14975 Cr, DII net -10445 Cr."
+  ],
+  "risks": [
+   "Markets stay shut until Wednesday (2 days): weekend news, geopolitics and any Wall Street or Asian moves will all be priced in at the open.",
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,376.86 (+0.31%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$96.98 (-1.36%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 93.927 (-0.56%), US 10-year yield 4.86% (+0.45%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 25,035.5 (-0.04% vs Nifty's close): the best live read on the next opening."
+  ],
+  "vol_movers": [
+   [
+    "DIVISLAB",
+    "11,565.50",
+    "6.5%",
+    "+12.06%"
+   ],
+   [
+    "TATASTEEL",
+    "184.85",
+    "5.2%",
+    "-0.78%"
+   ],
+   [
+    "HINDALCO",
+    "960.00",
+    "5.0%",
+    "+0.17%"
+   ],
+   [
+    "TRENT",
+    "3,119.20",
+    "3.4%",
+    "+1.31%"
+   ],
+   [
+    "NESTLEIND",
+    "1,297.80",
+    "3.3%",
+    "+1.22%"
+   ],
+   [
+    "ULTRACEMCO",
+    "12,275.00",
+    "2.9%",
+    "-1.41%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "DIVISLAB",
+    "11,565.50",
+    "3.8x vol",
+    "+12.06%"
+   ],
+   [
+    "SBIN",
+    "1,042.00",
+    "2.1x vol",
+    "+2.31%"
+   ],
+   [
+    "HDFCBANK",
+    "798.15",
+    "1.9x vol",
+    "+1.26%"
+   ],
+   [
+    "ICICIBANK",
+    "1,589.00",
+    "1.8x vol",
+    "+1.13%"
+   ]
+  ],
+  "pv_dn": [
+   [
+    "GRASIM",
+    "3,169.70",
+    "2.5x vol",
+    "-1.78%"
+   ],
+   [
+    "BPCL",
+    "316.00",
+    "1.2x vol",
+    "-1.22%"
+   ]
+  ],
+  "asof": "04:07 PM IST"
+ },
+ "title": "Evening Breeze (09 Nov 2026)",
+ "headline": "Nifty ends little changed, Banks lead",
+ "mood": {
+  "key": "neutral",
+  "label": "Range-bound close",
+  "sub": "Nifty +0.06% in the session"
+ },
+ "mood_score": 0.07998727170195494,
+ "mood_pic": "bull_over_bear",
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
