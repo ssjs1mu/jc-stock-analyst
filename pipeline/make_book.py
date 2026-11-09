@@ -89,7 +89,7 @@ document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text
   if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
   msg+=' <span style="opacity:.8">(No report is issued on market holidays.)</span>';o.innerHTML=msg;o.style.display='block'}})();
 z();setTimeout(function(){document.getElementById('hint').style.opacity=0},6000)})();
-</script>%(fx)s<script src="https://ssjs1mu.github.io/jc-stock-analyst/analytics.js?v=1" defer></script></body></html>"""
+</script>%(fx)s<script src="https://ssjs1mu.github.io/jc-stock-analyst/analytics.js?v=2" defer></script></body></html>"""
 
 LANG_JS = r'''<script>(function(){
 var LP=__LP__,DEF=document.documentElement.lang||'en',cur='en';
