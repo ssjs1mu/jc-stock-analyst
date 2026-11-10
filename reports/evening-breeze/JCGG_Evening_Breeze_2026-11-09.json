@@ -397,8 +397,7 @@
    "It settled at 25,045 (+0.23%), near the top of the day's range, so buyers held control into the close.",
    "The final hour added +49 points.",
    "22 of the 50 Nifty stocks advanced and 27 declined; Bank Nifty outperformed (+1.51%).",
-   "Latest institutional data (08 Nov): FII/FPI net -0 Cr, DII net -700 Cr.",
-   "Corrected edition: changes are measured from the 8 Nov special-session close (the first edition used the close before it)."
+   "Latest institutional data (08 Nov): FII/FPI net nil, DII net -700 Cr."
   ],
   "risks": [
    "Markets stay shut until Wednesday (2 days): weekend news, geopolitics and any Wall Street or Asian moves will all be priced in at the open.",
@@ -492,8 +491,9 @@
    ]
   ],
   "asof": "04:07 PM IST",
+  "gen": "04:07 PM; corrected 10 Nov, 12:51 PM",
   "corrected": {
-   "on": "2026-11-10T12:49:00+05:30",
+   "on": "2026-11-10T12:51:16+05:30",
    "base": "2026-11-08"
   }
  },
