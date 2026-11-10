@@ -102,6 +102,7 @@ async function moodNow(idx) {
 (async () => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   if (dow === 0 || dow === 6) { console.log('Weekend — no call book.'); return; }
+  try { const hol = (JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'festivals.json'), 'utf8')).days || []).find((d) => d.trading_holiday && d.date === today); if (hol && !FORCE) { console.log('NSE trading holiday (' + hol.name + ') — no call book.'); return; } } catch (e) { console.log('holiday list unreadable: ' + e.message); }
   let prev = null; try { prev = JSON.parse(fs.readFileSync(LATEST, 'utf8')); } catch (e) { /* none */ }
   if (prev && prev.date === today && !FORCE && !BOARD_ONLY) { // call book is done; still make sure the client board exists for today
     let bd = null; try { bd = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'board.json'), 'utf8')); } catch (e) { /* none */ }

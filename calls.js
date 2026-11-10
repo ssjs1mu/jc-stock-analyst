@@ -21,7 +21,9 @@
   const istMin = () => { const d = new Date(Date.now() + 19800000); return d.getUTCHours() * 60 + d.getUTCMinutes(); };
   const istToday = () => new Date(Date.now() + 19800000).toISOString().slice(0, 10);
   const istDow = () => new Date(Date.now() + 19800000).getUTCDay(); // 0 Sun … 6 Sat
-  const isWeekday = () => istDow() >= 1 && istDow() <= 5;
+  const holName = (iso) => (window.JC_HOL || {})[iso || istToday()] || '';   // NSE trading holiday (data/festivals.json)
+  const isWeekday = () => istDow() >= 1 && istDow() <= 5 && !holName();
+  const purgeHol = () => { C.book.calls = C.book.calls.filter((c) => !(c.type === 'DAY' && holName(c.date))); };   // a day call cannot exist on a day the market is shut
   const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
   const fmtD = (iso) => { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00Z'); return d.toLocaleDateString('en-IN', { timeZone: 'UTC', day: '2-digit', month: 'short', year: '2-digit', weekday: 'short' }); };
   const yfOf = (c) => (c.ex === 'BO' ? c.sym + '.BO' : c.sym + '.NS');
@@ -38,9 +40,10 @@
     Object.keys(b.days || {}).forEach((d) => { if (!C.book.days[d]) C.book.days[d] = b.days[d]; }); C.book.updated = Math.max(C.book.updated || 0, b.updated || 0);
   }
   async function loadBook() {
+    try { await window.JC_HOLP; } catch (e) {}
     try { const j = await api('calls_load'); mergeBook(j); C.src = 'drive'; C.err = ''; cacheBook(); }
     catch (e) { C.err = /unknown action/i.test(e.message || '') ? 'The Apps Script backend is the old version — redeploy Code.gs as a New version (call book needs v9).' : (e && e.message) || 'backend not reachable'; const c = readCache(); if (c && !C.loaded) mergeBook(c); C.src = 'browser'; }
-    C.loaded = true;
+    purgeHol(); C.loaded = true;
   }
   function queueSave(rec) { C.dirty[rec.id] = rec; clearTimeout(C.saveT); C.saveT = setTimeout(flush, 2500); cacheBook(); }
   async function flush() {
@@ -158,7 +161,8 @@
     const today = istToday(), min = istMin(), wd = isWeekday(), d = C.book.days[today], dayCalls = todayDay().sort((a, b) => (b.score || 0) - (a.score || 0));
     const closed = wd && min >= 935, early = wd && min < 8 * 60 + 10, build = C.busy;
     let status;
-    if (!wd) status = `<span class="cl-s off">MARKET CLOSED</span> Weekend — the next call book arrives on the next trading day by 8:30 AM IST.`;
+    if (holName()) status = `<span class="cl-s off">MARKET HOLIDAY</span> ${E(holName())} — NSE and BSE are closed today, so no day calls are issued. Open investment calls stay valid for the next trading session.`;
+    else if (!wd) status = `<span class="cl-s off">MARKET CLOSED</span> Weekend — the next call book arrives on the next trading day by 8:30 AM IST.`;
     else if (d) status = `<span class="cl-s ok">CALLS LOCKED</span> Issued ${new Date(d.generatedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })} IST by the ${d.source === 'server' ? 'Apps Script 8:10 AM trigger' : d.source === 'github' ? 'automatic morning build' : 'terminal'} · ${d.scanned} stocks scanned · ${d.dayCalls} day calls · ${d.invCalls} investment calls · ${d.noTrade} stocks with no edge.`;
     else if (build) status = `<span class="cl-s wait">BUILDING…</span> ${E(C.msg)}`;
     else if (early) status = `<span class="cl-s wait">AWAITING 8:10 AM</span> The call book is built automatically before 8:30 AM IST.`;
@@ -254,7 +258,7 @@
     const today = istToday(), wd = isWeekday(), d = C.book.days[today], day = todayDay().sort((a, b) => (b.score || 0) - (a.score || 0));
     const trig = day.filter(isTrig), live = day.filter((c) => c.status === 'LIVE').length, tgt = day.filter((c) => c.status === 'T1' || c.status === 'T2').length, slc = day.filter((c) => c.status === 'SL').length;
     const avg = trig.length ? trig.reduce((a, c) => a + (c.retPct || 0), 0) / trig.length : null;
-    const state = !wd ? 'WEEKEND' : d ? 'LOCKED' : C.busy ? 'BUILDING' : istMin() < 490 ? 'AWAITING 8:10' : 'NOT BUILT';
+    const state = holName() ? 'HOLIDAY' : !wd ? 'WEEKEND' : d ? 'LOCKED' : C.busy ? 'BUILDING' : istMin() < 490 ? 'AWAITING 8:10' : 'NOT BUILT';
     const goBtn = (t) => `onclick="showTab('${t}')"`;
     const inv = C.book.calls.filter((c) => c.type === 'INV' && !FINAL[c.status]).sort((a, b) => (a.date < b.date ? 1 : -1) || (b.score || 0) - (a.score || 0));
     const cut = new Date(Date.now() + 19800000 - 30 * 86400000).toISOString().slice(0, 10), fin = C.book.calls.filter((c) => FINAL[c.status] && isTrig(c) && c.date >= cut).sort((a, b) => (a.date < b.date ? 1 : -1));

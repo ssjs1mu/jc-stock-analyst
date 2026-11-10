@@ -104,6 +104,8 @@
     const p = istParts(ms), t = p.min, wk = p.dow >= 1 && p.dow <= 5;
     const base = { label: 'CLOSED', cls: 'off', blink: false, note: '' };
     if (!wk) return Object.assign(base, { note: 'Weekend', next: nextOpen(ms) });
+    const hol = (window.JC_HOL || {})[new Date(ms + 19800000).toISOString().slice(0, 10)];
+    if (hol) return Object.assign(base, { label: 'MARKET HOLIDAY', note: 'NSE / BSE closed today — ' + hol, next: nextOpen(ms) });
     const S = [
       [9 * 60, 9 * 60 + 15, 'PRE-OPEN', 'pre', true, 'Order entry & price discovery · opens 9:15 AM'],
       [9 * 60 + 15, 15 * 60 + 15, 'LIVE', 'live', true, 'Normal market · F&O stocks continue to 3:15 PM, others to 3:30 PM'],
@@ -119,7 +121,7 @@
   function nextOpen(ms) { // minutes until the next 09:15 IST weekday open
     for (let k = 0; k < 8; k++) {
       const t = ms + k * 86400000; const p = istParts(t);
-      if (p.dow >= 1 && p.dow <= 5) { const mins = (9 * 60 + 15 - p.min) + k * 1440; if (mins > 0) return mins; }
+      if (p.dow >= 1 && p.dow <= 5 && !(window.JC_HOL || {})[new Date(t + 19800000).toISOString().slice(0, 10)]) { const mins = (9 * 60 + 15 - p.min) + k * 1440; if (mins > 0) return mins; }
     }
     return null;
   }

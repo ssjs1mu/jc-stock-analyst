@@ -1,9 +1,9 @@
 /* Joshi's Corner - report analytics + feedback poll (free, no subscription).
    Sends anonymous view events, page depth and the reader's rating/comment to a Google Apps Script
-   web app that appends them to a Google Sheet (see apps_script/README.md). Until ENDPOINT is set the
+   web app that appends them to a Google Sheet (see apps-script/ReportsAnalytics.README.md). Until ENDPOINT is set the
    events are kept on the reader's device and sent as soon as it is. Branding is never touched. */
 (function () {
-  var ENDPOINT = "https://script.google.com/macros/s/AKfycbyAgkJHcFQUYOXfvqRYnrk5RXPGjDMHeAoqRosXbFlRnN2NIQC8zB-JkNx6fDbI4Tw/exec";   /* paste the Apps Script web-app URL here (apps_script/README.md) */
+  var ENDPOINT = "https://script.google.com/macros/s/AKfycbyAgkJHcFQUYOXfvqRYnrk5RXPGjDMHeAoqRosXbFlRnN2NIQC8zB-JkNx6fDbI4Tw/exec";   /* paste the Apps Script web-app URL here (apps-script/ReportsAnalytics.README.md) */
   var S = {
     en: {rate: "Rate this report", q: "How did you like this report?", u: "Was it useful?", y: "Yes", n: "Not really", nm: "Your name (optional)", c: "Any suggestion? (optional)", send: "Send", thanks: "Thank you! Your feedback is recorded.", close: "Close", sel: "Please pick a rating"},
     hi: {rate: "रिपोर्ट को रेट करें", q: "यह रिपोर्ट आपको कैसी लगी?", u: "क्या यह उपयोगी रही?", y: "हाँ", n: "खास नहीं", nm: "आपका नाम (वैकल्पिक)", c: "कोई सुझाव? (वैकल्पिक)", send: "भेजें", thanks: "धन्यवाद! आपकी राय दर्ज हो गई।", close: "बंद करें", sel: "कृपया रेटिंग चुनें"},

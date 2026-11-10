@@ -9,7 +9,7 @@
 var ENDPOINT="https://script.google.com/macros/s/AKfycbyAgkJHcFQUYOXfvqRYnrk5RXPGjDMHeAoqRosXbFlRnN2NIQC8zB-JkNx6fDbI4Tw/exec"; /* same Apps Script URL as in analytics.js */
 var NAME={morning:"Morning Sunrise",evening:"Evening Breeze",muhurat:"Muhurat Trading",updates:"All-reports card",app:"Reports tab / app"};
 var s=document.getElementById("s");
-if(!ENDPOINT){s.textContent="Not connected yet: paste the Apps Script URL into ENDPOINT (apps_script/README.md)."}
+if(!ENDPOINT){s.textContent="Not connected yet: paste the Apps Script URL into ENDPOINT (apps-script/ReportsAnalytics.README.md)."}
 else fetch(ENDPOINT+"?action=stats").then(function(r){return r.json()}).then(function(d){
  s.textContent="As of "+d.generated+" (IST). Unique = distinct devices.";var b=document.querySelector("#t tbody");
  Object.keys(d.reports).sort().forEach(function(k){var x=d.reports[k],L=x.by_lang||{};
