@@ -2,6 +2,14 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-10T08:14:09+05:30",
+   "date": "2026-11-10",
+   "status": "holiday",
+   "caption": "",
+   "note": "NSE closed today: Diwali Balipratipada.",
+   "files": []
+  },
+  {
    "generated_at": "2026-11-09T08:57:48+05:30",
    "date": "2026-11-09",
    "status": "ok",
@@ -1639,5 +1647,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-09T08:57:48+05:30"
+ "updated_at": "2026-11-10T08:14:09+05:30"
 }
