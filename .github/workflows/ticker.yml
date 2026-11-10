@@ -34,6 +34,10 @@ jobs:
             dow=${ist:0:1}; hm=$((10#${ist:1:4}))
             if [ "$dow" -le 5 ] && [ "$hm" -ge 730 ] && [ "$hm" -le 2100 ]; then
               gh workflow run auto-reports.yml --ref main || echo "dispatch failed (will retry next tick)"
+              # AI infographic: shortly after each report is due (the job exits at once if there is nothing to draw)
+              if { [ "$hm" -ge 850 ] && [ "$hm" -le 1000 ]; } || { [ "$hm" -ge 1610 ] && [ "$hm" -le 1730 ]; }; then
+                gh workflow run infographic.yml --ref main || true
+              fi
             fi
             sleep 300
           done

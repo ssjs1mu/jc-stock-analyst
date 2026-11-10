@@ -1,0 +1,55 @@
+name: AI infographic (Google NotebookLM, free, no Claude)
+# Draws one infographic for today's Morning Sunrise / Evening Breeze from our own figures and publishes it only if
+# every key figure can be read back from the picture (OCR). Inactive until the secret NOTEBOOKLM_MASTER_TOKEN_JSON
+# exists - see docs/notebooklm-setup.md. Started by the ticker shortly after each report is due.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: infographic
+  cancel-in-progress: false
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NLM_TOKEN: ${{ secrets.NOTEBOOKLM_MASTER_TOKEN_JSON }}
+    steps:
+      - name: Is NotebookLM connected?
+        id: has
+        run: if [ -n "$NLM_TOKEN" ]; then echo "yes=1" >> "$GITHUB_OUTPUT"; else echo "NotebookLM secret not set - nothing to do."; fi
+      - uses: actions/checkout@v5
+        if: steps.has.outputs.yes
+      - uses: actions/setup-python@v6
+        if: steps.has.outputs.yes
+        with: {python-version: '3.12'}
+      - name: Anything to draw?
+        id: need
+        if: steps.has.outputs.yes
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, datetime as dt
+          today = (dt.datetime.utcnow() + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d")
+          n = 0
+          for sid in ("morning-pulse", "evening-breeze"):
+              r = next((r for r in json.load(open("reports/%s/index.json" % sid))["runs"] if r["status"] == "ok"), None)
+              if r and r["date"] == today and r.get("ai_tries", 0) < 2 and not any("_AI_Infographic_" in f["name"] for f in r["files"]):
+                  n += 1
+          print("n=%d" % n)
+          PY
+      - name: Draw, check and publish
+        if: steps.has.outputs.yes && steps.need.outputs.n != '0'
+        run: |
+          sudo apt-get install -y -q tesseract-ocr >/dev/null
+          pip install -q "notebooklm-py[headless]" pillow pytesseract
+          mkdir -p ~/.notebooklm/profiles/default && umask 077 && printf '%s' "$NLM_TOKEN" > ~/.notebooklm/profiles/default/master_token.json
+          unset NLM_TOKEN
+          notebooklm auth refresh >/dev/null
+          notebooklm auth check --test --json | python -c "import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get('status')=='ok' else 1)" || { echo "::error::NotebookLM login is no longer valid - repeat docs/notebooklm-setup.md"; exit 1; }
+          python pipeline/infographic.py
+          rm -rf ~/.notebooklm
+          git config user.name "Joshi's Corner scheduler"; git config user.email "joshiscorner.group@gmail.com"
+          git add reports morning evening
+          git commit -m "infographic: NotebookLM page for today's report" || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
