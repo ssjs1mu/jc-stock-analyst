@@ -1,0 +1,26 @@
+name: Archive old report files to Google Drive (free, no Claude)
+# Google Drive mirrors every published report file hourly (apps-script/ReportsArchive.standalone.gs). Once a day this
+# removes files older than 15 days from the website, but only those Drive confirms it holds at the same size.
+on:
+  schedule:
+    - cron: '17 19 * * *'      # 00:47 IST daily
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: auto-reports
+  cancel-in-progress: false
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: |
+          python pipeline/archive_prune.py
+          git config user.name "Joshi's Corner scheduler"; git config user.email "joshiscorner.group@gmail.com"
+          git add -A reports morning evening muhurat data/archive.json
+          git commit -m "archive: older report files now on Google Drive" || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
