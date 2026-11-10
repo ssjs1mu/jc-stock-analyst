@@ -82,8 +82,9 @@ document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text
 (function(){var RD='%(rdate)s',KIND='%(kind)s',ADM='%(admin)s',GEN='%(gen)s';
  var n=new Date(Date.now()+19800000),mm=n.getUTCHours()*60+n.getUTCMinutes(),dow=n.getUTCDay(),due=KIND==='evening'?16*60+40:8*60+55;
  function iso(d){return d.toISOString().slice(0,10)}
- var e=new Date(n.getTime());if(dow>=1&&dow<=5&&mm>=due){}else{do{e=new Date(e.getTime()-86400000)}while(e.getUTCDay()===0||e.getUTCDay()===6)}
- var exp=iso(e);if(dow>=1&&dow<=5&&mm>=due)exp=iso(n);
+ var HOL=%(hol)s;function td(d){var w=d.getUTCDay();return w>=1&&w<=5&&HOL.indexOf(iso(d))<0}   /* trading day: weekday and not an NSE holiday */
+ var e=new Date(n.getTime());if(!(td(n)&&mm>=due)){do{e=new Date(e.getTime()-86400000)}while(!td(e))}
+ var exp=iso(e);
  var o=document.getElementById('old');
  if(RD<exp){var msg='This report was last updated <b>'+GEN+'</b> and is older than the latest one. Please inform the admin.';
   if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
@@ -218,6 +219,15 @@ def _og(path, date_txt, headline, mood, thumb_abs, name="Morning Sunrise", gen="
     os.remove(tmp)
 
 
+def _holidays():
+    """NSE trading holidays (ISO dates) as a JS array, so a booklet is not called 'old' on a day with no report."""
+    try:
+        days = json.load(open(os.path.join(ROOT, "data", "festivals.json")))["days"]
+        return json.dumps(sorted(d["date"] for d in days if d.get("trading_holiday")))
+    except Exception:
+        return "[]"
+
+
 def build(date, pages, headline="", mood="neutral", caption="", kind="morning", lang_pages=None):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
@@ -257,7 +267,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
         og_path = os.path.join(folder, "og.jpg")
         _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
-                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=("9999-12-31" if kind == "muhurat" else date), kind=kind, admin=admin, chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
+                          script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=("9999-12-31" if kind == "muhurat" else date), kind=kind, admin=admin, hol=_holidays(), chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
         with open(os.path.join(folder, "index.html"), "w") as f:
             f.write(doc)
         out[sub or "latest"] = url
