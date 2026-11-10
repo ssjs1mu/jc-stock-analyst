@@ -6,43 +6,42 @@
   "mood": {
    "key": "neutral",
    "label": "Range-bound close",
-   "sub": "Nifty +0.06% in the session"
+   "sub": "Nifty +0.23% in the session"
   },
   "label": "Range-bound close",
-  "headline": "Nifty ends little changed, Banks lead",
-  "summary": "Nifty 50 closed at 25,044.65 (+0.06%) and Sensex at 81,106.65 (+0.10%). Banks: Bank Nifty +1.11%. India VIX 17.42 (-0.29%). Brent crude -1.36%, USD/INR 93.927. 24 of 50 Nifty stocks advanced and 25 declined.",
+  "headline": "Nifty gains 0.23%, Banks lead",
+  "summary": "Nifty 50 closed at 25,044.65 (+0.23%) and Sensex at 81,106.65 (+0.13%). Banks: Bank Nifty +1.51%. India VIX 17.42 (-5.48%). Brent crude -1.36%, USD/INR 93.927. 22 of 50 Nifty stocks advanced and 27 declined.",
   "snapshot": [
    {
     "name": "Nifty 50",
     "sub": "close",
     "level": "25,044.65",
-    "pct": "+0.06%",
-    "pts": "+14.30"
+    "pct": "+0.23%",
+    "pts": "+58.25"
    },
    {
     "name": "Sensex",
     "sub": "close",
     "level": "81,106.65",
-    "pct": "+0.10%",
-    "pts": "+78.62"
+    "pct": "+0.13%",
+    "pts": "+107.25"
    },
    {
     "name": "Bank Nifty",
     "sub": "close",
     "level": "59,741.25",
-    "pct": "+1.11%",
-    "pts": "+655.25"
+    "pct": "+1.51%",
+    "pts": "+890.60"
    },
    {
     "name": "Nifty 500",
     "sub": "close",
     "level": "23,567.00",
-    "pct": "+0.47%",
-    "pts": "+110.05"
+    "pct": "+0.33%",
+    "pts": "+77.80"
    }
   ],
   "spark": [
-   22622.69921875,
    22997.349609375,
    23146.150390625,
    22888.94921875,
@@ -59,6 +58,7 @@
    23960.599609375,
    24536.599609375,
    25030.349609375,
+   24986.4,
    25044.650390625
   ],
   "flows": {
@@ -67,8 +67,8 @@
    "dii": -10444.54
   },
   "breadth": {
-   "up": 24,
-   "dn": 25
+   "up": 22,
+   "dn": 27
   },
   "levels": [
    {
@@ -177,7 +177,7 @@
   ],
   "vix": {
    "level": "17.42",
-   "pct": "-0.29%",
+   "pct": "-5.48%",
    "gauge": 0.6289999961853028,
    "text": "India VIX 17.42."
   },
@@ -195,54 +195,54 @@
    [
     "DIVISLAB",
     "11,565.50",
-    "+12.06%"
-   ],
-   [
-    "SUNPHARMA",
-    "1,904.50",
-    "+2.39%"
+    "+4.22%"
    ],
    [
     "SBIN",
     "1,042.00",
-    "+2.31%"
+    "+2.56%"
+   ],
+   [
+    "TRENT",
+    "3,119.20",
+    "+2.02%"
+   ],
+   [
+    "NESTLEIND",
+    "1,297.80",
+    "+1.91%"
    ],
    [
     "NTPC",
     "328.75",
-    "+1.64%"
-   ],
-   [
-    "LT",
-    "4,185.00",
-    "+1.63%"
+    "+1.87%"
    ]
   ],
   "losers": [
    [
-    "INFY",
-    "1,154.10",
-    "-2.31%"
+    "TATASTEEL",
+    "184.85",
+    "-2.81%"
    ],
    [
     "HCLTECH",
     "1,407.00",
-    "-2.29%"
+    "-2.43%"
+   ],
+   [
+    "ULTRACEMCO",
+    "12,275.00",
+    "-1.79%"
+   ],
+   [
+    "ITC",
+    "278.80",
+    "-1.64%"
    ],
    [
     "BAJFINANCE",
     "1,064.85",
-    "-2.11%"
-   ],
-   [
-    "SBILIFE",
-    "1,748.00",
-    "-2.02%"
-   ],
-   [
-    "HEROMOTOCO",
-    "5,410.50",
-    "-1.86%"
+    "-1.56%"
    ]
   ],
   "shock": [
@@ -250,25 +250,25 @@
     "DIVISLAB",
     "11,565.50",
     "3.8x avg vol",
-    "+12.06%"
+    "+4.22%"
    ],
    [
     "GRASIM",
     "3,169.70",
     "2.5x avg vol",
-    "-1.78%"
+    "-1.17%"
    ],
    [
     "TATASTEEL",
     "184.85",
     "2.2x avg vol",
-    "-0.78%"
+    "-2.81%"
    ],
    [
     "SBIN",
     "1,042.00",
     "2.1x avg vol",
-    "+2.31%"
+    "+2.56%"
    ]
   ],
   "opening": {
@@ -392,12 +392,13 @@
    "due": []
   },
   "story": [
-   "Nifty 50 opened at 25,074, a gap-up of 0.17% from the previous close of 25,030.",
-   "The index dipped to a low of 24,839 (-0.76%) around 10:40 AM and touched a high of 25,081 (+0.20%) around 9:15 AM.",
-   "It settled at 25,045 (+0.06%), near the top of the day's range, so buyers held control into the close.",
+   "Nifty 50 opened at 25,074, a gap-up of 0.35% from the previous close of 24,986.",
+   "The index dipped to a low of 24,839 (-0.59%) around 10:40 AM and touched a high of 25,081 (+0.38%) around 9:15 AM.",
+   "It settled at 25,045 (+0.23%), near the top of the day's range, so buyers held control into the close.",
    "The final hour added +49 points.",
-   "24 of the 50 Nifty stocks advanced and 25 declined; Bank Nifty outperformed (+1.11%).",
-   "Latest institutional data (05 Nov): FII/FPI net +14975 Cr, DII net -10445 Cr."
+   "22 of the 50 Nifty stocks advanced and 27 declined; Bank Nifty outperformed (+1.51%).",
+   "Latest institutional data (08 Nov): FII/FPI net -0 Cr, DII net -700 Cr.",
+   "Corrected edition: changes are measured from the 8 Nov special-session close (the first edition used the close before it)."
   ],
   "risks": [
    "Markets stay shut until Wednesday (2 days): weekend news, geopolitics and any Wall Street or Asian moves will all be priced in at the open.",
@@ -411,37 +412,37 @@
     "DIVISLAB",
     "11,565.50",
     "6.5%",
-    "+12.06%"
+    "+4.22%"
    ],
    [
     "TATASTEEL",
     "184.85",
     "5.2%",
-    "-0.78%"
+    "-2.81%"
    ],
    [
     "HINDALCO",
     "960.00",
     "5.0%",
-    "+0.17%"
+    "+0.73%"
    ],
    [
     "TRENT",
     "3,119.20",
     "3.4%",
-    "+1.31%"
+    "+2.02%"
    ],
    [
     "NESTLEIND",
     "1,297.80",
     "3.3%",
-    "+1.22%"
+    "+1.91%"
    ],
    [
     "ULTRACEMCO",
     "12,275.00",
     "2.9%",
-    "-1.41%"
+    "-1.79%"
    ]
   ],
   "pv_up": [
@@ -449,25 +450,25 @@
     "DIVISLAB",
     "11,565.50",
     "3.8x vol",
-    "+12.06%"
+    "+4.22%"
    ],
    [
     "SBIN",
     "1,042.00",
     "2.1x vol",
-    "+2.31%"
+    "+2.56%"
    ],
    [
     "HDFCBANK",
     "798.15",
     "1.9x vol",
-    "+1.26%"
+    "+1.79%"
    ],
    [
     "ICICIBANK",
     "1,589.00",
     "1.8x vol",
-    "+1.13%"
+    "+1.53%"
    ]
   ],
   "pv_dn": [
@@ -475,25 +476,35 @@
     "GRASIM",
     "3,169.70",
     "2.5x vol",
-    "-1.78%"
+    "-1.17%"
    ],
    [
-    "BPCL",
-    "316.00",
-    "1.2x vol",
-    "-1.22%"
+    "TATASTEEL",
+    "184.85",
+    "2.2x vol",
+    "-2.81%"
+   ],
+   [
+    "POWERGRID",
+    "257.95",
+    "1.3x vol",
+    "-1.30%"
    ]
   ],
-  "asof": "04:07 PM IST"
+  "asof": "04:07 PM IST",
+  "corrected": {
+   "on": "2026-11-10T12:49:00+05:30",
+   "base": "2026-11-08"
+  }
  },
  "title": "Evening Breeze (09 Nov 2026)",
- "headline": "Nifty ends little changed, Banks lead",
+ "headline": "Nifty gains 0.23%, Banks lead",
  "mood": {
   "key": "neutral",
   "label": "Range-bound close",
-  "sub": "Nifty +0.06% in the session"
+  "sub": "Nifty +0.23% in the session"
  },
- "mood_score": 0.07998727170195494,
+ "mood_score": 0.3263797380775059,
  "mood_pic": "bull_over_bear",
  "edition": "evening",
  "disclaimer": "For information only. Not investment advice. Markets carry risk."
