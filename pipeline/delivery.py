@@ -38,6 +38,13 @@ def universe():
     return syms
 
 
+try:   # special sessions held on a weekend (Diwali Muhurat) have a bhavcopy too
+    import special_session as _ss
+    SPECIAL = set(_ss.dates())
+except Exception:
+    SPECIAL = set()
+
+
 def fetch_day(d):
     url = URL % d.strftime('%d%m%Y')
     last = None
@@ -135,7 +142,7 @@ def main():
     d = start
     while d <= today:
         iso = d.isoformat()
-        if d.weekday() < 5 and (iso not in have or iso not in oh):
+        if (d.weekday() < 5 or iso in SPECIAL) and (iso not in have or iso not in oh):
             txt = fetch_day(d)
             if txt == 'HTTP403':
                 blocked += 1

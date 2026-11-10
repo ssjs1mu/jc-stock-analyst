@@ -1,0 +1,30 @@
+name: Re-issue a corrected Evening Breeze (special session)
+# Write "evening-breeze YYYY-MM-DD" into .reissue to re-issue that Evening Breeze with corrected previous closes (special session).
+on:
+  push:
+    paths: ['.reissue']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: auto-reports
+  cancel-in-progress: false
+jobs:
+  b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Build and commit
+        run: |
+          grep -E '^evening-breeze [0-9-]+$' .reissue | while read sid d; do python pipeline/reissue.py "$sid" "$d"; done
+          git config user.name "Joshi's Corner scheduler"; git config user.email "joshiscorner.group@gmail.com"
+          git add reports morning evening updates data/i18n_cache.json data/special_sessions.json
+          git commit -m "reissue: corrected Evening Breeze" || exit 0
+          for i in 1 2 3 4 5; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done

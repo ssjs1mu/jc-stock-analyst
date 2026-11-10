@@ -92,6 +92,7 @@ def quote(sym):
             vols = [r[4] for r in rows[-21:-1] if r[4]]
             return dict(last=c, prev=pc, chg=c - pc, pct=(c - pc) / pc * 100 if pc else 0.0,
                         date=dt.datetime.fromtimestamp(t + off, dt.timezone.utc).strftime("%Y-%m-%d"),
+                        pdate=dt.datetime.fromtimestamp(rows[-2][0] + off, dt.timezone.utc).strftime("%Y-%m-%d"),
                         hi=h, lo=l, vol=v or 0, avgvol=(sum(vols) / len(vols)) if vols else 0)
         except Exception:
             import time
@@ -343,7 +344,13 @@ def gather(mock=False):
             qs[s] = dict(last=b * (1 + ch / 100), prev=b, chg=b * ch / 100, pct=ch, date=today_ist().isoformat(),
                          hi=b * 1.01, lo=b * 0.99, vol=random.uniform(1e6, 5e6), avgvol=2e6)
         return qs, [(dt.datetime.now(dt.timezone.utc), "MOCK headline for layout test", "Mock")]
-    return fetch_all(syms), news()
+    qs = fetch_all(syms)
+    try:   # a special session (Diwali Muhurat on a weekend) is missing from the daily feed: measure from ITS close
+        import special_session
+        special_session.fix(qs)
+    except Exception as ex:
+        print("special-session check skipped:", ex)
+    return qs, news()
 
 
 def today_ist():
@@ -556,6 +563,8 @@ def build_eve(qs, heads, now):
     try:
         j = json.loads(http("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?range=1mo&interval=1d"))
         spark_vals = [c for c in j["chart"]["result"][0]["indicators"]["quote"][0]["close"] if c][-18:]
+        if n and n.get("pdate") and len(spark_vals) >= 2 and abs(spark_vals[-2] - n["prev"]) > 0.5 and abs(spark_vals[-1] - n["last"]) < 0.5:
+            spark_vals = (spark_vals[:-1] + [n["prev"], spark_vals[-1]])[-18:]   # special session missing from the daily feed
     except Exception:
         pass
     st = [qs.get(s_ + ".NS") for s_ in NIFTY50]
