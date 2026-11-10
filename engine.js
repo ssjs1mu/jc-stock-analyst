@@ -308,7 +308,7 @@ function tally(rows) { const use = rows.filter((r) => r.v !== null); const net =
 /* ---------- market status (IST) ---------- */
 function marketStatus(nowMs, lastDailyT) {
   const ist = new Date(nowMs + 19800000), dow = ist.getUTCDay(), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-  const inHours = dow >= 1 && dow <= 5 && mins >= 555 && mins <= 930; // 09:15–15:30
+  const inHours = !(window.JC_isHol && window.JC_isHol()) && dow >= 1 && dow <= 5 && mins >= 555 && mins <= 930; // 09:15–15:30
   const sameDay = istDate(nowMs / 1000) === istDate(lastDailyT);
   return { live: inHours && sameDay, inHours };
 }
@@ -1050,7 +1050,7 @@ function evalPlan(plan, bars, atr, final) {
 }
 function marketClock(nowMs) {
   const ist = new Date(nowMs + 19800000), dow = ist.getUTCDay(), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-  return { today: istDate(nowMs / 1000), open: dow >= 1 && dow <= 5 && mins >= 555 && mins <= 930, afterClose: mins > 930, preOpen: mins < 555 };
+  return { today: istDate(nowMs / 1000), open: !(window.JC_isHol && window.JC_isHol()) && dow >= 1 && dow <= 5 && mins >= 555 && mins <= 930, afterClose: mins > 930, preOpen: mins < 555 };
 }
 function analyseWatch(daily, m5, meta, nowMs, mkt) {
   const mc = marketClock(nowMs), sess = {};

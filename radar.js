@@ -86,7 +86,7 @@
 
   /* ---------- sweep ---------- */
   async function sweep(force) {
-    if (R.busy) return; const m = istMin(), live = istDow() >= 1 && istDow() <= 5 && m >= 555 && m <= 935;
+    if (R.busy) return; const m = istMin(), live = !(window.JC_isHol && window.JC_isHol()) && istDow() >= 1 && istDow() <= 5 && m >= 555 && m <= 935;
     if (!live && !force) { R.status = 'idle'; paint(); return; }
     const syms = uni(); if (!syms.length) return;
     R.busy = true; R.err = ''; paint();
@@ -100,7 +100,7 @@
 
   /* ---------- panel ---------- */
   function paint() {
-    const el = $('clRadar'); if (!el) return; if (document.activeElement && document.activeElement.id === 'rdAdd') return; const m = istMin(), live = istDow() >= 1 && istDow() <= 5 && m >= 555 && m <= 935;
+    const el = $('clRadar'); if (!el) return; if (document.activeElement && document.activeElement.id === 'rdAdd') return; const m = istMin(), live = !(window.JC_isHol && window.JC_isHol()) && istDow() >= 1 && istDow() <= 5 && m >= 555 && m <= 935;
     const al = R.alerts.slice().reverse(), perm = window.Notification ? Notification.permission : 'unsupported';
     el.innerHTML = `<section class="rd"><div class="rd-h"><div><h3>⚡ Early-Mover Radar ${al.filter((a) => Date.now() - a.t < 120000).length ? '<span class="rd-nw big">' + al.filter((a) => Date.now() - a.t < 120000).length + ' NEW</span>' : ''} <small>watches ~${uni().length} stocks every minute · pops up the moment a big move starts</small></h3><div class="rd-st">${live ? '<span class="g">● scanning</span>' : '<span>○ market closed — resumes 9:15 AM</span>'}${R.last ? ' · last sweep ' + hhmm(R.last) + ' · ' + R.n + ' quotes · ' + E(R.src) : ''}${R.busy ? ' · working…' : ''}</div></div><div class="rd-a"><button class="cl-btn" onclick="jcRadar.sweep(true)">⟳ Scan now</button><button class="cl-btn" onclick="jcRadar.mute()">${R.mute ? '🔇 Sound off' : '🔔 Sound on'}</button>${perm === 'default' ? '<button class="cl-btn" onclick="jcRadar.notify()">Enable desktop alerts</button>' : perm === 'granted' ? '<span class="rd-ok">desktop alerts on</span>' : ''}<button class="cl-btn" onclick="jcRadar.test()">Test popup</button></div></div>`
       + `<div class="rd-add"><b>Also watch:</b> <input id="rdAdd" maxlength="20" placeholder="NSE symbol" onkeydown="if(event.key==='Enter')jcRadar.add(this.value)"><button class="cl-btn" onclick="jcRadar.add(document.getElementById('rdAdd').value)">＋ Add</button>${R.custom.map((x) => '<span class="rd-ch">' + E(x) + ' <a href="javascript:void(0)" onclick="jcRadar.drop(\'' + E(x) + '\')">×</a></span>').join('')}<small>core ${(window.jcUni ? window.jcUni().length : 0)} · hand list ${R.extra.length} · screened small-caps ${R.pool ? R.pool.syms.length + ' (' + R.pool.src + ', ' + new Date(R.pool.at).toISOString().slice(0, 10) + ')' : 'pending — Microcap 250 until screened'} · your watchlists ${R.mine.length}</small> <a href="javascript:void(0)" onclick="jcRadar.screen()">${R.screening ? 'screening…' : 're-screen'}</a>${R.poolMsg ? ' <small>' + E(R.poolMsg) + '</small>' : ''}</div>`

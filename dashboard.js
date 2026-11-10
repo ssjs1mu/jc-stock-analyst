@@ -340,7 +340,7 @@
       <div class="jd-left"><div class="jd-clk"><div class="jd-time" id="jdTime">--:--:--</div><div class="jd-date">${esc(dateStr)}</div><div class="jd-tz">INDIAN STANDARD TIME · UTC+5:30</div><div class="jd-livebox"><a class="jd-pill st-${cls} ${blink ? 'jd-blink' : ''}" href="#jd-in" data-jdgo="jd-in" title="Jump to Indian markets"><span class="jd-dot"></span><span class="jd-pl"><small>INDIA · NSE / BSE</small><b>${esc(label)}</b></span></a></div></div>
       </div>
       ${biasHTML()}
-      <div class="jd-mid"><img class="jd-ban" src="assets/jc-banner.png" alt="Joshi’s Corner — Shares ◆ Insurance ◆ Restaurant · Connecting People Thru Services…S.I.R" draggable="false"></div>
+      <div class="jd-mid"><img class="jd-ban" src="assets/jc-banner.webp" onerror="this.onerror=null;this.src='assets/jc-banner.png'" alt="Joshi’s Corner — Shares ◆ Insurance ◆ Restaurant · Connecting People Thru Services…S.I.R" draggable="false"></div>
       <div class="jd-tv" aria-label="Live business TV">${tvTiles()}<div class="jd-sess"><div class="jd-sub">${sub}</div><div class="jd-sub jd-sn">${esc(note)}</div></div></div></div>`;
   }
 

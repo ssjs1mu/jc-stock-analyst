@@ -37,7 +37,7 @@ for k in ("bench", "cmd", "headlines", "opening", "nextday", "risks", "events", 
 old_s, new_s = ob["summary"].split(". "), b["summary"].split(". ")
 b["summary"] = ". ".join(o if o.startswith("Brent") else x for o, x in zip(old_s, new_s)) if len(old_s) == len(new_s) else b["summary"]
 dtxt = dt.date.fromisoformat(D).strftime("%-d %b")
-b["story"] = list(b.get("story") or []) + ["Corrected edition: changes are measured from the %s special-session close (the first edition used the close before it)." % dtxt]
+b["gen"] = "%s; corrected %s" % (ob.get("asof", "").replace(" IST", ""), dt.datetime.now(A.IST).strftime("%-d %b, %I:%M %p"))   # cover line: "Report generated 04:07 PM; corrected 10 Nov, 12:49 PM IST"
 b["corrected"] = {"on": dt.datetime.now(A.IST).isoformat(timespec="seconds"), "base": D}
 json.dump(cfg, open(cfg_path, "w"), indent=1)
 

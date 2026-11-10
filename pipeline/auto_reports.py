@@ -469,7 +469,8 @@ def session_story(qs, flows, br, up_n, dn_n):
         br_txt += "; Bank Nifty %s (%s)" % ("outperformed" if bn["pct"] > cp + 0.2 else "lagged" if bn["pct"] < cp - 0.2 else "moved in line", pct(bn["pct"]))
     L.append(br_txt + ".")
     if flows:
-        L.append("Latest institutional data (%s): FII/FPI net %+.0f Cr, DII net %+.0f Cr." % (flows["date"], flows["fii"], flows["dii"]))
+        cr = lambda v: "nil" if abs(v) < 0.5 else "%+.0f Cr" % v
+        L.append("Latest institutional data (%s): FII/FPI net %s, DII net %s." % (flows["date"], cr(flows["fii"]), cr(flows["dii"])))
     rev = ""
     if lo_p <= -0.1 and cp >= 0.35:
         rev = "bull"

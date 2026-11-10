@@ -36,7 +36,7 @@
   window.JCA = {track: send, flush: flush};
   /* one view per device per report per day */
   var vk = "jc_v_" + kind + "_" + rdate + "_" + ist().slice(0, 10);
-  if (!ls(vk)) { ls(vk, "1"); send("view", {}); }
+  if (kind !== "app" && !ls(vk)) { ls(vk, "1"); send("view", {}); }   /* the app page itself is already counted by visitors.js */
   flush();
   /* page depth (booklets) */
   var maxp = 0, total = 0;

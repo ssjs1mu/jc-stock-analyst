@@ -214,25 +214,25 @@
   <details class="datasec"><summary>DATA FEEDS, CANDLE AUDIT &amp; NEWS</summary><div id="pDataBody"><div class="note">Feed status, the candle audit and news appear after a report is generated.</div></div></details>
   <div class="legal">Systematic, rule-based analysis computed from fetched market data — research input, not personalised investment advice or a guarantee of returns. Prices are delayed Yahoo Finance data; result dates and filed results come from NSE where shown; “est” delivery, expected result-moves and time-to-target are model estimates. Confirm live quotes and price-band status on your trading terminal before acting. Joshi's Corner · SSJ Finance.</div>
 </div>
-<script>window.JC_HOL={};window.JC_HOLP=fetch("data/festivals.json").then(function(r){return r.json()}).then(function(j){(j.days||[]).forEach(function(d){if(d.trading_holiday)window.JC_HOL[d.date]=d.name})}).catch(function(){});</script>
+<script>window.JC_HOL={};window.JC_isHol=function(){return !!window.JC_HOL[new Date(Date.now()+19800000).toISOString().slice(0,10)]};window.JC_HOLP=fetch("data/festivals.json").then(function(r){return r.json()}).then(function(j){(j.days||[]).forEach(function(d){if(d.trading_holiday)window.JC_HOL[d.date]=d.name})}).catch(function(){});</script>
 <script>window.JCVC_CFG={site:"stock",url:"https://script.google.com/macros/s/AKfycbzMp82oHzLzKpaE0LrnUqEGGot7jqSw9e9VA1QhJNOPV35vOIYcfIChFL5PCDuD2Ahi5Q/exec"}</script>
 <script src="visitors.js?v=3"></script>
 <script src="calls_engine.js?v=2"></script>
-<script src="engine.js?v=24"></script>
+<script src="engine.js?v=25"></script>
 <script src="setup.js?v=2"></script>
 <script src="analyzer.js?v=5"></script>
 <script src="rpnl.js?v=1"></script>
 <script src="projection_cal.js?v=1"></script>
 <script src="projection.js?v=4"></script>
 <script src="schedules.js?v=9"></script>
-<script src="analytics.js?v=2" defer></script>
-<script>if(!window.JC_LEAN)document.write('<script src="dashboard.js?v=39"><\/script>')</script>
+<script src="analytics.js?v=3" defer></script>
+<script>if(!window.JC_LEAN)document.write('<script src="dashboard.js?v=40"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="fiidii.js?v=2"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="calls.js?v=14"><\/script>')</script>
 <script src="xray.js?v=11"></script>
 <script>if(!window.JC_LEAN)document.write('<script src="bigfish.js?v=4"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="radarcore.js?v=1"><\/script>')</script>
-<script>if(!window.JC_LEAN)document.write('<script src="radar.js?v=8"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="radar.js?v=9"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="manage.js?v=5"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="brief.js?v=5"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="alertlog.js?v=2"><\/script>')</script>
@@ -241,6 +241,6 @@
 <script src="outlook.js?v=15"></script>
 <script>if(!window.JC_LEAN)document.write('<script src="deliv.js?v=5"><\/script>')</script>
 <script>if(!window.JC_LEAN)document.write('<script src="kid.js?v=4"><\/script>')</script>
-<script>if(!window.JC_LEAN)document.write('<script src="dashsig.js?v=6"><\/script>')</script>
+<script>if(!window.JC_LEAN)document.write('<script src="dashsig.js?v=7"><\/script>')</script>
 </body>
 </html>
