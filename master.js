@@ -171,7 +171,11 @@
   }
   function fundTable(R) {
     const rows = ((R.long && R.long.F) || []).filter((x) => strip(x.value) !== '—' && x.group !== 'Recent results');
-    return rows.length ? tbl(['Metric', 'Value', 'Reading'], rows.map((x) => [E(x.name), `<b>${E(strip(x.value))}</b>`, `<span class="${x.v > 0 ? 'g' : x.v < 0 ? 'r' : ''}">${E(strip(x.reading))}</span>`]), 'grid') : '';
+    if (!rows.length) return '';
+    const cellsOf = (x) => (x ? [E(x.name), `<b>${E(strip(x.value))}</b>`, `<span class="${x.v > 0 ? 'g' : x.v < 0 ? 'r' : ''}">${E(strip(x.reading)).slice(0, 60)}</span>`] : ['', '', '']);
+    const h = Math.ceil(rows.length / 2), out = [];
+    for (let i = 0; i < h; i++) out.push(cellsOf(rows[i]).concat(cellsOf(rows[i + h])));
+    return tbl(['Metric', 'Value', 'Reading', 'Metric', 'Value', 'Reading'], out, 'grid', ['16%', '9%', '25%', '16%', '9%', '25%']);
   }
   function playbook(R) {
     const sw = (R.matrix || []).find((m) => m.horizon === 'Swing'), idm = (R.matrix || []).find((m) => m.horizon === 'Intraday');
