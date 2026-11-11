@@ -113,6 +113,7 @@
   const tbl = (head, rows, cls, widths) => `<table class="${cls || 'grid'}">${widths ? '<colgroup>' + widths.map((w) => `<col style="width:${w}">`).join('') + '</colgroup>' : ''}<thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   const kv = (rows) => '<table class="kv"><tbody>' + rows.map((r) => '<tr>' + r.map((c, i) => `<td class="${i % 2 === 0 ? 'k' : ''}">${c}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
   const panel = (title, body, st) => `<section class="panel"${st ? ` style="${st}"` : ''}><h2>${title}</h2>${body}</section>`;
+  const cut = (t, n) => { t = String(t || ''); if (t.length <= n) return t; const k = t.slice(0, n), i = Math.max(k.lastIndexOf('. '), k.lastIndexOf('; '), k.lastIndexOf(', ')); return (i > n * 0.5 ? k.slice(0, i) : k.replace(/\s+\S*$/, '')) + '…'; };
   const note = (t) => `<div class="note">${t}</div>`;
   const stepFor = (p) => (p < 100 ? 2.5 : p < 250 ? 5 : p < 500 ? 10 : p < 1000 ? 20 : p < 2500 ? 50 : p < 5000 ? 100 : 200);
 
@@ -126,12 +127,12 @@
     const parts = [];
     parts.push(`<b>${E(R.name)}</b> (${E(R.sym)}, ${R.exch === 'BO' ? 'BSE' : 'NSE'}${R.sector ? ' · ' + E(R.sector) : ''}${R.industry ? ' · ' + E(R.industry) : ''}) last closed at <b>${rs(R.cmp)}</b> (${pc(R.dayPct, 2)} on the day), ${num(R.w52H) && num(R.w52L) ? `${pc((R.cmp / R.w52H - 1) * 100)} from its 52-week high of ${rs(R.w52H)} and ${pc((R.cmp / R.w52L - 1) * 100)} above the low of ${rs(R.w52L)}` : ''}.`);
     if (R.ret) parts.push(`Returns: 1M ${pc(R.ret.m1)}, 3M ${pc(R.ret.m3)}, 6M ${pc(R.ret.m6)}, 1Y ${pc(R.ret.y1)}${num(R.benchRet && R.benchRet.y1) ? ` against Nifty 50 at ${pc(R.benchRet.y1)} over 1Y` : ''}.`);
-    if (sw && sw.call && !/INCOMPLETE|n\/a/i.test(sw.call)) parts.push(`The short-term (swing) read is <b>${E(sw.call)}</b>${sw.conf && sw.conf !== '—' ? ` (confidence ${E(sw.conf)})` : ''}: ${E(strip(sw.basis))}`);
-    if (lt && lt.call && !/INCOMPLETE|n\/a/i.test(lt.call)) parts.push(`On the long-term view, results and fundamentals currently point to <b>${E(lt.call)}</b>${lt.conf && lt.conf !== '—' ? ` (confidence ${E(lt.conf)})` : ''}: ${E(strip(lt.basis))}`);
+    if (sw && sw.call && !/INCOMPLETE|n\/a/i.test(sw.call)) parts.push(`The short-term (swing) read is <b>${E(sw.call)}</b>${sw.conf && sw.conf !== '—' ? ` (confidence ${E(sw.conf)})` : ''}: ${E(cut(strip(sw.basis), 150))}`);
+    if (lt && lt.call && !/INCOMPLETE|n\/a/i.test(lt.call)) parts.push(`On the long-term view, results and fundamentals currently point to <b>${E(lt.call)}</b>${lt.conf && lt.conf !== '—' ? ` (confidence ${E(lt.conf)})` : ''}: ${E(cut(strip(lt.basis), 150))}`);
     else parts.push('Long-term call is withheld because the results / fundamentals feed was incomplete for this symbol — no call is issued from the chart alone.');
     const ne = R.nextEarnings || (R.resultInfo && R.resultInfo.next);
     if (ne && num(ne.days) && ne.days >= 0) parts.push(`<b>Result due in ${ne.days} day${ne.days === 1 ? '' : 's'}</b>${R.resultInfo && num(R.resultInfo.expMove) ? ` — the model-implied move around the number is about ±${R.resultInfo.expMove.toFixed(1)}% (${E(R.resultInfo.basis || '')}). A daily-close stop does not protect against a result-day gap, so position size should reflect it.` : '.'}`);
-    return parts.map((p) => `<p>${p}</p>`).join('');
+    return '<ul class="bl">' + parts.map((p) => `<li>${p}</li>`).join('') + '</ul>';
   }
 
 
@@ -200,7 +201,7 @@
   function auditTable(R) {
     const a = (R.audit || []).slice(-5).reverse(); if (!a.length) return '';
     const d = (t) => (t ? new Date(t).toISOString().slice(5, 10).split('-').reverse().join('-') : '—');
-    return tbl(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Source'], a.map((x) => [d(x.date), f2(x.o), f2(x.h), f2(x.l), f2(x.c), f0(x.v), E(String(x.src || '').slice(0, 18)) + (x.approx ? ' ~' : '')]), 'grid num audit');
+    return tbl(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Source'], a.map((x) => [d(x.date), f2(x.o), f2(x.h), f2(x.l), f2(x.c), f0(x.v), E(String(x.src || '').replace(/Yahoo 2Y feed/,'Yahoo 2Y').slice(0, 12)) + (x.approx ? ' ~' : '')]), 'grid num audit');
   }
 
   function matrixTable(R) {
@@ -322,7 +323,7 @@
     const k = (a, b, c) => `<div><b style="color:${c}">${a}</b>${b}</div>`;
     const rrTxt = T ? (T.rr2 >= 3 ? 'The swing ticket meets the 1 : 3 reward-to-risk test on Target 2.' : T.rr3 != null && T.rr3 >= 3 ? `The 1 : 3 test is met only on the breakout extension (${rs(T.T3)}); on Targets 1–2 it is 1 : ${T.rr1.toFixed(1)} / 1 : ${T.rr2.toFixed(1)}, so a pullback entry near ${rs(T.req3)} or a confirmed close above ${rs(T.T2)} is the better trigger.` : `The 1 : 3 test is not met from this entry (1 : ${T.rr2.toFixed(1)} on Target 2); waiting for a better entry is the more conservative route.`) : '';
     const ne = R.nextEarnings && R.nextEarnings.days >= 0 && R.nextEarnings.days <= 15 ? `A result is due in ${R.nextEarnings.days} day${R.nextEarnings.days === 1 ? '' : 's'}; staging entries after the reaction is read is the more conservative route.` : '';
-    return `<div class="big">${E(head)}${lt && lt.call && !/INCOMPLETE|n\/a/i.test(lt.call) ? ' · LONG TERM: ' + E(lt.call) : ''}</div><div class="k">${k(T ? rs(T.eLo) + ' – ' + rs(T.eHi) : '—', 'Entry zone', '#f8e7a1')}${k(T ? rs(T.S) : '—', 'Stop (daily close)', '#fca5a5')}${k(T ? rs(T.T1) + ' · ' + rs(T.T2) : '—', 'Targets 1 · 2', '#86efac')}${k(b1 ? rs(b1.v[1]) : '—', '12-month base scenario' + (b1 ? ' (' + pc(b1.cagr[1]) + ')' : ''), '#e2e8f0')}</div><p>${E(strip(sw.basis || ''))} ${rrTxt} ${ne} Levels are rule-based reference zones from price, volume and results data — they may fail, and a daily close beyond the stop invalidates the view.</p><div class="disc">${DISC} For information only. Not investment advice. Markets carry risk.</div>`;
+    return `<div class="big">${E(head)}${lt && lt.call && !/INCOMPLETE|n\/a/i.test(lt.call) ? ' · LONG TERM: ' + E(lt.call) : ''}</div><div class="k">${k(T ? rs(T.eLo) + ' – ' + rs(T.eHi) : '—', 'Entry zone', '#f8e7a1')}${k(T ? rs(T.S) : '—', 'Stop (daily close)', '#fca5a5')}${k(T ? rs(T.T1) + ' · ' + rs(T.T2) : '—', 'Targets 1 · 2', '#86efac')}${k(b1 ? rs(b1.v[1]) : '—', '12-month base scenario' + (b1 ? ' (' + pc(b1.cagr[1]) + ')' : ''), '#e2e8f0')}</div><ul class="bl vb"><li>${E(cut(strip(sw.basis || ''), 170))}</li><li>${rrTxt}</li>${ne ? '<li>' + ne + '</li>' : ''}<li>A daily close beyond the stop invalidates the view; levels are rule-based reference zones and may fail.</li></ul><div class="disc">${DISC} For information only. Not investment advice. Markets carry risk.</div>`;
   }
 
   /* ---------- the document ---------- */
@@ -334,7 +335,7 @@
   let R_EX = 'NSE';
   const CSS = `@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}html,body{background:#f1f5f9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font-family:Inter,'Segoe UI','Liberation Sans',Arial,sans-serif;color:#1e293b;line-height:1.28;--fs:6.6pt}
-.page{width:210mm;height:297mm;padding:6mm 8mm 9mm;background:#f1f5f9;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.7mm;page-break-after:always;break-after:page;font-size:var(--fs)}.page:last-child{page-break-after:auto;break-after:auto}
+.page{width:210mm;height:296.5mm;padding:6mm 8mm 9mm;background:#f1f5f9;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:1.7mm;page-break-after:always;break-after:page;font-size:var(--fs)}.page:last-child{page-break-after:auto;break-after:auto}
 .wm{position:absolute;left:8mm;right:8mm;top:50%;transform:translateY(-50%);opacity:.045;pointer-events:none;z-index:50}.wm img{width:100%;display:block}
 .hdr{background:rgba(15,23,42,.95);border:1.3px solid #D4AF37;border-radius:3mm;padding:2.4mm 4mm 0;text-align:center;color:#e2e8f0}
 .brand{font-family:'Brush Script MT','Brush Script Std','Kaushan Script','Segoe Script',cursive;font-style:italic;color:#D4AF37;font-size:26pt;line-height:1}
@@ -349,12 +350,34 @@ table{border-collapse:collapse;width:100%;table-layout:auto}table.grid th{backgr
 table.kv td{padding:.5mm 1mm;border:1px solid #e2e8f0;vertical-align:top}table.kv td.k{background:#f8fafc;color:#475569;font-weight:600;width:19%}
 small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#15803d;font-weight:600}.r{color:#b91c1c;font-weight:600}.a{color:#a16207;font-weight:600}.mut{color:#64748b;font-weight:400}
 .cb{display:inline-block;padding:.2mm 1.4mm;border-radius:1.2mm;font-weight:800;font-size:.9em;border:1px solid currentColor}
-.note{font-size:.86em;color:#64748b;margin-top:.8mm;text-align:justify}svg{display:block}
+.bl{list-style:none;padding:0}.bl li{position:relative;padding-left:3mm;margin-bottom:.9mm;text-align:left}.bl li:before{content:'';position:absolute;left:.4mm;top:.55em;width:1.5mm;height:1.5mm;border-radius:50%;background:#D4AF37}.vb li{color:#e2e8f0}.chips{display:flex;gap:1.3mm}.chip{flex:1;border-radius:2mm;padding:1.1mm 1.3mm;color:#fff;text-align:center}.chip b{display:block;font-size:.8em;letter-spacing:.6px;text-transform:uppercase;opacity:.9}.chip i{display:block;font-style:normal;font-weight:800;font-size:1.05em;line-height:1.15;margin-top:.3mm}.chip span{display:block;font-size:.8em;opacity:.9}.note{font-size:.86em;color:#64748b;margin-top:.8mm;text-align:justify}svg{display:block}
 .verdict{background:rgba(15,23,42,.96);border:1.4px solid #D4AF37;border-radius:2.4mm;color:#e2e8f0;padding:2mm 3mm}.verdict h2{color:#D4AF37;font-size:8pt;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,.6);padding-bottom:.8mm;margin-bottom:1.2mm}.verdict .big{font-size:10pt;font-weight:800;color:#f8e7a1;margin-bottom:.8mm}.verdict .k{display:flex;gap:1.6mm;margin:1mm 0}.verdict .k div{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(212,175,55,.4);border-radius:1.4mm;padding:.8mm 1.4mm;text-align:center;font-size:.95em}.verdict .k b{display:block;font-size:1.25em}.verdict .disc{font-size:.92em;color:#94a3b8;margin-top:1mm}
 .pf{position:absolute;bottom:3mm;left:8mm;right:8mm;font-size:5.4pt;color:#64748b;display:flex;justify-content:space-between;z-index:5}`;
 
-  function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · Private Client Research</span><span class="rp">Page ${n} of 3</span></div>`; }
-  const pfoot = (n) => `<div class="pf"><span>Joshi's Corner · SSJ Finance · Private Client Research</span><span>Page ${n} of 3</span></div>`;
+  function dash(R) {
+    const T = ticket(R), m = R.matrix || [], W = 420;
+    const tc = (x) => (x.tone === 'bull' ? '#15803d' : x.tone === 'bear' ? '#be123c' : '#1d4ed8');
+    const chips = '<div class="chips">' + m.map((x) => `<div class="chip" style="background:${tc(x)}"><b>${E(x.horizon)}</b><i>${E(String(x.call || 'n/a').replace(/INCOMPLETE DATA/i, 'NO CALL'))}</i><span>${x.conf && x.conf !== '—' ? 'conf ' + E(x.conf) : '&nbsp;'}</span></div>`).join('') + '</div>';
+    let ruler = '';
+    if (T) {
+      const pts = [T.S, T.eLo, R.cmp, T.T1, T.T2].concat(T.T3 ? [T.T3] : []), lo = Math.min.apply(null, pts), hi = Math.max.apply(null, pts), pad = (hi - lo) * 0.06, x0 = lo - pad, x1 = hi + pad, X = (v) => 14 + (v - x0) / (x1 - x0) * (W - 28);
+      const mk = (v, col, top, lab) => `<line x1="${X(v)}" y1="20" x2="${X(v)}" y2="46" stroke="${col}" stroke-width="2"/><text x="${X(v)}" y="${top ? 14 : 58}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${col}">${lab}</text><text x="${X(v)}" y="${top ? 7 : 68}" text-anchor="middle" font-size="7.5" fill="#475569">${rs(v)}</text>`;
+      ruler = `<svg viewBox="0 0 ${W} 74" width="100%"><rect x="14" y="31" width="${W - 28}" height="4" rx="2" fill="#e2e8f0"/><rect x="${X(T.S)}" y="29" width="${X(T.eLo) - X(T.S)}" height="8" fill="#fecaca"/><rect x="${X(T.eLo)}" y="27" width="${Math.max(2, X(T.eHi) - X(T.eLo))}" height="12" rx="2" fill="#D4AF37" opacity=".85"/><rect x="${X(R.cmp)}" y="29" width="${X(T.T2) - X(R.cmp)}" height="8" fill="#bbf7d0"/>${mk(T.S, '#b91c1c', 0, 'STOP')}${mk(T.eLo, '#a16207', 1, 'ENTRY')}${mk(R.cmp, '#0f172a', 0, 'CMP')}${mk(T.T1, '#15803d', 1, 'T1')}${mk(T.T2, '#15803d', 0, 'T2')}${T.T3 ? mk(T.T3, '#15803d', 1, 'T3') : ''}</svg>`;
+    }
+    let range = '';
+    if (num(R.w52H) && num(R.w52L) && R.w52H > R.w52L) {
+      const pf = Math.max(0, Math.min(1, (R.cmp - R.w52L) / (R.w52H - R.w52L))), p = pf * (W - 28) + 14;
+      range = `<svg viewBox="0 0 ${W} 40" width="100%"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#ef4444"/><stop offset=".5" stop-color="#facc15"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs><rect x="14" y="14" width="${W - 28}" height="7" rx="3.5" fill="url(#rg)"/><path d="M${p - 4} 8 L${p + 4} 8 L${p} 15 Z" fill="#0f172a"/><text x="14" y="34" font-size="8" fill="#475569">52W low ${rs(R.w52L)}</text><text x="${W - 14}" y="34" font-size="8" text-anchor="end" fill="#475569">52W high ${rs(R.w52H)}</text><text x="${Math.min(W - 40, Math.max(40, p))}" y="5" font-size="8" text-anchor="middle" font-weight="700" fill="#0f172a">${(pf * 100).toFixed(0)}% of range</text></svg>`;
+    }
+    let bars = '';
+    if (R.ret) {
+      const it = [['1M', R.ret.m1], ['3M', R.ret.m3], ['6M', R.ret.m6], ['1Y', R.ret.y1]].filter((x) => num(x[1])), mx = Math.max.apply(null, it.map((x) => Math.abs(x[1])).concat([1])), bw = (W - 28) / (it.length || 1);
+      bars = `<svg viewBox="0 0 ${W} 74" width="100%">${it.map((x, i) => { const h = Math.abs(x[1]) / mx * 22, up = x[1] >= 0, cx = 14 + i * bw + bw / 2; return `<rect x="${cx - 14}" y="${up ? 36 - h : 36}" width="28" height="${Math.max(1, h)}" fill="${up ? '#16a34a' : '#dc2626'}" rx="1.5"/><text x="${cx}" y="${up ? 33 - h : 48 + h}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${up ? '#15803d' : '#b91c1c'}">${pc(x[1])}</text><text x="${cx}" y="72" text-anchor="middle" font-size="8" fill="#475569">${x[0]}</text>`; }).join('')}<line x1="14" x2="${W - 14}" y1="36" y2="36" stroke="#cbd5e1"/></svg>`;
+    }
+    return chips + `<div class="row" style="margin-top:1.2mm"><div class="col" style="flex:1.25"><div class="note" style="margin:0 0 .4mm"><b>Swing trade ruler</b> — stop · entry · CMP · targets</div>${ruler || note('n/a')}</div><div class="col" style="flex:1"><div class="note" style="margin:0 0 .4mm"><b>Price within its 52-week range</b></div>${range}<div class="note" style="margin:0"><b>Returns</b></div>${bars}</div></div>`;
+  }
+  function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · Private Client Research</span><span class="rp">Page ${n} of 5</span></div>`; }
+  const pfoot = (n) => `<div class="pf"><span>Joshi's Corner · SSJ Finance · Private Client Research</span><span>Page ${n} of 5</span></div>`;
 
   function build(R) {
     R_EX = R.exch === 'BO' ? 'BSE' : 'NSE';
@@ -375,30 +398,38 @@ small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#1580
     const sigRows = (R.swing && R.swing.rows) || [], lTech = (R.long && R.long.tech) || [];
     const p1 = `<section class="page">${wm}<div class="hdr"><div class="brand">Joshi's Corner</div><div class="sub">Private Client Research Report · Equity Research &amp; Quantitative Strategy<span class="mood" style="background:${ml.c}">${ml.name}</span></div><div class="logo">${monogram(R.sym)}</div><div class="meta"><div style="flex-basis:13%"><b>Script / Exchange</b><span>${E(R.sym)} · ${R_EX}</span></div><div style="flex-basis:21%"><b>Company</b><span>${E(R.name)}</span></div><div style="flex-basis:14%"><b>Sector</b><span>${E(R.sector || '—')}</span></div><div><b>CMP</b><span>${rs(R.cmp)}</span></div><div><b>Market cap</b><span>${num(R.mcap) ? cr(R.mcap) : '—'}</span></div><div><b>Generated (IST)</b><span>${now}</span></div><div><b>Data basis</b><span>${R.live ? 'Market live · delayed' : 'Last close'}</span></div></div></div>
 <div class="row"><div class="col stack" style="flex:1.55">${panel('1 · Executive Snapshot <span>&amp; Investment Thesis</span>', snap + `<div style="height:1.2mm"></div>${thesis(R)}`)}</div><div class="col stack" style="flex:1">${panel('Key levels', chartLevels(R) || note('Levels unavailable.'))}</div></div>
-${panel('2 · Master Multi-Horizon Strategic Execution Matrix <span>· Intraday to Long term</span>', matrixTable(R) + note('Calls come from fixed rules on price, volume, results and fundamentals; a horizon shows “INCOMPLETE DATA” rather than a guess when its inputs are missing. The Swing row uses the reconciled ticket in section 4; Medium / Long term targets are the valuation scenarios in section 3. Reference zones, not guarantees.'))}
-${panel('3 · Support &amp; Target Ladder <span>· Day to 5 Years</span>', horizonTable(R))}${pfoot(1)}</section>`;
+${panel('At a glance', dash(R))}
+${pfoot(1)}</section>`;
 
     const p2 = `<section class="page">${wm}${pageHdr(2, R)}
+${panel('2 · Master Multi-Horizon Strategic Execution Matrix <span>· Intraday to Long term</span>', matrixTable(R) + note('Rule-based calls; “INCOMPLETE DATA” where inputs are missing. Swing row = ticket in section 4; Medium / Long = scenarios in section 3.'))}
+${panel('3 · Support &amp; Target Ladder <span>· Day to 5 Years</span>', horizonTable(R))}
 ${panel('4 · Tactical Trading Playbook <span>· Intraday and swing</span>', playbook(R) + (intr ? '' : note('Intraday feed unavailable right now — intraday levels may be missing.')) + '<div style="height:1mm"></div>' + (optionsTable(R) || ''))}
-<div class="row"><div class="col" style="flex:1">${panel('% to target vs stop', chartTargets(R) || note('Targets unavailable.'))}</div><div class="col" style="flex:1">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div></div>
-<div class="row"><div class="col" style="flex:1">${panel('Short-term signals', signalTable(sigRows, 11) || note('n/a'))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 11) || note('n/a'))}</div></div>
-<div class="row"><div class="col stack" style="flex:1">${panel('5 · Structural deep dive <span>· results</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue (other income, presentation); filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>${pfoot(2)}</section>`;
+${pfoot(2)}</section>`;
 
     const p3 = `<section class="page">${wm}${pageHdr(3, R)}
+<div class="row"><div class="col" style="flex:1">${panel('% to target vs stop', chartTargets(R) || note('Targets unavailable.'))}</div><div class="col" style="flex:1">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div></div>
+<div class="row"><div class="col" style="flex:1">${panel('Short-term signals', signalTable(sigRows, 11) || note('n/a'))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 11) || note('n/a'))}</div></div>
+<div class="row"><div class="col stack" style="flex:1">${panel('5 · Structural deep dive <span>· results</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue (other income, presentation); filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>${pfoot(3)}</section>`;
+
+    const p4 = `<section class="page">${wm}${pageHdr(4, R)}
 ${panel('6 · Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
 ${panel('7 · Peer Valuation Matrix', peerTable(R))}
 <div class="row"><div class="col" style="flex:1.2">${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}</div><div class="col" style="flex:1">${panel('9 · Risk Matrix', riskTable(R))}</div></div>
+${pfoot(4)}</section>`;
+
+    const p5 = `<section class="page">${wm}${pageHdr(5, R)}
 ${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
 <section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
-${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.45">${derivation(R)}</div><div class="col" style="flex:1.1">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(3)}</section>`;
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${E(R.sym)} — Joshi's Corner Master Report</title><style>${CSS}</style></head><body>${p1}${p2}${p3}</body></html>`;
+${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.1">${derivation(R)}</div><div class="col" style="flex:1.2;overflow:hidden">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(5)}</section>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${E(R.sym)} — Joshi's Corner Master Report</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
   }
 
   /* shrink or grow type so each page is full and nothing is clipped */
   function fit(doc) {
     doc.querySelectorAll('.page').forEach((pg) => {
-      const lo = 4.6, hi = 8.2; let a = lo, b = hi;
-      const ok = (fs) => { pg.style.setProperty('--fs', fs + 'pt'); const items = pg.querySelectorAll(':scope > *:not(.wm):not(.pf)'); let bottom = 0; items.forEach((c) => { bottom = Math.max(bottom, c.getBoundingClientRect().bottom); }); const pf = pg.querySelector('.pf').getBoundingClientRect().top; return pg.scrollHeight <= pg.clientHeight + 1 && bottom <= pf - 2; };
+      const lo = 5.6, hi = 10.2; let a = lo, b = hi;
+      const ok = (fs) => { pg.style.setProperty('--fs', fs + 'pt'); const items = pg.querySelectorAll(':scope > *:not(.wm):not(.pf)'); let bottom = 0; items.forEach((c) => { bottom = Math.max(bottom, c.getBoundingClientRect().bottom); }); const pf = pg.querySelector('.pf').getBoundingClientRect().top; return pg.scrollHeight <= pg.clientHeight + 1 && bottom <= pf - 5; };
       if (ok(hi)) return;
       for (let i = 0; i < 9; i++) { const mid = (a + b) / 2; if (ok(mid)) a = mid; else b = mid; }
       ok(a);
