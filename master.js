@@ -295,11 +295,16 @@
     const C = R.extra && R.extra.corp; if (!C) return note('Corporate-action history (dividends / splits / bonus) could not be retrieved for this symbol right now.');
     const d = (t) => new Date(t + 19800000).toISOString().slice(0, 10).split('-').reverse().join('-');
     const rows = [];
-    C.spl.forEach((s) => rows.push([d(s.ts), '<span class="mut">n/a</span>', s.num > s.den ? 'Split / bonus (share-count increase)' : 'Reverse split / consolidation', E(s.txt || s.num + ' : ' + s.den)]));
-    C.div.forEach((x) => rows.push([d(x.ts), '<span class="mut">n/a</span>', 'Dividend', '₹' + f2(x.amt) + ' / share']));
+    C.spl.forEach((s) => rows.push([d(s.ts), '<span class="mut">= ex-date</span>', s.num > s.den ? 'Split / bonus (share-count increase)' : 'Reverse split / consolidation', E(s.txt || s.num + ' : ' + s.den)]));
+    C.div.forEach((x) => rows.push([d(x.ts), '<span class="mut">= ex-date</span>', 'Dividend', '₹' + f2(x.amt) + ' / share']));
     rows.sort((a, b) => (a[0].split('-').reverse().join('') < b[0].split('-').reverse().join('') ? 1 : -1));
     const tot = C.div.reduce((a, x) => a + x.amt, 0);
-    return (rows.length ? tbl(['Ex-date', 'Record date', 'Action', 'Detail / ratio'], rows, 'grid', ['16%', '16%', '34%', '34%']) : note('No dividend, split or bonus recorded in the last 3 years.')) + note(`Window: last 3 years. ${C.div.length ? `Dividends: ${C.div.length}, total ₹${f2(tot)} / share. ` : ''}${C.spl.length ? '' : 'No split or bonus issue recorded. '}Record dates are not published in the price feed — confirm on the exchange announcement. A bonus issue appears in the feed as a share-count split (e.g. 1 : 1 bonus = 2-for-1).`);
+    return (rows.length ? tbl(['Ex-date', 'Record date', 'Action', 'Detail / ratio'], rows, 'grid', ['16%', '16%', '34%', '34%']) : note('No dividend, split or bonus recorded in the last 3 years.')) + note(`Window: last 3 years. ${C.div.length ? `Dividends: ${C.div.length}, total ₹${f2(tot)} / share. ` : ''}${C.spl.length ? '' : 'No split or bonus issue recorded. '}Record date equals the ex-date under T+1 settlement (the feed does not publish it separately) — confirm on the exchange announcement. A bonus issue appears in the feed as a share-count split (e.g. 1 : 1 bonus = 2-for-1).`);
+  }
+  function segTable(R) {
+    const g = R.extra && R.extra.seg; if (!g || !g.rows || !g.rows.length) return '';
+    const tot = g.rows.reduce((a, x) => a + x[1], 0);
+    return panel(`Segment contribution <span>· ${E(g.fy)}</span>`, tbl(['Segment', g.unit || '₹ Cr', 'Share', ''], g.rows.map((x) => [E(x[0]), f0(x[1]), (x[1] / tot * 100).toFixed(0) + '%', `<div style="background:#D4AF37;height:2.2mm;width:${(x[1] / tot * 100).toFixed(0)}%"></div>`]).concat([['<b>Total</b>', `<b>${f0(tot)}</b>`, '100%', '']]), 'grid num', ['34%', '20%', '14%', '32%']));
   }
   function peerTable(R) {
     const PP = R.extra && R.extra.peers, P = PP && PP.rows;
@@ -491,6 +496,7 @@ ${pfoot(3)}</section>`;
 ${panel('5 · Long-Term View <span>· Support &amp; target ladder, Day to 5 Years</span>', horizonTable(R))}
 <div class="row"><div class="col stack" style="flex:1">${panel('Results <span>· quarterly &amp; annual</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue; filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>
 ${panel('Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
+${segTable(R)}
 <div class="row"><div class="col" style="flex:1.35">${panel('Peer Valuation Matrix', peerTable(R))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 9) || note('n/a'))}</div></div>
 ${pfoot(4)}</section>`;
 
@@ -550,8 +556,9 @@ ${panel('8 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R)
     const k = Math.min(1, (w.clientWidth - 16) / 794);
     f.style.height = h + 'px'; f.style.transform = 'scale(' + k + ')'; i.style.width = 794 * k + 'px'; i.style.height = h * k + 'px';
   }
-  function show(R) {
+  async function show(R) {
     ensure(); lastR = R;
+    try { if (!(R.extra && R.extra.seg)) { const j = await (await fetch('data/segments.json', { cache: 'no-cache' })).json(), k = j[R.sym]; if (k) { R.extra = R.extra || {}; R.extra.seg = k; } } } catch (e) {}
     const o = document.getElementById('jcMaster'), f = document.getElementById('jcmF'); document.getElementById('jcmT').textContent = R.name + ' · Master report';
     const html = build(R); o.classList.add('on'); scaleView();
     f.onload = () => { try { const d = f.contentDocument; (d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve()).then(() => { fit(d); scaleView(); }); } catch (e) {} };

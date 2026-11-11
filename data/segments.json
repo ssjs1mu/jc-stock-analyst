@@ -1,0 +1,21 @@
+{
+ "_note": "Curated segment revenue (Rs Cr) from company filings; add a symbol to show a Segment panel in the Master report. Others are skipped, never guessed.",
+ "HAL": {
+  "fy": "FY26",
+  "unit": "₹ Cr",
+  "rows": [
+   [
+    "Manufacturing",
+    9227
+   ],
+   [
+    "Repair & Overhaul",
+    20524
+   ],
+   [
+    "Other",
+    3299
+   ]
+  ]
+ }
+}
