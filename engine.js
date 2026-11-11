@@ -1703,8 +1703,9 @@ const RPT = {
   swing: { label: 'Short-term report', feeds: ['daily', 'daily2', 'weekly', 'bench', 'summary', 'deliv'], tab: 'pSwing' },
   long: { label: 'Long-term report', feeds: ['daily', 'daily2', 'weekly', 'bench', 'summary', 'ts', 'tsq', 'deliv', 'news'], tab: 'pLong' },
   summary: { label: 'Quick summary', feeds: ['daily', 'daily2', 'intra', 'weekly', 'bench'], tab: 'pSummary' },
+  master: { label: 'Master report', feeds: ['daily', 'daily2', 'intra', 'weekly', 'bench', 'summary', 'ts', 'tsq', 'deliv', 'news', 'corp', 'peers'], tab: 'pSummary' },
 };
-const FEED_NAMES = { daily: 'Daily OHLCV (2Y)', daily2: 'Daily cross-check (1M)', intra: 'Intraday 5-min OHLCV (5D)', weekly: 'Weekly OHLCV (10Y)', bench: 'Nifty 50 benchmark (2Y)', summary: 'Fundamentals & ratios (Yahoo quoteSummary)', ts: 'Annual financial statements (Yahoo timeseries)', tsq: 'Quarterly results (Yahoo timeseries)', deliv: 'NSE bundle — result dates, filed results, holding, delivery, DPR (Apps Script)', news: 'News (Google News RSS)' };
+const FEED_NAMES = { daily: 'Daily OHLCV (2Y)', daily2: 'Daily cross-check (1M)', intra: 'Intraday 5-min OHLCV (5D)', weekly: 'Weekly OHLCV (10Y)', bench: 'Nifty 50 benchmark (2Y)', summary: 'Fundamentals & ratios (Yahoo quoteSummary)', ts: 'Annual financial statements (Yahoo timeseries)', tsq: 'Quarterly results (Yahoo timeseries)', deliv: 'NSE bundle — result dates, filed results, holding, delivery, DPR (Apps Script)', news: 'News (Google News RSS)', corp: 'Corporate actions — dividends, splits, bonus (3Y)', peers: 'Peer valuation (similar stocks)' };
 const FC = {};   // feed cache: FC[ySym][key] = { t, f }
 function meter(pct, label) {
   const el = $('statusLine'); el.className = 'statusline show'; pct = Math.max(0, Math.min(100, Math.round(pct)));
@@ -1733,6 +1734,7 @@ async function runAnalysis(kind) {
     const DEF = {
       daily2: (tr) => fetchChart(ySym, '1mo', '1d', tr), intra: (tr) => fetchChart(ySym, '5d', '5m', tr), weekly: (tr) => fetchChart(ySym, '10y', '1wk', tr), bench: (tr) => fetchChart('^NSEI', '2y', '1d', tr),
       summary: (tr) => fetchSummary(ySym, tr), ts: (tr) => fetchTimeseries(ySym, TS_TYPES, 6, tr), tsq: (tr) => fetchTimeseries(ySym, TSQ_TYPES, 3.5, tr),
+      corp: (tr) => window.JCMaster.fetchCorp(ySym, tr), peers: () => window.JCMaster.fetchPeers(ySym),
       deliv: () => (usedExch === 'NS' ? fetchDelivery(sym) : Promise.resolve(null)), news: async () => { const sf = FC[ySym] && FC[ySym].summary; const nm0 = (sf && sf.f.data?.price?.longName) || dailyF.data.meta.longName || dailyF.data.meta.shortName || sym; return fetchNews(nm0, {}); },
     };
     const todo = spec.feeds.filter((k) => k !== 'daily');
@@ -1745,6 +1747,7 @@ async function runAnalysis(kind) {
     const all = Object.keys(FEED_NAMES), F = {}; all.forEach((k) => { F[k] = g(k); });
     const feeds = all.map((k) => ({ name: F[k].name, ok: F[k].ok, via: F[k].via, err: F[k].err }));
     const R = buildReport({ sym, exch: usedExch, daily: F.daily.data, daily2: F.daily2.data, intra: F.intra.data, weekly: F.weekly.data, bench: F.bench.data, summary: F.summary.data, ts: F.ts.data, tsq: F.tsq.data, deliv: F.deliv.data, news: F.news.data || [], feeds, nowMs: Date.now() });
+    R.extra = { corp: F.corp && F.corp.data, peers: F.peers && F.peers.data };
     window.__R = R; $('titlebar').classList.remove('hidden');
     $('asOfTag').textContent = 'data as of ' + R.lastDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + (R.live ? ' · market live' : ' · market closed'); $('coName').textContent = `${R.name} (${R.sym})`;
     const have = (k) => RPT[k].feeds.every((x) => FC[ySym] && FC[ySym][x] && FC[ySym][x].f.ok);
@@ -1754,6 +1757,7 @@ async function runAnalysis(kind) {
     const pp = $('projPanel'); if (kind === 'intraday' && window.JCProj) window.JCProj.run(R); else if (pp) pp.style.display = 'none';
     if (window.JCSetup) window.JCSetup.run(R);
     refreshChips(); showTab(spec.tab);
+    if (kind === 'master' && window.JCMaster) { meter(98, `${spec.label} — laying out 3 pages`); window.JCMaster.show(R); }
     meter(100, `${spec.label} ready · ${new Date().toLocaleTimeString('en-IN')}${usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''}`);
   } catch (e) {
     console.error(e); setStatus('Report failed', 'err');
