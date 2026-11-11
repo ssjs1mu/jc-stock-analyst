@@ -389,11 +389,15 @@ small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#1580
     }
     return chips + `<div class="row" style="margin-top:1.2mm"><div class="col" style="flex:1.25"><div class="note" style="margin:0 0 .4mm"><b>Swing trade ruler</b> — stop · entry · CMP · targets</div>${ruler || note('n/a')}</div><div class="col" style="flex:1"><div class="note" style="margin:0 0 .4mm"><b>Price within its 52-week range</b></div>${range}<div class="note" style="margin:0"><b>Returns</b></div>${bars}</div></div>`;
   }
-  function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · Private Client Research</span><span class="rp">Page ${n} of 5</span></div>`; }
-  const pfoot = (n) => `<div class="pf"><span>Joshi's Corner · SSJ Finance · Private Client Research</span><span>Page ${n} of 5</span></div>`;
+  const istNow = () => new Date(Date.now() + 19800000).toISOString();
+  const stampTxt = () => { const t = istNow(); return t.slice(8, 10) + '-' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+t.slice(5, 7) - 1] + '-' + t.slice(0, 4) + ' ' + t.slice(11, 16) + ' IST'; };
+  const fileStamp = (R) => R.sym + '_' + (R.exch === 'BO' ? 'BSE' : 'NSE') + '_' + istNow().slice(0, 16).replace('T', '_').replace(':', '-');
+  function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · ${stampTxt()}</span><span class="rp">Page ${n} of 5</span></div>`; }
+  let SYM_NOW = '';
+  const pfoot = (n) => `<div class="pf"><span>${E(SYM_NOW)} · ${stampTxt()} · Joshi's Corner · SSJ Finance</span><span>Page ${n} of 5</span></div>`;
 
   function build(R) {
-    R_EX = R.exch === 'BO' ? 'BSE' : 'NSE';
+    R_EX = R.exch === 'BO' ? 'BSE' : 'NSE'; SYM_NOW = R.sym;
     const ml = moodOf(R), wm = `<div class="wm"><img src="${logoUrl()}" alt=""></div>`, now = new Date(Date.now() + 19800000).toISOString().slice(0, 16).replace('T', ' ');
     const pe = Fv(R, /^P\/E \(trailing\)/), pb = Fv(R, /^P\/B/), dy = Fv(R, /^Dividend yield/), de = Fv(R, /^Debt \/ Equity/), roe = Fv(R, /^ROE/), prom = Fv(R, /^Promoter/), mt = Fv(R, /^Mean target/);
     const ne = R.nextEarnings, dpr = R.dpr && typeof R.dpr === 'object' ? R.dpr : null;
@@ -435,7 +439,7 @@ ${pfoot(4)}</section>`;
 ${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
 <section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
 ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.1">${derivation(R)}</div><div class="col" style="flex:1.2;overflow:hidden">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(5)}</section>`;
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${E(R.sym)} — Joshi's Corner Master Report</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${fileStamp(R)}_Master_Report</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
   }
 
   /* shrink or grow type so each page is full and nothing is clipped */
@@ -453,7 +457,7 @@ ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was r
   function pack(R) {
     const t = (rows) => rows.map((r) => '| ' + r.join(' | ') + ' |').join('\n');
     const m = (R.matrix || []).map((x) => { const e = lvl(x, /^(Entry|Buy zone|Accumulate)/), s = lvl(x, /^(Stop|Risk line|Hard floor)/), a = lvl(x, /^Target( 1)?( ·|$)/), b = lvl(x, /^Target 2/); const h = hz(R)[x.horizon], T = x.horizon === 'Swing' ? ticket(R) : null; if (h) return [x.horizon, x.call, e ? e.v : '—', f2(h.stop), f2(h.t1) + ' (' + h.la + ')', f2(h.t2) + ' (' + h.lb + ')']; if (T) return [x.horizon, x.call, f2(T.eLo) + ' – ' + f2(T.eHi), f2(T.S), f2(T.T1), f2(T.T2)]; return [x.horizon, x.call, e ? e.v : '—', s ? s.v : '—', a ? a.v : '—', b ? b.v : '—']; });
-    const md = [`# ${R.name} (${R.sym}, ${R.exch === 'BO' ? 'BSE' : 'NSE'}) — Joshi's Corner source pack`, '', `Generated ${new Date().toISOString()}. Close ${rs(R.cmp)} (${pc(R.dayPct, 2)}). 52W ${rs(R.w52L)} – ${rs(R.w52H)}.`, '', '## Multi-horizon calls', '| Horizon | Call | Entry | Stop | Target 1 | Target 2 |', '|---|---|---|---|---|---|', t(m), '', '## Thesis', strip(thesis(R).replace(/<\/p>/g, '\n')), '', '## Risks', strip(riskTable(R).replace(/<\/tr>/g, '\n').replace(/<\/td>/g, ' | ')), '', '## Instruction for NotebookLM', 'Create a one-page infographic presentation: header with the stock and CMP, a horizon-by-horizon call table, a levels ladder, results trend, risks and the verdict. Use only the figures in this source. Add the line: ' + DISC].join('\n');
+    const md = [`# ${R.name} (${R.sym}, ${R.exch === 'BO' ? 'BSE' : 'NSE'}) — Joshi's Corner source pack`, '', `Generated ${stampTxt()}. Close ${rs(R.cmp)} (${pc(R.dayPct, 2)}). 52W ${rs(R.w52L)} – ${rs(R.w52H)}.`, '', '## Multi-horizon calls', '| Horizon | Call | Entry | Stop | Target 1 | Target 2 |', '|---|---|---|---|---|---|', t(m), '', '## Thesis', strip(thesis(R).replace(/<\/p>/g, '\n')), '', '## Risks', strip(riskTable(R).replace(/<\/tr>/g, '\n').replace(/<\/td>/g, ' | ')), '', '## Instruction for NotebookLM', 'Create a one-page infographic presentation: header with the stock and CMP, a horizon-by-horizon call table, a levels ladder, results trend, risks and the verdict. Use only the figures in this source. Add the line: ' + DISC].join('\n');
     return md;
   }
 
@@ -468,10 +472,10 @@ ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was r
     o.innerHTML = '<div class="mb"><b id="jcmT">Master report</b><span class="sp"></span><button id="jcmPdf">⬇ Save PDF</button><button id="jcmNb" title="Downloads a source file and opens NotebookLM">📊 NotebookLM infographic</button><button id="jcmX">✕ Close</button></div><iframe id="jcmF" title="Master report"></iframe>';
     document.body.appendChild(o);
     document.getElementById('jcmX').onclick = () => o.classList.remove('on');
-    document.getElementById('jcmPdf').onclick = () => { const f = document.getElementById('jcmF'); try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { alert('Print failed: ' + e.message); } };
+    document.getElementById('jcmPdf').onclick = () => { const f = document.getElementById('jcmF'); const t0 = document.title; try { document.title = f.contentDocument.title; f.contentWindow.focus(); f.contentWindow.print(); document.title = t0; } catch (e) { alert('Print failed: ' + e.message); } };
     document.getElementById('jcmNb').onclick = () => {
       if (!lastR) return; const md = pack(lastR), a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' })); a.download = lastR.sym + '_NotebookLM_source.md'; document.body.appendChild(a); a.click(); a.remove();
+      a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' })); a.download = fileStamp(lastR) + '_NotebookLM_source.md'; document.body.appendChild(a); a.click(); a.remove();
       try { navigator.clipboard.writeText(md); } catch (e) {}
       window.open('https://notebooklm.google.com/', '_blank');
       alert('Source file downloaded (and copied). In NotebookLM: create a notebook → Add source → upload the file → Studio → Infographic / Slide deck.');
