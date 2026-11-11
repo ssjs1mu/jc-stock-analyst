@@ -153,9 +153,9 @@
     const atr = R.swing && R.swing.metrics && R.swing.metrics.atr, cmp = R.cmp; if (!num(atr) || !num(cmp)) return null;
     const L = ladder(R), plan = (R.swing && R.swing.plan) || {}, sup = L.sup.slice().sort((a, b) => b.v - a.v), res = L.res.slice().sort((a, b) => a.v - b.v);
     const near = sup.find((c) => cmp - c.v >= 0.25 * atr && cmp - c.v <= 1.6 * atr), eLo = near ? near.v : cmp - 0.8 * atr, eHi = cmp, E = (eLo + eHi) / 2;
-    const below = sup.find((c) => c.v < eLo - 0.3 * atr); let S = below ? below.v - 0.25 * atr : eLo - 1.2 * atr, sWhy = below ? 'below ' + short(below) + ' − 0.25×ATR' : '1.2×ATR under the entry zone (no support cluster found)';
+    const below = sup.find((c) => c.hi < eLo - 0.3 * atr); let S = below ? below.lo - 0.25 * atr : eLo - 1.2 * atr, sWhy = below ? 'below ' + short(below) + ' − 0.25×ATR' : '1.2×ATR under the entry zone (no support cluster found)';
     if (E - S > 3 * atr) { S = E - 3 * atr; sWhy = 'capped at 3×ATR below entry'; }
-    const t1c = res.find((c) => c.v - E >= 0.6 * atr), T1 = t1c ? t1c.v : E + 1.2 * atr, t2c = res.find((c) => c.v - T1 >= 0.5 * atr), T2 = t2c ? t2c.v : T1 + 1.3 * atr;
+    const t1c = res.find((c) => c.lo - E >= 0.6 * atr), T1 = t1c ? t1c.lo : E + 1.2 * atr, t2c = res.find((c) => c.lo - T1 >= 0.5 * atr), T2 = t2c ? t2c.lo : T1 + 1.3 * atr;
     const ext = [plan.t1, plan.t2].filter((x) => num(x) && x > T2 * 1.002).sort((a, b) => a - b), T3 = ext.length ? ext[0] : null;
     const risk = Math.max(1e-9, E - S), rr = (t) => (t - E) / risk;
     const reqEntry = (T, k) => (T + k * S) / (1 + k);
@@ -291,7 +291,7 @@
     const PP = R.extra && R.extra.peers, P = PP && PP.rows;
     if (!P || !P.length) return note('Peer comparison is not available for this symbol (no peer list returned).');
     const pv = parseFloat(Fv(R, /^P\/E \(trailing\)/)), me = { sym: R.sym, name: R.name, mcap: R.mcap, pe: num(pv) ? pv : null, pb: parseFloat(Fv(R, /^P\/B/)), roe: parseFloat(Fv(R, /^ROE/)) / 100, me: true };
-    const all = [me].concat(P), pes = P.map((x) => x.pe).filter(num).sort((a, b) => a - b), med = pes.length ? (pes.length % 2 ? pes[(pes.length - 1) / 2] : (pes[pes.length / 2 - 1] + pes[pes.length / 2]) / 2) : null;
+    const all = [me].concat(P.slice(0, 5)), pes = P.map((x) => x.pe).filter(num).sort((a, b) => a - b), med = pes.length ? (pes.length % 2 ? pes[(pes.length - 1) / 2] : (pes[pes.length / 2 - 1] + pes[pes.length / 2]) / 2) : null;
     const rows = all.map((x) => [x.me ? `<b>${E(x.sym)}</b>` : E(x.sym), `<span class="mut">${E(String(x.name).slice(0, 26))}</span>`, num(x.mcap) ? cr(x.mcap) : '—', num(x.pe) ? x.pe.toFixed(1) + 'x' : '—', num(x.pb) ? x.pb.toFixed(1) + 'x' : '—', num(x.roe) ? (x.roe * 100).toFixed(1) + '%' : '—']);
     return tbl(['Symbol', 'Company', 'Mkt cap', 'P/E (TTM)', 'P/B', 'ROE'], rows, 'grid num') + note(`Peer set: ${E(PP.basis)} — nearest similar names returned for this stock, not a curated list. ${med && num(me.pe) ? `Peer median P/E ${med.toFixed(1)}x; ${E(R.sym)} trades at ${pc((me.pe / med - 1) * 100)} versus it.` : ''}`);
   }
@@ -387,8 +387,7 @@ ${panel('4 · Tactical Trading Playbook <span>· Intraday and swing</span>', pla
     const p3 = `<section class="page">${wm}${pageHdr(3, R)}
 ${panel('6 · Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
 ${panel('7 · Peer Valuation Matrix', peerTable(R))}
-${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}
-${panel('9 · Risk Matrix', riskTable(R))}
+<div class="row"><div class="col" style="flex:1.2">${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}</div><div class="col" style="flex:1">${panel('9 · Risk Matrix', riskTable(R))}</div></div>
 ${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
 <section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
 ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.45">${derivation(R)}</div><div class="col" style="flex:1.1">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(3)}</section>`;

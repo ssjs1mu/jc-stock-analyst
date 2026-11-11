@@ -423,8 +423,12 @@ function buildSwing(D, X) {
 
   // levels
   const sw = swingPoints(dly, 4, 120);
-  const wk = D.weekly?.bars; let wp = null;
-  if (wk && wk.length > 3) { const lastW = last(wk), useIdx = weekKey(lastW.t) === weekKey(X.nowMs / 1000) ? wk.length - 2 : wk.length - 1; const w = wk[useIdx]; if (w) wp = pivotSet(w.h, w.l, w.c); }
+  let wp = null; { // completed-week pivot, identical rule to buildPivots (single source of truth)
+    const ist = new Date(X.nowMs + 19800000), dow = ist.getUTCDay(), mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+    const weekend = dow === 0 || dow === 6 || (dow === 5 && mins > 930);
+    const wkg = groupHLC(dly, weekKey), w = wkg.length ? (weekend || last(wkg).k !== weekKey(X.nowMs / 1000) ? last(wkg) : wkg[wkg.length - 2]) : null;
+    if (w) wp = pivotSet(w.h, w.l, w.c);
+  }
   const w52H = X.w52H, w52L = X.w52L, fib = X.fib;
   const levels = []; const add = (v, label, type) => { if (isNum(v)) levels.push({ v, label, type }); };
   sw.hi.forEach((p) => add(p.v, 'Swing high ' + istDate(p.t).slice(5), 'swing')); sw.lo.forEach((p) => add(p.v, 'Swing low ' + istDate(p.t).slice(5), 'swing'));
