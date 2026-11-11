@@ -1,0 +1,280 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "11 Nov 2026",
+ "report_time": "08:13 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 25,295 - 25,370"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-up opening likely: Wall Street weak, Asia positive. Expected Nifty opening zone: 25,295 - 25,370 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,333.0 (+288 pts, +1.15% vs Nifty's last close).",
+      "US: S&P 500 -0.38%, Nasdaq -0.74%, Dow -0.30%.",
+      "Asia this morning: Nikkei +0.78%, Hang Seng -0.62%, Kospi +0.97%.",
+      "Currency, crude and volatility: Brent 92.35 (-0.24%); USD/INR 93.918 (-0.03%); India VIX 17.42 (-5.48%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 12 Nov 2026.",
+      "Results today (49 companies): AFSL, AIRAN, AMBIKCO, AVTNPL, BAFNAPH, BAJAJHIND, BALPHARMA, BANARISUG, BASML, BURNPUR and others."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "KOTAKBANK",
+       "In the news",
+       "India in 'Sweet Spot' Amidst Oil Volatility, Strong Rupee Outlook: Kotak Neo Expert"
+      ],
+      [
+       "SBIN",
+       "In the news",
+       "Sensex Today Trades Lower | Nifty Below 24,050 | SBI & Titan Company Top Losers"
+      ],
+      [
+       "BSE",
+       "Setup: BUY (A+)",
+       "Entry 3,822.3, stop 3,777.8, target 3,901.3"
+      ],
+      [
+       "RUBICON",
+       "Setup: BUY (A+)",
+       "Entry 1,780.1, stop 1,745.6, target 1,840.2"
+      ],
+      [
+       "ATHERENERG",
+       "Setup: BUY (A+)",
+       "Entry 1,874.1, stop 1,843.9, target 1,948.1"
+      ],
+      [
+       "SONACOMS",
+       "Setup: BUY (A+)",
+       "Entry 924.9, stop 913.5, target 950.8"
+      ],
+      [
+       "DIVISLAB",
+       "Volume surge (last session)",
+       "3.8x average volume, +4.22%"
+      ],
+      [
+       "GRASIM",
+       "Volume surge (last session)",
+       "2.5x average volume, -1.17%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Trump says Iran war \u2018effectively over\u2019: How's it likely to impact Sensex, Nifty, gold and silver prices? Experts' views",
+      "Global Bonds Fall as Hot US Inflation Sparks Jumbo Fed Hike Fears",
+      "Will Dalal Street spring a surprise today? GIFT Nifty's 95-point swing keeps investors guessing",
+      "Top stocks to watch today: Cochin Shipyard, MRF, Tata Power shares in focus on Wednesday, 11 November"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "52,231.89",
+        "-0.30%"
+       ],
+       [
+        "S&P 500",
+        "7,520.93",
+        "-0.38%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,065.88",
+        "-0.74%"
+       ],
+       [
+        "FTSE 100",
+        "10,751.60",
+        "-0.29%"
+       ],
+       [
+        "DAX",
+        "26,347.45",
+        "+0.31%"
+       ],
+       [
+        "Nikkei 225",
+        "60,928.92",
+        "+0.78%"
+       ],
+       [
+        "Hang Seng",
+        "24,405.51",
+        "-0.62%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,657.81",
+        "-0.16%"
+       ],
+       [
+        "Kospi",
+        "5,290.14",
+        "+0.97%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "92.35",
+        "-0.24%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "86.57",
+        "-0.32%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "4,051.00",
+        "-1.54%"
+       ],
+       [
+        "USD/INR",
+        "93.92",
+        "-0.03%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "102.25",
+        "+0.02%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.98",
+        "+2.45%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "25,234",
+       "25,385"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,140",
+       "25,500"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (25,295 - 25,370) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
