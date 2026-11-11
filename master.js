@@ -92,7 +92,10 @@
     const rows = [];
     (R.matrix || []).forEach((m) => {
       const t1 = m.levels.find((l) => /^Target( 1)?( ·|$)/.test(l.label)), st = m.levels.find((l) => /^(Stop|Risk line|Hard floor)/.test(l.label));
-      if (t1 && num(t1.n) && num(R.cmp)) rows.push({ h: m.horizon, t: (t1.n / R.cmp - 1) * 100, s: st && num(st.n) ? (st.n / R.cmp - 1) * 100 : null });
+      const h = hz(R)[m.horizon], sw = m.horizon === 'Swing' ? ticket(R) : null;
+      if (h) rows.push({ h: m.horizon, t: (h.t1 / R.cmp - 1) * 100, s: (h.stop / R.cmp - 1) * 100 });
+      else if (sw) rows.push({ h: m.horizon, t: (sw.T1 / R.cmp - 1) * 100, s: (sw.S / R.cmp - 1) * 100 });
+      else if (t1 && num(t1.n) && num(R.cmp)) rows.push({ h: m.horizon, t: (t1.n / R.cmp - 1) * 100, s: st && num(st.n) ? (st.n / R.cmp - 1) * 100 : null });
     });
     if (!rows.length) return '';
     const mx = Math.max(5, ...rows.map((r) => Math.abs(r.t)), ...rows.map((r) => Math.abs(r.s || 0))), W = 340, rh = 22, H = rows.length * rh + 22, mid = 150, sc = 110 / mx;
@@ -168,21 +171,22 @@
     if (!num(g)) { g = rg ? parseFloat(rg) : NaN; src = 'revenue CAGR'; }
     if (!num(g)) return null;
     g = Math.max(0, Math.min(20, g)); const gf = Math.max(0, g - 3), eps = R.cmp / pe;
-    const H = [{ k: '1Y', y: 1, m: [0.75, 0.9, 1] }, { k: '3Y', y: 3, m: [0.7, 0.85, 1] }, { k: '5Y', y: 5, m: [0.65, 0.8, 0.95] }];
-    return { eps, pe, g, gf, src, rows: H.map((h) => { const e = eps * (1 + g / 100) * Math.pow(1 + gf / 100, h.y - 1), v = h.m.map((m) => e * pe * m); return { k: h.k, y: h.y, eps: e, mult: h.m.map((m) => pe * m), v, cagr: v.map((x) => (Math.pow(x / R.cmp, 1 / h.y) - 1) * 100) }; }) };
+    const H = [{ k: '1Y', y: 1, m: [0.8, 1, 1.15] }, { k: '3Y', y: 3, m: [0.68, 0.92, 1.1] }, { k: '5Y', y: 5, m: [0.58, 0.85, 1.05] }];
+    return { eps, pe, g, gf, src, H, rows: H.map((h) => { const e = eps * (1 + g / 100) * Math.pow(1 + gf / 100, h.y - 1), v = h.m.map((m) => e * pe * m); return { k: h.k, y: h.y, eps: e, mult: h.m.map((m) => pe * m), v, cagr: v.map((x) => (Math.pow(x / R.cmp, 1 / h.y) - 1) * 100) }; }) };
   }
   const call = (R, h) => { const m = (R.matrix || []).find((x) => x.horizon === h); return m && m.call && !/INCOMPLETE|n\/a/i.test(m.call) ? m.call : '—'; };
   function horizonTable(R) {
     const P = R.pivots || {}, d = P.daily && P.daily.set, w = P.weekly && P.weekly.set, m = P.monthly && P.monthly.set, M = (R.swing && R.swing.metrics) || {}, fb = R.fib || {}, wk = (R.long && R.long.wk) || {}, S = scen(R);
-    const two = (a, b) => (num(a) && num(b) ? `₹${f2(a)} / ₹${f2(b)}` : num(a) ? '₹' + f2(a) : num(b) ? '₹' + f2(b) : '—');
+    const two = (a, b) => (!num(a) && !num(b) ? '—' : num(a) && num(b) ? `₹${f2(a)} / ₹${f2(b)}` : num(a) ? '₹' + f2(a) : num(b) ? '₹' + f2(b) : '—');
+    const up = (a, b) => two.apply(null, [a, b].filter((x) => num(x) && x > R.cmp).sort((p, q) => p - q)), dn = (a, b) => two.apply(null, [a, b].filter((x) => num(x) && x < R.cmp).sort((p, q) => q - p));
     const rows = [];
     if (d) rows.push(['<b>Day</b>', two(d.S1, d.S2), two(d.R1, d.R2), 'Daily pivots (previous session H/L/C)', call(R, 'Intraday')]);
     if (w) rows.push(['<b>Week</b>', two(w.S1, w.S2), two(w.R1, w.R2), 'Weekly pivots', call(R, 'Swing')]);
     rows.push(['<b>1 Month</b>', two(m && m.S1, R.swing && R.swing.ll20), two(m && m.R1, R.swing && R.swing.hh20), 'Monthly pivot; 20-day low / high', call(R, 'Swing')]);
-    rows.push(['<b>3 Months</b>', two(M.s50, M.s100), two(R.w52H, fb.s60 && fb.s60.ext && fb.s60.ext[0] && fb.s60.ext[0].level), '50 / 100-day SMA; 52-week high; 60-day Fib ext 1.272', call(R, 'Positional')]);
-    rows.push(['<b>6 Months</b>', two(M.s200, wk.w40), two(R.w52H, fb.s2y && fb.s2y.ext && fb.s2y.ext[0] && fb.s2y.ext[0].level), '200-day / 40-week SMA; 52-week high; 2-year Fib ext 1.272', call(R, 'Medium term')]);
+    rows.push(['<b>3 Months</b>', dn(M.s50, M.s100), up(R.w52H, fb.s60 && fb.s60.ext && fb.s60.ext[0] && fb.s60.ext[0].level), '50 / 100-day SMA; 52-week high; 60-day Fib ext 1.272', call(R, 'Positional')]);
+    rows.push(['<b>6 Months</b>', dn(M.s200, wk.w40), up(R.w52H, fb.s2y && fb.s2y.ext && fb.s2y.ext[0] && fb.s2y.ext[0].level), '200-day / 40-week SMA; 52-week high; 2-year Fib ext 1.272', call(R, 'Medium term')]);
     if (S) S.rows.forEach((r) => rows.push([`<b>${r.k === '1Y' ? '1 Year' : r.k === '3Y' ? '3 Years' : '5 Years'}</b>`, `₹${f0(r.v[0])} <span class="mut">(bear)</span>`, `<b>₹${f0(r.v[1])}</b> base / ₹${f0(r.v[2])} bull`, `EPS ₹${f2(r.eps)} × ${r.mult.map((x) => x.toFixed(0)).join(' / ')}x · base ${pc(r.cagr[1])} p.a.`, call(R, r.k === '1Y' ? 'Medium term' : 'Long term')]));
-    return tbl(['Horizon', 'Support / floor', 'Resistance / target', 'Basis of levels', 'Engine call'], rows, 'grid', ['10%', '19%', '24%', '37%', '10%']) + (S ? note(`1Y–5Y rows are earnings × multiple <b>scenarios</b>, not forecasts: EPS ₹${f2(S.eps)} (= price ÷ trailing P/E ${S.pe.toFixed(1)}), grown at ${S.g.toFixed(0)}% a year for year 1 (trailing ${S.src}, capped 0–20%) then ${S.gf.toFixed(0)}% a year; exit P/E assumed at 75–100% (1Y), 70–100% (3Y), 65–95% (5Y) of today's multiple. Change the assumption and the numbers change.`) : note('1Y–5Y scenarios need trailing P/E and a growth rate from filed results — not available for this symbol, so none is shown.'));
+    return tbl(['Horizon', 'Support / floor', 'Resistance / target', 'Basis of levels', 'Engine call'], rows, 'grid', ['10%', '19%', '24%', '37%', '10%']) + (S ? note(`1Y–5Y rows are earnings × multiple <b>scenarios</b>, not forecasts: EPS ₹${f2(S.eps)} (= price ÷ trailing P/E ${S.pe.toFixed(1)}), grown at ${S.g.toFixed(0)}% a year for year 1 (trailing ${S.src}, capped 0–20%) then ${S.gf.toFixed(0)}% a year; exit P/E (bear / base / bull) assumed at ${S.H.map((h) => h.k + ' ' + h.m.map((x) => Math.round(x * 100)).join('/') + '%').join(', ')} of today's multiple — base holds the multiple for year 1 and fades it later. Change the assumption and the numbers change.`) : note('1Y–5Y scenarios need trailing P/E and a growth rate from filed results — not available for this symbol, so none is shown.'));
   }
   function derivation(R) {
     const T = ticket(R), rows = [], live = R.live, ld = R.lastDate ? new Date(R.lastDate).toISOString().slice(0, 10).split('-').reverse().join('-') : '';
@@ -204,14 +208,23 @@
     return tbl(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Source'], a.map((x) => [d(x.date), f2(x.o), f2(x.h), f2(x.l), f2(x.c), f0(x.v), E(String(x.src || '').replace(/Yahoo 2Y feed/,'Yahoo 2Y').slice(0, 12)) + (x.approx ? ' ~' : '')]), 'grid num audit');
   }
 
+  /* one source for Medium / Long term numbers: risk line = engine review line (weekly close), targets = scenarios */
+  function hz(R) {
+    const S = scen(R), out = {}, mm = (R.matrix || []).find((x) => x.horizon === 'Medium term'), rl = mm && mm.levels.find((l) => /^Risk line/.test(l.label)), stop = rl && num(rl.n) ? rl.n : null;
+    if (!S || !stop) return out;
+    const r1 = S.rows.find((r) => r.k === '1Y'), r3 = S.rows.find((r) => r.k === '3Y'), r5 = S.rows.find((r) => r.k === '5Y'), risk = R.cmp - stop;
+    const mk = (a, b, la, lb) => ({ stop, t1: a, t2: b, la, lb, rr1: (a - R.cmp) / risk, rr2: (b - R.cmp) / risk });
+    if (r1) out['Medium term'] = mk(r1.v[1], r1.v[2], '1Y base', '1Y bull');
+    if (r3 && r5) out['Long term'] = mk(r3.v[1], r5.v[1], '3Y base', '5Y base');
+    return out;
+  }
   function matrixTable(R) {
-    const T = ticket(R), S = scen(R), sc = (k) => (S ? S.rows.find((r) => r.k === k) : null);
+    const T = ticket(R), S = scen(R), H = hz(R), sc = (k) => (S ? S.rows.find((r) => r.k === k) : null);
     const rows = (R.matrix || []).map((m) => {
       let ent = lvl(m, /^(Entry|Buy zone|Accumulate)/), stp = lvl(m, /^(Stop|Risk line)/) || lvl(m, /^Hard floor/), t1 = lvl(m, /^Target( 1)?( ·|$)/), t2 = lvl(m, /^Target 2/), basis = E(strip(m.basis)).slice(0, 130), tag = '';
       if (m.horizon === 'Swing' && T) { ent = { v: `₹${f2(T.eLo)} – ₹${f2(T.eHi)}`, sub: 'avg ' + rs(T.E) }; stp = { v: rs(T.S), sub: pc((T.S / R.cmp - 1) * 100) + ' · daily close' }; t1 = { v: rs(T.T1), sub: pc((T.T1 / R.cmp - 1) * 100) + ' · 1:' + T.rr1.toFixed(1) }; t2 = { v: rs(T.T2), sub: pc((T.T2 / R.cmp - 1) * 100) + ' · 1:' + T.rr2.toFixed(1) }; tag = ' <span class="mut">reconciled</span>'; }
-      if (m.horizon === 'Medium term' && sc('1Y')) { const r = sc('1Y'); t1 = { v: rs(r.v[1]), sub: pc((r.v[1] / R.cmp - 1) * 100) + ' · 1Y base' }; t2 = { v: rs(r.v[2]), sub: pc((r.v[2] / R.cmp - 1) * 100) + ' · 1Y bull' }; tag = ' <span class="mut">scenario targets</span>'; }
-      if (m.horizon === 'Long term' && sc('3Y')) { const a = sc('3Y'), b = sc('5Y'); t1 = { v: rs(a.v[1]), sub: pc((a.v[1] / R.cmp - 1) * 100) + ' · 3Y base' }; t2 = { v: rs(b.v[1]), sub: pc((b.v[1] / R.cmp - 1) * 100) + ' · 5Y base' }; tag = ' <span class="mut">scenario targets</span>'; }
-      return [`<b>${E(m.horizon)}</b>${tag}<small>${E(m.sub)}</small>`, `<span class="cb ${tone(m.tone)}">${E(m.call)}</span><small>${E(m.conf && m.conf !== '—' ? 'conf. ' + m.conf : '')}</small>`, cell(ent), `<span class="r">${cell(stp)}</span>`, `<span class="g">${cell(t1)}</span>`, `<span class="g">${cell(t2)}</span>`, `<span class="mut">${basis}</span>`];
+      const h = H[m.horizon]; if (h) { stp = { v: rs(h.stop), sub: pc((h.stop / R.cmp - 1) * 100) + ' · weekly close' }; t1 = { v: rs(h.t1), sub: pc((h.t1 / R.cmp - 1) * 100) + ' · ' + h.la + ' · 1:' + h.rr1.toFixed(1) }; t2 = { v: rs(h.t2), sub: pc((h.t2 / R.cmp - 1) * 100) + ' · ' + h.lb + ' · 1:' + h.rr2.toFixed(1) }; tag = ' <span class="mut">scenario targets</span>'; if (m.horizon === 'Long term') { const hf = lvl(m, /^Hard floor/); basis = hf ? 'Thesis-break floor ' + E(hf.v) + ' (' + pc((hf.n / R.cmp - 1) * 100) + ') — a review level, not a stop.' : basis; } }
+            return [`<b>${E(m.horizon)}</b>${tag}<small>${E(m.sub)}</small>`, `<span class="cb ${tone(m.tone)}">${E(m.call)}</span><small>${E(m.conf && m.conf !== '—' ? 'conf. ' + m.conf : '')}</small>`, cell(ent), `<span class="r">${cell(stp)}</span>`, `<span class="g">${cell(t1)}</span>`, `<span class="g">${cell(t2)}</span>`, `<span class="mut">${basis}</span>`];
     });
     return tbl(['Horizon', 'Call', 'Entry', 'Stop / risk', 'Target 1', 'Target 2', 'Basis'], rows, 'grid', ['13%', '11%', '15%', '12%', '14%', '14%', '21%']);
   }
@@ -439,7 +452,7 @@ ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was r
   /* ---------- NotebookLM source pack ---------- */
   function pack(R) {
     const t = (rows) => rows.map((r) => '| ' + r.join(' | ') + ' |').join('\n');
-    const m = (R.matrix || []).map((x) => { const e = lvl(x, /^(Entry|Buy zone|Accumulate)/), s = lvl(x, /^(Stop|Risk line|Hard floor)/), a = lvl(x, /^Target( 1)?( ·|$)/), b = lvl(x, /^Target 2/); return [x.horizon, x.call, e ? e.v : '—', s ? s.v : '—', a ? a.v : '—', b ? b.v : '—']; });
+    const m = (R.matrix || []).map((x) => { const e = lvl(x, /^(Entry|Buy zone|Accumulate)/), s = lvl(x, /^(Stop|Risk line|Hard floor)/), a = lvl(x, /^Target( 1)?( ·|$)/), b = lvl(x, /^Target 2/); const h = hz(R)[x.horizon], T = x.horizon === 'Swing' ? ticket(R) : null; if (h) return [x.horizon, x.call, e ? e.v : '—', f2(h.stop), f2(h.t1) + ' (' + h.la + ')', f2(h.t2) + ' (' + h.lb + ')']; if (T) return [x.horizon, x.call, f2(T.eLo) + ' – ' + f2(T.eHi), f2(T.S), f2(T.T1), f2(T.T2)]; return [x.horizon, x.call, e ? e.v : '—', s ? s.v : '—', a ? a.v : '—', b ? b.v : '—']; });
     const md = [`# ${R.name} (${R.sym}, ${R.exch === 'BO' ? 'BSE' : 'NSE'}) — Joshi's Corner source pack`, '', `Generated ${new Date().toISOString()}. Close ${rs(R.cmp)} (${pc(R.dayPct, 2)}). 52W ${rs(R.w52L)} – ${rs(R.w52H)}.`, '', '## Multi-horizon calls', '| Horizon | Call | Entry | Stop | Target 1 | Target 2 |', '|---|---|---|---|---|---|', t(m), '', '## Thesis', strip(thesis(R).replace(/<\/p>/g, '\n')), '', '## Risks', strip(riskTable(R).replace(/<\/tr>/g, '\n').replace(/<\/td>/g, ' | ')), '', '## Instruction for NotebookLM', 'Create a one-page infographic presentation: header with the stock and CMP, a horizon-by-horizon call table, a levels ladder, results trend, risks and the verdict. Use only the figures in this source. Add the line: ' + DISC].join('\n');
     return md;
   }
