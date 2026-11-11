@@ -210,7 +210,7 @@
 
   /* one source for Medium / Long term numbers: risk line = engine review line (weekly close), targets = scenarios */
   function hz(R) {
-    const S = scen(R), out = {}, mm = (R.matrix || []).find((x) => x.horizon === 'Medium term'), rl = mm && mm.levels.find((l) => /^Risk line/.test(l.label)), stop = rl && num(rl.n) ? rl.n : null;
+    const S = scen(R), out = {}, mm = (R.matrix || []).find((x) => x.horizon === 'Medium term'), rl = mm && mm.levels.find((l) => /^Risk line/.test(l.label)), w40 = mm && mm.levels.find((l) => /40-week/.test(l.label)), pv = rl && parseFloat(String(rl.v).replace(/[^0-9.]/g, '')), stop = rl && num(rl.n) ? rl.n : num(pv) ? pv : w40 && num(w40.n) ? w40.n : null;
     if (!S || !stop) return out;
     const r1 = S.rows.find((r) => r.k === '1Y'), r3 = S.rows.find((r) => r.k === '3Y'), r5 = S.rows.find((r) => r.k === '5Y'), risk = R.cmp - stop;
     const mk = (a, b, la, lb) => ({ stop, t1: a, t2: b, la, lb, rr1: (a - R.cmp) / risk, rr2: (b - R.cmp) / risk });
