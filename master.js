@@ -339,6 +339,60 @@
     return `<div class="big">${E(head)}${lt && lt.call && !/INCOMPLETE|n\/a/i.test(lt.call) ? ' · LONG TERM: ' + E(lt.call) : ''}</div><div class="k">${k(T ? rs(T.eLo) + ' – ' + rs(T.eHi) : '—', 'Entry zone', '#f8e7a1')}${k(T ? rs(T.S) : '—', 'Stop (daily close)', '#fca5a5')}${k(T ? rs(T.T1) + ' · ' + rs(T.T2) : '—', 'Targets 1 · 2', '#86efac')}${k(b1 ? rs(b1.v[1]) : '—', '12-month base scenario' + (b1 ? ' (' + pc(b1.cagr[1]) + ')' : ''), '#e2e8f0')}</div><ul class="bl vb"><li>${E(cut(strip(sw.basis || ''), 170))}</li><li>${rrTxt}</li>${ne ? '<li>' + ne + '</li>' : ''}<li>A daily close beyond the stop invalidates the view; levels are rule-based reference zones and may fail.</li></ul><div class="disc">${DISC} For information only. Not investment advice. Markets carry risk.</div>`;
   }
 
+  /* ---------- v11 additions: quant scorecard, intraday setups, swing plans A/B, checklist ---------- */
+  const rowVal = (R, re) => { const rows = ((R.swing && R.swing.rows) || []).concat((R.long && R.long.tech) || []); return rows.find((x) => re.test(x.name)); };
+  function scorecard(R) {
+    const sw = (R.swing && R.swing.rows) || [], lt = (R.long && R.long.tech) || [], all = sw.concat(lt), rows = [];
+    const b = all.filter((x) => x.v > 0).length, br = all.filter((x) => x.v < 0).length, n = all.length - b - br;
+    const sc = (v) => (v > 0 ? '<span class="g">+1</span>' : v < 0 ? '<span class="r">−1</span>' : '<span class="a">0</span>'), tot = [];
+    const add = (name, reading, v) => { rows.push([name, reading, sc(v)]); tot.push(v); };
+    if (all.length) add('Technical signals', `${b} bullish · ${br} bearish · ${n} neutral (of ${all.length})`, b - br > 2 ? 1 : br - b > 2 ? -1 : 0);
+    const ma = (R.swing && R.swing.maRows) || [];
+    if (ma.length) { const up = ma.filter((m) => R.cmp > m.val).length; add('Trend vs moving averages', `Above ${up} of ${ma.length} averages`, up / ma.length >= 0.75 ? 1 : up / ma.length <= 0.25 ? -1 : 0); }
+    if (R.benchRet && num(R.benchRet.y1) && R.ret && num(R.ret.y1)) { const a = R.ret.y1 - R.benchRet.y1; add('Relative strength (1Y)', `${pc(a)} alpha vs Nifty 50`, a > 5 ? 1 : a < -5 ? -1 : 0); }
+    const pe = parseFloat(Fv(R, /^P\/E \(trailing\)/)), P = R.extra && R.extra.peers && R.extra.peers.rows, pes = (P || []).map((x) => x.pe).filter(num).sort((x, y) => x - y);
+    if (num(pe) && pes.length) { const med = pes[Math.floor(pes.length / 2)], d = (pe / med - 1) * 100; add('Valuation vs peers', `P/E ${pe.toFixed(1)}x vs peer median ${med.toFixed(1)}x (${pc(d, 0)})`, d < -10 ? 1 : d > 25 ? -1 : 0); }
+    else if (num(pe)) add('Valuation', `P/E ${pe.toFixed(1)}x`, pe < 18 ? 1 : pe > 40 ? -1 : 0);
+    const roe = parseFloat(Fv(R, /^ROE/)), de = parseFloat(Fv(R, /^Debt \/ Equity/));
+    if (num(roe)) add('Quality · returns', `ROE ${roe.toFixed(1)}%${num(de) ? ' · D/E ' + de.toFixed(2) : ''}`, roe >= 18 && (!num(de) || de < 1) ? 1 : roe < 8 ? -1 : 0);
+    const T = ticket(R); if (T) add('Reward : risk (swing)', `1:${T.rr1.toFixed(1)} / 1:${T.rr2.toFixed(1)} on T1 / T2`, T.rr2 >= 3 ? 1 : T.rr2 < 1.5 ? -1 : 0);
+    const ne = R.nextEarnings; if (ne && num(ne.days) && ne.days >= 0) add('Event risk', `Result in ${ne.days} day${ne.days === 1 ? '' : 's'}`, ne.days <= 7 ? -1 : 0);
+    if (!rows.length) return note('Scorecard unavailable (inputs incomplete).');
+    const t = tot.reduce((x, y) => x + y, 0), lab = t >= 3 ? 'POSITIVE' : t <= -2 ? 'NEGATIVE' : 'NEUTRAL';
+    return tbl(['Factor', 'Reading', 'Score'], rows, 'grid', ['30%', '54%', '16%']) + note(`Net score <b>${t > 0 ? '+' : ''}${t}</b> of ${tot.length} → <b>${lab}</b>. Equal-weight, rule-based; for orientation, not a trade signal.`);
+  }
+  function intradaySetups(R) {
+    const d = R.pivots && R.pivots.daily && R.pivots.daily.set; if (!d || !num(d.P)) return note('Daily pivots unavailable for this symbol — no intraday setups issued.');
+    const mk = (nm, trig, sl, t1, t2, side) => { const risk = Math.abs(trig - sl) || 1e-9, r = (t) => Math.abs(t - trig) / risk; return { nm, trig, sl, t1, t2, side, r1: r(t1), r2: r(t2) }; };
+    const S = [mk('Breakout long', d.R1, d.P, d.R2, d.R3, 'L'), mk('Pivot pullback long', d.P, d.S1, d.R1, d.R2, 'L'), mk('Breakdown short', d.S1, d.P, d.S2, d.S3, 'S')].filter((x) => [x.trig, x.sl, x.t1, x.t2].every(num));
+    const act = (x) => (x.side === 'L' ? (R.cmp >= d.P ? 'Bias: with price above pivot' : 'Counter-trend today') : (R.cmp < d.P ? 'Bias: with price below pivot' : 'Counter-trend today'));
+    const rows = S.map((x) => [`<b>${x.nm}</b><small>${act(x)}</small>`, x.side === 'L' ? `Buy on 15-min close ${x.nm.startsWith('Break') ? 'above ' : 'near '}<b>${rs(x.trig)}</b>` : `Sell on 15-min close below <b>${rs(x.trig)}</b>`, `<span class="r"><b>${rs(x.sl)}</b></span>`, `<span class="g"><b>${rs(x.t1)}</b></span>`, `<span class="g"><b>${rs(x.t2)}</b></span>`, `1 : ${x.r1.toFixed(1)} · 1 : ${x.r2.toFixed(1)}`]);
+    return tbl(['Setup', 'Trigger', 'Stop', 'Target 1', 'Target 2', 'R : R (T1 · T2)'], rows, 'grid', ['21%', '25%', '12%', '12%', '12%', '18%']) + note('Classic pivots from the previous session’s high / low / close. Intraday positions are squared off by 3:15 PM IST; no overnight carry. Short setups apply to F&amp;O / intraday-eligible stocks only.');
+  }
+  function swingPlans(R) {
+    const T = ticket(R); if (!T) return note('Swing plans need ATR and levels — unavailable right now.');
+    const L = ladder(R), res = L.res.slice().sort((a, b) => a.v - b.v), atr = T.atr, trig = res.length ? res[0].hi : R.cmp + atr, rest = res.filter((c) => c.lo > trig + 0.4 * atr);
+    const bE = trig, bS = trig - atr, bT1 = rest.length ? rest[0].lo : trig + 1.5 * atr, bT2 = rest.length > 1 ? rest[1].lo : bT1 + 1.5 * atr, bRisk = Math.max(1e-9, bE - bS);
+    const aBl = (T.rr1 + T.rr2) / 2, bBl = ((bT1 - bE) / bRisk + (bT2 - bE) / bRisk) / 2;
+    const ok = (v) => (v >= 3 ? `<b class="g">1 : ${v.toFixed(1)} ✔</b>` : `<b class="r">1 : ${v.toFixed(1)} ✖</b>`);
+    const rows = [[`<b>Plan A · Buy the pullback</b><small>${E(short(L.sup.length ? { labels: [T.near] } : { labels: ['ATR zone'] }))}</small>`, `${rs(T.eLo)} – ${rs(T.eHi)}`, `<span class="r">${rs(T.S)}</span><small>daily close</small>`, `<span class="g">${rs(T.T1)}</span> / <span class="g">${rs(T.T2)}</span>`, ok(aBl)],
+      [`<b>Plan B · Buy the breakout</b><small>close above ${rs(trig)}</small>`, `${rs(bE)} on close`, `<span class="r">${rs(bS)}</span><small>daily close · 1×ATR</small>`, `<span class="g">${rs(bT1)}</span> / <span class="g">${rs(bT2)}</span>`, ok(bBl)]];
+    return tbl(['Plan', 'Entry', 'Stop', 'Target 1 / 2', 'Blended R : R'], rows, 'grid', ['24%', '20%', '19%', '23%', '14%']) + note('Blended R : R assumes a 50 / 50 exit at Target 1 and Target 2 and must be ≥ 1 : 3 to pass. A plan that fails is a wait, not a trade; entry levels are reference zones, not guarantees.');
+  }
+  function checklist(R) {
+    const T = ticket(R), ma = (R.swing && R.swing.maRows) || [], g = (n) => ma.find((m) => m.name === n), s50 = g('SMA 50'), s200 = g('SMA 200'), rsi = rowVal(R, /^RSI/), ne = R.nextEarnings;
+    const rows = [], add = (c, ok, why) => rows.push([c, ok === null ? '<span class="a">n/a</span>' : ok ? '<b class="g">✔ Pass</b>' : '<b class="r">✖ Fail</b>', why]);
+    if (s50) add('Price above 50-day average', R.cmp > s50.val, `${rs(R.cmp)} vs ${rs(s50.val)}`);
+    if (s200) add('Price above 200-day average', R.cmp > s200.val, `${rs(R.cmp)} vs ${rs(s200.val)}`);
+    if (rsi) add('Momentum not stretched', rsi.v >= 0, E(strip(rsi.reading)).slice(0, 48));
+    if (T) { add('Blended R : R ≥ 1 : 3 (Plan A)', (T.rr1 + T.rr2) / 2 >= 3, `1:${T.rr1.toFixed(1)} / 1:${T.rr2.toFixed(1)}`); add('Stop within 3×ATR of entry', (T.E - T.S) <= 3 * T.atr + 1e-6, `${pc((T.S / T.E - 1) * 100)} from average entry`); }
+    if (ne && num(ne.days) && ne.days >= 0) add('No result inside 5 sessions', ne.days > 5, `Result in ${ne.days} day${ne.days === 1 ? '' : 's'}`);
+    if (num(R.vol) && num(R.avgVol) && !R.live) add('Volume ≥ 80% of average', R.vol >= 0.8 * R.avgVol, `${f0(R.vol)} vs ${f0(R.avgVol)}`);
+    if (!rows.length) return note('Checklist unavailable.');
+    const p = rows.filter((r) => /Pass/.test(r[1])).length;
+    return tbl(['Condition', 'Status', 'Reading'], rows, 'grid', ['40%', '16%', '44%']) + note(`${p} of ${rows.length} conditions met. Enter only when the plan’s own trigger is hit <i>and</i> the failed items above are understood.`);
+  }
+
   /* ---------- the document ---------- */
   function logoUrl() { try { return new URL('assets/jc-logo-3d.png', location.href).href; } catch (e) { return 'assets/jc-logo-3d.png'; } }
   function monogram(sym) {
@@ -415,30 +469,36 @@ small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#1580
     const sigRows = (R.swing && R.swing.rows) || [], lTech = (R.long && R.long.tech) || [];
     const p1 = `<section class="page">${wm}<div class="hdr"><div class="brand">Joshi's Corner</div><div class="sub">Private Client Research Report · Equity Research &amp; Quantitative Strategy<span class="mood" style="background:${ml.c}">${ml.name}</span></div><div class="logo">${monogram(R.sym)}</div><div class="meta"><div style="flex-basis:13%"><b>Script / Exchange</b><span>${E(R.sym)} · ${R_EX}</span></div><div style="flex-basis:21%"><b>Company</b><span>${E(R.name)}</span></div><div style="flex-basis:14%"><b>Sector</b><span>${E(R.sector || '—')}</span></div><div><b>CMP</b><span>${rs(R.cmp)}</span></div><div><b>Market cap</b><span>${num(R.mcap) ? cr(R.mcap) : '—'}</span></div><div><b>Generated (IST)</b><span>${now}</span></div><div><b>Data basis</b><span>${R.live ? 'Market live · delayed' : 'Last close'}</span></div></div></div>
 <div class="row"><div class="col stack" style="flex:1.55">${panel('1 · Executive Snapshot <span>&amp; Investment Thesis</span>', snap + `<div style="height:1.2mm"></div>${thesis(R)}`)}</div><div class="col stack" style="flex:1">${panel('Key levels', chartLevels(R) || note('Levels unavailable.'))}</div></div>
+${panel('2 · Master Multi-Horizon Strategic Execution Matrix <span>· Intraday to Long term</span>', matrixTable(R) + note('Rule-based calls; “INCOMPLETE DATA” where inputs are missing. Swing row = ticket in section 4; Medium / Long = scenarios in section 5.'))}
 ${panel('At a glance', dash(R))}
 ${pfoot(1)}</section>`;
 
     const p2 = `<section class="page">${wm}${pageHdr(2, R)}
-${panel('2 · Master Multi-Horizon Strategic Execution Matrix <span>· Intraday to Long term</span>', matrixTable(R) + note('Rule-based calls; “INCOMPLETE DATA” where inputs are missing. Swing row = ticket in section 4; Medium / Long = scenarios in section 3.'))}
-${panel('3 · Support &amp; Target Ladder <span>· Day to 5 Years</span>', horizonTable(R))}
-${panel('4 · Tactical Trading Playbook <span>· Intraday and swing</span>', playbook(R) + (intr ? '' : note('Intraday feed unavailable right now — intraday levels may be missing.')) + '<div style="height:1mm"></div>' + (optionsTable(R) || ''))}
+${panel('3 · Intraday Desk <span>· Today’s trading plan (pivot setups)</span>', intradaySetups(R) + (intr ? '' : note('Intraday feed unavailable right now — pivot levels come from daily candles.')))}
+<div class="row"><div class="col" style="flex:1">${panel('Pivot points', pivotTable(R) || note('n/a'))}</div><div class="col" style="flex:1">${panel('Fibonacci (60-day swing)', fibTable(R) || note('n/a'))}</div></div>
+<div class="row"><div class="col" style="flex:1.25">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div><div class="col" style="flex:1">${panel('Moving averages', maTable(R) || note('n/a'))}</div></div>
+${panel('Quant scorecard <span>· multi-factor, equal weight</span>', scorecard(R))}
+${panel('Intraday read <span>· from the matrix</span>', (() => { const m = (R.matrix || []).find((x) => x.horizon === 'Intraday'); return m ? `<p><b>${E(m.call)}</b>${m.conf && m.conf !== '—' ? ' (confidence ' + E(m.conf) + ')' : ''} — ${E(strip(m.basis))}</p>` : note('n/a'); })())}
 ${pfoot(2)}</section>`;
 
     const p3 = `<section class="page">${wm}${pageHdr(3, R)}
-<div class="row"><div class="col" style="flex:1">${panel('% to target vs stop', chartTargets(R) || note('Targets unavailable.'))}</div><div class="col" style="flex:1">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div></div>
-<div class="row"><div class="col" style="flex:1">${panel('Short-term signals', signalTable(sigRows, 11) || note('n/a'))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 11) || note('n/a'))}</div></div>
-<div class="row"><div class="col stack" style="flex:1">${panel('5 · Structural deep dive <span>· results</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue (other income, presentation); filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>${pfoot(3)}</section>`;
+${panel('4 · Swing Playbook <span>· 1–4 weeks · entry zone, daily-close stop, targets, R:R</span>', playbook(R) + '<div style="height:1mm"></div>' + swingPlans(R))}
+<div class="row"><div class="col" style="flex:1.2">${panel('How the ticket was derived', derivation(R))}</div><div class="col" style="flex:1">${panel('Swing checklist', checklist(R))}</div></div>
+<div class="row"><div class="col" style="flex:1">${panel('Short-term signals', signalTable(sigRows, 11) || note('n/a'))}</div><div class="col" style="flex:1.3">${panel('Options structures', optionsTable(R) || note('n/a'))}</div></div>
+${pfoot(3)}</section>`;
 
     const p4 = `<section class="page">${wm}${pageHdr(4, R)}
-${panel('6 · Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
-${panel('7 · Peer Valuation Matrix', peerTable(R))}
-${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}
+${panel('5 · Long-Term View <span>· Support &amp; target ladder, Day to 5 Years</span>', horizonTable(R))}
+<div class="row"><div class="col stack" style="flex:1">${panel('Results <span>· quarterly &amp; annual</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue; filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>
+${panel('Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
+<div class="row"><div class="col" style="flex:1.35">${panel('Peer Valuation Matrix', peerTable(R))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 9) || note('n/a'))}</div></div>
 ${pfoot(4)}</section>`;
 
     const p5 = `<section class="page">${wm}${pageHdr(5, R)}
-${panel('9 · Risk Matrix', riskTable(R))}
-${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
-<section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
+${panel('6 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}
+${panel('7 · Risk Matrix', riskTable(R))}
+${panel('8 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
+<section class="verdict"><h2>9 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
 <div class="discbox"><b>DISCLAIMER</b> — ${DISC} Calls, levels and scenarios are rule-based reference zones computed from delayed market data and company filings; they are not guaranteed and not personalised advice. Investments in securities are subject to market risk; past performance is not indicative of future returns. Please consult your adviser and size positions to your own risk budget. © Joshi's Corner · SSJ Finance.</div>${pfoot(5)}</section>`;
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${fileStamp(R)}_Master</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
   }
