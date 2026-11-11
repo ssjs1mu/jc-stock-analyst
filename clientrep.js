@@ -82,7 +82,7 @@
       const T = window.jcXrayApi.trendData(d); if (!T) return { sym: base, err: 'not enough history', news };
       d.trend = T; const cv = conviction(d), st = stanceOf(T, cv, d), rm = roadmap(T, d), day = dayBox(d), tdy = mode === 'closing' ? await today(d, mkt) : null;
       const pos = num(d.dayH) && num(d.dayL) && d.dayH > d.dayL ? (d.cmp - d.dayL) / (d.dayH - d.dayL) : null;
-      return { sym: base, name: d.name || base, cmp: d.cmp, chg: dayMove(d), conv: cv.conv, dir: cv.dir, S: cv.S, T, st, rm, day, tdy, news, pos, rv: d.x.rv, rsi: d.x.rsi, hi52: d.hi52, lo52: d.lo52 };
+      return { sym: base, name: d.name || base, cmp: d.cmp, chg: dayMove(d), conv: cv.conv, dir: cv.dir, S: cv.S, T, st, rm, day, tdy, news, pos, rv: d.x.rv, rsi: d.x.rsi, hi52: d.hi52, lo52: d.lo52, piv: d.piv, atr: d.x.atr, e20: d.x.e20, e50: d.x.e50, e200: d.x.e200, hi20: d.x.hi20, lo20: d.x.lo20, ph: d.x.h, pl: d.x.l, pc: d.x.c };
     } catch (e) { return { sym: base, err: (e && e.message) || 'fetch failed', news: null }; }
   }
 
@@ -159,7 +159,8 @@
     setP(92); R.stage = 'Adding the day’s outlook and calls'; paintStatus();
     let frames = ''; try { if (window.jcOutlook) frames = await window.jcOutlook.snapshot(mode); } catch (e) { }
     const html = reportHTML(list.name, list.name, out, mode, P.notes && P.notes[list.id], frames);
-    CACHE[istDay() + '|' + mode + '|' + list.id] = { t: Date.now(), html, n: out.length, bad: out.filter((r) => r.err).length }; saveC(); setP(100);
+    let xl = null; try { if (window.JCXL) xl = window.JCXL.rows(out, mode); } catch (e) { }
+    CACHE[istDay() + '|' + mode + '|' + list.id] = { t: Date.now(), html, xl, n: out.length, bad: out.filter((r) => r.err).length }; saveC(); setP(100);
     return html;
   }
   async function run(listIds, mode, auto) {
@@ -193,7 +194,7 @@
         <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ALL clients</button>
         <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div><div id="crPg"></div>
         <table class="cl"><thead><tr><th>Watchlist / client</th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
-        ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span>${cur.cid ? `<button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button>` : '<small style="color:#8a94ad">Telegram sending needs a client link (Client dashboards below)</small>'}<button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
+        ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span>${cur.cid ? `<button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button>` : '<small style="color:#8a94ad">Telegram sending needs a client link (Client dashboards below)</small>'}<button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button> <button class="goBtn" data-crxl="1">📊 Excel (CMP + levels)</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
     el.innerHTML = `<style>${CSS}.crb{padding:10px 14px}.crb .bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.crb table.cl{width:100%;border-collapse:collapse;font-size:12.5px}.crb table.cl td,.crb table.cl th{border-bottom:1px solid #dfe5f2;padding:5px 6px;text-align:left}.crb .sel{padding:5px 8px;border:1px solid #b8c6e6;border-radius:8px}.crb .goBtn.on{box-shadow:0 0 0 2px #D4AF37}
       .crb .pre{border:2px solid #D4AF37;border-radius:14px;margin-top:10px;overflow:hidden;background:#fffdf6}</style>
       <div class="crb"><h2 style="margin:0 0 4px;color:#8A6D1F">📋 Client Reports <small style="font-weight:600;color:#5a6a8e">— Morning Update and Closing Bell, one watchlist at a time</small></h2>
@@ -246,6 +247,7 @@
       return; }
     const o = c('[data-cropen]'); if (o) { const [m, id] = o.getAttribute('data-cropen').split('|'); R.mode = m; R.listId = id; paint(); return; }
     const tg = c('[data-crtg]'); if (tg) { (async () => { R.msg = 'Sending…'; paintStatus(); try { const j = await window.jcClients.send(tg.getAttribute('data-crtg')); R.msg = j && j.ok ? 'Dashboard sent on Telegram ✓' : 'Telegram said: ' + ((j && j.msg) || 'failed') + ' — the client must open the bot and press Start first'; } catch (e) { R.msg = 'Not sent: ' + ((e && e.message) || e); } paintStatus(); })(); return; }
+    if (c('[data-crxl]')) { const kc = CACHE[istDay() + '|' + R.mode + '|' + R.listId], cu = listsAll().find((l) => l.id === R.listId); if (kc && kc.xl && window.JCXL) { R.msg = 'Excel saved: ' + window.JCXL.download(kc.xl, R.mode, (cu && cu.name) || 'Watchlist'); paintStatus(); } else alert('Rebuild this report once (press ' + (R.mode === 'closing' ? 'Closing Bell' : 'Morning Update') + ') to enable Excel.'); return; }
     if (c('[data-crprint]')) { const kc = CACHE[istDay() + '|' + R.mode + '|' + R.listId]; if (kc) openPrint(kc.html); }
   });
   document.addEventListener('change', (e) => {
