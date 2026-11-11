@@ -391,7 +391,7 @@ small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#1580
   }
   const istNow = () => new Date(Date.now() + 19800000).toISOString();
   const stampTxt = () => { const t = istNow(); return t.slice(8, 10) + '-' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+t.slice(5, 7) - 1] + '-' + t.slice(0, 4) + ' ' + t.slice(11, 16) + ' IST'; };
-  const fileStamp = (R) => R.sym + '_' + (R.exch === 'BO' ? 'BSE' : 'NSE') + '_' + istNow().slice(0, 16).replace('T', '_').replace(':', '-');
+  const fileStamp = (R) => { const t = istNow(); return R.sym + '_' + t.slice(2, 4) + t.slice(5, 7) + t.slice(8, 10) + '-' + t.slice(11, 13) + t.slice(14, 16); };
   function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · ${stampTxt()}</span><span class="rp">Page ${n} of 5</span></div>`; }
   let SYM_NOW = '';
   const pfoot = (n) => `<div class="pf"><span>${E(SYM_NOW)} · ${stampTxt()} · Joshi's Corner · SSJ Finance</span><span>Page ${n} of 5</span></div>`;
@@ -439,7 +439,7 @@ ${pfoot(4)}</section>`;
 ${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
 <section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
 ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.1">${derivation(R)}</div><div class="col" style="flex:1.2;overflow:hidden">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(5)}</section>`;
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${fileStamp(R)}_Master_Report</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${fileStamp(R)}_Master</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
   }
 
   /* shrink or grow type so each page is full and nothing is clipped */
