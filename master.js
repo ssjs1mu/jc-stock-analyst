@@ -363,7 +363,7 @@ table{border-collapse:collapse;width:100%;table-layout:auto}table.grid th{backgr
 table.kv td{padding:.5mm 1mm;border:1px solid #e2e8f0;vertical-align:top}table.kv td.k{background:#f8fafc;color:#475569;font-weight:600;width:19%}
 small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#15803d;font-weight:600}.r{color:#b91c1c;font-weight:600}.a{color:#a16207;font-weight:600}.mut{color:#64748b;font-weight:400}
 .cb{display:inline-block;padding:.2mm 1.4mm;border-radius:1.2mm;font-weight:800;font-size:.9em;border:1px solid currentColor}
-.bl{list-style:none;padding:0}.bl li{position:relative;padding-left:3mm;margin-bottom:.9mm;text-align:left}.bl li:before{content:'';position:absolute;left:.4mm;top:.55em;width:1.5mm;height:1.5mm;border-radius:50%;background:#D4AF37}.vb li{color:#e2e8f0}.chips{display:flex;gap:1.3mm}.chip{flex:1;border-radius:2mm;padding:1.1mm 1.3mm;color:#fff;text-align:center}.chip b{display:block;font-size:.8em;letter-spacing:.6px;text-transform:uppercase;opacity:.9}.chip i{display:block;font-style:normal;font-weight:800;font-size:1.05em;line-height:1.15;margin-top:.3mm}.chip span{display:block;font-size:.8em;opacity:.9}.note{font-size:.86em;color:#64748b;margin-top:.8mm;text-align:justify}svg{display:block}
+.bl{list-style:none;padding:0}.bl li{position:relative;padding-left:3mm;margin-bottom:.9mm;text-align:left}.bl li:before{content:'';position:absolute;left:.4mm;top:.55em;width:1.5mm;height:1.5mm;border-radius:50%;background:#D4AF37}.vb li{color:#e2e8f0}.chips{display:flex;gap:1.3mm}.chip{flex:1;border-radius:2mm;padding:1.1mm 1.3mm;color:#fff;text-align:center}.chip b{display:block;font-size:.8em;letter-spacing:.6px;text-transform:uppercase;opacity:.9}.chip i{display:block;font-style:normal;font-weight:800;font-size:1.05em;line-height:1.15;margin-top:.3mm}.chip span{display:block;font-size:.8em;opacity:.9}.discbox{border:1.2px solid #D4AF37;background:#fffbeb;border-radius:2mm;padding:1.8mm 2.6mm;font-size:.9em;color:#334155;text-align:justify}.discbox b{color:#7a5b00;letter-spacing:.6px}.note{font-size:.86em;color:#64748b;margin-top:.8mm;text-align:justify}svg{display:block}
 .verdict{background:rgba(15,23,42,.96);border:1.4px solid #D4AF37;border-radius:2.4mm;color:#e2e8f0;padding:2mm 3mm}.verdict h2{color:#D4AF37;font-size:8pt;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid rgba(212,175,55,.6);padding-bottom:.8mm;margin-bottom:1.2mm}.verdict .big{font-size:10pt;font-weight:800;color:#f8e7a1;margin-bottom:.8mm}.verdict .k{display:flex;gap:1.6mm;margin:1mm 0}.verdict .k div{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(212,175,55,.4);border-radius:1.4mm;padding:.8mm 1.4mm;text-align:center;font-size:.95em}.verdict .k b{display:block;font-size:1.25em}.verdict .disc{font-size:.92em;color:#94a3b8;margin-top:1mm}
 .pf{position:absolute;bottom:3mm;left:8mm;right:8mm;font-size:5.4pt;color:#64748b;display:flex;justify-content:space-between;z-index:5}`;
 
@@ -394,7 +394,7 @@ small{display:block;color:#64748b;font-size:.88em;font-weight:400}.g{color:#1580
   const fileStamp = (R) => { const t = istNow(); return R.sym + '_' + t.slice(2, 4) + t.slice(5, 7) + t.slice(8, 10) + '-' + t.slice(11, 13) + t.slice(14, 16); };
   function pageHdr(n, R) { return `<div class="runhdr"><span class="rb">Joshi's Corner</span><span class="rt">${E(R.sym)} · ${R_EX} · ${stampTxt()}</span><span class="rp">Page ${n} of 5</span></div>`; }
   let SYM_NOW = '';
-  const pfoot = (n) => `<div class="pf"><span>${E(SYM_NOW)} · ${stampTxt()} · Joshi's Corner · SSJ Finance</span><span>Page ${n} of 5</span></div>`;
+  const pfoot = (n) => `<div class="pf"><span>${E(SYM_NOW)} · ${stampTxt()} · Joshi's Corner · SSJ Finance · Not investment advice</span><span>Page ${n} of 5</span></div>`;
 
   function build(R) {
     R_EX = R.exch === 'BO' ? 'BSE' : 'NSE'; SYM_NOW = R.sym;
@@ -432,13 +432,14 @@ ${pfoot(2)}</section>`;
     const p4 = `<section class="page">${wm}${pageHdr(4, R)}
 ${panel('6 · Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
 ${panel('7 · Peer Valuation Matrix', peerTable(R))}
-<div class="row"><div class="col" style="flex:1.2">${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}</div><div class="col" style="flex:1">${panel('9 · Risk Matrix', riskTable(R))}</div></div>
+${panel('8 · Corporate Actions <span>· last 3 years</span>', corpTable(R))}
 ${pfoot(4)}</section>`;
 
     const p5 = `<section class="page">${wm}${pageHdr(5, R)}
+${panel('9 · Risk Matrix', riskTable(R))}
 ${panel('10 · Portfolio Sizing <span>· % of equity portfolio</span>', sizing(R))}
 <section class="verdict"><h2>11 · Final Wealth Advisory Verdict</h2>${verdict(R)}</section>
-${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was reached</span>', `<div class="row"><div class="col" style="flex:1.1">${derivation(R)}</div><div class="col" style="flex:1.2;overflow:hidden">${auditTable(R) || note('Candle audit unavailable.')}</div></div>`)}${pfoot(5)}</section>`;
+<div class="discbox"><b>DISCLAIMER</b> — ${DISC} Calls, levels and scenarios are rule-based reference zones computed from delayed market data and company filings; they are not guaranteed and not personalised advice. Investments in securities are subject to market risk; past performance is not indicative of future returns. Please consult your adviser and size positions to your own risk budget. © Joshi's Corner · SSJ Finance.</div>${pfoot(5)}</section>`;
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${fileStamp(R)}_Master</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}</body></html>`;
   }
 
@@ -466,10 +467,10 @@ ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was r
   function ensure() {
     if (document.getElementById('jcMaster')) return;
     const st = document.createElement('style');
-    st.textContent = '#jcMaster{position:fixed;inset:0;z-index:9000;background:rgba(2,6,23,.78);display:none;flex-direction:column}#jcMaster.on{display:flex}#jcMaster .mb{display:flex;gap:8px;align-items:center;padding:8px 12px;background:#0f172a;border-bottom:2px solid #D4AF37;color:#e2e8f0;font:600 13px system-ui,sans-serif;flex-wrap:wrap}#jcMaster .mb b{color:#D4AF37}#jcMaster .mb button,#jcMaster .mb a{background:#D4AF37;color:#0f172a;border:0;border-radius:8px;padding:6px 12px;font:800 12px system-ui,sans-serif;cursor:pointer;text-decoration:none}#jcMaster .mb .sp{flex:1}#jcMaster iframe{flex:1;border:0;background:#cbd5e1;width:100%}';
+    st.textContent = '#jcMaster{position:fixed;inset:0;z-index:9000;background:rgba(2,6,23,.78);display:none;flex-direction:column}#jcMaster.on{display:flex}#jcMaster .mb{display:flex;gap:8px;align-items:center;padding:8px 12px;background:#0f172a;border-bottom:2px solid #D4AF37;color:#e2e8f0;font:600 13px system-ui,sans-serif;flex-wrap:wrap}#jcMaster .mb b{color:#D4AF37}#jcMaster .mb button,#jcMaster .mb a{background:#D4AF37;color:#0f172a;border:0;border-radius:8px;padding:6px 12px;font:800 12px system-ui,sans-serif;cursor:pointer;text-decoration:none}#jcMaster .mb .sp{flex:1}#jcMaster .vw{flex:1;overflow:auto;background:#cbd5e1;position:relative}#jcMaster .vi{margin:0 auto;position:relative}#jcMaster iframe{border:0;background:#cbd5e1;width:794px;position:absolute;left:0;top:0;transform-origin:0 0}';
     document.head.appendChild(st);
     const o = document.createElement('div'); o.id = 'jcMaster';
-    o.innerHTML = '<div class="mb"><b id="jcmT">Master report</b><span class="sp"></span><button id="jcmPdf">⬇ Save PDF</button><button id="jcmNb" title="Downloads a source file and opens NotebookLM">📊 NotebookLM infographic</button><button id="jcmX">✕ Close</button></div><iframe id="jcmF" title="Master report"></iframe>';
+    o.innerHTML = '<div class="mb"><b id="jcmT">Master report</b><span class="sp"></span><button id="jcmPdf">⬇ Save PDF</button><button id="jcmNb" title="Downloads a source file and opens NotebookLM">📊 NotebookLM infographic</button><button id="jcmX">✕ Close</button></div><div class="vw" id="jcmW"><div class="vi" id="jcmI"><iframe id="jcmF" title="Master report"></iframe></div></div>';
     document.body.appendChild(o);
     document.getElementById('jcmX').onclick = () => o.classList.remove('on');
     document.getElementById('jcmPdf').onclick = () => { const f = document.getElementById('jcmF'); const t0 = document.title; try { document.title = f.contentDocument.title; f.contentWindow.focus(); f.contentWindow.print(); document.title = t0; } catch (e) { alert('Print failed: ' + e.message); } };
@@ -480,13 +481,20 @@ ${panel('12 · Level Derivation &amp; Data Audit <span>· how every number was r
       window.open('https://notebooklm.google.com/', '_blank');
       alert('Source file downloaded (and copied). In NotebookLM: create a notebook → Add source → upload the file → Studio → Infographic / Slide deck.');
     };
+    window.addEventListener('resize', () => { if (o.classList.contains('on')) scaleView(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') o.classList.remove('on'); });
+  }
+  function scaleView() {
+    const w = document.getElementById('jcmW'), i = document.getElementById('jcmI'), f = document.getElementById('jcmF'); if (!w || !f) return;
+    let h = 1123 * 5; try { const d = f.contentDocument; h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight); } catch (e) {}
+    const k = Math.min(1, (w.clientWidth - 16) / 794);
+    f.style.height = h + 'px'; f.style.transform = 'scale(' + k + ')'; i.style.width = 794 * k + 'px'; i.style.height = h * k + 'px';
   }
   function show(R) {
     ensure(); lastR = R;
     const o = document.getElementById('jcMaster'), f = document.getElementById('jcmF'); document.getElementById('jcmT').textContent = R.name + ' · Master report';
-    const html = build(R); o.classList.add('on');
-    f.onload = () => { try { const d = f.contentDocument; (d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve()).then(() => fit(d)); } catch (e) {} };
+    const html = build(R); o.classList.add('on'); scaleView();
+    f.onload = () => { try { const d = f.contentDocument; (d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve()).then(() => { fit(d); scaleView(); }); } catch (e) {} };
     f.srcdoc = html;
   }
   window.JCMaster = { build, fit, pack, show, fetchCorp, fetchPeers };
