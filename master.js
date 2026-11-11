@@ -481,7 +481,7 @@ ${pfoot(1)}</section>`;
     const p2 = `<section class="page">${wm}${pageHdr(2, R)}
 ${panel('3 · Intraday Desk <span>· Today’s trading plan (pivot setups)</span>', intradaySetups(R) + (intr ? '' : note('Intraday feed unavailable right now — pivot levels come from daily candles.')))}
 <div class="row"><div class="col" style="flex:1">${panel('Pivot points', pivotTable(R) || note('n/a'))}</div><div class="col" style="flex:1">${panel('Fibonacci (60-day swing)', fibTable(R) || note('n/a'))}</div></div>
-<div class="row"><div class="col" style="flex:1.25">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div><div class="col" style="flex:1">${panel('Moving averages', maTable(R) || note('n/a'))}</div></div>
+<div class="row"><div class="col" style="flex:1.25">${panel('Trend', chartPrice(R) || note('Not enough history.'))}</div><div class="col stack" style="flex:1">${panel('Moving averages', maTable(R) || note('n/a'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>
 ${panel('Quant scorecard <span>· multi-factor, equal weight</span>', scorecard(R))}
 ${panel('Intraday read <span>· from the matrix</span>', (() => { const m = (R.matrix || []).find((x) => x.horizon === 'Intraday'); return m ? `<p><b>${E(m.call)}</b>${m.conf && m.conf !== '—' ? ' (confidence ' + E(m.conf) + ')' : ''} — ${E(strip(m.basis))}</p>` : note('n/a'); })())}
 ${pfoot(2)}</section>`;
@@ -494,9 +494,8 @@ ${pfoot(3)}</section>`;
 
     const p4 = `<section class="page">${wm}${pageHdr(4, R)}
 ${panel('5 · Long-Term View <span>· Support &amp; target ladder, Day to 5 Years</span>', horizonTable(R))}
-<div class="row"><div class="col stack" style="flex:1">${panel('Results <span>· quarterly &amp; annual</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue; filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${panel('Returns vs Nifty 50', returnsTable(R))}</div></div>
+<div class="row"><div class="col stack" style="flex:1">${panel('Results <span>· quarterly &amp; annual</span>', (quarterTable(R) || note('Quarterly results unavailable.')) + '<div style="height:1mm"></div>' + (annualTable(R) || note('Annual statements unavailable.')) + note('Annual figures are vendor-standardised and can differ from company-reported revenue; filed results prevail.'))}</div><div class="col stack" style="flex:1">${panel('Revenue &amp; profit trend', chartFin(R) || note('Annual statements unavailable.'))}${segTable(R)}</div></div>
 ${panel('Fundamentals &amp; valuation', fundTable(R) || note('Fundamentals unavailable.'))}
-${segTable(R)}
 <div class="row"><div class="col" style="flex:1.35">${panel('Peer Valuation Matrix', peerTable(R))}</div><div class="col" style="flex:1">${panel('Long-term signals', signalTable(lTech, 9) || note('n/a'))}</div></div>
 ${pfoot(4)}</section>`;
 
