@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-11T21:13:05+05:30",
+   "date": "2026-11-11",
+   "status": "ok",
+   "caption": "Circuit Watch, session of 11 Nov 2026: 13 circuit locks flagged (8 upper, 5 lower), Sensex +0.95%, Nifty +0.84%",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-11.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-11.pdf",
+     "type": "pdf",
+     "bytes": 10644
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-10T21:10:20+05:30",
    "date": "2026-11-10",
    "status": "holiday",
@@ -258,5 +273,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-10T21:10:20+05:30"
+ "updated_at": "2026-11-11T21:13:05+05:30"
 }
