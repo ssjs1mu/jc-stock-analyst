@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-12T21:13:01+05:30",
+   "date": "2026-11-12",
+   "status": "ok",
+   "caption": "Circuit Watch - session of Thu 12 Nov 2026: no confirmed lower-circuit locks; upper locks led by Sterlite Tech, BN Agrochem, PVP Ventures",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-12.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-12.pdf",
+     "type": "pdf",
+     "bytes": 9826
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-11T21:13:05+05:30",
    "date": "2026-11-11",
    "status": "ok",
@@ -273,5 +288,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-11T21:13:05+05:30"
+ "updated_at": "2026-11-12T21:13:01+05:30"
 }
