@@ -1,0 +1,562 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "12 Nov 2026",
+  "date_iso": "2026-11-12",
+  "mood": {
+   "key": "neutral",
+   "label": "Range-bound close",
+   "sub": "Nifty +0.18% in the session"
+  },
+  "label": "Range-bound close",
+  "headline": "Nifty gains 0.18%, Banks lead",
+  "summary": "Nifty 50 closed at 25,299.35 (+0.18%) and Sensex at 81,911.01 (+0.04%). Banks: Bank Nifty +1.19%. India VIX 16.62 (-5.37%). Brent crude -0.83%, USD/INR 94.040. 17 of 50 Nifty stocks advanced and 32 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "25,299.35",
+    "pct": "+0.18%",
+    "pts": "+44.30"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "81,911.01",
+    "pct": "+0.04%",
+    "pts": "+31.61"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "61,518.50",
+    "pct": "+1.19%",
+    "pts": "+726.10"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "23,865.80",
+    "pct": "+0.36%",
+    "pts": "+86.50"
+   }
+  ],
+  "spark": [
+   23146.150390625,
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375
+  ],
+  "flows": {
+   "date": "09 Nov",
+   "fii": 7212.22,
+   "dii": -7172.53
+  },
+  "breadth": {
+   "up": 17,
+   "dn": 32
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,034 - 25,167",
+    "r": "25,408 - 25,518",
+    "note": "A close above 25,408 opens up 25,518; a slide below 25,167 would expose 25,034."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "60,440 - 60,979",
+    "r": "61,802 - 62,085",
+    "note": "A close above 61,802 opens up 62,085; a slide below 60,979 would expose 60,440."
+   }
+  ],
+  "events": [
+   "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 19 Nov 2026."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "52,486.49",
+    "pct": "+0.49%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,619.38",
+    "pct": "+1.31%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "25,466.19",
+    "pct": "+1.60%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,874.55",
+    "pct": "+0.36%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "26,957.34",
+    "pct": "+1.10%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "60,819.36",
+    "pct": "-0.70%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "24,008.55",
+    "pct": "-1.26%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,655.83",
+    "pct": "-0.67%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,342.73",
+    "pct": "-0.61%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "91.99",
+    "pct": "-0.83%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "85.81",
+    "pct": "-0.83%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,954.50",
+    "pct": "-1.15%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.040",
+    "pct": "+0.12%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "102.84",
+    "pct": "-0.07%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "5.00",
+    "pct": "+0.30%"
+   }
+  ],
+  "vix": {
+   "level": "16.62",
+   "pct": "-5.37%",
+   "gauge": 0.669124984741211,
+   "text": "India VIX 16.62."
+  },
+  "headlines": [
+   "Today's Market: Sensex Today Ends Flat",
+   "Market wrap, Nov 12: NIFTY50 ends at 25,229, SENSEX flat; NIFTY Smallcap 100 outperforms for second straight session",
+   "Gabriel India hits 20% upper circuit on huge volume; up 112% from March low",
+   "What happened overnight",
+   "SENSEX off the day\u2019s high, NIFTY trades flat in noon deals; Bajaj Finance, Cupid, Ola Electric among buzzing stocks",
+   "Sensex Today | Nifty 50 | Indian Stock Market Live: Sensex Surges Over 300 Points, Nifty Crosses 25,350 As Rs 3 Lakh Crore Added...",
+   "Stock Market Today: Sensex, Nifty 50 Trade Flat; Financials Lead, M&M, Nestle, PowerGrid Top Drags",
+   "Sensex erases all Middle East war losses but is it too soon to forget the Hormuz factor?"
+  ],
+  "gainers": [
+   [
+    "HDFCLIFE",
+    "597.80",
+    "+4.23%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "1,003.80",
+    "+3.58%"
+   ],
+   [
+    "INDUSINDBK",
+    "931.35",
+    "+3.48%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,115.00",
+    "+3.36%"
+   ],
+   [
+    "SBILIFE",
+    "1,819.50",
+    "+2.97%"
+   ]
+  ],
+  "losers": [
+   [
+    "ONGC",
+    "224.50",
+    "-4.39%"
+   ],
+   [
+    "HINDUNILVR",
+    "1,974.00",
+    "-2.39%"
+   ],
+   [
+    "NESTLEIND",
+    "1,260.90",
+    "-2.10%"
+   ],
+   [
+    "M&M",
+    "3,399.00",
+    "-1.90%"
+   ],
+   [
+    "POWERGRID",
+    "259.45",
+    "-1.63%"
+   ]
+  ],
+  "shock": [
+   [
+    "HDFCLIFE",
+    "597.80",
+    "2.8x avg vol",
+    "+4.23%"
+   ],
+   [
+    "HINDALCO",
+    "964.00",
+    "2.5x avg vol",
+    "+0.18%"
+   ],
+   [
+    "SBIN",
+    "1,086.50",
+    "2.1x avg vol",
+    "+2.38%"
+   ],
+   [
+    "ONGC",
+    "224.50",
+    "2.1x avg vol",
+    "-4.39%"
+   ]
+  ],
+  "opening": {
+   "label": "Flat to marginally mixed start",
+   "zone": "25,264 - 25,340",
+   "headline": "Flat to marginally mixed start: Wall Street firm, Asia negative",
+   "drivers": [
+    "GIFT Nifty 25,303.0 (+4 pts, +0.01% vs Nifty's last close).",
+    "US: S&P 500 +1.31%, Nasdaq +1.60%, Dow +0.49%.",
+    "Asia this morning: Nikkei -0.70%, Hang Seng -1.26%, Kospi -0.61%.",
+    "Currency, crude and volatility: Brent 91.99 (-0.83%); USD/INR 94.040 (+0.12%); India VIX 16.62 (-5.37%)."
+   ],
+   "next": "Friday, 13 November 2026",
+   "mood": "neutral",
+   "gift": {
+    "last": "25,303.0",
+    "pct": "+0.17%",
+    "premium": "+4 pts",
+    "vs": "+0.01%",
+    "asof": "12 Nov 16:00"
+   },
+   "anchored": true
+  },
+  "nextday": {
+   "date": "Friday, 13 November 2026",
+   "results": [
+    "ABB",
+    "EICHERMOT",
+    "GRASIM",
+    "RVNL",
+    "TMPV",
+    "A2ZINFRA",
+    "AAATECH",
+    "AARVI",
+    "ABMINTLLTD",
+    "ADL",
+    "AEPL",
+    "AGARIND",
+    "AHLEAST",
+    "AJOONI"
+   ],
+   "results_n": 240,
+   "actions": [
+    {
+     "sym": "RAIN",
+     "what": "Interim Dividend - Re 0.50 Per Share"
+    },
+    {
+     "sym": "PREMCO",
+     "what": "Interim Dividend - Rs 10 Per Share"
+    },
+    {
+     "sym": "SBCL",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "SOMANYCERA",
+     "what": "Interim Dividend - Rs 6 Per Share"
+    },
+    {
+     "sym": "STARCEMENT",
+     "what": "Interim Dividend - Re 1 Per Share"
+    },
+    {
+     "sym": "TAALTECH",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "TRANSWORLD",
+     "what": "Interim Dividend - Rs 11 Per Share"
+    },
+    {
+     "sym": "679GS2027",
+     "what": "Interest Payment"
+    },
+    {
+     "sym": "APTUS",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "ASTRAL",
+     "what": "Interim Dividend - Rs 1.50 Per Share"
+    },
+    {
+     "sym": "BMWVENTLTD",
+     "what": "Interim Dividend - Rs 1.50 Per Share"
+    },
+    {
+     "sym": "CAMS",
+     "what": "Interim Dividend - Rs 3.25 Per Share"
+    },
+    {
+     "sym": "DYNAMATECH",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "EMAMILTD",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "FDC",
+     "what": "Buy Back"
+    },
+    {
+     "sym": "GESHIP",
+     "what": "Interim Dividend - Rs 14.40 Per Share"
+    },
+    {
+     "sym": "GOLDIAM",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "IGPL",
+     "what": "Interim Dividend - Rs 10 Per Share"
+    },
+    {
+     "sym": "MAFATIND",
+     "what": "Interim Dividend - Re 1 Per Share"
+    },
+    {
+     "sym": "OCCLLTD",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "ORIENTTECH",
+     "what": "Interim Dividend - Rs 2 Per Share"
+    },
+    {
+     "sym": "PASHUPATI",
+     "what": "Bonus 3:2"
+    },
+    {
+     "sym": "PGIL",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    },
+    {
+     "sym": "PPAP",
+     "what": "Interim Dividend - Rs 1.50 Per Share"
+    },
+    {
+     "sym": "PRECWIRE",
+     "what": "Interim Dividend - Re 0.35 Per Share"
+    },
+    {
+     "sym": "REPCOHOME",
+     "what": "Interim Dividend - Rs 5 Per Share"
+    }
+   ],
+   "due": [
+    {
+     "t": "19:00",
+     "ccy": "USD",
+     "title": "Core PPI m/m",
+     "hi": true,
+     "fc": "0.3%"
+    },
+    {
+     "t": "19:00",
+     "ccy": "USD",
+     "title": "PPI m/m",
+     "hi": true,
+     "fc": "0.4%"
+    },
+    {
+     "t": "01:00",
+     "ccy": "EUR",
+     "title": "ECB President Lagarde Speaks",
+     "hi": false,
+     "fc": ""
+    }
+   ]
+  },
+  "story": [
+   "Nifty 50 opened at 25,214, a gap-down of 0.16% from the previous close of 25,255.",
+   "The index dipped to a low of 25,145 (-0.44%) around 9:15 AM and touched a high of 25,380 (+0.50%) around 10:00 AM.",
+   "It settled at 25,299 (+0.18%), in the middle of the day's range, a session of two-way trade.",
+   "The final hour added +60 points.",
+   "17 of the 50 Nifty stocks advanced and 32 declined; Bank Nifty outperformed (+1.19%).",
+   "Latest institutional data (09 Nov): FII/FPI net +7212 Cr, DII net -7173 Cr."
+  ],
+  "risks": [
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,619.38 (+1.31%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$91.99 (-0.83%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 94.040 (+0.12%), US 10-year yield 5.00% (+0.30%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 25,303.0 (+0.01% vs Nifty's close): the best live read on the next opening.",
+   "Nifty 50 results due on Friday: EICHERMOT, GRASIM."
+  ],
+  "vol_movers": [
+   [
+    "HDFCLIFE",
+    "597.80",
+    "4.0%",
+    "+4.23%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "1,003.80",
+    "3.9%",
+    "+3.58%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,115.00",
+    "3.7%",
+    "+3.36%"
+   ],
+   [
+    "INDUSINDBK",
+    "931.35",
+    "3.6%",
+    "+3.48%"
+   ],
+   [
+    "SBILIFE",
+    "1,819.50",
+    "3.5%",
+    "+2.97%"
+   ],
+   [
+    "EICHERMOT",
+    "7,549.00",
+    "3.2%",
+    "-0.57%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "HDFCLIFE",
+    "597.80",
+    "2.8x vol",
+    "+4.23%"
+   ],
+   [
+    "SBIN",
+    "1,086.50",
+    "2.1x vol",
+    "+2.38%"
+   ],
+   [
+    "SBILIFE",
+    "1,819.50",
+    "1.3x vol",
+    "+2.97%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,115.00",
+    "1.2x vol",
+    "+3.36%"
+   ]
+  ],
+  "pv_dn": [
+   [
+    "ONGC",
+    "224.50",
+    "2.1x vol",
+    "-4.39%"
+   ],
+   [
+    "GRASIM",
+    "3,114.90",
+    "1.8x vol",
+    "-1.32%"
+   ],
+   [
+    "MARUTI",
+    "13,024.00",
+    "1.3x vol",
+    "-1.22%"
+   ],
+   [
+    "BPCL",
+    "311.50",
+    "1.3x vol",
+    "-1.19%"
+   ]
+  ],
+  "asof": "04:06 PM IST"
+ },
+ "title": "Evening Breeze (12 Nov 2026)",
+ "headline": "Nifty gains 0.18%, Banks lead",
+ "mood": {
+  "key": "neutral",
+  "label": "Range-bound close",
+  "sub": "Nifty +0.18% in the session"
+ },
+ "mood_score": 0.24556814362473595,
+ "mood_pic": "bull_over_bear",
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
