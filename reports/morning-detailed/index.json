@@ -2,6 +2,27 @@
  "schedule_id": "morning-detailed",
  "runs": [
   {
+   "generated_at": "2026-11-13T08:13:31+05:30",
+   "date": "2026-11-13",
+   "status": "ok",
+   "caption": "Morning Detailed 13 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Updates_Detailed_2026-11-13.pdf",
+     "path": "reports/morning-detailed/JCGG_Morning_Updates_Detailed_2026-11-13.pdf",
+     "type": "pdf",
+     "bytes": 372750
+    },
+    {
+     "name": "JCGG_Morning_Updates_Detailed_2026-11-13.json",
+     "path": "reports/morning-detailed/JCGG_Morning_Updates_Detailed_2026-11-13.json",
+     "type": "json",
+     "bytes": 5746
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-12T08:14:05+05:30",
    "date": "2026-11-12",
    "status": "ok",
@@ -375,5 +396,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-12T08:14:05+05:30"
+ "updated_at": "2026-11-13T08:13:31+05:30"
 }
