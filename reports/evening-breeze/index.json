@@ -2,6 +2,165 @@
  "schedule_id": "evening-breeze",
  "runs": [
   {
+   "generated_at": "2026-11-13T16:07:19+05:30",
+   "date": "2026-11-13",
+   "status": "ok",
+   "caption": "Evening Breeze 13 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_1.png",
+     "type": "png",
+     "bytes": 1116305
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_2.png",
+     "type": "png",
+     "bytes": 730228
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_3.png",
+     "type": "png",
+     "bytes": 770745
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_4.png",
+     "type": "png",
+     "bytes": 915367
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_5.png",
+     "type": "png",
+     "bytes": 943477
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_6.png",
+     "type": "png",
+     "bytes": 828505
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_7.png",
+     "type": "png",
+     "bytes": 746946
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_2026-11-13_8.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_2026-11-13_8.png",
+     "type": "png",
+     "bytes": 1526396
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_1.png",
+     "type": "png",
+     "bytes": 1111368
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_2.png",
+     "type": "png",
+     "bytes": 713573
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_3.png",
+     "type": "png",
+     "bytes": 756209
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_4.png",
+     "type": "png",
+     "bytes": 905277
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_5.png",
+     "type": "png",
+     "bytes": 932488
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_6.png",
+     "type": "png",
+     "bytes": 810406
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_7.png",
+     "type": "png",
+     "bytes": 725697
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_HI_2026-11-13_8.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_HI_2026-11-13_8.png",
+     "type": "png",
+     "bytes": 1525813
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_1.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_1.png",
+     "type": "png",
+     "bytes": 1124646
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_2.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_2.png",
+     "type": "png",
+     "bytes": 738684
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_3.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_3.png",
+     "type": "png",
+     "bytes": 774546
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_4.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_4.png",
+     "type": "png",
+     "bytes": 908808
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_5.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_5.png",
+     "type": "png",
+     "bytes": 1000503
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_6.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_6.png",
+     "type": "png",
+     "bytes": 856613
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_7.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_7.png",
+     "type": "png",
+     "bytes": 790131
+    },
+    {
+     "name": "JCGG_Evening_Breeze_Mobile_BN_2026-11-13_8.png",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_Mobile_BN_2026-11-13_8.png",
+     "type": "png",
+     "bytes": 1527047
+    },
+    {
+     "name": "JCGG_Evening_Breeze_2026-11-13.json",
+     "path": "reports/evening-breeze/JCGG_Evening_Breeze_2026-11-13.json",
+     "type": "json",
+     "bytes": 8512
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-12T16:06:52+05:30",
    "date": "2026-11-12",
    "status": "ok",
@@ -1597,5 +1756,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-12T16:06:52+05:30"
+ "updated_at": "2026-11-13T16:07:19+05:30"
 }
