@@ -1,0 +1,270 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "16 Nov 2026",
+ "report_time": "08:10 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 25,230 - 25,305"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Positive start likely: Wall Street weak, Asia negative, rupee softer. Expected Nifty opening zone: 25,230 - 25,305 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,268.5 (+124 pts, +0.49% vs Nifty's last close).",
+      "US: S&P 500 -0.40%, Nasdaq -0.91%, Dow +0.10%.",
+      "Asia this morning: Nikkei -1.43%, Hang Seng +0.95%, Kospi -2.07%.",
+      "Currency, crude and volatility: Brent 95.12 (-0.75%); USD/INR 94.230 (+0.21%); India VIX 15.50 (-6.74%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 19 Nov 2026.",
+      "Results today (1 companies): SANDHAR."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "BAJFINANCE",
+       "In the news",
+       "Bajaj Finance, Radico, Clean Science top stock ideas by Choice Broking"
+      ],
+      [
+       "NYKAA",
+       "Setup: BUY (A+)",
+       "Entry 367.0, stop 362.7, target 378.8"
+      ],
+      [
+       "GRAPHITE",
+       "Setup: BUY (A+)",
+       "Entry 804.9, stop 793.0, target 825.3"
+      ],
+      [
+       "BHARTIARTL",
+       "Setup: BUY (A+)",
+       "Entry 2,124.3, stop 2,100.3, target 2,166.2"
+      ],
+      [
+       "GRASIM",
+       "Volume surge (last session)",
+       "2.6x average volume, -2.60%"
+      ],
+      [
+       "HINDALCO",
+       "Volume surge (last session)",
+       "1.6x average volume, -2.12%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty jumps 100 pts, signals firm start for Sensex, Nifty despite weak Asian markets; Nvidia, Fed in...",
+      "Asia stocks dip before Nvidia earnings, Anthropic IPO",
+      "Anthropic's record IPO faces some big questions",
+      "Bajaj Finance, Radico, Clean Science top stock ideas by Choice Broking"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "52,347.55",
+        "+0.10%"
+       ],
+       [
+        "S&P 500",
+        "7,561.67",
+        "-0.40%"
+       ],
+       [
+        "Nasdaq Composite",
+        "25,136.27",
+        "-0.91%"
+       ],
+       [
+        "FTSE 100",
+        "10,902.60",
+        "+0.36%"
+       ],
+       [
+        "DAX",
+        "26,749.95",
+        "-0.08%"
+       ],
+       [
+        "Nikkei 225",
+        "60,270.73",
+        "-1.43%"
+       ],
+       [
+        "Hang Seng",
+        "23,861.10",
+        "+0.95%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,612.65",
+        "-0.60%"
+       ],
+       [
+        "Kospi",
+        "5,180.86",
+        "-2.07%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "95.12",
+        "-0.75%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "88.12",
+        "-0.50%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,885.60",
+        "-0.02%"
+       ],
+       [
+        "USD/INR",
+        "94.23",
+        "+0.21%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.42",
+        "+0.01%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "5.15",
+        "+1.00%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "25,148",
+       "25,340"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,054",
+       "25,434"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (25,230 - 25,305) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
