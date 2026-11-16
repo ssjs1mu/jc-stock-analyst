@@ -1,0 +1,680 @@
+{
+ "book": {
+  "flows": {
+   "date": "12 Nov",
+   "fii": 7830.6,
+   "dii": -6331.17
+  },
+  "pcr": {
+   "pcr": 0.829640039447732,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "16 Nov 2026",
+  "date_iso": "2026-11-16",
+  "mood": {
+   "key": "bull",
+   "label": "Positive start likely",
+   "sub": "Indicative Nifty opening zone 25,230 - 25,305"
+  },
+  "label": "Positive start likely",
+  "zone": "25,230 - 25,305",
+  "headline": "Positive start likely - Nifty zone 25,230 - 25,305",
+  "open_text": "Wall Street weak, Asia negative, rupee softer. Opening call anchored on GIFT Nifty.",
+  "yday": null,
+  "spark": [
+   22888.94921875,
+   22811.349609375,
+   22687.650390625,
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125
+  ],
+  "proj": 25267.5,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "25,144.30",
+    "pct": "-0.61%",
+    "pts": "-155.05"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "81,592.45",
+    "pct": "-0.39%",
+    "pts": "-318.55"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "61,034.10",
+    "pct": "-0.79%",
+    "pts": "-484.40"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "23,734.20",
+    "pct": "-0.55%",
+    "pts": "-131.60"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,054 - 25,148",
+    "r": "25,340 - 25,434",
+    "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 25,340 / R3 25,434; a slide below 25,148 exposes 25,054. (R1, Prev high inside the open zone.)",
+    "flag": "Re-anchored to GIFT open zone"
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "60,781 - 61,038",
+    "r": "61,558 - 61,816",
+    "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 61,558 / R3 61,816; a slide below 61,038 exposes 60,781. (R1, Prev high inside the open zone.) Estimated from the Nifty gap.",
+    "flag": "Re-anchored to GIFT open zone"
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "52,347.55",
+    "pct": "+0.10%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,561.67",
+    "pct": "-0.40%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "25,136.27",
+    "pct": "-0.91%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,902.60",
+    "pct": "+0.36%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "26,749.95",
+    "pct": "-0.08%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "60,259.78",
+    "pct": "-1.44%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "23,858.51",
+    "pct": "+0.93%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,612.41",
+    "pct": "-0.60%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "5,180.86",
+    "pct": "-2.07%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "95.12",
+    "pct": "-0.75%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "88.14",
+    "pct": "-0.47%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,886.20",
+    "pct": "-0.00%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "94.230",
+    "pct": "+0.21%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.42",
+    "pct": "+0.01%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "5.15",
+    "pct": "+1.00%"
+   }
+  ],
+  "vix": {
+   "level": "15.50",
+   "pct": "-6.74%",
+   "gauge": 0.725,
+   "text": "India VIX 15.50 (-6.74%); USD/INR 94.23 (+0.21%); US 10-yr yield 5.15 (+1.00%). India VIX eased 6.7% - volatility expectations cooling."
+  },
+  "events": [
+   "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 19 Nov 2026.",
+   "Results today (1 companies): SANDHAR."
+  ],
+  "watch": [
+   [
+    "BAJFINANCE",
+    "In the news",
+    "Bajaj Finance, Radico, Clean Science top stock ideas by Choice Broking"
+   ],
+   [
+    "NYKAA",
+    "Setup: BUY (A+)",
+    "Entry 367.0, stop 362.7, target 378.8"
+   ],
+   [
+    "GRAPHITE",
+    "Setup: BUY (A+)",
+    "Entry 804.9, stop 793.0, target 825.3"
+   ],
+   [
+    "BHARTIARTL",
+    "Setup: BUY (A+)",
+    "Entry 2,124.3, stop 2,100.3, target 2,166.2"
+   ],
+   [
+    "GRASIM",
+    "Volume surge (last session)",
+    "2.6x average volume, -2.60%"
+   ],
+   [
+    "HINDALCO",
+    "Volume surge (last session)",
+    "1.6x average volume, -2.12%"
+   ]
+  ],
+  "headlines": [
+   "GIFT Nifty jumps 100 pts, signals firm start for Sensex, Nifty despite weak Asian markets; Nvidia, Fed in...",
+   "Asia stocks dip before Nvidia earnings, Anthropic IPO",
+   "Anthropic's record IPO faces some big questions",
+   "Bajaj Finance, Radico, Clean Science top stock ideas by Choice Broking",
+   "Dow, S&P 500, Nasdaq Futures Edge Lower As Markets Brace For Nvidia Earnings, Anthropic IPO, Fed Minutes: SMMT, NBIS, HELP, MSTR...",
+   "Asian stocks slip, Nikkei down nearly 1% amid US inflation",
+   "Sensex, Nifty today: GIFT Nifty signals steady start; Brent continues near $95",
+   "Stock Market Today: Gift Nifty, Oil Prices To FPI Inflows; Five Key Factors For Sensex, Nifty 50 On Nov 16"
+  ],
+  "calls": {
+   "buy": [
+    {
+     "sym": "BAJFINANCE",
+     "side": "BUY",
+     "entry": "1,118.94",
+     "sl": "1,106.40",
+     "t1": "1,137.77",
+     "t2": "1,157.53",
+     "rr": "1.5",
+     "risk": "12.54",
+     "riskpct": "1.12%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 31: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "NYKAA",
+     "side": "BUY",
+     "entry": "367.02",
+     "sl": "362.71",
+     "t1": "378.83",
+     "t2": "385.31",
+     "rr": "2.7",
+     "risk": "4.31",
+     "riskpct": "1.17%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "Market: Nifty bullish \u00b7 VIX 15.5"
+     ]
+    },
+    {
+     "sym": "GRAPHITE",
+     "side": "BUY",
+     "entry": "804.89",
+     "sl": "792.97",
+     "t1": "825.30",
+     "t2": "843.19",
+     "rr": "1.7",
+     "risk": "11.92",
+     "riskpct": "1.48%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "Market: Nifty bullish \u00b7 VIX 15.5"
+     ]
+    },
+    {
+     "sym": "BHARTIARTL",
+     "side": "BUY",
+     "entry": "2,124.27",
+     "sl": "2,100.25",
+     "t1": "2,166.17",
+     "t2": "2,193.55",
+     "rr": "1.7",
+     "risk": "24.02",
+     "riskpct": "1.13%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 43: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "EICHERMOT",
+     "side": "BUY",
+     "entry": "7,659.57",
+     "sl": "7,585.27",
+     "t1": "7,787.67",
+     "t2": "7,899.12",
+     "rr": "1.7",
+     "risk": "74.30",
+     "riskpct": "0.97%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 10,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 28: strong trend, +DI leads"
+     ]
+    }
+   ],
+   "sell": [
+    {
+     "sym": "PAGEIND",
+     "side": "SELL",
+     "entry": "31,252.59",
+     "sl": "31,751.41",
+     "t1": "30,401.67",
+     "t2": "29,513.33",
+     "rr": "1.7",
+     "risk": "498.82",
+     "riskpct": "1.60%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 22: developing trend"
+     ]
+    }
+   ],
+   "watch_buy": [
+    {
+     "sym": "MINDACORP",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.45 < 1.5)"
+    },
+    {
+     "sym": "MCX",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.24 < 1.5)"
+    },
+    {
+     "sym": "AEGISVOPAK",
+     "conv": 49,
+     "S": 10.5,
+     "why": "first target too close for the risk (R:R 1.35 < 1.5)"
+    },
+    {
+     "sym": "ANGELONE",
+     "conv": 49,
+     "S": 10.5,
+     "why": "first target too close for the risk (R:R 1.30 < 1.5)"
+    }
+   ]
+  },
+  "gift": {
+   "last": "25,268.5",
+   "pct": "+0.01%",
+   "premium": "+124 pts",
+   "vs": "+0.49%",
+   "asof": "16 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "EICHERMOT",
+    "7,650.00",
+    "+1.34%"
+   ],
+   [
+    "HINDUNILVR",
+    "1,992.90",
+    "+0.96%"
+   ],
+   [
+    "HEROMOTOCO",
+    "5,385.00",
+    "+0.80%"
+   ],
+   [
+    "ASIANPAINT",
+    "2,550.00",
+    "+0.53%"
+   ],
+   [
+    "BHARTIARTL",
+    "2,106.00",
+    "+0.48%"
+   ]
+  ],
+  "losers": [
+   [
+    "SHRIRAMFIN",
+    "970.00",
+    "-3.37%"
+   ],
+   [
+    "BPCL",
+    "302.00",
+    "-3.05%"
+   ],
+   [
+    "GRASIM",
+    "3,034.00",
+    "-2.60%"
+   ],
+   [
+    "HINDALCO",
+    "943.60",
+    "-2.12%"
+   ],
+   [
+    "ADANIENT",
+    "2,688.00",
+    "-1.95%"
+   ]
+  ],
+  "shock": [
+   [
+    "GRASIM",
+    "3,034.00",
+    "2.6x avg vol",
+    "-2.60%"
+   ],
+   [
+    "HINDALCO",
+    "943.60",
+    "1.6x avg vol",
+    "-2.12%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "24,956",
+     "25,050",
+     "25,148",
+     "25,242",
+     "25,340"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "60,518",
+     "60,776",
+     "61,038",
+     "61,296",
+     "61,558"
+    ]
+   }
+  ],
+  "est": 0.49
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (16 Nov 2026)",
+ "headline": "Positive start likely - Nifty zone 25,230 - 25,305",
+ "bias_text": "GIFT Nifty 25,268.5 (+124 pts, +0.49% vs Nifty's last close). US: S&P 500 -0.40%, Nasdaq -0.91%, Dow +0.10%. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street weak, Asia negative, rupee softer. Opening call anchored on GIFT Nifty.",
+ "proj": 25267.5,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 25,230 - 25,305"
+ },
+ "mood_score": 0.49,
+ "mood_pic": "bull_calm",
+ "spark": [
+  22888.94921875,
+  22811.349609375,
+  22687.650390625,
+  22600.0,
+  22753.19921875,
+  22749.75,
+  22698.849609375,
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375,
+  25030.349609375,
+  25044.650390625,
+  25255.05078125,
+  25299.349609375,
+  25144.30078125
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.725,
+  "headline": "India VIX 15.50 (-6.74%)",
+  "text": "India VIX 15.50 (-6.74%); USD/INR 94.23 (+0.21%); US 10-yr yield 5.15 (+1.00%). India VIX eased 6.7% - volatility expectations cooling."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "25,144.30",
+   "pct": "-0.61%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "95.12",
+   "pct": "-0.75%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "3,886.20",
+   "pct": "-0.00%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "15.50",
+   "pct": "-6.74%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "94.230",
+   "pct": "+0.21%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "5.15",
+   "pct": "+1.00%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "52,347.55",
+   "pct": "+0.10%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,561.67",
+   "pct": "-0.40%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "25,136.27",
+   "pct": "-0.91%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,902.60",
+   "pct": "+0.36%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "26,749.95",
+   "pct": "-0.08%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "60,259.78",
+   "pct": "-1.44%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "23,858.51",
+   "pct": "+0.93%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,612.41",
+   "pct": "-0.60%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "5,180.86",
+   "pct": "-2.07%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 60,259.78 (-1.44%), Hang Seng 23,858.51 (+0.93%), Shanghai 3,612.41 (-0.60%), Kospi 5,180.86 (-2.07%). Wall Street: Dow 52,347.55 (+0.10%), S&P 500 7,561.67 (-0.40%), Nasdaq 25,136.27 (-0.91%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "25,054 - 25,148",
+   "r": "25,340 - 25,434",
+   "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 25,340 / R3 25,434; a slide below 25,148 exposes 25,054. (R1, Prev high inside the open zone.)",
+   "flag": "Re-anchored to GIFT open zone"
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "60,781 - 61,038",
+   "r": "61,558 - 61,816",
+   "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 61,558 / R3 61,816; a slide below 61,038 exposes 60,781. (R1, Prev high inside the open zone.) Estimated from the Nifty gap.",
+   "flag": "Re-anchored to GIFT open zone"
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Next Nifty weekly expiry: Tue 17 Nov 2026; next Sensex weekly expiry: Thu 19 Nov 2026. Results today (1 companies): SANDHAR."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "BAJFINANCE (In the news); NYKAA (Setup: BUY (A+)); GRAPHITE (Setup: BUY (A+)); BHARTIARTL (Setup: BUY (A+)); GRASIM (Volume surge (last session)); HINDALCO (Volume surge (last session))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "GIFT Nifty jumps 100 pts, signals firm start for Sensex, Nifty despite weak Asia | Asia stocks dip before Nvidia earnings, Anthropic IPO"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "EICHERMOT",
+    "pct": "+1.34%"
+   },
+   {
+    "sym": "HINDUNILVR",
+    "pct": "+0.96%"
+   },
+   {
+    "sym": "HEROMOTOCO",
+    "pct": "+0.80%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "SHRIRAMFIN",
+    "pct": "-3.37%"
+   },
+   {
+    "sym": "BPCL",
+    "pct": "-3.05%"
+   },
+   {
+    "sym": "GRASIM",
+    "pct": "-2.60%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
