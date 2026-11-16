@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-16T21:10:35+05:30",
+   "date": "2026-11-16",
+   "status": "ok",
+   "caption": "Circuit Watch - session of Mon 16 Nov 2026: Sensex 82,104.79 (+0.63%), Nifty 25,291.10 (+0.58%); circuit and momentum names with hedged notes",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-16.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-16.pdf",
+     "type": "pdf",
+     "bytes": 8758
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-12T21:13:01+05:30",
    "date": "2026-11-12",
    "status": "ok",
@@ -288,5 +303,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-12T21:13:01+05:30"
+ "updated_at": "2026-11-16T21:10:35+05:30"
 }
