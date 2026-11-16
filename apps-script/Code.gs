@@ -792,7 +792,9 @@ function installCallsTriggers() {
 var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
 var TG_MORNING = { 'premarket-news': 480, 'morning-brief': 510, 'morning-detailed': 510, 'morning-pulse': 525 }; // fixed post times (minutes after midnight IST) on trading days: 08:00, 08:30, 08:30, 08:45 - never earlier
 // SUSPENDED 2026-11-05 (not in the booklets): premarket-news, morning-brief, evening-market-wrap, evening-news-wrap
-var TG_IDS = ['morning-detailed', 'morning-pulse', 'circuit-watch'];
+var TG_IDS = ['morning-detailed', 'morning-pulse', 'evening-breeze', 'circuit-watch'];
+// Booklet reports are NOT posted page by page: one thumbnail (og.jpg) + the link to the flip-book booklet. id -> site folder.
+var TG_BOOKLET = { 'morning-pulse': ['morning', '\uD83C\uDF05 Morning Sunrise'], 'evening-breeze': ['evening', '\uD83C\uDF07 Evening Breeze'] };
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
 function installTelegramTrigger() {
@@ -807,7 +809,7 @@ var TG_HOLIDAYS = {
 function tgTradingDay_(ymd, dow) { return dow >= 1 && dow <= 5 && !TG_HOLIDAYS[ymd]; }
 // Watchdog: GitHub's own cron is often hours late. If GH_TOKEN (fine-grained token, repo ssjs1mu/jc-stock-analyst, Actions: read & write only)
 // is set in Script properties, this asks GitHub to build any report that is due but not yet published today. No token = does nothing.
-var GH_DUE = [['morning-detailed', 490, 900], ['morning-pulse', 505, 900]];
+var GH_DUE = [['morning-detailed', 490, 900], ['morning-pulse', 505, 900], ['evening-breeze', 975, 1380]];
 function ghWatchdog_() {
   try {
     var p = PropertiesService.getScriptProperties(), tok = p.getProperty('GH_TOKEN'); if (!tok) return;
@@ -845,6 +847,14 @@ function tgPostReports() {
       if (!runs.length) return;
       runs.sort(function (a, b) { return a.generated_at < b.generated_at ? 1 : -1; });
       var run = runs[0]; if (sent[id] && sent[id] >= run.generated_at) return;
+      if (TG_BOOKLET[id]) { // booklet: one thumbnail + link, never the individual pages
+        var bk = TG_BOOKLET[id], url = TG_SITE + bk[0] + '/' + run.date + '/', tcap = (bk[1] + ' - ' + run.date + (run.caption ? '\n' + run.caption : '') + '\n\nOpen the booklet: ' + url).slice(0, 1000);
+        var th = UrlFetchApp.fetch(url + 'og.jpg?t=' + Date.now(), { muteHttpExceptions: true }), bres;
+        if (th.getResponseCode() === 200) bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendPhoto', { method: 'post', payload: { chat_id: s.c, caption: tcap, photo: th.getBlob().setName('booklet.jpg') }, muteHttpExceptions: true });
+        else bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: tcap }, muteHttpExceptions: true });
+        if (bres.getResponseCode() === 200) { sent[id] = run.generated_at; dayP.ids[id] = 1; n++; } else Logger.log(id + ' ' + bres.getContentText());
+        return;
+      }
       var pngs = run.files.filter(function (x) { return x.type === 'png'; }), mob = pngs.filter(function (x) { return /Mobile/.test(x.name); }).sort(function (a, b) { return a.name < b.name ? -1 : 1; }), ok = true; // phones: portrait pages first
       var send = mob.length ? mob : [pngs[0] || run.files[0]], cap = (run.caption || send[0].name).slice(0, 900);
       send.forEach(function (f, i) {
