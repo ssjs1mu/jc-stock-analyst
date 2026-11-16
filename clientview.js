@@ -19,7 +19,7 @@
   const CSS = `
   .cv{font-family:'Segoe UI',Arial,sans-serif;color:#1F2937;max-width:780px;margin:0 auto;background:#fff}
   .cv *{box-sizing:border-box}
-  .cv .hd{background:#000;border-radius:8px 8px 0 0;overflow:hidden}.cv .hd img{display:block;height:150px;width:auto;max-width:100%;margin:0 auto}
+  .cv .hd img,.cv .fo img{display:block;width:100%;height:auto}
   .cv .tt{text-align:center;margin:10px 0 2px;font-size:22px;font-weight:800;color:#2b59c3}
   .cv .st{text-align:center;color:#d97706;font-size:12.5px;margin-bottom:6px}
   .cv .nt{font-size:11px;color:#6B7280;font-style:italic;margin:4px 2px 8px}
@@ -48,7 +48,7 @@
   .cv .trk i.n{background:#FEE2E2;color:${Rd};border:1.5px solid ${Rd}}.cv .trk i.y{background:#DCFCE7;color:#15803d;border:1.5px solid #15803d}.cv .trk small{display:block;color:#6B7280;font-size:9.5px}
   .cv .sum{grid-column:1/-1;background:linear-gradient(90deg,${NAVY},#1B6FD1);color:#fff;border-radius:8px;text-align:center;font-weight:700;font-size:11px;padding:7px;display:block}
   .cv .disc{margin-top:12px;border-top:1.5px solid ${GOLD};padding-top:4px;color:#b91c1c;font-style:italic;font-size:11px}
-  .cv .ft{background:#000;color:#fff;text-align:center;font-weight:700;font-size:12px;padding:7px;border-radius:0 0 8px 8px;margin-top:10px}
+  .cv .fo{margin-top:10px}
   @media(max-width:620px){.cv .hero,.cv .g3,.cv .trk{grid-template-columns:1fr}.cv .g4{grid-template-columns:1fr 1fr}.cv .ma{grid-template-columns:repeat(3,1fr)}}`;
 
   function gauge(v, lo, hi, zones, label, cap1, cap2) {
@@ -122,7 +122,7 @@
       'Risks: a wider market sell-off, a surprise in company news or results, and a close below the first support on heavy volume. Levels are for monitoring, not a trade instruction.'];
     const li = (a) => '<ul>' + a.filter(Boolean).map((t) => '<li>' + t + '</li>').join('') + '</ul>';
     return `<div class="cv"><style>${CSS}</style>
-    <div class="hd"><img src="assets/jc-banner.png" alt="Joshi's Corner"></div>
+    <div class="hd"><img src="assets/jc-letterhead-top.png" alt="Joshi's Corner"></div>
     <div class="tt">Stock View: ${E(sym)} (${exch})</div><div class="st">${E(stamp())}</div>
     <div class="nt">${E(d.name)} · ${E(basis)}. Delayed data — intraday readings are provisional while the market is open.</div>
     <h3>1. TODAY'S STOCK BEHAVIOR</h3>
@@ -152,7 +152,7 @@
     <div class="trk">${trkItems.map((t) => `<div><i class="${t[1] ? 'y' : 'n'}">${t[1] ? '✓' : '✗'}</i><span><b>${E(t[0])}</b><small>${E(t[2])} · ${t[1] ? 'confirmed' : 'not yet'}</small></span></div>`).join('')}<span class="sum">${done} of 6 confirmed → ${stance}</span></div>
     ${li(bullets3)}
     <div class="disc">This report is for informational purposes only and does not constitute investment advice.</div>
-    <div class="ft">9/25C, Bijoygarh Colony, Jadavpur, Kolkata-32 · Tel 9477030987</div></div>`;
+    <div class="fo"><img src="assets/jc-letterhead-foot.png" alt="Joshi's Corner, Kolkata"></div></div>`;
   }
 
   const S = { html: '', busy: false };
