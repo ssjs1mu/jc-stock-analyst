@@ -1,0 +1,264 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "17 Nov 2026",
+ "report_time": "08:11 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "neutral",
+  "label": "Flat to marginally mixed start",
+  "sub": "Indicative Nifty opening zone 25,235 - 25,311"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Flat to marginally mixed start: Wall Street weak, Asia negative, crude easing. Expected Nifty opening zone: 25,235 - 25,311 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,274.5 (-17 pts, -0.07% vs Nifty's last close).",
+      "US: S&P 500 -1.92%, Nasdaq -2.49%, Dow -1.41%.",
+      "Asia this morning: Nikkei -1.35%, Hang Seng -1.13%, Kospi -1.45%.",
+      "Currency, crude and volatility: Brent 91.35 (-4.68%); USD/INR 93.912 (-0.35%); India VIX 15.68 (+1.16%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty closed within 0.3% of its resistance pivot (25,362), so that level decides the early direction."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Nifty weekly expiry today (Tue 17 Nov 2026).",
+      "Results today (1 companies): LIBAS."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "HDFCBANK",
+       "In the news",
+       "Honasa Consumer, HDFC Bank: Two stock ideas by Shrikant Chouhan"
+      ],
+      [
+       "ADANIENT",
+       "In the news",
+       "Top stocks to watch today: Senco Gold, Adani Enterprises, BSE, Cipla shares in focus on Tu"
+      ],
+      [
+       "ITC",
+       "Volume surge (last session)",
+       "2.5x average volume, +3.54%"
+      ],
+      [
+       "COALINDIA",
+       "Volume surge (last session)",
+       "2.3x average volume, -1.49%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Global stocks fall as Nvidia earnings, Anthropic debut put AI rally to test",
+      "Dow plunges 739 points, GIFT Nifty barely moves: Can Dalal Street dodge the selloff?",
+      "Honasa Consumer, HDFC Bank: Two stock ideas by Shrikant Chouhan",
+      "Top stocks to watch today: Senco Gold, Adani Enterprises, BSE, Cipla shares in focus on Tuesday, 17 November"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "51,608.17",
+        "-1.41%"
+       ],
+       [
+        "S&P 500",
+        "7,416.59",
+        "-1.92%"
+       ],
+       [
+        "Nasdaq Composite",
+        "24,509.76",
+        "-2.49%"
+       ],
+       [
+        "FTSE 100",
+        "10,881.60",
+        "-0.19%"
+       ],
+       [
+        "DAX",
+        "26,598.64",
+        "-0.57%"
+       ],
+       [
+        "Nikkei 225",
+        "58,854.70",
+        "-1.35%"
+       ],
+       [
+        "Hang Seng",
+        "23,486.56",
+        "-1.13%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,577.94",
+        "-0.68%"
+       ],
+       [
+        "Kospi",
+        "5,026.58",
+        "-1.45%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "91.35",
+        "-4.68%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "84.79",
+        "-1.08%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,868.40",
+        "+0.40%"
+       ],
+       [
+        "USD/INR",
+        "93.91",
+        "-0.35%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.61",
+        "+0.05%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "5.12",
+        "-0.64%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "25,196",
+       "25,362"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,101",
+       "25,432"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
