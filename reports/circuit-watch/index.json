@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-17T21:12:14+05:30",
+   "date": "2026-11-17",
+   "status": "ok",
+   "caption": "Circuit Watch, session of 17 Nov 2026: Sensex +0.52%, Nifty +0.38%; upper locks in Sigma, SML Mahindra, Salasar; lower lock in Capital Trust (single source)",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-17.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-17.pdf",
+     "type": "pdf",
+     "bytes": 9082
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-16T21:10:35+05:30",
    "date": "2026-11-16",
    "status": "ok",
@@ -303,5 +318,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-16T21:10:35+05:30"
+ "updated_at": "2026-11-17T21:12:14+05:30"
 }
