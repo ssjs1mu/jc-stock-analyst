@@ -349,8 +349,9 @@
     return out;
   }
   function frameScore() {
+    const L0 = lists(), l0 = L0.find((x) => x.id === O.listId) || L0[0], key = todayIST() + '|' + (l0 ? l0.id + ':' + l0.syms.join(',') : '');
     const S = O.sc, today = todayIST();
-    if (!S || S.day !== today) { if (!O.scBusy) { O.scBusy = true; scoreBuild().then((r) => { r.day = today; O.sc = r; }).catch(() => { O.sc = { day: today, err: 1 }; }).then(() => { O.scBusy = false; draw(); }); } return `<section class="olF"><h3>YOUR STOCKS TODAY &amp; CALL RESULTS</h3><div class="olN">Checking today’s results against this morning’s plan…</div></section>`; }
+    if (!S || S.key !== key) { if (!O.scBusy) { O.scBusy = true; scoreBuild().then((r) => { r.day = today; r.key = key; O.sc = r; }).catch(() => { O.sc = { day: today, err: 1 }; }).then(() => { O.scBusy = false; draw(); }); } return `<section class="olF"><h3>YOUR STOCKS TODAY &amp; CALL RESULTS</h3><div class="olN">Checking today’s results against this morning’s plan…</div></section>`; }
     if (S.err) return `<section class="olF"><h3>YOUR STOCKS TODAY &amp; CALL RESULTS</h3><div class="olN">Today’s results could not be fetched right now — tap ↻ Refresh in a minute.</div></section>`;
     const pc = (v) => (num(v) ? `<b class="${cls(v)}">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</b>` : '—');
     const W = S.wl, trig = W.filter((w) => ['SL', 'T1', 'T2', 'EOD', 'LIVE'].includes(w.v.k)), win = trig.filter((w) => ['T1', 'T2'].includes(w.v.k) || (w.v.k === 'EOD' && w.v.pct > 0)), los = trig.filter((w) => w.v.k === 'SL' || (w.v.k === 'EOD' && w.v.pct <= 0)), liveN = trig.filter((w) => w.v.k === 'LIVE').length, mktOpen = (() => { const n = new Date(Date.now() + 19800000), m = n.getUTCHours() * 60 + n.getUTCMinutes(), d = n.getUTCDay(); return d > 0 && d < 6 && m >= 555 && m < 930; })(), up = W.filter((w) => num(w.dp) && w.dp > 0).length;
