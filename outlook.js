@@ -12,7 +12,13 @@
   const f2 = (v, d) => (num(v) ? Number(v).toLocaleString('en-IN', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }) : '—');
   const CL = !!document.getElementById('toasts') && !document.getElementById('viewSel'), BASE = CL ? '../' : '', EMB = /[?&]embed=1/.test(location.search);
   const O = { rep: {}, calls: null, board: null, listId: null, loaded: false, busy: false, sym: '', err: '' };
-  const IDS = { brief: 'morning-brief', det: 'morning-detailed', news: 'premarket-news', mkt: 'evening-market-wrap', enews: 'evening-news-wrap' };
+  const IDS = { pulse: 'morning-pulse', breeze: 'evening-breeze', det: 'morning-detailed', brief: 'morning-brief', news: 'premarket-news', mkt: 'evening-market-wrap', enews: 'evening-news-wrap' };
+  /* FRESHNESS GUARD: a report is used only for its own session. Morning = dated today (IST). Closing = the newest run and at most 4 days old
+     (covers weekends / holidays). Anything older is never shown - the frame says the report is not ready instead. */
+  const todayIST = () => new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+  const ageD = (d) => Math.round((Date.parse(todayIST()) - Date.parse(d)) / 864e5);
+  const freshM = (r) => (r && r.cfg && r.date === todayIST() ? r : null);
+  const freshC = (r) => (r && r.cfg && r.newest && ageD(r.date) >= 0 && ageD(r.date) <= 4 ? r : null);
   const pf = (s) => { const v = parseFloat(String(s).replace(/[,%+]/g, '')); return isFinite(v) ? v : null; };
   const frmClose = () => { const m = document.getElementById('olFrm'); if (m) { m.className = ''; m.innerHTML = ''; } document.body.style.overflow = ''; };
   const xrClose = () => { O.progClose = true; try { const b = [...document.querySelectorAll('#jcxr button')].find((x) => /Close/.test(x.innerText)); if (b) b.click(); } catch (e) { } O.progClose = false; O.xrLayer = false; };
@@ -34,11 +40,11 @@
       if (!run) return { holiday: hol };
       const f = run.files.find((x) => x.type === 'json'), pdf = run.files.find((x) => x.type === 'pdf');
       const cfg = await jget(f.path);
-      return { cfg, date: run.date, at: run.generated_at, pdf: pdf && BASE + pdf.path, holiday: hol };
+      return { cfg, date: run.date, at: run.generated_at, pdf: pdf && BASE + pdf.path, holiday: hol, newest: runs[0] === run };
     } catch (e) { return null; }
   }
   const sec = (rep, re) => ((rep && rep.cfg && rep.cfg.sections) || []).filter((s) => re.test(s.heading));
-  const tabs = (rep, re) => sec(rep, re).flatMap((s) => s.blocks.filter((b) => b.type === 'table').map((b) => b.rows));
+  const tabs = (rep, re) => sec(rep, re).flatMap((s) => s.blocks.flatMap((b) => (b.type === 'pair' ? [b.left, b.right] : [b])).filter((b) => b && b.type === 'table').map((b) => b.rows));
   const bul = (rep, re) => sec(rep, re).flatMap((s) => s.blocks.filter((b) => b.type === 'bullets').flatMap((b) => b.items));
   const para = (rep, re) => sec(rep, re).flatMap((s) => s.blocks.filter((b) => b.type === 'paragraph').map((b) => b.text)).join(' ');
   const pick = (rows, nm) => (rows || []).find((r) => r[0].toLowerCase().indexOf(nm.toLowerCase()) === 0);
@@ -54,7 +60,7 @@
     const cx = O.calls && O.calls.ctx; if (k && cx && num(cx.mood) && O.calls.date === (k.R && k.R.date)) return { score: cx.mood, label: cx.moodLabel || moodLab(cx.mood), col: moodColor(cx.mood), parts: [], src: 'call book' };
     if (!k) return null; const P = [], cl = (v) => Math.max(-1, Math.min(1, v)), add = (n, v, w, t) => { if (v != null && isFinite(v)) P.push({ n, v: cl(v), w, t }); };
     const nf = pick(k.ind, 'Nifty 50'), vx = pick(k.ind, 'India VIX'), g = [...(k.g || []), ...(k.a || [])].map((r) => pf(r[2])).filter((x) => x != null);
-    if (nf) add('Nifty 50', pf(nf[2]) / 1.2, 3, nf[2]); if (vx) { const vp = pf(vx[2]), lv = pf(vx[1]); add('India VIX', -vp / 8 + (lv < 13 ? 0.3 : lv > 20 ? -0.5 : 0), 1.8, vx[1]); }
+    if (nf) { const np = num(k.est) ? k.est : pf(nf[2]); add(num(k.est) ? 'GIFT Nifty' : 'Nifty 50', np / 1.2, 3, (np >= 0 ? '+' : '') + np.toFixed(2) + '%'); } if (vx) { const vp = pf(vx[2]), lv = pf(vx[1]); add('India VIX', -vp / 8 + (lv < 13 ? 0.3 : lv > 20 ? -0.5 : 0), 1.8, vx[1]); }
     if (g.length >= 3) { const a = g.reduce((x, y) => x + y, 0) / g.length; add('Global', a / 0.9, 2, (a >= 0 ? '+' : '') + a.toFixed(2) + '% avg'); }
     const fx = pick(k.cm, 'USD/INR'), br = pick(k.cm, 'Brent'), tn = pick(k.cm, 'US 10');
     if (fx) add('Rupee', -pf(fx[2]) / 0.4, 1, pf(fx[2]) > 0 ? 'weaker' : 'firmer'); if (br) add('Crude', -pf(br[2]) / 2.5, 0.8, br[2]); if (tn) add('US yields', -(pf(tn[1]) * pf(tn[2])) / 8, 0.7, tn[1] + '%');
@@ -77,8 +83,8 @@
 
   async function loadAll() {
     if (O.busy) return; O.busy = true;
-    const [brief, det, news, mkt, enews, calls, board] = await Promise.all([loadRep('brief'), loadRep('det'), loadRep('news'), loadRep('mkt'), loadRep('enews'), jget('data/calls/latest.json').catch(() => null), jget('data/calls/board.json').catch(() => null)]);
-    O.rep = { brief, det, news, mkt, enews }; O.calls = calls; O.board = board; O.loaded = true; O.busy = false; draw();
+    const [pulse, breeze, brief, det, news, mkt, enews, calls, board] = await Promise.all([loadRep('pulse'), loadRep('breeze'), loadRep('brief'), loadRep('det'), loadRep('news'), loadRep('mkt'), loadRep('enews'), jget('data/calls/latest.json').catch(() => null), jget('data/calls/board.json').catch(() => null)]);
+    O.rep = { pulse, breeze, brief, det, news, mkt, enews }; O.calls = calls; O.board = board; O.loaded = true; O.busy = false; draw();
     if (!window.__jcReady) { window.__jcReady = true; setTimeout(() => { try { window.dispatchEvent(new Event('jc-ready')); } catch (e) { } }, 120); }
   }
 
@@ -98,23 +104,30 @@
     if (y10) L.push(`US 10-yr yield ${E(y10[1])}%.`);
     return L.join(' ');
   }
-  /* one normalised "pack" per mode: morning = morning reports, closing = evening wrap reports */
+  const brow = (x) => [x.name, x.level, x.pct];
+  const ASIA = /Nikkei|Hang Seng|Shanghai|Kospi|Straits|Taiwan|ASX|Jakarta|SET\b|Asia/i;
+  /* one normalised "pack" per mode, from the LIVE booklet reports (Morning Pulse / Evening Breeze); never from a stale or suspended report */
+  function bookPack(rep, mode) {
+    const B = rep.cfg.book || {}, bench = B.bench || [];
+    const ind = (B.snapshot || []).map(brow); if (B.vix && B.vix.level) ind.push(['India VIX', B.vix.level, B.vix.pct || '']);
+    const morning = mode !== 'closing', d = morning ? freshM(O.rep.det) : null;
+    return { title: morning ? 'OUTLOOK FOR THE DAY' : 'CLOSING OUTLOOK', R: rep, ind, lv: (B.levels || []).map((l) => [l.name, l.s, l.r]),
+      out: morning ? (d ? bul(d, /Outlook/) : []).concat(B.gift && B.gift.last ? ['GIFT Nifty ' + B.gift.last + ' (' + (B.gift.vs || B.gift.pct || '') + ' vs Nifty close, as of ' + (B.gift.asof || '') + ').'] : []).filter((x) => x.length > 25)
+        : [...(B.story || []), ...(B.risks || [])].filter((x) => x.length > 25),
+      al: [...(B.events || []), ...(!morning && B.nextday && B.nextday.results && B.nextday.results.length ? ['Results ' + (B.nextday.date || 'next session') + ': ' + B.nextday.results.join(', ') + '.'] : [])],
+      bias: morning ? [B.headline, B.open_text].filter(Boolean).join('. ') : [B.headline, B.summary].filter(Boolean).join('. '),
+      est: morning && num(B.est) ? B.est : null,
+      g: bench.filter((x) => !ASIA.test(x.name)).map(brow), a: bench.filter((x) => ASIA.test(x.name)).map(brow), cm: (B.cmd || []).map(brow),
+      heads: (B.headlines || []).slice(), gain: (B.gainers || []).slice(0, 5), lose: (B.losers || []).slice(0, 5), src: morning ? 'Morning Pulse' : 'Evening Breeze' };
+  }
   function pack(mode) {
     const r = O.rep;
-    if (mode === 'closing') {
-      const m = r.mkt, n = r.enews; if (!m || !m.cfg) return null;
-      const g9 = tabs(m, /Global Market/)[0] || [], sf = tabs(m, /Stocks in Focus/);
-      return { title: 'CLOSING OUTLOOK', R: m, ind: tabs(m, /Indian Market/)[0] || [], lv: tabs(m, /Near-Term/)[0] || [], out: bul(m, /Near-Term/).filter((x) => x.length > 25),
-        al: [...bul(m, /Next Session/), ...bul(n, /Calendar/)], bias: para(m, /Close in Brief/), g: g9.slice(0, 5), a: g9.slice(5), cm: tabs(m, /Currenc|Commodit/)[0] || [],
-        heads: [...bul(n, /Headlines/), ...bul(n, /What to Watch/)], gain: (sf[0] || []).slice(0, 5), lose: (sf[1] || []).slice(0, 5), src: 'Evening Market Wrap' };
-    }
-    const b = r.brief, d = r.det, n = r.news, R = b || d; if (!R || !R.cfg) return null;
-    let g = tabs(R, /^Global/)[0], a = tabs(R, /^Asian/)[0];
-    if (!g || !a) { const all = tabs(R, /Global & Asian|Overnight Global/)[0] || tabs(n, /Overnight Global/)[0] || []; g = g || all.slice(0, 5); a = a || all.slice(5); }
-    const sf = tabs(d, /Stocks in Focus/)[0] || [];
-    return { title: 'OUTLOOK FOR THE DAY', R, ind: tabs(R, /India VIX|Indian Markets/)[0] || [], lv: tabs(R, /Key Levels/)[0] || [], out: bul(d, /^Outlook/).filter((x) => x.length > 25),
-      al: [...bul(R, /Alerts/), ...bul(n, /Calendar/)], bias: para(R, /Bias/), g, a, cm: tabs(R, /Commodit/)[0] || [], heads: [...bul(n, /Headlines/), ...bul(d, /^Headlines/)],
-      gain: sf.filter((x) => pf(x[2]) > 0).slice(0, 5), lose: sf.filter((x) => pf(x[2]) < 0).slice(0, 5), src: 'Morning Updates' };
+    if (mode === 'closing') { const b = freshC(r.breeze); return b ? bookPack(b, 'closing') : null; }
+    const p = freshM(r.pulse); if (p) return bookPack(p, 'morning');
+    const d = freshM(r.det); if (!d) return null; /* fallback: today's Morning Updates (Detailed) */
+    const all = tabs(d, /Overnight/), eq = all[0] || [];
+    return { title: 'OUTLOOK FOR THE DAY', R: d, ind: [], lv: tabs(d, /Key Levels/)[0] || [], out: bul(d, /Outlook/).filter((x) => x.length > 25), al: bul(d, /Events/), bias: para(d, /Outlook/),
+      g: eq.filter((x) => !ASIA.test(x[0])), a: eq.filter((x) => ASIA.test(x[0])), cm: all[1] || [], heads: bul(d, /Headlines/), gain: [], lose: [], src: 'Morning Updates' };
   }
   const nodata = (mode, h) => `<section class="olF${h === 1 ? ' dbl' : ''}"><h3>${h === 1 ? (mode === 'closing' ? 'CLOSING OUTLOOK' : 'OUTLOOK FOR THE DAY') : h === 2 ? 'WORLD · COMMODITIES · CURRENCY · BONDS' : 'IMPORTANT NEWS'}</h3><div class="olN">${mode === 'closing' ? 'The evening wrap is built after 17:43 IST on trading days and appears here automatically.' : 'The morning report has not been published yet — it appears here automatically after the 07:30–08:30 IST build.'}</div></section>`;
   /* F&O expiry wording: Nifty = Tuesday, Sensex = Thursday; the LAST one of a month is the MONTHLY expiry. Rewrites the stored sentence and gives a real date. */
@@ -180,6 +193,7 @@
   }
   function frame4(k) {
     const C = O.calls; if (!C) return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS</h3><div class="olN">Calls file not available.</div></section>`;
+    if (C.date !== todayIST()) return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS</h3><div class="olN">Today’s call book is not ready yet (last one was for ${E(C.date || '—')}). Old calls are never shown as today’s — this frame fills by itself when today’s book is built (target 08:30 IST on trading days).</div></section>`;
     const m = moodOf(k || pack('morning')), md = m ? m.score : null, all = C.calls || [];
     const keep = all.filter((c) => !against(c, md)), held = all.filter((c) => against(c, md));
     const day = keep.filter((c) => c.type === 'DAY'), inv = keep.filter((c) => c.type !== 'DAY'), cx = C.ctx || {};
@@ -209,7 +223,7 @@
     return { lp: p };
   }
   function classify(list) {
-    const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
+    const B = (O.board && O.board.rows) || {}, calls = {}; ((O.calls && O.calls.date === todayIST() && O.calls.calls) || []).forEach((c) => { calls[clean(c.sym)] = c; });
     const out = { BUY: [], SELL: [], AVOID: [] }, mm = moodOf(pack('morning')), md = mm ? mm.score : null;
     const put = (side, o) => { const a = liveAdj(o.s, o.r, o.c, side); if (a) { if (a.lp != null) o.lp = a.lp; if (a.tag) o.tag = a.tag; if (a.side === 'AVOID') { out.AVOID.push(Object.assign(o, { why: a.why, tag: '' })); return; } if (a.side) side = a.side; } if (against({ side }, md)) out.AVOID.push(Object.assign(o, { why: 'Against today’s ' + mm.label.toLowerCase() + ' mood (' + md + '/100) — wait', tag: '' })); else out[side].push(o); };
     (list ? list.syms : []).forEach((s0) => {

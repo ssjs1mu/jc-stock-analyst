@@ -32,6 +32,10 @@ jobs:
           while [ "$(date +%s)" -lt "$end" ]; do
             ist=$(TZ=Asia/Kolkata date +%u%H%M)   # weekday(1-7) HH MM
             dow=${ist:0:1}; hm=$((10#${ist:1:4}))
+            # morning call book: every 10 min 05:30-09:10 IST (idempotent; GitHub's own cron for it is often skipped)
+            if [ "$dow" -le 5 ] && [ "$hm" -ge 530 ] && [ "$hm" -le 910 ] && [ $(( 10#${ist:3:2} % 10 )) -lt 5 ]; then
+              gh workflow run day-calls.yml --ref main || echo "calls dispatch failed (will retry next tick)"
+            fi
             if [ "$dow" -le 5 ] && [ "$hm" -ge 730 ] && [ "$hm" -le 2100 ]; then
               gh workflow run auto-reports.yml --ref main || echo "dispatch failed (will retry next tick)"
               # AI infographic: shortly after each report is due (the job exits at once if there is nothing to draw)
