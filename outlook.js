@@ -30,6 +30,18 @@
   };
 
   const clean = (s) => String(s || '').replace(/\.(NS|BO)$/i, '').toUpperCase();
+  /* click a stock name anywhere in the report -> its Master report (3-page research note) */
+  const mClose = () => { const m = document.getElementById('jcMaster'); if (m) m.classList.remove('on'); };
+  const openM = (sym, viaPop) => {
+    const lay = (f) => (viaPop ? swapLayer(f) : pushLayer(f)), s = clean(sym);
+    if (!CL) {
+      const si = document.getElementById('symbolInput'), ex = document.getElementById('exchangeInput'), rs = document.getElementById('rptSel');
+      if (!si || typeof runAnalysis !== 'function') { openX(sym, viaPop); return; }
+      si.value = s; if (ex) ex.value = 'NS'; if (rs) rs.value = 'master'; Promise.resolve(runAnalysis('master')).catch(() => { }); lay(mClose); return;
+    }
+    let m = document.getElementById('olFrm'); if (!m) { m = document.createElement('div'); m.id = 'olFrm'; document.body.appendChild(m); }
+    m.innerHTML = '<div class="olFh"><b>' + E(s) + ' · Master report</b><button class="olClose" data-closefrm="1">← Back</button></div><iframe title="Master report" src="../?embed=1&sym=' + encodeURIComponent(s) + '&go=master"></iframe>'; m.className = 'on'; document.body.style.overflow = 'hidden'; lay(frmClose);
+  };
 
   async function jget(url) { const r = await fetch(BASE + url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
   async function loadRep(key) {
@@ -90,7 +102,7 @@
 
   /* ---------- pieces ---------- */
   const tile = (nm, r, d) => { if (!r) return ''; const p = pf(r[2]); return `<div class="olT"><small>${E(nm)}</small><b>${E(r[1])}</b><span class="${cls(p)}">${arrow(p)} ${E(r[2])}</span></div>`; };
-  const mini = (title, rows) => rows && rows.length ? `<div class="olC"><h5>${E(title)}</h5>${rows.map((r) => { const p = pf(r[2]), w = p == null ? 0 : Math.min(100, Math.abs(p) / 3 * 100); return `<div class="olR"><span>${E(r[0])}</span><i>${E(r[1])}</i><u class="${cls(p)}">${arrow(p)} ${E(r[2])}</u><s class="olBar ${p >= 0 ? 'bu' : 'bd'}" style="width:${w.toFixed(0)}%"></s></div>`; }).join('')}</div>` : ''
+  const mini = (title, rows, stk) => rows && rows.length ? `<div class="olC"><h5>${E(title)}</h5>${rows.map((r) => { const p = pf(r[2]), w = p == null ? 0 : Math.min(100, Math.abs(p) / 3 * 100); return `<div class="olR"><span${stk ? ` class="olM" data-m="${E(r[0])}" title="Open the Master report"` : ''}>${E(r[0])}</span><i>${E(r[1])}</i><u class="${cls(p)}">${arrow(p)} ${E(r[2])}</u><s class="olBar ${p >= 0 ? 'bu' : 'bd'}" style="width:${w.toFixed(0)}%"></s></div>`; }).join('')}</div>` : ''
   function worldRead(g, a, c, x) {
     const ps = (rows) => (rows || []).map((r) => pf(r[2])).filter((v) => v != null);
     const gp = ps(g), ap = ps(a), L = [];
@@ -167,7 +179,7 @@
     const heads = k.heads.map((x) => x.trim()).filter((x, i, a) => x.length > 20 && a.findIndex((y) => y.slice(0, 40) === x.slice(0, 40)) === i).slice(0, 8);
     return `<section class="olF"><h3>IMPORTANT NEWS <small>from the ${mode === 'closing' ? 'evening' : 'pre-market news &amp; morning'} reports</small></h3>
       ${heads.length ? `<ul class="olNews">${heads.map((h) => { const m = /^(.*?)\s*\[([^\]]+)\]\.?$/.exec(h); return `<li>${E(m ? m[1] : h)}${m ? ` <em>${E(m[2])}</em>` : ''}</li>`; }).join('')}</ul>` : '<div class="olN">No headlines published yet.</div>'}
-      ${k.gain.length || k.lose.length ? `<div class="olGrid">${mini('Top gainers (Nifty 50)', k.gain)}${mini('Top losers', k.lose)}</div>` : ''}</section>`;
+      ${k.gain.length || k.lose.length ? `<div class="olGrid">${mini('Top gainers (Nifty 50)', k.gain, 1)}${mini('Top losers', k.lose, 1)}</div>` : ''}</section>`;
   }
   const lvl2 = (v) => (num(v) ? f2(v, v < 100 ? 2 : 1) : '—');
   const against = (c, md) => md != null && ((c.side === 'BUY' && md <= 40) || (c.side === 'SELL' && md >= 60));
@@ -188,7 +200,7 @@
   }
   function callCard(c) {
     const buy = c.side === 'BUY', why = (c.why || []).slice(0, 2).join(' · ');
-    return `<div class="olCall ${buy ? 'olBuy' : 'olSell'}"><div class="olCh"><b class="olSide">${buy ? '▲ BUY' : '▼ SELL'}</b><b class="olSym">${E(c.sym)}</b>${c.grade ? `<span class="olGr">${E(c.grade)}</span>` : ''}<button class="olX" data-x="${E(c.sym)}">X-ray</button></div>${ladder(c)}
+    return `<div class="olCall ${buy ? 'olBuy' : 'olSell'}"><div class="olCh"><b class="olSide">${buy ? '▲ BUY' : '▼ SELL'}</b><b class="olSym olM" data-m="${E(c.sym)}" title="Open the Master report">${E(c.sym)}</b>${c.grade ? `<span class="olGr">${E(c.grade)}</span>` : ''}<button class="olX" data-x="${E(c.sym)}">X-ray</button></div>${ladder(c)}
       <div class="olLv4"><span>Entry<b>${lvl2(c.entry)}</b></span><span class="dn">Stop<b>${lvl2(c.sl)}</b></span><span class="up">T1<b>${lvl2(c.t1)}</b></span><span class="up">T2<b>${lvl2(c.t2)}</b></span><span>R:R<b>${num(c.rr1) ? '1:' + c.rr1.toFixed(1) : '—'}</b></span></div>${why ? `<div class="olWhy">${E(why)}</div>` : ''}</div>`;
   }
   /* ---------- WAIT-AND-BUY / WAIT-AND-SELL plans for calls held back by the day's mood ----------
@@ -225,9 +237,9 @@
       const w = waitPlan(c, B); if (!w) return; const lp = live(c), buy = c.side === 'BUY', sd = `<small>${buy ? 'BUY' : 'SELL'}</small>`;
       const nowC = (flag) => `<td class="n">${lp != null ? f2(lp) + (flag ? ' <b class="up">' + flag + '</b>' : '') : '—'}</td>`;
       if (w.kind === 'INV') { const inZ = lp != null && lp >= w.z1 && lp <= w.z2;
-        inv.push(`<tr><td><b>${E(c.sym)}</b> ${sd}</td><td class="n">${f2(w.z2)}</td><td class="n">${f2(w.z1)}</td><td class="n dn">${f2(w.sl)}</td><td class="n up">${f2(w.t1)}</td><td class="n up">${f2(w.t2)}</td>${nowC(inZ ? 'IN ZONE' : '')}</tr>`); return; }
+        inv.push(`<tr><td><b class="olM" data-m="${E(c.sym)}" title="Open the Master report">${E(c.sym)}</b> ${sd}</td><td class="n">${f2(w.z2)}</td><td class="n">${f2(w.z1)}</td><td class="n dn">${f2(w.sl)}</td><td class="n up">${f2(w.t1)}</td><td class="n up">${f2(w.t2)}</td>${nowC(inZ ? 'IN ZONE' : '')}</tr>`); return; }
       const A = w.A, inA = A && lp != null && (buy ? lp <= A.e * 1.004 && lp > A.sl : lp >= A.e * 0.996 && lp < A.sl), dash = '<td class="n muted">—</td>';
-      day.push(`<tr><td><b>${E(c.sym)}</b> ${sd}</td>${A ? `<td class="n">${f2(A.e)}</td><td class="n dn">${f2(A.sl)}</td><td class="n up">${f2(A.t1)}</td><td class="n up">${f2(A.t2)}</td><td class="n">${A.rr.toFixed(1)}</td>` : dash.repeat(5)}<td class="n bB">${f2(w.Bk.e)}</td><td class="n dn">${f2(w.Bk.sl)}</td><td class="n up">${f2(w.Bk.t1)}</td><td class="n up">${f2(w.Bk.t2)}</td><td class="n">${num(c.rr1) ? c.rr1.toFixed(1) : '—'}</td>${nowC(inA ? 'AT A' : '')}</tr>`);
+      day.push(`<tr><td><b class="olM" data-m="${E(c.sym)}" title="Open the Master report">${E(c.sym)}</b> ${sd}</td>${A ? `<td class="n">${f2(A.e)}</td><td class="n dn">${f2(A.sl)}</td><td class="n up">${f2(A.t1)}</td><td class="n up">${f2(A.t2)}</td><td class="n">${A.rr.toFixed(1)}</td>` : dash.repeat(5)}<td class="n bB">${f2(w.Bk.e)}</td><td class="n dn">${f2(w.Bk.sl)}</td><td class="n up">${f2(w.Bk.t1)}</td><td class="n up">${f2(w.Bk.t2)}</td><td class="n">${num(c.rr1) ? c.rr1.toFixed(1) : '—'}</td>${nowC(inA ? 'AT A' : '')}</tr>`);
     });
     if (!day.length && !inv.length) return '';
     const bw = buyMood ? 'buy' : 'sell';
@@ -305,14 +317,14 @@
     const tradeTbl = () => `<div class="olScroll"><table class="olTb olCT"><thead><tr><th>Stock</th><th>Call</th><th>CMP</th><th>Entry</th><th>Stop-loss</th><th>Target 1</th><th>Target 2</th><th>R:R</th><th>Status</th><th>Conv.</th><th></th></tr></thead><tbody>${k.map((x) => {
       const r = x.r, px = num(x.lp) ? x.lp : (r ? r.c : null), chg = r && r.pc && px != null ? (px / r.pc - 1) * 100 : null, p = plan(x), buy = kind === 'BUY';
       const rr = p && num(p.e) && num(p.sl) && num(p.t1) && p.e !== p.sl ? Math.abs((p.t1 - p.e) / (p.e - p.sl)) : null;
-      return `<tr><td><b>${E(x.s)}</b></td><td><span class="olSide" style="${buy ? '' : 'background:#c11d3d'}">${buy ? '▲ BUY' : '▼ SELL'}</span><br><small>${E((x.tag || '').replace(/^LIVE · .*/, x.c ? (x.c.type === 'DAY' ? 'Intraday call' : 'Investment call') : 'Signal'))}</small></td>
+      return `<tr><td><b class="olM" data-m="${E(x.s)}" title="Open the Master report">${E(x.s)}</b></td><td><span class="olSide" style="${buy ? '' : 'background:#c11d3d'}">${buy ? '▲ BUY' : '▼ SELL'}</span><br><small>${E((x.tag || '').replace(/^LIVE · .*/, x.c ? (x.c.type === 'DAY' ? 'Intraday call' : 'Investment call') : 'Signal'))}</small></td>
         <td>${px != null ? f2(px) : '—'}${num(x.lp) ? ' <small style="color:#12894b;font-weight:800">●</small>' : ''}${chg != null ? `<br><small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</td>
         <td>${p && num(p.e) ? (p.ind ? (buy ? '&gt; ' : '&lt; ') : '') + f2(p.e) : '—'}</td><td class="dn">${p && num(p.sl) ? f2(p.sl) : '—'}</td><td class="up">${p && num(p.t1) ? f2(p.t1) : '—'}</td><td class="up">${p && num(p.t2) ? f2(p.t2) : '—'}</td><td>${rr != null ? '1:' + rr.toFixed(1) : '—'}</td>
         <td><small>${E(/^LIVE · /.test(x.tag || '') ? x.tag.replace(/^LIVE · /, '') : (p && p.ind ? 'Indicative (pivot levels) — wait for trigger' : 'Waiting for trigger'))}</small></td><td>${num(x.conv) ? Math.round(x.conv) : '—'}</td><td><button class="olX" data-x="${E(x.s)}">X-ray</button></td></tr>`;
     }).join('')}</tbody></table></div><div class="olSrc">Levels: the day's call / board signal; "Indicative" rows use pivot levels for a stock that is only leaning. CMP is live (●) when the page is open in market hours.</div>`;
     const body = !k.length ? `<div class="olN">No stocks in this group for the selected watchlist today.</div>` : kind !== 'AVOID' ? tradeTbl() : `<div class="olScroll"><table class="olTb"><thead><tr><th>Stock</th><th>Price</th><th>Why</th><th>Conv.</th><th></th></tr></thead><tbody>${k.map((x) => {
       const r = x.r, px = num(x.lp) ? x.lp : (r ? r.c : null), chg = r && r.pc && px != null ? (px / r.pc - 1) * 100 : null, why = x.why || ((r && r.why) || []).slice(0, 2).join(' · ');
-      return `<tr><td><b>${E(x.s)}</b></td><td>${px != null ? f2(px) : '—'}${num(x.lp) ? '<br><small style="color:#12894b;font-weight:800">● live</small>' : ''}${chg != null ? `<br><small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</td><td><small>${E(why)}</small></td><td>${num(x.conv) ? Math.round(x.conv) : '—'}</td><td><button class="olX" data-x="${E(x.s)}">X-ray</button></td></tr>`;
+      return `<tr><td><b class="olM" data-m="${E(x.s)}" title="Open the Master report">${E(x.s)}</b></td><td>${px != null ? f2(px) : '—'}${num(x.lp) ? '<br><small style="color:#12894b;font-weight:800">● live</small>' : ''}${chg != null ? `<br><small class="${cls(chg)}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</small>` : ''}</td><td><small>${E(why)}</small></td><td>${num(x.conv) ? Math.round(x.conv) : '—'}</td><td><button class="olX" data-x="${E(x.s)}">X-ray</button></td></tr>`;
     }).join('')}</tbody></table></div>`;
     let m = $('olPop'); if (!m) { m = document.createElement('div'); m.id = 'olPop'; document.body.appendChild(m); }
     m.innerHTML = `<div class="olBox"><div class="olHd"><h3>${T} — ${E(l ? l.name : '')} <small>${k.length} stock${k.length === 1 ? '' : 's'}</small></h3><button class="olClose" data-close="1">✕</button></div>${body}<div class="olSrc">Rule-based, from delayed data. Conv. = signal-agreement score, not a probability. Not investment advice.</div></div>`;
@@ -390,6 +402,7 @@
   .olR{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:3px 0;border-top:1px solid #f3ead0}.olR:first-of-type{border-top:0}.olR i{font-style:normal;font-variant-numeric:tabular-nums}.olR u{text-decoration:none;font-weight:700;min-width:74px;text-align:right}
   .olNews{margin:4px 0 6px;padding-left:18px}.olNews li{margin:5px 0;line-height:1.4}.olNews em{color:#8A6D1F;font-style:normal;font-size:11px;border:1px solid #ecd9a0;border-radius:99px;padding:0 7px;margin-left:4px}
   .olH{margin:10px 0 4px;color:#14306e}.olScroll{overflow-x:auto}.olTb{border-collapse:collapse;width:100%;background:#fff}.olTb th{background:#f6ecc9;color:#6b5314;text-align:left;padding:5px 8px;font-size:11px}.olTb td{padding:5px 8px;border-top:1px solid #f0e6c4;vertical-align:top}
+  .olM{cursor:pointer;color:#14306e;text-decoration:underline dotted #D4AF37;text-underline-offset:3px}.olM:hover{color:#8A6D1F}
   .olRules{background:#fffaf0;border:1px solid #ecd9a0;border-radius:8px;padding:6px 10px;margin:4px 0 6px;font-size:12px;line-height:1.5}.olWt th.gA{background:#1d6b45}.olWt th.gB{background:#8a5a12}.olWt td.bB{border-left:2px solid #8a5a12}.olWt .muted{color:#aab}
   .olWt{width:100%;border-collapse:collapse;font-size:12px;background:#fff}.olWt th{background:#14306e;color:#fff;padding:4px 6px;text-align:left;position:sticky;top:0}.olWt td{border:1px solid #ecd9a0;padding:4px 6px;vertical-align:top}.olWt td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.olWt small{color:#6a7694}
   .olN{padding:8px 10px;background:#fff;border:1px dashed #D4AF37;border-radius:8px;color:#52607f}.olSrc{margin-top:8px;font-size:11px;color:#6a7694}
@@ -426,6 +439,7 @@
     if (c('#olBack')) { if (!popLayer()) showTab(O.home || 'pClient'); return; }
     if (c('[data-close]') || t.id === 'olPop') { closePop(); return; }
     const k = c('#pOutlook [data-k], #pClient [data-k]'); if (k) { popup(k.getAttribute('data-k')); return; }
+    const mm = c('#pOutlook [data-m], #pClient [data-m], #olPop [data-m]'); if (mm) { const vp = popOpen(); openM(mm.getAttribute('data-m'), vp); if (vp) domClosePop(); return; }
     const x = c('#pOutlook [data-x], #pClient [data-x], #olPop [data-x]'); if (x) { const vp = popOpen(); openX(x.getAttribute('data-x'), vp); if (vp) domClosePop(); return; }
     const tb = c('#pOutlook [data-tab], #pClient [data-tab]'); if (tb) { O.fromOutlook = true; pushLayer(() => showTab(O.home || 'pClient')); showTab(tb.getAttribute('data-tab')); return; }
     if (c('#olGo')) { go(); return; }
@@ -452,11 +466,12 @@
   /* embedded terminal opened by the client page with ?sym=: X-ray first, then report buttons */
   function initEmbedSym() {
     const m = /[?&]sym=([^&#]{1,24})/.exec(location.search); if (!m || !EMB) return;
-    const sym = decodeURIComponent(m[1]).toUpperCase(), goX = /[?&]go=xray/.test(location.search), isWin = /[?&]win=1/.test(location.search), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
+    const sym = decodeURIComponent(m[1]).toUpperCase(), goX = /[?&]go=xray/.test(location.search), goM = /[?&]go=master/.test(location.search), isWin = /[?&]win=1/.test(location.search), w = setInterval(() => { if (!window.jcXray || typeof runAnalysis !== 'function' || !$('symbolInput')) return; clearInterval(w);
       $('symbolInput').value = sym.replace(/\.(NS|BO)$/, ''); if (/\.BO$/.test(sym) && $('exchangeInput')) $('exchangeInput').value = 'BO';
       const bar = document.createElement('div'); bar.id = 'olEmb'; bar.innerHTML = '<style>#olEmb{position:sticky;top:0;z-index:30;display:flex;gap:6px;flex-wrap:wrap;padding:8px;background:#fff8e6;border-bottom:2px solid #D4AF37}#olEmb button{cursor:pointer;border:1px solid #D4AF37;background:#fff;border-radius:8px;padding:6px 10px;font-weight:700}#olEmb button[disabled]{opacity:.45}</style><b style="align-self:center;margin-right:6px">' + sym.replace(/\.(NS|BO)$/, '') + '</b><button data-t="pSummary" disabled>① Quick summary</button><button data-xr="' + sym + '" disabled>② X-ray</button><button data-t="pIntraday" disabled>③ Intraday</button><button data-t="pSwing" disabled>④ Short term</button><button data-t="pLong" disabled>⑤ Long term</button>';
       document.body.insertBefore(bar, document.body.firstChild);
       bar.onclick = (e) => { const b = e.target.closest('button'); if (!b || b.disabled) return; if (b.getAttribute('data-xr')) window.jcXray(sym); else showTab(b.getAttribute('data-t')); };
+      if (goM) { const rs = $('rptSel'); if (rs) rs.value = 'master'; Promise.resolve(runAnalysis('master')).catch(() => { }).then(() => bar.querySelectorAll('button').forEach((b) => { b.disabled = false; })); return; }
       const pg = !goX && window.jcProgress ? window.jcProgress(null, 'Preparing the report for ' + sym.replace(/\.(NS|BO)$/, ''), true) : null;
       if (goX) window.jcXray(sym); /* opened from the client page after its instant Quick summary: X-ray first, the other reports build behind it */
       Promise.resolve(runAnalysis()).catch(() => { }).then(() => { if (pg) pg.fail ? (document.getElementById('errArea') && /quota|too many times/i.test(document.getElementById('errArea').innerText) ? pg.fail() : pg.done()) : 0; const ea = document.getElementById('errArea'); if (ea && /quota|too many times/i.test(ea.innerText)) { ea.innerHTML = '<div style="background:#fff4e5;border:2px solid #f2711c;border-radius:12px;padding:12px 14px;font:600 14px system-ui"><b>Live data is paused for today.</b><br>The data service has reached its daily Google limit, so a fresh report for ' + E(sym.replace(/\.(NS|BO)$/, '')) + ' cannot be built right now. It resets around 12:30–13:30 IST tomorrow. Today’s calls, levels and the morning reports are still available on the client page.</div>'; } if (0) pg.done(); bar.querySelectorAll('button').forEach((b) => { b.disabled = false; });
