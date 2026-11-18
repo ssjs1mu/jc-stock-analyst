@@ -57,7 +57,7 @@
   function moodColor(sc) { sc = Math.max(0, Math.min(100, sc)); for (let i = 1; i < MSTOPS.length; i++) { const a = MSTOPS[i - 1], b = MSTOPS[i]; if (sc <= b[0]) { const t = b[0] === a[0] ? 0 : (sc - a[0]) / (b[0] - a[0]), x = hex2(a[1]), y = hex2(b[1]); return '#' + x.map((v, k) => Math.round(v + (y[k] - v) * t).toString(16).padStart(2, '0')).join(''); } } return MSTOPS[MSTOPS.length - 1][1]; }
   const moodLab = (sc) => (sc >= 80 ? 'VERY BULLISH' : sc >= 60 ? 'BULLISH' : sc >= 40 ? 'NEUTRAL' : sc >= 20 ? 'BEARISH' : 'VERY BEARISH');
   function moodOf(k) { /* from the report's own numbers; the call book's pre-open mood wins when it is for the same day */
-    const cx = O.calls && O.calls.ctx; if (k && cx && num(cx.mood) && O.calls.date === (k.R && k.R.date)) return { score: cx.mood, label: cx.moodLabel || moodLab(cx.mood), col: moodColor(cx.mood), parts: [], src: 'call book' };
+    const cx = O.calls && O.calls.ctx; if (k && !num(k.est) && cx && num(cx.mood) && O.calls.date === (k.R && k.R.date)) return { score: cx.mood, label: cx.moodLabel || moodLab(cx.mood), col: moodColor(cx.mood), parts: [], src: 'call book' };
     if (!k) return null; const P = [], cl = (v) => Math.max(-1, Math.min(1, v)), add = (n, v, w, t) => { if (v != null && isFinite(v)) P.push({ n, v: cl(v), w, t }); };
     const nf = pick(k.ind, 'Nifty 50'), vx = pick(k.ind, 'India VIX'), g = [...(k.g || []), ...(k.a || [])].map((r) => pf(r[2])).filter((x) => x != null);
     if (nf) { const np = num(k.est) ? k.est : pf(nf[2]); add(num(k.est) ? 'GIFT Nifty' : 'Nifty 50', np / 1.2, 3, (np >= 0 ? '+' : '') + np.toFixed(2) + '%'); } if (vx) { const vp = pf(vx[2]), lv = pf(vx[1]); add('India VIX', -vp / 8 + (lv < 13 ? 0.3 : lv > 20 ? -0.5 : 0), 1.8, vx[1]); }
