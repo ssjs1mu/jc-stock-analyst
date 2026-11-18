@@ -1087,10 +1087,37 @@ function tgUpdates_() {
   (j.result || []).forEach(function (u) { var m = u.message || (u.my_chat_member && { chat: u.my_chat_member.chat, date: u.my_chat_member.date }); if (!m || !m.chat || m.chat.type !== 'private') return; seen[String(m.chat.id)] = { chat: String(m.chat.id), name: [m.chat.first_name, m.chat.last_name].filter(Boolean).join(' '), username: m.chat.username || '', date: m.date || 0 }; });
   return JSON.stringify({ ok: true, bot: me.result && me.result.username || '', chats: Object.keys(seen).map(function (k) { return seen[k]; }) });
 }
+/* the client's greeting name: first name + "ji" (titles like Mr / Shri / Dr dropped, no double "ji") */
+function cliHello_(name) {
+  var w = String(name || '').trim().split(/\s+/).filter(function (x) { return !/^(mr|mrs|ms|miss|shri|sri|smt|dr|prof|sh)\.?$/i.test(x); });
+  var f = w[0] || 'Investor'; f = f.charAt(0).toUpperCase() + f.slice(1);
+  return /ji$/i.test(f) || (w[1] && /^ji$/i.test(w[1])) ? f + (w[1] && /^ji$/i.test(w[1]) ? ' ji' : '') : f + ' ji';
+}
+/* thumbnail: today's Morning Sunrise cover - used ONLY when the morning report is dated today, else the brand banner (no date on it) */
+function cliThumb_(today) {
+  var base = 'https://ssjs1mu.github.io/jc-stock-analyst/';
+  try { var ix = JSON.parse(UrlFetchApp.fetch(base + 'reports/morning-pulse/index.json?t=' + Date.now(), { muteHttpExceptions: true }).getContentText() || '{}'), r = (ix.runs || [])[0];
+    if (r && r.status === 'ok' && r.date === today) return base + 'updates/sunrise.jpg?d=' + today; } catch (e) { }
+  return base + 'assets/jc-banner.png';
+}
 function tgClientMsg_(s, c) {
-  var url = CL_PAGE + '?k=' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(String(c.name || '').split(' ')[0]) + '</b>\nYour pre-market pulse is ready — world markets, today’s outlook and your stocks with levels.\n<i>Educational information, not investment advice.</i>';
+  var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+  if (!s.__thumb || s.__thumbD !== today) { s.__thumb = cliThumb_(today); s.__thumbD = today; }
+  var url = CL_PAGE + '?k=' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(cliHello_(c.name)) + '</b>\n'
+    + 'Your pre-market report for <b>' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'EEE, d MMM yyyy') + '</b> is ready — today’s outlook, world cues, news, calls and your stocks with levels.\n\n'
+    + '<b>📖 How to read your report</b>\n'
+    + '🟡 <b>Market mood dial</b> (top): below 40 = Bearish, 40-60 = Neutral, above 60 = Bullish. It decides how aggressive to be today.\n'
+    + '🔵 <b>Outlook for the day</b>: expected Nifty opening zone, support and resistance.\n'
+    + '🟢 <b>World · commodities · currency · bonds</b>: overnight cues. A rise in crude, the US dollar or US bond yields is negative for India.\n'
+    + '🟣 <b>Important news</b>: headlines that can move the opening.\n'
+    + '🟠 <b>Calls</b>: Entry is a trigger — act only after a 5-minute candle closes beyond it. Exit at Stop, book profit at T1 / T2. Intraday trades close by 3:15 PM.\n'
+    + '🟤 <b>Wait-and-buy plans</b> (weak days): Plan A = buy the dip at support, Plan B = breakout only after Nifty recovers. Rules are written above the table.\n'
+    + '⚪ <b>Your stocks</b>: Buy / Sell / Avoid with levels. Tap any stock name for its full Master report — a tree grows while it is built.\n'
+    + '🔴 <b>Every trade needs a stop-loss.</b> No trigger, no trade.\n\n'
+    + '<i>Educational information, not investment advice.</i>';
+  var lp = JSON.stringify({ url: s.__thumb, prefer_large_media: true, show_above_text: true });
   var kb = { inline_keyboard: [[{ text: '📱 Open my dashboard', web_app: { url: url } }], [{ text: '🌐 Open in browser', url: url }]] };
-  var send = function (markup) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', reply_markup: JSON.stringify(markup) }, muteHttpExceptions: true }); var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (j.description || 'failed') }; };
+  var send = function (markup) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', link_preview_options: lp, reply_markup: JSON.stringify(markup) }, muteHttpExceptions: true }); var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (j.description || 'failed') }; };
   var o = send(kb);
   if (!o.ok && /button|web_app|url/i.test(o.msg)) { o = send({ inline_keyboard: [[{ text: '\uD83D\uDCF1 Open my dashboard', url: url }]] }); if (o.ok) o.msg = 'sent (link button)'; }
   if (!o.ok && /chat not found|bot was blocked|user is deactivated|Forbidden/i.test(o.msg)) o.msg += ' \u2014 the client must open the bot and press Start first, and the chat id must be theirs';
