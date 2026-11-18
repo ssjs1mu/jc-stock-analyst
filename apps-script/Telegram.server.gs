@@ -110,6 +110,7 @@ function tgLive_(s) {
   }
   if (wk) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
   if (wk && m >= 495 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
+  if (wk && m >= 990 && m <= 1110) { try { tgClientsEve_(s, today); } catch (e) { Logger.log('clients eve ' + e); } } // 16:30-18:30 IST Closing Bell
 }
 /* ---------- pre-market accumulation list (08:45-09:30) and 10 AM live confirmation (10:00-11:00) from data/accum.json ---------- */
 function tgAccum_(s, m, today) {

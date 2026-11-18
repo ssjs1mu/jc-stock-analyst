@@ -893,6 +893,7 @@ function tgLive_(s) {
   }
   if (wk) { try { tgAccum_(s, m, today); } catch (e) { Logger.log('accum ' + e); } }
   if (wk && m >= 495 && m <= 600) { try { tgClients_(s, today); } catch (e) { Logger.log('clients ' + e); } }
+  if (wk && m >= 990 && m <= 1110) { try { tgClientsEve_(s, today); } catch (e) { Logger.log('clients eve ' + e); } } // 16:30-18:30 IST Closing Bell
 }
 /* ---------- pre-market accumulation list (08:45-09:30) and 10 AM live confirmation (10:00-11:00) from data/accum.json ---------- */
 function tgAccum_(s, m, today) {
@@ -1045,7 +1046,7 @@ function cliRoute_(a, b) {
     var bot = tgBotName_(); if (!bot) throw new Error('Telegram bot not reachable - check TG_TOKEN');
     return JSON.stringify({ ok: true, bot: bot, code: c.inv, link: 'https://t.me/' + bot + '?start=' + c.inv, linked: !!c.chat, name: c.name });
   });
-  if (a === 'cl_send') { var d2 = cliRead_(), c2 = d2.clients[String(b.id)]; if (!c2) throw new Error('client not found'); if (!c2.chat) throw new Error('no Telegram chat id for this client'); var s = tgProps_(); var r = tgClientMsg_(s, c2); return JSON.stringify(r); }
+  if (a === 'cl_send') { var d2 = cliRead_(), c2 = d2.clients[String(b.id)]; if (!c2) throw new Error('client not found'); if (!c2.chat) throw new Error('no Telegram chat id for this client'); var s = tgProps_(); var r = tgClientMsg_(s, c2, b.mode === 'closing'); return JSON.stringify(r); }
   return cliTx_(function () {
     var d = cliRead_(), now = Date.now(), c;
     if (a === 'cl_link') {
@@ -1124,7 +1125,8 @@ function tgAutoLink_(s) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_CL') || '{}'); } catch (e) { }
   linked.forEach(function (c) {
     UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, parse_mode: 'HTML', text: '\u2705 <b>Namaste ' + tgEsc_(cliHello_(c.name)) + ', you are connected to Joshi\u2019s Corner.</b>\nYour personal pre-market report will now arrive here automatically every trading morning (from 8:15 AM IST). Today\u2019s report follows below.' }, muteHttpExceptions: true });
-    var o = tgClientMsg_(s, c); if (o.ok) sent[c.id] = today;
+    var ist = new Date(Date.now() + 19800000), mi = ist.getUTCHours() * 60 + ist.getUTCMinutes(), eve = mi >= 990 && cliEveReady_(today);
+    var o = tgClientMsg_(s, c, eve); if (o.ok && !eve) sent[c.id] = today;
   });
   s.p.setProperty('TG_CL', JSON.stringify(sent));
 }
@@ -1141,8 +1143,9 @@ function cliThumb_(today) {
     if (r && r.status === 'ok' && r.date === today) return base + 'updates/sunrise.jpg?d=' + today; } catch (e) { }
   return base + 'assets/jc-banner.png';
 }
-function tgClientMsg_(s, c) {
+function tgClientMsg_(s, c, eve) {
   var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+  if (eve) return tgClientEveMsg_(s, c, today);
   if (!s.__thumb || s.__thumbD !== today) { s.__thumb = cliThumb_(today); s.__thumbD = today; }
   var url = CL_PAGE + '?k=' + c.token, txt = '🙏 <b>Namaste ' + tgEsc_(cliHello_(c.name)) + '</b>\n'
     + 'Your pre-market report for <b>' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'EEE, d MMM yyyy') + '</b> is ready — today’s outlook, world cues, news, calls and your stocks with levels.\n\n'
@@ -1156,13 +1159,44 @@ function tgClientMsg_(s, c) {
     + '⚪ <b>Your stocks</b>: Buy / Sell / Avoid with levels. Tap any stock name for its full Master report — a tree grows while it is built.\n'
     + '🔴 <b>Every trade needs a stop-loss.</b> No trigger, no trade.\n\n'
     + '<i>Educational information, not investment advice.</i>';
-  var lp = JSON.stringify({ url: s.__thumb, prefer_large_media: true, show_above_text: true });
+  return tgClientSend_(s, c, txt, s.__thumb, url);
+}
+function tgClientSend_(s, c, txt, thumb, url) {
+  var lp = JSON.stringify({ url: thumb, prefer_large_media: true, show_above_text: true });
   var kb = { inline_keyboard: [[{ text: '📱 Open my dashboard', web_app: { url: url } }], [{ text: '🌐 Open in browser', url: url }]] };
   var send = function (markup) { var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, text: txt, parse_mode: 'HTML', link_preview_options: lp, reply_markup: JSON.stringify(markup) }, muteHttpExceptions: true }); var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } return { ok: r.getResponseCode() === 200, code: r.getResponseCode(), msg: r.getResponseCode() === 200 ? 'sent' : (j.description || 'failed') }; };
   var o = send(kb);
   if (!o.ok && /button|web_app|url/i.test(o.msg)) { o = send({ inline_keyboard: [[{ text: '\uD83D\uDCF1 Open my dashboard', url: url }]] }); if (o.ok) o.msg = 'sent (link button)'; }
   if (!o.ok && /chat not found|bot was blocked|user is deactivated|Forbidden/i.test(o.msg)) o.msg += ' \u2014 the client must open the bot and press Start first, and the chat id must be theirs';
   return o;
+}
+/* EVENING: Closing Bell - sent once per trading day 16:30-18:30 IST, only after today's Evening Breeze is published (its cover = thumbnail).
+   The dashboard link opens in closing mode: how the client's stocks did against this morning's plan, and today's call results (settled by the server at ~16:10). */
+function cliEveReady_(today) {
+  try { var ix = JSON.parse(UrlFetchApp.fetch(TG_SITE + 'reports/evening-breeze/index.json?t=' + Date.now(), { muteHttpExceptions: true }).getContentText() || '{}'), r = (ix.runs || [])[0];
+    return !!(r && r.status === 'ok' && r.date === today); } catch (e) { return false; }
+}
+function tgClientEveMsg_(s, c, today) {
+  var url = CL_PAGE + '?k=' + c.token + '&m=closing', thumb = cliEveReady_(today) ? TG_SITE + 'evening/' + today + '/og.jpg?d=' + today : TG_SITE + 'assets/jc-banner.png';
+  var txt = '🌇 <b>Namaste ' + tgEsc_(cliHello_(c.name)) + '</b>\n'
+    + 'Your Closing Bell for <b>' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'EEE, d MMM yyyy') + '</b> is ready — how your stocks did against this morning’s plan, and how today’s calls performed.\n\n'
+    + '<b>📖 How to read your Closing Bell</b>\n'
+    + '🟡 <b>Mood at the close</b> (top dial): how the market finished the day.\n'
+    + '🔵 <b>Closing outlook</b>: where Nifty closed, support and resistance for tomorrow.\n'
+    + '🟢 <b>World · commodities · currency · bonds</b>: how global cues closed.\n'
+    + '🟠 <b>Your stocks today</b>: this morning’s view for each stock and what happened — trigger hit or not, Target 1 / Target 2 reached, or stop-loss hit, with the day’s move.\n'
+    + '🟣 <b>Today’s calls — results</b>: every call with its outcome. Not triggered = no trade, no loss.\n'
+    + '⚪ <b>Tap any stock name</b> for its full Master report.\n'
+    + '🔴 <b>Results are checked against the day’s actual high / low</b> — the same rules as the morning plan.\n\n'
+    + '<i>Educational information, not investment advice.</i>';
+  return tgClientSend_(s, c, txt, thumb, url);
+}
+function tgClientsEve_(s, today) {
+  var sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_CLE') || '{}'); } catch (e) { }
+  var d = cliRead_(), due = Object.keys(d.clients).filter(function (id) { return d.clients[id].chat && sent[id] !== today; }); if (!due.length) return;
+  if (!cliEveReady_(today)) return; // wait for today's Evening Breeze - never post a stale evening report
+  due.forEach(function (id) { var c = d.clients[id], r = tgClientMsg_(s, c, true); if (r.ok || r.code === 403 || r.code === 400) sent[id] = today; if (!r.ok) Logger.log('client eve ' + c.name + ' ' + r.msg); });
+  s.p.setProperty('TG_CLE', JSON.stringify(sent));
 }
 function tgClients_(s, today) { // once per day per client, weekdays 08:20-10:00 IST (called from the 5-minute trigger)
   var d = cliRead_(), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_CL') || '{}'); } catch (e) { }

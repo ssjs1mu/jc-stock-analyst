@@ -147,6 +147,9 @@
     cl.forEach((x) => { const id = x.listId || x.id; if (!seen.has(id)) out.push({ id, cid: x.id, name: x.name || x.listName, syms: (x.syms || []).slice(), chat: x.chat || '', linked: true }); });
     return out;
   };
+  /* which watchlists the bulk / automatic builds cover (ticked in the table); a list never ticked or unticked counts as ticked */
+  const isSel = (id) => !P.sel || P.sel[id] !== false;
+  const selIds = () => listsAll().filter((l) => isSel(l.id) && l.syms.length).map((l) => l.id);
   const setP = (v) => { R.pct = Math.min(100, (R.base || 0) + (R.span == null ? 100 : R.span) * v / 100); };
   async function build(list, mode, quiet) {
     const syms = (list.syms || []).slice(); if (!syms.length) return null;
@@ -188,12 +191,12 @@
     const key = (m, id) => CACHE[td + '|' + m + '|' + id], cur = L.find((l) => l.id === R.listId), kc = cur ? key(R.mode, cur.id) : null;
     if (cur && window.jcOutlook) window.jcOutlook.setList({ id: cur.id, name: cur.name, syms: cur.syms }); else if (window.jcOutlook) window.jcOutlook.setList(null);
     const tm = (c) => new Date(c.t + 19800000).toISOString().slice(11, 16);
-    const rows = L.map((l) => { const a = key('morning', l.id), b = key('closing', l.id); return `<tr><td><button class="crName" data-crpop="${E(l.id)}" title="Stocks, rename, Telegram invite">${E(l.name)} <span>${l.syms.length}</span></button></td><td>${l.syms.length}</td><td>${l.linked ? (l.chat ? '✓ linked' : '<small style="color:#b3261e">no chat id</small>') : '<small style="color:#8a94ad">not linked</small>'}</td><td>${a ? `<button class="ghostBtn" data-cropen="morning|${E(l.id)}">Open ${tm(a)}</button>` : '<small>—</small>'}</td><td>${b ? `<button class="ghostBtn" data-cropen="closing|${E(l.id)}">Open ${tm(b)}</button>` : '<small>—</small>'}</td></tr>`; }).join('');
+    const rows = L.map((l) => { const a = key('morning', l.id), b = key('closing', l.id); return `<tr><td><input type="checkbox" data-crsel="${E(l.id)}" ${isSel(l.id) ? 'checked' : ''} title="Include in bulk / automatic builds"></td><td><button class="crName" data-crpop="${E(l.id)}" title="Stocks, rename, Telegram invite">${E(l.name)} <span>${l.syms.length}</span></button></td><td>${l.syms.length}</td><td>${l.linked ? (l.chat ? '✓ linked' : '<small style="color:#b3261e">no chat id</small>') : '<small style="color:#8a94ad">not linked</small>'}</td><td>${a ? `<button class="ghostBtn" data-cropen="morning|${E(l.id)}">Open ${tm(a)}</button>` : '<small>—</small>'}</td><td>${b ? `<button class="ghostBtn" data-cropen="closing|${E(l.id)}">Open ${tm(b)}</button>` : '<small>—</small>'}</td></tr>`; }).join('');
     const body = !L.length ? `<div class="note">No watchlist yet — add one below.</div>${addBox()}`
       : `${addBox()}${editBox(cur)}<div class="bar2"><label>Watchlist <select class="sel" id="crList">${L.map((l) => `<option value="${E(l.id)}" ${l.id === R.listId ? 'selected' : ''}>${E(l.name)} (${l.syms.length})</option>`).join('')}</select></label>
-        <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ALL clients</button>
-        <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div><div id="crPg"></div>
-        <table class="cl"><thead><tr><th>Watchlist / client <small style="font-weight:500">(click to manage)</small></th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
+        <button class="goBtn ${R.mode === 'morning' ? 'on' : ''}" data-crrun="morning" ${R.busy ? 'disabled' : ''}>☀ Morning Update</button><button class="goBtn ${R.mode === 'closing' ? 'on' : ''}" data-crrun="closing" ${R.busy ? 'disabled' : ''}>🔔 Closing Bell</button><button class="ghostBtn" data-crrun="all" ${R.busy || !selIds().length ? 'disabled' : ''}>Build ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'} for ticked (${selIds().length} of ${L.length})</button>
+        <label style="font-size:12px"><input type="checkbox" id="crAuto" ${P.auto ? 'checked' : ''}> auto-build 08:45 &amp; 16:00 IST for ticked lists (page must be open)</label><span id="crSt" style="font-size:12px;color:#34456a"></span></div><div id="crPg"></div>
+        <table class="cl"><thead><tr><th><input type="checkbox" id="crSelAll" ${L.every((l) => isSel(l.id)) ? 'checked' : ''} title="Tick / untick all"></th><th>Watchlist / client <small style="font-weight:500">(click to manage)</small></th><th>Stocks</th><th>Telegram</th><th>Morning (today)</th><th>Closing (today)</th></tr></thead><tbody>${rows}</tbody></table>
         ${kc ? `<div class="bar2"><b>${E(cur.name)} · ${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b><span style="font-size:12px;color:#5a6a8e">built ${tm(kc)} IST${kc.bad ? ' · ' + kc.bad + ' stock(s) failed' : ''}</span>${cur.cid ? `<button class="goBtn" data-crtg="${E(cur.cid)}">📨 Send dashboard to ${E(cur.name)} on Telegram</button>` : '<small style="color:#8a94ad">Telegram sending needs a client link (Client dashboards below)</small>'}<button class="goBtn" data-crprint="1">🖨 Print / Save as PDF</button> <button class="goBtn" data-crxl="1">📊 Excel (CMP + levels)</button></div><div class="pre">${kc.html.replace('<!--BSA-->', window.jcOutlook ? window.jcOutlook.buttons() : '').replace('<!--SRCH-->', window.jcOutlook ? window.jcOutlook.search() : '')}</div>` : `<div class="note">Press <b>${R.mode === 'closing' ? 'Closing Bell' : 'Morning Update'}</b> to build ${E(cur.name)}’s report for today (about a minute for 15 stocks).</div>`}`;
     el.innerHTML = `<style>${CSS}.crb .crName{border:1px solid #D4AF37;background:#fffaf0;border-radius:8px;padding:3px 8px;font-weight:800;color:#14306e;cursor:pointer}.crb .crName span{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:99px;background:#14306e;color:#fff;font-size:11px}.crb .crName:hover{background:#fff1c9}.crb{padding:10px 14px}.crb .bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.crb table.cl{width:100%;border-collapse:collapse;font-size:12.5px}.crb table.cl td,.crb table.cl th{border-bottom:1px solid #dfe5f2;padding:5px 6px;text-align:left}.crb .sel{padding:5px 8px;border:1px solid #b8c6e6;border-radius:8px}.crb .goBtn.on{box-shadow:0 0 0 2px #D4AF37}
       .crb .pre{border:2px solid #D4AF37;border-radius:14px;margin-top:10px;overflow:hidden;background:#fffdf6}</style>
@@ -300,7 +303,7 @@
   window.addEventListener('jc-clients', () => paint());
   document.addEventListener('click', (e) => {
     const c = (q) => e.target.closest && e.target.closest(q); if (!c('#pClient')) return;
-    const r = c('[data-crrun]'); if (r) { const m = r.getAttribute('data-crrun'), ids = m === 'all' ? listsAll().map((l) => l.id) : [R.listId]; run(ids, m === 'all' ? R.mode : m); if (m !== 'all') R.mode = m; return; }
+    const r = c('[data-crrun]'); if (r) { const m = r.getAttribute('data-crrun'), ids = m === 'all' ? selIds() : [R.listId]; run(ids, m === 'all' ? R.mode : m); if (m !== 'all') R.mode = m; return; }
     if (c('[data-crren]')) { renameList(R.listId).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     if (c('[data-crdel]')) { deleteList(R.listId).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
     const rm = c('[data-crrm]'); if (rm) { editSyms(R.listId, [], [rm.getAttribute('data-crrm')]).then((m) => { paint(); if (m) { const e = $('crEditMsg'); if (e) e.textContent = m; } }); return; }
@@ -309,20 +312,22 @@
       try { wlEnsure(); const l = { id: 'l' + Date.now().toString(36), name: n, syms: [...new Set(raw.map((x) => cleanSym(x, 'NS')).filter(Boolean))] }; WL.store.lists.push(l); wlSave(); R.listId = l.id; R.msg = 'Added ' + n; try { if (typeof wlRenderBar === 'function' && $('wlBar')) wlRenderBar(); } catch (e2) { } paint(); } catch (e3) { $('crAddMsg').textContent = 'Could not add: ' + ((e3 && e3.message) || e3); }
       return; }
     const o = c('[data-cropen]'); if (o) { const [m, id] = o.getAttribute('data-cropen').split('|'); R.mode = m; R.listId = id; paint(); return; }
-    const tg = c('[data-crtg]'); if (tg) { (async () => { R.msg = 'Sending…'; paintStatus(); try { const j = await window.jcClients.send(tg.getAttribute('data-crtg')); R.msg = j && j.ok ? 'Dashboard sent on Telegram ✓' : 'Telegram said: ' + ((j && j.msg) || 'failed') + ' — the client must open the bot and press Start first'; } catch (e) { R.msg = 'Not sent: ' + ((e && e.message) || e); } paintStatus(); })(); return; }
+    const tg = c('[data-crtg]'); if (tg) { (async () => { R.msg = 'Sending…'; paintStatus(); try { const j = await window.jcClients.send(tg.getAttribute('data-crtg'), R.mode); R.msg = j && j.ok ? 'Dashboard sent on Telegram ✓' : 'Telegram said: ' + ((j && j.msg) || 'failed') + ' — the client must open the bot and press Start first'; } catch (e) { R.msg = 'Not sent: ' + ((e && e.message) || e); } paintStatus(); })(); return; }
     if (c('[data-crxl]')) { const kc = CACHE[istDay() + '|' + R.mode + '|' + R.listId], cu = listsAll().find((l) => l.id === R.listId); if (kc && kc.xl && window.JCXL) { R.msg = 'Excel saved: ' + window.JCXL.download(kc.xl, R.mode, (cu && cu.name) || 'Watchlist'); paintStatus(); } else alert('Rebuild this report once (press ' + (R.mode === 'closing' ? 'Closing Bell' : 'Morning Update') + ') to enable Excel.'); return; }
     if (c('[data-crprint]')) { const kc = CACHE[istDay() + '|' + R.mode + '|' + R.listId]; if (kc) openPrint(kc.html); }
   });
   document.addEventListener('change', (e) => {
     if (!e.target.closest || !e.target.closest('#pClient')) return;
-    if (e.target.id === 'crList') { R.listId = e.target.value; paint(); } else if (e.target.id === 'crAuto') { P.auto = e.target.checked; saveP(); } else if (e.target.dataset && e.target.dataset.crn) { P.names[e.target.dataset.crn] = e.target.value.trim(); saveP(); }
+    if (e.target.dataset && e.target.dataset.crsel) { P.sel = P.sel || {}; P.sel[e.target.dataset.crsel] = e.target.checked; saveP(); paint(); }
+    else if (e.target.id === 'crSelAll') { P.sel = P.sel || {}; listsAll().forEach((l) => { P.sel[l.id] = e.target.checked; }); saveP(); paint(); }
+    else if (e.target.id === 'crList') { R.listId = e.target.value; paint(); } else if (e.target.id === 'crAuto') { P.auto = e.target.checked; saveP(); } else if (e.target.dataset && e.target.dataset.crn) { P.names[e.target.dataset.crn] = e.target.value.trim(); saveP(); }
   });
 
   /* ---------- automatic build: 08:45 and 16:00 IST on weekdays while the page is open ---------- */
   async function autoTick() {
     if (!P.auto || R.busy || document.hidden === undefined) return; const d = ist(), dow = d.getUTCDay(), m = istMinNow(); if (dow < 1 || dow > 5 || typeof WL === 'undefined') return;
     const td = istDay(); let mode = null; if (m >= 525 && m < 560) mode = 'morning'; else if (m >= 935 && m < 1080) mode = 'closing'; if (!mode) return; /* only just before the open / after the close — never while the market is live and the dashboard needs every request */
-    const ids = listsAll().filter((l) => l.syms.length && !CACHE[td + '|' + mode + '|' + l.id]).map((l) => l.id); if (!ids.length) return;
+    const ids = listsAll().filter((l) => l.syms.length && isSel(l.id) && !CACHE[td + '|' + mode + '|' + l.id]).map((l) => l.id); if (!ids.length) return;
     if (R.autoTried && R.autoTried[td + mode] && Date.now() - R.autoTried[td + mode] < 600000) return; (R.autoTried = R.autoTried || {})[td + mode] = Date.now();
     await run(ids, mode, true); R.mode = mode;
   }

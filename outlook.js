@@ -301,6 +301,71 @@
     Object.values(out).forEach((a) => a.sort((x, y) => (y.conv || 0) - (x.conv || 0)));
     return out;
   }
+  /* ---------- CLOSING: the day's scorecard ----------
+     (A) the watchlist against THIS MORNING's board (board.json dated today): each plan replayed on today's 5-minute bars -
+         entry = first bar crossing the trigger (09:15-15:00), then the first of stop-loss / Target 1 decides; T2 checked after T1; a bar touching both entry/T1 and the stop
+         counts as the STOP (conservative); still open at the close = valued at the close. No plan = day move only.
+     (B) today's calls with the result settled by the server (~16:10 IST): T1 / T2 / SL / closed in profit or loss / not triggered. */
+  const BEU = () => { try { if (typeof getBackend === 'function' && getBackend()) return getBackend(); } catch (e) { } return 'https://script.google.com/macros/s/AKfycbzMp82oHzLzKpaE0LrnUqEGGot7jqSw9e9VA1QhJNOPV35vOIYcfIChFL5PCDuD2Ahi5Q/exec'; };
+  const beq = (q) => { const b = BEU(); return fetch(b + (b.indexOf('?') < 0 ? '?' : '&') + q).then((r) => r.json()); };
+  async function bars5(sym) {
+    const u = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym + '.NS') + '?range=1d&interval=5m&includePrePost=false';
+    const j = await beq('action=fetch&url=' + encodeURIComponent(u)); const x = j && j.chart && j.chart.result && j.chart.result[0]; if (!x) return null;
+    const q = x.indicators.quote[0], out = []; (x.timestamp || []).forEach((t, i) => { if (q.high[i] == null || q.low[i] == null) return; const m = (new Date((t + 19800) * 1000)).getUTCHours() * 60 + (new Date((t + 19800) * 1000)).getUTCMinutes(); out.push({ m, h: q.high[i], l: q.low[i], c: q.close[i] }); });
+    const d0 = x.timestamp && x.timestamp[0] ? new Date((x.timestamp[0] + 19800) * 1000).toISOString().slice(0, 10) : ''; return d0 === todayIST() ? out : null;
+  }
+  function replay(B, side, e, sl, t1, t2, close) {
+    const d = side === 'BUY' ? 1 : -1; let inAt = null, t1At = null, res = null;
+    for (const b of B) {
+      if (inAt == null) { if (b.m > 900) break; if (d > 0 ? b.h >= e : b.l <= e) { inAt = b.m; if (d > 0 ? b.l <= sl : b.h >= sl) { res = 'SL'; break; } if (d > 0 ? b.h >= t1 : b.l <= t1) t1At = b.m; if (t1At != null && (d > 0 ? b.h >= t2 : b.l <= t2)) { res = 'T2'; break; } } continue; }
+      if (t1At == null) { if (d > 0 ? b.l <= sl : b.h >= sl) { res = 'SL'; break; } if (d > 0 ? b.h >= t1 : b.l <= t1) t1At = b.m; }
+      if (t1At != null && (d > 0 ? b.h >= t2 : b.l <= t2)) { res = 'T2'; break; }
+    }
+    if (inAt == null) return { k: 'NT' };
+    const hm = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    if (res === 'SL') return { k: 'SL', pct: d * (sl / e - 1) * 100, at: hm(inAt) };
+    if (res === 'T2') return { k: 'T2', pct: d * (t2 / e - 1) * 100, at: hm(inAt) };
+    if (t1At != null) return { k: 'T1', pct: d * (t1 / e - 1) * 100, at: hm(inAt) };
+    return { k: 'EOD', pct: d * (close / e - 1) * 100, at: hm(inAt) };
+  }
+  const RES = { NT: ['⏸ Not triggered', 'mu'], SL: ['🛑 Stop-loss hit', 'dn'], T1: ['🎯 Target 1 hit', 'up'], T2: ['🎯🎯 Target 2 hit', 'up'], EOD: ['⏹ Closed at day end', ''], NOP: ['— No trade planned', 'mu'], NA: ['data not available', 'mu'] };
+  const CRES = { T1: ['🎯 Target 1', 'up'], T2: ['🎯🎯 Target 2', 'up'], 'T1·OPEN': ['🎯 T1 · rest open', 'up'], SL: ['🛑 Stop-loss', 'dn'], 'EOD+': ['⏹ Closed in profit', 'up'], 'EOD−': ['⏹ Closed in loss', 'dn'], NT: ['⏸ Not triggered', 'mu'], SKIP: ['⏭ Skipped (gap)', 'mu'], OPEN: ['📂 Open (positional)', ''], WAIT: ['⏳ Settling after 16:10', 'mu'] };
+  async function scoreBuild() {
+    const today = todayIST(), L = lists(), l = L.find((x) => x.id === O.listId) || L[0], syms = ((l && l.syms) || []).map(clean).filter(Boolean);
+    const out = { at: Date.now(), list: l ? l.name : '', wl: [], calls: [], boardOk: !!(O.board && O.board.date === today) };
+    /* (A) watchlist */
+    const q = {}; for (let i = 0; i < syms.length; i += 40) { try { const j = await beq('action=liveq&symbols=' + encodeURIComponent(syms.slice(i, i + 40).map((x) => x + '.NS').join(','))); Object.keys(j.q || {}).forEach((k) => { q[clean(k)] = j.q[k]; }); } catch (e) { } }
+    const rows = syms.map((sy) => { const r = out.boardOk ? O.board.rows[sy] : null, x = q[sy]; return { sy, r, x }; });
+    const need = rows.filter((o) => o.r && o.r.p && (o.r.b === 'BUY' || o.r.b === 'SELL') && o.x && (o.r.b === 'BUY' ? o.x[3] >= o.r.p.e : o.x[4] <= o.r.p.e));
+    const BR = {}; let i = 0; await Promise.all([0, 1, 2, 3].map(async () => { while (i < need.length) { const o = need[i++]; try { BR[o.sy] = await bars5(o.sy); } catch (e) { BR[o.sy] = null; } } }));
+    rows.forEach((o) => {
+      const x = o.x, dp = x && x[1] ? (x[0] / x[1] - 1) * 100 : null; let v = { k: 'NOP' };
+      if (o.r && o.r.p && (o.r.b === 'BUY' || o.r.b === 'SELL') && x) { const P = o.r.p; if (!(o.r.b === 'BUY' ? x[3] >= P.e : x[4] <= P.e)) v = { k: 'NT' }; else v = BR[o.sy] && BR[o.sy].length ? replay(BR[o.sy], o.r.b, P.e, P.sl, P.t1, P.t2, x[0]) : { k: 'NA' }; }
+      out.wl.push({ sy: o.sy, view: o.r ? (o.r.b === 'WAIT' ? 'AVOID' : o.r.b) : '—', p: o.r && o.r.p, close: x ? x[0] : null, dp, v });
+    });
+    /* (B) today's calls, settled by the server */
+    try { const j = await beq('action=calls_load'); out.calls = Object.values(j.calls || {}).filter((c) => c.date === today && (c.type === 'DAY' || c.type === 'INV')); } catch (e) { out.calls = null; }
+    return out;
+  }
+  function frameScore() {
+    const S = O.sc, today = todayIST();
+    if (!S || S.day !== today) { if (!O.scBusy) { O.scBusy = true; scoreBuild().then((r) => { r.day = today; O.sc = r; }).catch(() => { O.sc = { day: today, err: 1 }; }).then(() => { O.scBusy = false; draw(); }); } return `<section class="olF"><h3>YOUR STOCKS TODAY &amp; CALL RESULTS</h3><div class="olN">Checking today’s results against this morning’s plan…</div></section>`; }
+    if (S.err) return `<section class="olF"><h3>YOUR STOCKS TODAY &amp; CALL RESULTS</h3><div class="olN">Today’s results could not be fetched right now — tap ↻ Refresh in a minute.</div></section>`;
+    const pc = (v) => (num(v) ? `<b class="${cls(v)}">${v >= 0 ? '+' : ''}${v.toFixed(2)}%</b>` : '—');
+    const W = S.wl, trig = W.filter((w) => ['SL', 'T1', 'T2', 'EOD'].includes(w.v.k)), win = trig.filter((w) => ['T1', 'T2'].includes(w.v.k) || (w.v.k === 'EOD' && w.v.pct > 0)), los = trig.filter((w) => w.v.k === 'SL' || (w.v.k === 'EOD' && w.v.pct <= 0)), up = W.filter((w) => num(w.dp) && w.dp > 0).length;
+    const wl = !S.boardOk ? `<div class="olN">This morning’s stock board was not dated today, so plans cannot be checked — day moves only.</div>` : '';
+    const wrows = W.map((w) => { const r = RES[w.v.k] || RES.NA; return `<tr><td><b class="olM" data-m="${E(w.sy)}" title="Open the Master report">${E(w.sy)}</b></td><td><span class="olTag ${E(w.view)}">${E(w.view)}</span></td><td class="n">${w.p ? f2(w.p.e) : '—'}</td><td class="n">${w.p ? f2(w.p.sl) + ' / ' + f2(w.p.t1) : '—'}</td><td class="${r[1]}">${r[0]}${w.v.at ? ` <small>in ${w.v.at}</small>` : ''}</td><td class="n">${w.v.pct != null ? pc(w.v.pct) : '—'}</td><td class="n">${f2(w.close)}</td><td class="n">${pc(w.dp)}</td></tr>`; }).join('');
+    const C = S.calls || [], cd = C.filter((c) => c.type === 'DAY'), settled = cd.filter((c) => c.status && c.status !== 'WAIT'), cw = settled.filter((c) => /^(T1|T2|EOD\+|T1·OPEN)$/.test(c.status)), cl = settled.filter((c) => /^(SL|EOD−)$/.test(c.status)), netR = settled.reduce((a, c) => a + (num(c.R) ? c.R : 0), 0);
+    const crows = C.map((c) => { const r = CRES[c.status] || [E(c.status || '—'), '']; const rp = num(c.R) && num(c.risk) && num(c.entry) ? c.R * c.risk / c.entry * 100 : null; return `<tr><td><b class="olM" data-m="${E(clean(c.sym))}" title="Open the Master report">${E(clean(c.sym))}</b></td><td>${c.type === 'DAY' ? 'Intraday' : 'Investment'}</td><td><b class="${c.side === 'BUY' ? 'up' : 'dn'}">${E(c.side)}</b></td><td class="n">${f2(c.entry)}</td><td class="n">${f2(c.sl)} / ${f2(c.t1)}</td><td class="${r[1]}">${r[0]}</td><td class="n">${num(c.R) && c.status !== 'NT' && c.status !== 'SKIP' && c.status !== 'WAIT' ? `<b class="${cls(c.R)}">${c.R >= 0 ? '+' : ''}${c.R.toFixed(2)}R</b>` : '—'}</td><td class="n">${rp != null && c.status !== 'NT' && c.status !== 'SKIP' ? pc(rp) : '—'}</td></tr>`; }).join('');
+    return `<section class="olF dbl"><h3>YOUR STOCKS TODAY <small>${E(S.list)} · this morning’s plan vs what happened</small></h3>${wl}
+      <div class="olSum"><span>${W.length} stocks · <b class="up">${up} up</b> · <b class="dn">${W.length - up} down / flat</b></span><span>Plans triggered <b>${trig.length}</b></span><span>Target hit / profit <b class="up">${win.length}</b></span><span>Stop / loss <b class="dn">${los.length}</b></span></div>
+      ${W.length ? `<div class="olScroll"><table class="olWt"><thead><tr><th>Stock</th><th>Morning view</th><th>Entry</th><th>Stop / T1</th><th>What happened</th><th>Trade %</th><th>Close</th><th>Day %</th></tr></thead><tbody>${wrows}</tbody></table></div>` : '<div class="olN">Your watchlist is empty.</div>'}
+      <div class="olSrc">Each plan is replayed on today’s 5-minute bars: entry when price first crosses the trigger (until 15:00), then whichever of stop-loss or Target 1 comes first; Target 2 after Target 1; a bar touching both counts as the stop. Not triggered = no trade, no loss. Open trades valued at the close.</div></section>
+      <section class="olF"><h3>TODAY’S CALLS — RESULTS <small>${settled.length}/${cd.length} intraday settled</small></h3>
+      ${C.length ? `<div class="olSum"><span>Wins <b class="up">${cw.length}</b></span><span>Losses <b class="dn">${cl.length}</b></span><span>Not triggered <b>${cd.filter((c) => c.status === 'NT').length}</b></span><span>Net <b class="${cls(netR)}">${netR >= 0 ? '+' : ''}${netR.toFixed(2)}R</b></span></div>
+      <div class="olScroll"><table class="olWt"><thead><tr><th>Stock</th><th>Type</th><th>Side</th><th>Entry</th><th>Stop / T1</th><th>Result</th><th>R</th><th>%</th></tr></thead><tbody>${crows}</tbody></table></div>` : `<div class="olN">${S.calls === null ? 'Call results could not be loaded.' : 'No calls were made today.'}</div>`}
+      <div class="olSrc">R = result in multiples of the risk taken (entry to stop). Results are settled by the server after the close (~16:10 IST) from the day’s actual prices.</div></section>`;
+  }
   function frame5() {
     const L = lists(); if (!O.listId || !L.find((l) => l.id === O.listId)) O.listId = O.custom ? O.custom.id : CL ? 'me' : (typeof WL !== 'undefined' && WL.store && WL.store.active) || (L[0] && L[0].id);
     const l = L.find((x) => x.id === O.listId), k = classify(l);
@@ -382,10 +447,17 @@
     }, 'The report for <b>' + E(clean(s)) + '</b> is ready. Open the Quick summary?', 'Yes — Quick summary');
   }
   /* ---------- paint ---------- */
+  /* which view: the person's choice (buttons), else ?m=closing from the evening Telegram post, else automatically Closing after 16:30 IST once today's Evening Breeze is out */
+  function curMode() {
+    if (O.mode) return O.mode; if (/[?&]m=closing/.test(location.search)) return 'closing';
+    const t = new Date(Date.now() + 19800000), m = t.getUTCHours() * 60 + t.getUTCMinutes();
+    return m >= 990 && O.rep && O.rep.breeze && O.rep.breeze.date === todayIST() ? 'closing' : 'morning';
+  }
   function draw() {
     const p = $('pOutlook'); if (!p || (!CL && !p.classList.contains('active'))) return;
     const keep = $('olSym') ? $('olSym').value : O.sym; O.sym = keep || O.sym;
-    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>Today’s Outlook</h2><button class="olB sm" id="olRef">↻ Refresh</button></div>${O.loaded ? (() => { const k = pack('morning'); return frame1(k, 'morning') + frame2(k, 'morning') + frame3(k, 'morning'); })() + frame4(pack('morning')) + frame5() + frame6() : '<div class="olN">Loading the morning reports…</div>'}
+    const md = curMode();
+    p.innerHTML = css() + `<div class="olWrap"><div class="olTop"><h2${CL ? ' style="color:#e7cf86"' : ''}>${md === 'closing' ? 'Closing Bell' : 'Today’s Outlook'}</h2><span class="olMode"><button class="olB sm${md === 'morning' ? ' on' : ''}" data-olmode="morning">☀ Morning</button><button class="olB sm${md === 'closing' ? ' on' : ''}" data-olmode="closing">🌇 Closing</button><button class="olB sm" id="olRef">↻ Refresh</button></span></div>${O.loaded ? (md === 'closing' ? (() => { const k = pack('closing'); return frame1(k, 'closing') + frame2(k, 'closing') + frame3(k, 'closing'); })() + frameScore() + frame6() : (() => { const k = pack('morning'); return frame1(k, 'morning') + frame2(k, 'morning') + frame3(k, 'morning'); })() + frame4(pack('morning')) + frame5() + frame6()) : '<div class="olN">Loading the reports…</div>'}
       <div class="olLegal">Prepared from delayed market data and published morning reports with fixed, rule-based formulas. Research information for discussion with your adviser — not investment advice, not a recommendation, and no outcome is guaranteed.</div></div>`;
   }
   const css = () => `<style>
@@ -403,6 +475,7 @@
   .olNews{margin:4px 0 6px;padding-left:18px}.olNews li{margin:5px 0;line-height:1.4}.olNews em{color:#8A6D1F;font-style:normal;font-size:11px;border:1px solid #ecd9a0;border-radius:99px;padding:0 7px;margin-left:4px}
   .olH{margin:10px 0 4px;color:#14306e}.olScroll{overflow-x:auto}.olTb{border-collapse:collapse;width:100%;background:#fff}.olTb th{background:#f6ecc9;color:#6b5314;text-align:left;padding:5px 8px;font-size:11px}.olTb td{padding:5px 8px;border-top:1px solid #f0e6c4;vertical-align:top}
   .olM{cursor:pointer;color:#14306e;text-decoration:underline dotted #D4AF37;text-underline-offset:3px}.olM:hover{color:#8A6D1F}
+  .olMode{display:flex;gap:6px;flex-wrap:wrap}.olMode .on{box-shadow:0 0 0 2px #D4AF37;background:#14306e;color:#fff}.olSum{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}.olSum span{background:#fff;border:1px solid #ecd9a0;border-radius:99px;padding:3px 10px;font-weight:600}.olWt td.up,.olWt td .up{color:#12894b}.olWt td.dn{color:#c11d3d;font-weight:700}.olWt td.mu{color:#7a8299}.olTag{font-weight:800;font-size:11px;padding:1px 7px;border-radius:99px;background:#eef1f8}.olTag.BUY{background:#e3f6ea;color:#12894b}.olTag.SELL{background:#fde8ec;color:#c11d3d}
   .olRules{background:#fffaf0;border:1px solid #ecd9a0;border-radius:8px;padding:6px 10px;margin:4px 0 6px;font-size:12px;line-height:1.5}.olWt th.gA{background:#1d6b45}.olWt th.gB{background:#8a5a12}.olWt td.bB{border-left:2px solid #8a5a12}.olWt .muted{color:#aab}
   .olWt{width:100%;border-collapse:collapse;font-size:12px;background:#fff}.olWt th{background:#14306e;color:#fff;padding:4px 6px;text-align:left;position:sticky;top:0}.olWt td{border:1px solid #ecd9a0;padding:4px 6px;vertical-align:top}.olWt td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.olWt small{color:#6a7694}
   .olN{padding:8px 10px;background:#fff;border:1px dashed #D4AF37;border-radius:8px;color:#52607f}.olSrc{margin-top:8px;font-size:11px;color:#6a7694}
@@ -443,7 +516,8 @@
     const x = c('#pOutlook [data-x], #pClient [data-x], #olPop [data-x]'); if (x) { const vp = popOpen(); openX(x.getAttribute('data-x'), vp); if (vp) domClosePop(); return; }
     const tb = c('#pOutlook [data-tab], #pClient [data-tab]'); if (tb) { O.fromOutlook = true; pushLayer(() => showTab(O.home || 'pClient')); showTab(tb.getAttribute('data-tab')); return; }
     if (c('#olGo')) { go(); return; }
-    if (c('#olRef')) { O.loaded = false; O.busy = false; draw(); loadAll(); }
+    const om = c('[data-olmode]'); if (om) { O.mode = om.getAttribute('data-olmode'); draw(); return; }
+    if (c('#olRef')) { O.loaded = false; O.busy = false; O.sc = null; draw(); loadAll(); }
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'olList') { O.listId = e.target.value; draw(); } });
   document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'olSym') go(); if (e.key === 'Escape') popLayer(); });
