@@ -112,7 +112,7 @@
     const ind = (B.snapshot || []).map(brow); if (B.vix && B.vix.level) ind.push(['India VIX', B.vix.level, B.vix.pct || '']);
     const morning = mode !== 'closing', d = morning ? freshM(O.rep.det) : null;
     return { title: morning ? 'OUTLOOK FOR THE DAY' : 'CLOSING OUTLOOK', R: rep, ind, lv: (B.levels || []).map((l) => [l.name, l.s, l.r]),
-      out: morning ? (d ? bul(d, /Outlook/) : []).concat(B.gift && B.gift.last ? ['GIFT Nifty ' + B.gift.last + ' (' + (B.gift.vs || B.gift.pct || '') + ' vs Nifty close, as of ' + (B.gift.asof || '') + ').'] : []).filter((x) => x.length > 25)
+      out: morning ? (d ? bul(d, /Outlook/) : []).concat(!d && B.gift && B.gift.last ? ['GIFT Nifty ' + B.gift.last + ' (' + (B.gift.vs || B.gift.pct || '') + ' vs Nifty close, as of ' + (B.gift.asof || '') + ').'] : []).filter((x) => x.length > 25)
         : [...(B.story || []), ...(B.risks || [])].filter((x) => x.length > 25),
       al: [...(B.events || []), ...(!morning && B.nextday && B.nextday.results && B.nextday.results.length ? ['Results ' + (B.nextday.date || 'next session') + ': ' + B.nextday.results.join(', ') + '.'] : [])],
       bias: morning ? [B.headline, B.open_text].filter(Boolean).join('. ') : [B.headline, B.summary].filter(Boolean).join('. '),
