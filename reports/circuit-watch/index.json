@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-18T21:10:32+05:30",
+   "date": "2026-11-18",
+   "status": "ok",
+   "caption": "Circuit Watch, session of 18 Nov 2026: Sensex 82,031.81 (-0.61%), Nifty 25,227.95 (-0.63%)",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-18.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-18.pdf",
+     "type": "pdf",
+     "bytes": 8745
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-17T21:12:14+05:30",
    "date": "2026-11-17",
    "status": "ok",
@@ -318,5 +333,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-17T21:12:14+05:30"
+ "updated_at": "2026-11-18T21:10:32+05:30"
 }
