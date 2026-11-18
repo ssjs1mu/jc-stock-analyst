@@ -83,6 +83,7 @@ function tgPostReports() {
     } catch (e) { Logger.log(id + ' ' + e); }
   });
   s.p.setProperty('TG_SENT', JSON.stringify(sent)); s.p.setProperty('TG_DAY', JSON.stringify(dayP));
+  try { tgAutoLink_(s); } catch (e) { Logger.log('autolink ' + e); }
   try { tgLive_(s); } catch (e) { Logger.log('live ' + e); }
   return n;
 }

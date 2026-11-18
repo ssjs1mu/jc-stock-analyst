@@ -52,6 +52,12 @@ function cliTx_(fn) { var lk = LockService.getScriptLock(); lk.waitLock(20000); 
 function cliRoute_(a, b) {
   if (a === 'cl_list') { var d = cliRead_(); return JSON.stringify({ ok: true, clients: Object.keys(d.clients).map(function (k) { return cliPub_(d.clients[k]); }), trash: Object.keys(d.trash).length }); }
   if (a === 'tg_updates') return tgUpdates_();
+  if (a === 'cl_invite') return cliTx_(function () { // invite link: t.me/<bot>?start=<code>; pressing Start links the client's chat automatically
+    var d = cliRead_(), c = d.clients[String(b.id)]; if (!c) throw new Error('client not found');
+    if (!c.inv) { c.inv = 'j' + Utilities.getUuid().replace(/-/g, '').slice(0, 15); c.updated = Date.now(); cliWrite_(d); }
+    var bot = tgBotName_(); if (!bot) throw new Error('Telegram bot not reachable - check TG_TOKEN');
+    return JSON.stringify({ ok: true, bot: bot, code: c.inv, link: 'https://t.me/' + bot + '?start=' + c.inv, linked: !!c.chat, name: c.name });
+  });
   if (a === 'cl_send') { var d2 = cliRead_(), c2 = d2.clients[String(b.id)]; if (!c2) throw new Error('client not found'); if (!c2.chat) throw new Error('no Telegram chat id for this client'); var s = tgProps_(); var r = tgClientMsg_(s, c2); return JSON.stringify(r); }
   return cliTx_(function () {
     var d = cliRead_(), now = Date.now(), c;
@@ -99,7 +105,41 @@ function tgUpdates_() {
   var j = JSON.parse(UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/getUpdates?limit=100&timeout=0', { muteHttpExceptions: true }).getContentText());
   if (!j.ok) throw new Error(j.description || 'Telegram refused getUpdates'); var seen = {};
   (j.result || []).forEach(function (u) { var m = u.message || (u.my_chat_member && { chat: u.my_chat_member.chat, date: u.my_chat_member.date }); if (!m || !m.chat || m.chat.type !== 'private') return; seen[String(m.chat.id)] = { chat: String(m.chat.id), name: [m.chat.first_name, m.chat.last_name].filter(Boolean).join(' '), username: m.chat.username || '', date: m.date || 0 }; });
+  try { var keep = JSON.parse(s.p.getProperty('TG_SEEN') || '{}'); Object.keys(keep).forEach(function (k) { if (!seen[k]) seen[k] = keep[k]; }); } catch (e) { }
   return JSON.stringify({ ok: true, bot: me.result && me.result.username || '', chats: Object.keys(seen).map(function (k) { return seen[k]; }) });
+}
+function tgBotName_() {
+  var p = PropertiesService.getScriptProperties(), b = p.getProperty('TG_BOT'); if (b) return b;
+  try { var s = tgProps_(), me = JSON.parse(UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/getMe', { muteHttpExceptions: true }).getContentText()); b = me.result && me.result.username; if (b) p.setProperty('TG_BOT', b); return b || ''; } catch (e) { return ''; }
+}
+/* every 5 minutes: a client who opened the invite link and pressed Start sends "/start <code>" - store that chat id on the client, welcome them and send today's dashboard.
+   Updates are read from the last processed id onward (Telegram then drops older ones), and every private chat seen is remembered (TG_SEEN) for "Find Telegram users". */
+function tgAutoLink_(s) {
+  var last = parseInt(s.p.getProperty('TG_UPD') || '0', 10);
+  var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/getUpdates?timeout=0&limit=100' + (last ? '&offset=' + (last + 1) : '') + '&allowed_updates=' + encodeURIComponent('["message"]'), { muteHttpExceptions: true });
+  var j = {}; try { j = JSON.parse(r.getContentText() || '{}'); } catch (e) { } if (!j.ok || !(j.result || []).length) return;
+  var seen = {}; try { seen = JSON.parse(s.p.getProperty('TG_SEEN') || '{}'); } catch (e) { }
+  var starts = [];
+  j.result.forEach(function (u) {
+    if (u.update_id > last) last = u.update_id; var m = u.message; if (!m || !m.chat || m.chat.type !== 'private') return;
+    seen[String(m.chat.id)] = { chat: String(m.chat.id), name: [m.chat.first_name, m.chat.last_name].filter(Boolean).join(' '), username: m.chat.username || '', date: m.date || 0 };
+    var g = /^\/start\s+([A-Za-z0-9_-]{6,64})/.exec(String(m.text || '')); if (g) starts.push({ code: g[1], chat: String(m.chat.id) });
+  });
+  var ks = Object.keys(seen).sort(function (a, b) { return (seen[b].date || 0) - (seen[a].date || 0); }).slice(0, 60), keep = {}; ks.forEach(function (k) { keep[k] = seen[k]; });
+  s.p.setProperty('TG_SEEN', JSON.stringify(keep)); s.p.setProperty('TG_UPD', String(last));
+  if (!starts.length) return;
+  var linked = [];
+  cliTx_(function () {
+    var d = cliRead_(), ch = false;
+    starts.forEach(function (st) { Object.keys(d.clients).forEach(function (k) { var c = d.clients[k]; if (c.inv && c.inv === st.code) { if (c.chat !== st.chat) { c.chat = st.chat; c.updated = Date.now(); c.joined = c.joined || Date.now(); ch = true; } linked.push(c); } }); });
+    if (ch) cliWrite_(d);
+  });
+  var today = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd'), sent = {}; try { sent = JSON.parse(s.p.getProperty('TG_CL') || '{}'); } catch (e) { }
+  linked.forEach(function (c) {
+    UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: c.chat, parse_mode: 'HTML', text: '\u2705 <b>Namaste ' + tgEsc_(cliHello_(c.name)) + ', you are connected to Joshi\u2019s Corner.</b>\nYour personal pre-market report will now arrive here automatically every trading morning (from 8:15 AM IST). Today\u2019s report follows below.' }, muteHttpExceptions: true });
+    var o = tgClientMsg_(s, c); if (o.ok) sent[c.id] = today;
+  });
+  s.p.setProperty('TG_CL', JSON.stringify(sent));
 }
 /* the client's greeting name: first name + "ji" (titles like Mr / Shri / Dr dropped, no double "ji") */
 function cliHello_(name) {
