@@ -1713,6 +1713,7 @@ const RPT = {
 const FEED_NAMES = { daily: 'Daily OHLCV (2Y)', daily2: 'Daily cross-check (1M)', intra: 'Intraday 5-min OHLCV (5D)', weekly: 'Weekly OHLCV (10Y)', bench: 'Nifty 50 benchmark (2Y)', summary: 'Fundamentals & ratios (Yahoo quoteSummary)', ts: 'Annual financial statements (Yahoo timeseries)', tsq: 'Quarterly results (Yahoo timeseries)', deliv: 'NSE bundle — result dates, filed results, holding, delivery, DPR (Apps Script)', news: 'News (Google News RSS)', corp: 'Corporate actions — dividends, splits, bonus (3Y)', peers: 'Peer valuation (similar stocks)' };
 const FC = {};   // feed cache: FC[ySym][key] = { t, f }
 function meter(pct, label) {
+  try { if (window.jcTree) window.jcTree.set(pct, label); } catch (e) { }
   const el = $('statusLine'); el.className = 'statusline show'; pct = Math.max(0, Math.min(100, Math.round(pct)));
   $('statusText').innerHTML = `<span style="display:inline-flex;align-items:center;gap:10px;vertical-align:middle;flex-wrap:wrap">${esc(label)}<span style="display:inline-block;width:240px;height:11px;border-radius:6px;background:rgba(120,130,160,.35);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#c99a1c,#2f8f5b);transition:width .25s"></span></span><b>${pct}%</b></span>`;
 }
@@ -1765,7 +1766,7 @@ async function runAnalysis(kind) {
     if (kind === 'master' && window.JCMaster) { meter(98, `${spec.label} — laying out 3 pages`); window.JCMaster.show(R); }
     meter(100, `${spec.label} ready · ${new Date().toLocaleTimeString('en-IN')}${usedExch !== exch ? ` · auto-switched to ${usedExch === 'NS' ? 'NSE' : 'BSE'}` : ''}`);
   } catch (e) {
-    console.error(e); setStatus('Report failed', 'err');
+    console.error(e); setStatus('Report failed', 'err'); try { if (window.jcTree) window.jcTree.fail(); } catch (e2) { }
     const be = getBackend(), onFile = typeof location !== 'undefined' && location.protocol === 'file:';
     const hint = be ? 'A Data backend URL is set but the request still failed — open that URL with <code>?action=ping</code> in a browser tab; it must answer {"ok":true}. If not, redeploy the Apps Script web app with “Who has access: Anyone”.' : '<b>No Data backend is set.</b> Public CORS proxies are often rate-limited or blocked on your network — deploy <code>Code.gs</code> as an Apps Script web app and paste its /exec URL under “Data backend” above. That is the reliable route.';
     $('errArea').innerHTML = `<div class="errbox">Could not build a report for <b>${esc(sym)}</b> (tried ${esc(sym)}.${exch}, then the other exchange).<br><br><b>Why:</b> ${esc((e && e.message) || e)}<br><br>${hint}${onFile ? '<br><br>You opened this as a local file — open it over your GitHub Pages https:// address instead.' : ''}<br><br>Also check the symbol is the exchange trading code, not the company name (e.g. M&amp;M, BAJAJ-AUTO; BSE Ltd itself trades as BSE).</div>`;
