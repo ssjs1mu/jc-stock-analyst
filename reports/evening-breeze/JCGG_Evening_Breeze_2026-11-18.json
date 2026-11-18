@@ -1,0 +1,428 @@
+{
+ "book": {
+  "edition": "evening",
+  "date_txt": "18 Nov 2026",
+  "date_iso": "2026-11-18",
+  "mood": {
+   "key": "bear",
+   "label": "Weak close",
+   "sub": "Nifty -0.63% in the session"
+  },
+  "label": "Weak close",
+  "headline": "Nifty slips 0.63%",
+  "summary": "Nifty 50 closed at 25,227.95 (-0.63%) and Sensex at 82,031.81 (-0.61%). Banks: Bank Nifty -0.38%. India VIX 15.52 (+0.00%). Brent crude -3.95%, USD/INR 93.440. 15 of 50 Nifty stocks advanced and 34 declined.",
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "close",
+    "level": "25,227.95",
+    "pct": "-0.63%",
+    "pts": "-159.45"
+   },
+   {
+    "name": "Sensex",
+    "sub": "close",
+    "level": "82,031.81",
+    "pct": "-0.61%",
+    "pts": "-500.38"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "close",
+    "level": "62,038.65",
+    "pct": "-0.38%",
+    "pts": "-234.60"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "close",
+    "level": "23,630.25",
+    "pct": "-0.81%",
+    "pts": "-192.05"
+   }
+  ],
+  "spark": [
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125,
+   25291.099609375,
+   25387.400390625,
+   25227.94921875
+  ],
+  "flows": {
+   "date": "16 Nov",
+   "fii": 4864.68,
+   "dii": -3519.05
+  },
+  "breadth": {
+   "up": 15,
+   "dn": 34
+  },
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,005 - 25,116",
+    "r": "25,365 - 25,503",
+    "note": "A close above 25,365 opens up 25,503; a slide below 25,116 would expose 25,005."
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "61,458 - 61,748",
+    "r": "62,346 - 62,654",
+    "note": "A close above 62,346 opens up 62,654; a slide below 61,748 would expose 61,458."
+   }
+  ],
+  "events": [
+   "Sensex weekly expiry today (Thu 19 Nov 2026)."
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "",
+    "level": "50,759.42",
+    "pct": "-1.64%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "",
+    "level": "7,340.53",
+    "pct": "-1.03%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "",
+    "level": "24,328.38",
+    "pct": "-0.74%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "",
+    "level": "10,666.02",
+    "pct": "-0.22%"
+   },
+   {
+    "name": "DAX",
+    "code": "",
+    "level": "26,088.53",
+    "pct": "+0.17%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "",
+    "level": "59,024.28",
+    "pct": "+0.28%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "",
+    "level": "23,294.75",
+    "pct": "-0.91%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "",
+    "level": "3,587.83",
+    "pct": "+0.09%"
+   },
+   {
+    "name": "Kospi",
+    "code": "",
+    "level": "5,067.44",
+    "pct": "+1.99%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "89.46",
+    "pct": "-3.95%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "83.40",
+    "pct": "-3.03%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,771.30",
+    "pct": "-2.40%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "93.440",
+    "pct": "-0.56%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.74",
+    "pct": "+0.24%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "5.10",
+    "pct": "-0.35%"
+   }
+  ],
+  "vix": {
+   "level": "15.52",
+   "pct": "+0.00%",
+   "gauge": 0.7239999771118164,
+   "text": "India VIX 15.52."
+  },
+  "headlines": [
+   "Sensex falls 500 points, Nifty declines 0.63% as investors book profits after November rally",
+   "Sensex Today Tanks 502 Points",
+   "Market wrap, Nov 18: SENSEX falls 500 pts, NIFTY50 ends below 25,250; 126 stocks hit lower circuit, Titan Company top loser",
+   "Sensex falls 500 points, Nifty settles at 25,228; Titan sinks over 4%",
+   "Stock Market Highlights: Sensex Ends 500 Points Lower; Nifty At 25,278; SBI, ITC Top Gainers",
+   "Jakarta Stocks Slide 1% as BI Delivers Rate Hike",
+   "Stock Market Crash: Sensex Erases 82,000, Nifty Struggles At 25,200; 5 Reasons Why Rs 4 Lakh Crore Wiped Out",
+   "Glass Wall Systems shares jump 4% on new order win, up 55% from IPO price"
+  ],
+  "gainers": [
+   [
+    "SBIN",
+    "1,135.00",
+    "+2.38%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "+2.09%"
+   ],
+   [
+    "TATACONSUM",
+    "1,130.90",
+    "+1.66%"
+   ],
+   [
+    "APOLLOHOSP",
+    "8,821.00",
+    "+1.25%"
+   ],
+   [
+    "ITC",
+    "296.60",
+    "+1.13%"
+   ]
+  ],
+  "losers": [
+   [
+    "TITAN",
+    "4,648.10",
+    "-5.30%"
+   ],
+   [
+    "HDFCLIFE",
+    "575.50",
+    "-3.29%"
+   ],
+   [
+    "HINDALCO",
+    "900.00",
+    "-2.99%"
+   ],
+   [
+    "WIPRO",
+    "185.14",
+    "-2.50%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,093.85",
+    "-2.43%"
+   ]
+  ],
+  "shock": [
+   [
+    "SBIN",
+    "1,135.00",
+    "2.3x avg vol",
+    "+2.38%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "2.0x avg vol",
+    "+2.09%"
+   ]
+  ],
+  "opening": {
+   "label": "Flat to marginally mixed start",
+   "zone": "25,188 - 25,263",
+   "headline": "Flat to marginally mixed start: Wall Street weak, Asia positive, crude easing",
+   "drivers": [
+    "GIFT Nifty 25,224.5 (-3 pts, -0.01% vs Nifty's last close).",
+    "US: S&P 500 -1.03%, Nasdaq -0.74%, Dow -1.64%.",
+    "Asia this morning: Nikkei +0.28%, Hang Seng -0.91%, Kospi +1.99%.",
+    "Currency, crude and volatility: Brent 89.46 (-3.95%); USD/INR 93.440 (-0.56%); India VIX 15.52 (+0.00%)."
+   ],
+   "next": "Thursday, 19 November 2026",
+   "mood": "neutral",
+   "gift": {
+    "last": "25,224.5",
+    "pct": "+0.50%",
+    "premium": "-3 pts",
+    "vs": "-0.01%",
+    "asof": "18 Nov 16:00"
+   },
+   "anchored": true
+  },
+  "nextday": {
+   "date": "Thursday, 19 November 2026",
+   "results": [
+    "ANTGRAPHIC",
+    "MUTHOOTMF"
+   ],
+   "results_n": 2,
+   "actions": [
+    {
+     "sym": "VGCL",
+     "what": "Interim Dividend - Re 1 Per Share"
+    },
+    {
+     "sym": "NATCOPHARM",
+     "what": "Interim Dividend - Rs 1.25 Per Share"
+    },
+    {
+     "sym": "INGERRAND",
+     "what": "Interim Dividend - Rs 20 Per Share"
+    }
+   ],
+   "due": [
+    {
+     "t": "00:30",
+     "ccy": "USD",
+     "title": "FOMC Meeting Minutes",
+     "hi": true,
+     "fc": ""
+    },
+    {
+     "t": "19:00",
+     "ccy": "EUR",
+     "title": "ECB President Lagarde Speaks",
+     "hi": false,
+     "fc": ""
+    },
+    {
+     "t": "19:00",
+     "ccy": "USD",
+     "title": "Philly Fed Manufacturing Index",
+     "hi": false,
+     "fc": "20.6"
+    },
+    {
+     "t": "19:00",
+     "ccy": "USD",
+     "title": "Unemployment Claims",
+     "hi": false,
+     "fc": "198K"
+    }
+   ]
+  },
+  "story": [
+   "Nifty 50 opened at 25,323, a gap-down of 0.25% from the previous close of 25,387.",
+   "The index dipped to a low of 25,142 (-0.97%) around 1:05 PM and touched a high of 25,391 (+0.01%) around 9:15 AM.",
+   "It settled at 25,228 (-0.63%), in the middle of the day's range, a session of two-way trade.",
+   "The final hour shed 21 points.",
+   "15 of the 50 Nifty stocks advanced and 34 declined; Bank Nifty outperformed (-0.38%).",
+   "Latest institutional data (16 Nov): FII/FPI net +4865 Cr, DII net -3519 Cr."
+  ],
+  "risks": [
+   "Wall Street trades through tonight (from about 7:00 PM IST); the S&P 500 last closed at 7,340.53 (-1.03%), so US data and Fed commentary can swing the opening.",
+   "Brent crude is at US$89.46 (-3.95%); a sharp fall would help oil marketers and the rupee.",
+   "Currency and yields to track: USD/INR 93.440 (-0.56%), US 10-year yield 5.10% (-0.35%). A firmer dollar or higher US yields usually weigh on foreign flows.",
+   "GIFT Nifty keeps trading into the late evening, now 25,224.5 (-0.01% vs Nifty's close): the best live read on the next opening."
+  ],
+  "vol_movers": [
+   [
+    "TITAN",
+    "4,648.10",
+    "5.0%",
+    "-5.30%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "3.8%",
+    "+2.09%"
+   ],
+   [
+    "TRENT",
+    "3,190.00",
+    "3.3%",
+    "+0.43%"
+   ],
+   [
+    "SBIN",
+    "1,135.00",
+    "3.3%",
+    "+2.38%"
+   ],
+   [
+    "ITC",
+    "296.60",
+    "3.1%",
+    "+1.13%"
+   ],
+   [
+    "ADANIENT",
+    "2,684.20",
+    "3.1%",
+    "-2.22%"
+   ]
+  ],
+  "pv_up": [
+   [
+    "SBIN",
+    "1,135.00",
+    "2.3x vol",
+    "+2.38%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "2.0x vol",
+    "+2.09%"
+   ]
+  ],
+  "pv_dn": [
+   [
+    "TITAN",
+    "4,648.10",
+    "1.4x vol",
+    "-5.30%"
+   ],
+   [
+    "HINDALCO",
+    "900.00",
+    "1.3x vol",
+    "-2.99%"
+   ]
+  ],
+  "asof": "04:10 PM IST"
+ },
+ "title": "Evening Breeze (18 Nov 2026)",
+ "headline": "Nifty slips 0.63%",
+ "mood": {
+  "key": "bear",
+  "label": "Weak close",
+  "sub": "Nifty -0.63% in the session"
+ },
+ "mood_score": -0.8793009019837826,
+ "mood_pic": "bear_calm",
+ "edition": "evening",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
