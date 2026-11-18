@@ -191,6 +191,53 @@
     return `<div class="olCall ${buy ? 'olBuy' : 'olSell'}"><div class="olCh"><b class="olSide">${buy ? '▲ BUY' : '▼ SELL'}</b><b class="olSym">${E(c.sym)}</b>${c.grade ? `<span class="olGr">${E(c.grade)}</span>` : ''}<button class="olX" data-x="${E(c.sym)}">X-ray</button></div>${ladder(c)}
       <div class="olLv4"><span>Entry<b>${lvl2(c.entry)}</b></span><span class="dn">Stop<b>${lvl2(c.sl)}</b></span><span class="up">T1<b>${lvl2(c.t1)}</b></span><span class="up">T2<b>${lvl2(c.t2)}</b></span><span>R:R<b>${num(c.rr1) ? '1:' + c.rr1.toFixed(1) : '—'}</b></span></div>${why ? `<div class="olWhy">${E(why)}</div>` : ''}</div>`;
   }
+  /* ---------- WAIT-AND-BUY / WAIT-AND-SELL plans for calls held back by the day's mood ----------
+     Rule-based, from the call book (entry/stop/targets/ATR) and the stock board (pivots, prev-day high/low, 20-DMA).
+     Plan A "dip"   : buy the pull-back at pivot S1 only when a 5-min candle closes back above it (sell: rally to R1, close back below);
+                      stop 0.35 x ATR beyond S1 (never beyond S2); T1/T2 = the next pivot levels giving at least 1.5R; skipped if R:R < 1.5.
+     Plan B "turn"  : the original breakout trigger, valid only after Nifty 15-min close back above the opening-zone top
+                      (sell: below the zone bottom) and after 09:45.  Investment calls: staggered accumulation zone S1 / 20-DMA. */
+  const nz = (x) => pf(String(x || '').split('-')[0]), nzHi = (x) => { const a = String(x || '').split('-'); return pf(a[a.length - 1]); };
+  function waitPlan(c, B) {
+    const r = O.board && O.board.rows && O.board.rows[clean(c.sym)]; if (!r || !r.pv) return null;
+    const buy = c.side === 'BUY', d = buy ? 1 : -1, pv = r.pv, atr = num(r.atr) ? r.atr : (num(c.atr) ? c.atr : null); if (!atr) return null;
+    const lv = [pv.S2, pv.S1, pv.P, pv.R1, pv.R2, c.entry, c.t1, c.t2].filter(num).sort((a, b) => a - b);
+    if (c.type !== 'DAY') {
+      const zHi = buy ? Math.min(r.c, pv.S1) : Math.max(r.c, pv.R1), zLo = buy ? Math.max(num(r.e20) ? r.e20 : pv.S2, pv.S2) : Math.min(num(r.e20) ? r.e20 : pv.R2, pv.R2);
+      return { kind: 'INV', z1: Math.min(zHi, zLo), z2: Math.max(zHi, zLo), sl: c.sl, t1: c.t1, t2: c.t2 };
+    }
+    const base = buy ? pv.S1 : pv.R1; if (!num(base)) return null;
+    const e = base * (1 + d * 0.001); let sl = base - d * 0.35 * atr; const lim = buy ? pv.S2 : pv.R2; if (num(lim) && (buy ? sl < lim * 0.998 : sl > lim * 1.002)) sl = lim * (1 - d * 0.002);
+    const R = Math.abs(e - sl), tg = (buy ? lv.filter((x) => x >= e + 1.5 * R) : lv.filter((x) => x <= e - 1.5 * R).reverse());
+    const A = R > 0 && tg.length ? { e, sl, t1: tg[0], t2: tg[1] || tg[0] + d * R, rr: Math.abs(tg[0] - e) / R } : null;
+    return { kind: 'DAY', A, Bk: { e: c.entry, sl: c.sl, t1: c.t1, t2: c.t2 } };
+  }
+  function waitTable(held, k, md) {
+    if (!held.length) return '';
+    const B = (k && k.R && k.R.cfg && k.R.cfg.book) || {}, zone = B.zone || '', zLo = nz(zone), zHi = nzHi(zone);
+    const pvN = ((B.pivots || []).find((x) => /Nifty 50/.test(x.name)) || {}).vals || [];
+    const buyMood = md != null && md <= 40;
+    const go = buyMood ? (num(zHi) ? `Nifty 15-min close above ${f2(zHi, 0)}` : 'Nifty back above its opening zone') + (pvN[2] ? ` (stronger above pivot ${E(pvN[2])})` : '')
+      : (num(zLo) ? `Nifty 15-min close below ${f2(zLo, 0)}` : 'Nifty back below its opening zone') + (pvN[2] ? ` (weaker below pivot ${E(pvN[2])})` : '');
+    const live = (c) => { const L = O.live && O.live[clean(c.sym)]; return L && num(L[0]) ? L[0] : null; };
+    const rows = held.map((c) => {
+      const w = waitPlan(c, B); if (!w) return ''; const lp = live(c), buy = c.side === 'BUY';
+      if (w.kind === 'INV') {
+        const inZ = lp != null && lp >= w.z1 && lp <= w.z2;
+        return `<tr><td><b>${E(c.sym)}</b><br><small>Investment · ${E(c.side)}</small></td><td>Staggered: 50% at ${f2(w.z2)}, 50% at ${f2(w.z1)} — on any day this week, no chasing above ${f2(w.z2)}</td><td class="n">${f2(w.z1)} – ${f2(w.z2)}</td><td class="n dn">${f2(w.sl)}<br><small>daily close</small></td><td class="n up">${f2(w.t1)}</td><td class="n up">${f2(w.t2)}</td><td>—</td><td class="n">${lp != null ? f2(lp) + (inZ ? ' <b class="up">IN ZONE</b>' : '') : '—'}</td></tr>`;
+      }
+      const A = w.A, inA = A && lp != null && (buy ? lp <= A.e * 1.004 && lp > A.sl : lp >= A.e * 0.996 && lp < A.sl);
+      return `<tr><td><b>${E(c.sym)}</b><br><small>Intraday · ${E(c.side)} · ${E(c.grade || '')}</small></td>
+        <td>${A ? `<b>A · ${buy ? 'Dip buy' : 'Rally sell'}</b> 09:30–13:30: when price ${buy ? 'dips to' : 'rises to'} ${f2(A.e)} and a 5-min candle closes back ${buy ? 'above' : 'below'} it` : '<small>No dip plan with R:R ≥ 1.5</small>'}<br><b>B · ${buy ? 'Breakout' : 'Breakdown'}</b> 09:45–13:30, only after ${go}: 5-min close ${buy ? 'above' : 'below'} ${f2(w.Bk.e)}</td>
+        <td class="n">${A ? 'A ' + f2(A.e) : ''}<br>B ${f2(w.Bk.e)}</td><td class="n dn">${A ? 'A ' + f2(A.sl) : ''}<br>B ${f2(w.Bk.sl)}</td>
+        <td class="n up">${A ? 'A ' + f2(A.t1) : ''}<br>B ${f2(w.Bk.t1)}</td><td class="n up">${A ? 'A ' + f2(A.t2) : ''}<br>B ${f2(w.Bk.t2)}</td><td class="n">${A ? A.rr.toFixed(1) : '—'}<br>${num(c.rr1) ? c.rr1.toFixed(1) : '—'}</td>
+        <td class="n">${lp != null ? f2(lp) + (inA ? ' <b class="up">AT A</b>' : '') : '—'}</td></tr>`;
+    }).join('');
+    if (!rows) return '';
+    return `<h5 class="olH">${buyMood ? 'When to buy today — wait-and-buy plans' : 'When to sell today — wait-and-sell plans'} (held back by the ${buyMood ? 'weak' : 'strong'} open)</h5>
+      <div class="olScroll"><table class="olWt"><thead><tr><th>Stock</th><th>When</th><th>Entry</th><th>Stop</th><th>T1</th><th>T2</th><th>R:R</th><th>Now</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="olSrc">Market go-signal for plan B: <b>${go}</b>. Plan A works even on a weak day because it buys support with a tight stop. Take only one of A or B per stock; square off intraday by 15:15. Nothing is triggered until the condition is met — no condition, no trade. Rule-based levels (pivots, ATR), not advice, not a guaranteed outcome.</div>`;
+  }
   function frame4(k) {
     const C = O.calls; if (!C) return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS</h3><div class="olN">Calls file not available.</div></section>`;
     if (C.date !== todayIST()) return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS</h3><div class="olN">Today’s call book is not ready yet (last one was for ${E(C.date || '—')}). Old calls are never shown as today’s — this frame fills by itself when today’s book is built (target 08:30 IST on trading days).</div></section>`;
@@ -202,6 +249,7 @@
     return `<section class="olF"><h3>INTRADAY &amp; INVESTMENT CALLS <small>${E(C.date || '')} · ${E(String(C.scanned || ''))} stocks scanned · Nifty trend ${E(cx.regime || '—')} · VIX ${f2(cx.vix, 1)}</small></h3>${bn}
       <h5 class="olH">Intraday — today only, square off the same day</h5>${grid(day, 'intraday')}
       <h5 class="olH">Investment — positional / long-term</h5>${grid(inv, 'investment')}
+      ${waitTable(held, k || pack('morning'), md)}
       <div class="olSrc">Entry = trigger on a 5-minute close beyond the level; every call carries a stop. Rule-based levels from daily data — not advice, not a guaranteed outcome.</div></section>`;
   }
   /* ---------- watchlist Buy / Sell / Avoid ---------- */
@@ -339,6 +387,7 @@
   .olR{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:3px 0;border-top:1px solid #f3ead0}.olR:first-of-type{border-top:0}.olR i{font-style:normal;font-variant-numeric:tabular-nums}.olR u{text-decoration:none;font-weight:700;min-width:74px;text-align:right}
   .olNews{margin:4px 0 6px;padding-left:18px}.olNews li{margin:5px 0;line-height:1.4}.olNews em{color:#8A6D1F;font-style:normal;font-size:11px;border:1px solid #ecd9a0;border-radius:99px;padding:0 7px;margin-left:4px}
   .olH{margin:10px 0 4px;color:#14306e}.olScroll{overflow-x:auto}.olTb{border-collapse:collapse;width:100%;background:#fff}.olTb th{background:#f6ecc9;color:#6b5314;text-align:left;padding:5px 8px;font-size:11px}.olTb td{padding:5px 8px;border-top:1px solid #f0e6c4;vertical-align:top}
+  .olWt{width:100%;border-collapse:collapse;font-size:12px;background:#fff}.olWt th{background:#14306e;color:#fff;padding:4px 6px;text-align:left;position:sticky;top:0}.olWt td{border:1px solid #ecd9a0;padding:4px 6px;vertical-align:top}.olWt td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.olWt small{color:#6a7694}
   .olN{padding:8px 10px;background:#fff;border:1px dashed #D4AF37;border-radius:8px;color:#52607f}.olSrc{margin-top:8px;font-size:11px;color:#6a7694}
   .olSel{display:flex;gap:12px;align-items:center;margin-bottom:8px}.olBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .olB{cursor:pointer;border:1px solid #1f3a85;background:#fff;color:#0b1c45;border-radius:10px;padding:8px 14px;font-weight:800;font-size:13px}.olB.sm{padding:4px 10px;font-size:12px}
