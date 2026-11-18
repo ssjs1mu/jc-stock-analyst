@@ -1,0 +1,255 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "18 Nov 2026",
+ "report_time": "08:12 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 25,230 - 25,306"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Weak start likely: Wall Street weak, Asia negative, rupee firmer. Expected Nifty opening zone: 25,230 - 25,306 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,268.5 (-119 pts, -0.47% vs Nifty's last close).",
+      "US: S&P 500 -1.03%, Nasdaq -0.74%, Dow -1.64%.",
+      "Asia this morning: Nikkei -0.52%, Hang Seng -0.54%, Kospi -0.20%.",
+      "Currency, crude and volatility: Brent 92.67 (-0.50%); USD/INR 93.460 (-0.54%); India VIX 15.52 (-1.02%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty MONTHLY expiry: Mon 23 Nov 2026; next Sensex weekly expiry: Thu 19 Nov 2026.",
+      "Results today (3 companies): ANSALAPI, BLSPOLY, GVPTECH."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "ASIANPAINT",
+       "In the news",
+       "Stock Market Today: Sensex Zooms 800 Points, Nifty Ends Near 25,400; Asian Paints Extends "
+      ],
+      [
+       "COALINDIA",
+       "Volume surge (last session)",
+       "3.1x average volume, -1.50%"
+      ],
+      [
+       "ADANIENT",
+       "Volume surge (last session)",
+       "1.6x average volume, +3.24%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Asia-Pacific Markets Track Wall Street\u2019s Losses Amid Investor Focus on Nvidia Earnings",
+      "Asia stocks set to snap losing streak on Nvidia beat as Anthropic looms",
+      "Sensex, Nifty Today: GIFT Nifty signals muted start; crude and gold edge lower",
+      "Stock Market Today: Gift Nifty, Nvidia Earnings To Oil Prices; Five Key Factors For Sensex, Nifty 50 On Nov 18"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "50,759.42",
+        "-1.64%"
+       ],
+       [
+        "S&P 500",
+        "7,340.53",
+        "-1.03%"
+       ],
+       [
+        "Nasdaq Composite",
+        "24,328.38",
+        "-0.74%"
+       ],
+       [
+        "FTSE 100",
+        "10,689.90",
+        "-1.76%"
+       ],
+       [
+        "DAX",
+        "26,045.37",
+        "-2.08%"
+       ],
+       [
+        "Nikkei 225",
+        "58,551.45",
+        "-0.52%"
+       ],
+       [
+        "Hang Seng",
+        "23,381.32",
+        "-0.54%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,577.21",
+        "-0.21%"
+       ],
+       [
+        "Kospi",
+        "4,958.42",
+        "-0.20%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "92.67",
+        "-0.50%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "85.08",
+        "-1.08%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,808.50",
+        "-1.44%"
+       ],
+       [
+        "USD/INR",
+        "93.46",
+        "-0.54%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.61",
+        "+0.12%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "5.10",
+        "-0.35%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "25,151",
+       "25,385"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,035",
+       "25,501"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (25,230 - 25,306) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
