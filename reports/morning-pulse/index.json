@@ -2,6 +2,141 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-19T08:14:21+05:30",
+   "date": "2026-11-19",
+   "status": "ok",
+   "caption": "Morning Pulse 19 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-19.pdf",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-19.pdf",
+     "type": "pdf",
+     "bytes": 673710
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-19.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-19.png",
+     "type": "png",
+     "bytes": 1227316
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_1.png",
+     "type": "png",
+     "bytes": 980213
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_2.png",
+     "type": "png",
+     "bytes": 627785
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_3.png",
+     "type": "png",
+     "bytes": 896857
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_4.png",
+     "type": "png",
+     "bytes": 863005
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_5.png",
+     "type": "png",
+     "bytes": 598730
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-19_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-19_6.png",
+     "type": "png",
+     "bytes": 1452932
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_1.png",
+     "type": "png",
+     "bytes": 972036
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_2.png",
+     "type": "png",
+     "bytes": 609289
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_3.png",
+     "type": "png",
+     "bytes": 888675
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_4.png",
+     "type": "png",
+     "bytes": 803727
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_5.png",
+     "type": "png",
+     "bytes": 561908
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-19_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-19_6.png",
+     "type": "png",
+     "bytes": 1451537
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_1.png",
+     "type": "png",
+     "bytes": 985893
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_2.png",
+     "type": "png",
+     "bytes": 653329
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_3.png",
+     "type": "png",
+     "bytes": 896828
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_4.png",
+     "type": "png",
+     "bytes": 882393
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_5.png",
+     "type": "png",
+     "bytes": 621225
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-19_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-19_6.png",
+     "type": "png",
+     "bytes": 1453559
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-19.json",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-19.json",
+     "type": "json",
+     "bytes": 13653
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-18T08:13:04+05:30",
    "date": "2026-11-18",
    "status": "ok",
@@ -2457,5 +2592,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-18T08:13:04+05:30"
+ "updated_at": "2026-11-19T08:14:21+05:30"
 }

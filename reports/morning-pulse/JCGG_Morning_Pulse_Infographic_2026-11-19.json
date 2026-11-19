@@ -1,0 +1,670 @@
+{
+ "book": {
+  "flows": {
+   "date": "17 Nov",
+   "fii": 4195.38,
+   "dii": 196.93
+  },
+  "pcr": {
+   "pcr": 0.8560012038415442,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "19 Nov 2026",
+  "date_iso": "2026-11-19",
+  "mood": {
+   "key": "bear",
+   "label": "Weak start likely",
+   "sub": "Indicative Nifty opening zone 25,127 - 25,203"
+  },
+  "label": "Weak start likely",
+  "zone": "25,127 - 25,203",
+  "headline": "Weak start likely - Nifty zone 25,127 - 25,203",
+  "open_text": "Wall Street steady, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
+  "yday": null,
+  "spark": [
+   22600.0,
+   22753.19921875,
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125,
+   25291.099609375,
+   25387.400390625,
+   25227.94921875
+  ],
+  "proj": 25164.9,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "25,227.95",
+    "pct": "-0.63%",
+    "pts": "-159.45"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "82,031.81",
+    "pct": "-0.61%",
+    "pts": "-500.38"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "62,038.65",
+    "pct": "-0.38%",
+    "pts": "-234.60"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "23,630.25",
+    "pct": "-0.81%",
+    "pts": "-192.05"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,005 - 25,116",
+    "r": "25,365 - 25,503",
+    "note": "A sustained move above 25,365 opens up 25,503; a slide below 25,116 would expose 25,005.",
+    "flag": ""
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "61,458 - 61,748",
+    "r": "62,346 - 62,654",
+    "note": "A sustained move above 62,346 opens up 62,654; a slide below 61,748 would expose 61,458.",
+    "flag": ""
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "50,198.17",
+    "pct": "-1.11%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,323.63",
+    "pct": "-0.23%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "24,429.88",
+    "pct": "+0.42%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,551.20",
+    "pct": "-1.30%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "25,736.24",
+    "pct": "-1.19%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "59,191.44",
+    "pct": "+0.28%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "22,893.98",
+    "pct": "-1.72%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,561.86",
+    "pct": "-0.72%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "5,023.78",
+    "pct": "-0.86%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "89.39",
+    "pct": "-2.78%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "82.34",
+    "pct": "-1.10%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,742.30",
+    "pct": "+0.01%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "93.440",
+    "pct": "-0.04%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.87",
+    "pct": "+0.01%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "5.07",
+    "pct": "-0.73%"
+   }
+  ],
+  "vix": {
+   "level": "15.57",
+   "pct": "+0.32%",
+   "gauge": 0.721500015258789,
+   "text": "India VIX 15.57 (+0.32%); USD/INR 93.44 (-0.04%); US 10-yr yield 5.07 (-0.73%). India VIX rose 0.3% - hedging demand up."
+  },
+  "events": [
+   "Sensex weekly expiry today (Thu 19 Nov 2026).",
+   "Results today (2 companies): ANTGRAPHIC, MUTHOOTMF."
+  ],
+  "watch": [
+   [
+    "COALINDIA",
+    "In the news",
+    "Top stocks to watch today: Coal India, Jio Financial, NALCO, Bharat Forge, Sky Gold, Dalmi"
+   ],
+   [
+    "TITAN",
+    "In the news",
+    "Market wrap, Nov 18: SENSEX falls 500 pts, NIFTY50 ends below 25,250; 126 stocks hit lower"
+   ],
+   [
+    "EICHERMOT",
+    "Setup: BUY (A+)",
+    "Entry 7,854.2, stop 7,772.0, target 7,999.7"
+   ],
+   [
+    "MAHABANK",
+    "Setup: BUY (A+)",
+    "Entry 96.2, stop 95.1, target 98.2"
+   ],
+   [
+    "FEDERALBNK",
+    "Setup: BUY (A+)",
+    "Entry 366.9, stop 363.4, target 372.5"
+   ],
+   [
+    "WELSPUNLIV",
+    "Setup: BUY (A+)",
+    "Entry 267.9, stop 261.1, target 278.5"
+   ],
+   [
+    "SBIN",
+    "Volume surge (last session)",
+    "2.3x average volume, +2.38%"
+   ],
+   [
+    "CIPLA",
+    "Volume surge (last session)",
+    "2.0x average volume, +2.09%"
+   ]
+  ],
+  "headlines": [
+   "Buy Nifty on dips as 25,000 holds; BoB among 3 stock ideas: Ajit Mishra",
+   "Top stocks to watch today: Coal India, Jio Financial, NALCO, Bharat Forge, Sky Gold, Dalmia Bharat and 7 others in focus",
+   "Sensex, Nifty today: GIFT Nifty signals cautious start; crude continues below $93",
+   "Stock Market Today: Gift Nifty, US Fed Minutes To Anthropic IPO; Five Key Factors For Sensex, Nifty 50 On Nov 19",
+   "Daily Voice: India to retain long-term appeal for global investors, says AlfAccurate's Rajesh Kothari",
+   "Stock market outlook today,19 Nov:Sensex, Nifty prediction-DJIA, S&P, NASDAQ, GIFT Nifty, Kospi, Nikkei, Taiwan cues",
+   "Stock market cues to watch today: GIFT Nifty, FII, crude, and other data",
+   "Stocks in news: Jio Financial Services, IIFL Finance, Nalco, LT Foods and Samvardhana Motherson"
+  ],
+  "calls": {
+   "buy": [
+    {
+     "sym": "EICHERMOT",
+     "side": "BUY",
+     "entry": "7,854.16",
+     "sl": "7,772.02",
+     "t1": "7,999.67",
+     "t2": "8,151.33",
+     "rr": "1.8",
+     "risk": "82.14",
+     "riskpct": "1.05%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 30: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "MAHABANK",
+     "side": "BUY",
+     "entry": "96.18",
+     "sl": "95.07",
+     "t1": "98.24",
+     "t2": "99.88",
+     "rr": "1.9",
+     "risk": "1.11",
+     "riskpct": "1.15%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 26: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "FEDERALBNK",
+     "side": "BUY",
+     "entry": "366.86",
+     "sl": "363.40",
+     "t1": "372.47",
+     "t2": "377.66",
+     "rr": "1.6",
+     "risk": "3.46",
+     "riskpct": "0.94%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 26: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "WELSPUNLIV",
+     "side": "BUY",
+     "entry": "267.88",
+     "sl": "261.08",
+     "t1": "278.48",
+     "t2": "286.12",
+     "rr": "1.6",
+     "risk": "6.80",
+     "riskpct": "2.54%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 33: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "BAJFINANCE",
+     "side": "BUY",
+     "entry": "1,127.80",
+     "sl": "1,115.82",
+     "t1": "1,148.83",
+     "t2": "1,166.81",
+     "rr": "1.8",
+     "risk": "11.98",
+     "riskpct": "1.06%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 35: strong trend, +DI leads"
+     ]
+    }
+   ],
+   "sell": [],
+   "watch_buy": [
+    {
+     "sym": "AXISBANK",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.35 < 1.5)"
+    },
+    {
+     "sym": "ADANIENSOL",
+     "conv": 49,
+     "S": 10.5,
+     "why": "first target too close for the risk (R:R 1.39 < 1.5)"
+    },
+    {
+     "sym": "PNB",
+     "conv": 49,
+     "S": 10.5,
+     "why": "RSI stretched"
+    },
+    {
+     "sym": "ASAHIINDIA",
+     "conv": 49,
+     "S": 10.5,
+     "why": "RSI stretched"
+    }
+   ]
+  },
+  "gift": {
+   "last": "25,164.5",
+   "pct": "+0.13%",
+   "premium": "-63 pts",
+   "vs": "-0.25%",
+   "asof": "19 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "EICHERMOT",
+    "7,828.00",
+    "+3.01%"
+   ],
+   [
+    "SBIN",
+    "1,135.00",
+    "+2.38%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "+2.09%"
+   ],
+   [
+    "TATACONSUM",
+    "1,130.90",
+    "+1.66%"
+   ],
+   [
+    "BAJAJFINSV",
+    "1,870.80",
+    "+1.22%"
+   ]
+  ],
+  "losers": [
+   [
+    "TITAN",
+    "4,648.10",
+    "-5.30%"
+   ],
+   [
+    "HDFCLIFE",
+    "575.50",
+    "-3.29%"
+   ],
+   [
+    "HINDALCO",
+    "900.00",
+    "-2.99%"
+   ],
+   [
+    "WIPRO",
+    "185.14",
+    "-2.50%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,093.85",
+    "-2.43%"
+   ]
+  ],
+  "shock": [
+   [
+    "SBIN",
+    "1,135.00",
+    "2.3x avg vol",
+    "+2.38%"
+   ],
+   [
+    "CIPLA",
+    "1,417.00",
+    "2.0x avg vol",
+    "+2.09%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "25,005",
+     "25,116",
+     "25,254",
+     "25,365",
+     "25,503"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "61,458",
+     "61,748",
+     "62,056",
+     "62,346",
+     "62,654"
+    ]
+   }
+  ],
+  "est": -0.25
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (19 Nov 2026)",
+ "headline": "Weak start likely - Nifty zone 25,127 - 25,203",
+ "bias_text": "GIFT Nifty 25,164.5 (-63 pts, -0.25% vs Nifty's last close). US: S&P 500 -0.23%, Nasdaq +0.42%, Dow -1.11%. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street steady, Asia negative, crude easing. Opening call anchored on GIFT Nifty.",
+ "proj": 25164.9,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 25,127 - 25,203"
+ },
+ "mood_score": -0.25,
+ "mood_pic": "bear_over_bull",
+ "spark": [
+  22600.0,
+  22753.19921875,
+  22749.75,
+  22698.849609375,
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375,
+  25030.349609375,
+  25044.650390625,
+  25255.05078125,
+  25299.349609375,
+  25144.30078125,
+  25291.099609375,
+  25387.400390625,
+  25227.94921875
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.721500015258789,
+  "headline": "India VIX 15.57 (+0.32%)",
+  "text": "India VIX 15.57 (+0.32%); USD/INR 93.44 (-0.04%); US 10-yr yield 5.07 (-0.73%). India VIX rose 0.3% - hedging demand up."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "25,227.95",
+   "pct": "-0.63%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "89.39",
+   "pct": "-2.78%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "3,742.30",
+   "pct": "+0.01%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "15.57",
+   "pct": "+0.32%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "93.440",
+   "pct": "-0.04%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "5.07",
+   "pct": "-0.73%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "50,198.17",
+   "pct": "-1.11%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,323.63",
+   "pct": "-0.23%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "24,429.88",
+   "pct": "+0.42%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,551.20",
+   "pct": "-1.30%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "25,736.24",
+   "pct": "-1.19%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "59,191.44",
+   "pct": "+0.28%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "22,893.98",
+   "pct": "-1.72%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,561.86",
+   "pct": "-0.72%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "5,023.78",
+   "pct": "-0.86%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 59,191.44 (+0.28%), Hang Seng 22,893.98 (-1.72%), Shanghai 3,561.86 (-0.72%), Kospi 5,023.78 (-0.86%). Wall Street: Dow 50,198.17 (-1.11%), S&P 500 7,323.63 (-0.23%), Nasdaq 24,429.88 (+0.42%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "25,005 - 25,116",
+   "r": "25,365 - 25,503",
+   "note": "A sustained move above 25,365 opens up 25,503; a slide below 25,116 would expose 25,005.",
+   "flag": ""
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "61,458 - 61,748",
+   "r": "62,346 - 62,654",
+   "note": "A sustained move above 62,346 opens up 62,654; a slide below 61,748 would expose 61,458.",
+   "flag": ""
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Sensex weekly expiry today (Thu 19 Nov 2026). Results today (2 companies): ANTGRAPHIC, MUTHOOTMF."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "COALINDIA (In the news); TITAN (In the news); EICHERMOT (Setup: BUY (A+)); MAHABANK (Setup: BUY (A+)); FEDERALBNK (Setup: BUY (A+)); WELSPUNLIV (Setup: BUY (A+))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "Buy Nifty on dips as 25,000 holds; BoB among 3 stock ideas: Ajit Mishra | Top stocks to watch today: Coal India, Jio Financial, NALCO, Bharat Forge, Sky G"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "EICHERMOT",
+    "pct": "+3.01%"
+   },
+   {
+    "sym": "SBIN",
+    "pct": "+2.38%"
+   },
+   {
+    "sym": "CIPLA",
+    "pct": "+2.09%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "TITAN",
+    "pct": "-5.30%"
+   },
+   {
+    "sym": "HDFCLIFE",
+    "pct": "-3.29%"
+   },
+   {
+    "sym": "HINDALCO",
+    "pct": "-2.99%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
