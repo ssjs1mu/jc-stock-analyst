@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-19T21:10:14+05:30",
+   "date": "2026-11-19",
+   "status": "ok",
+   "caption": "Circuit Watch - session 19 Nov 2026: Sensex +1.21%, Nifty 25,514; upper/lower-circuit table with flagged unverified items",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-19.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-19.pdf",
+     "type": "pdf",
+     "bytes": 10039
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-18T21:10:32+05:30",
    "date": "2026-11-18",
    "status": "ok",
@@ -333,5 +348,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-18T21:10:32+05:30"
+ "updated_at": "2026-11-19T21:10:14+05:30"
 }
