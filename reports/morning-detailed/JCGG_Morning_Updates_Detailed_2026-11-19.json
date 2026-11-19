@@ -1,0 +1,280 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "19 Nov 2026",
+ "report_time": "08:13 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bear",
+  "label": "Weak start likely",
+  "sub": "Indicative Nifty opening zone 25,127 - 25,203"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Weak start likely: Wall Street steady, Asia negative, crude easing. Expected Nifty opening zone: 25,127 - 25,203 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,164.5 (-63 pts, -0.25% vs Nifty's last close).",
+      "US: S&P 500 -0.23%, Nasdaq +0.42%, Dow -1.11%.",
+      "Asia this morning: Nikkei +0.28%, Hang Seng -1.72%, Kospi -0.84%.",
+      "Currency, crude and volatility: Brent 89.39 (-2.78%); USD/INR 93.440 (-0.04%); India VIX 15.57 (+0.32%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex weekly expiry today (Thu 19 Nov 2026).",
+      "Results today (2 companies): ANTGRAPHIC, MUTHOOTMF."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "COALINDIA",
+       "In the news",
+       "Top stocks to watch today: Coal India, Jio Financial, NALCO, Bharat Forge, Sky Gold, Dalmi"
+      ],
+      [
+       "TITAN",
+       "In the news",
+       "Market wrap, Nov 18: SENSEX falls 500 pts, NIFTY50 ends below 25,250; 126 stocks hit lower"
+      ],
+      [
+       "EICHERMOT",
+       "Setup: BUY (A+)",
+       "Entry 7,854.2, stop 7,772.0, target 7,999.7"
+      ],
+      [
+       "MAHABANK",
+       "Setup: BUY (A+)",
+       "Entry 96.2, stop 95.1, target 98.2"
+      ],
+      [
+       "FEDERALBNK",
+       "Setup: BUY (A+)",
+       "Entry 366.9, stop 363.4, target 372.5"
+      ],
+      [
+       "WELSPUNLIV",
+       "Setup: BUY (A+)",
+       "Entry 267.9, stop 261.1, target 278.5"
+      ],
+      [
+       "SBIN",
+       "Volume surge (last session)",
+       "2.3x average volume, +2.38%"
+      ],
+      [
+       "CIPLA",
+       "Volume surge (last session)",
+       "2.0x average volume, +2.09%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Buy Nifty on dips as 25,000 holds; BoB among 3 stock ideas: Ajit Mishra",
+      "Top stocks to watch today: Coal India, Jio Financial, NALCO, Bharat Forge, Sky Gold, Dalmia Bharat and 7 others in focus",
+      "Sensex, Nifty today: GIFT Nifty signals cautious start; crude continues below $93",
+      "Stock Market Today: Gift Nifty, US Fed Minutes To Anthropic IPO; Five Key Factors For Sensex, Nifty 50 On Nov 19"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "50,198.17",
+        "-1.11%"
+       ],
+       [
+        "S&P 500",
+        "7,323.63",
+        "-0.23%"
+       ],
+       [
+        "Nasdaq Composite",
+        "24,429.88",
+        "+0.42%"
+       ],
+       [
+        "FTSE 100",
+        "10,551.20",
+        "-1.30%"
+       ],
+       [
+        "DAX",
+        "25,736.24",
+        "-1.19%"
+       ],
+       [
+        "Nikkei 225",
+        "59,192.05",
+        "+0.28%"
+       ],
+       [
+        "Hang Seng",
+        "22,893.05",
+        "-1.72%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,562.53",
+        "-0.71%"
+       ],
+       [
+        "Kospi",
+        "5,024.78",
+        "-0.84%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "89.39",
+        "-2.78%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "82.34",
+        "-1.10%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,742.10",
+        "+0.01%"
+       ],
+       [
+        "USD/INR",
+        "93.44",
+        "-0.04%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.87",
+        "+0.01%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "5.07",
+        "-0.73%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "25,116",
+       "25,365"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,005",
+       "25,503"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
