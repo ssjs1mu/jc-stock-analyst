@@ -2,6 +2,21 @@
  "schedule_id": "circuit-watch",
  "runs": [
   {
+   "generated_at": "2026-11-20T21:15:55+05:30",
+   "date": "2026-11-20",
+   "status": "ok",
+   "caption": "Circuit Watch \u2014 session of Fri 20 Nov 2026: Nifty 25,800.60 (+1.12%); circuit data from midday snapshot",
+   "note": "",
+   "files": [
+    {
+     "name": "Circuit_Watch_2026-11-20.pdf",
+     "path": "reports/circuit-watch/Circuit_Watch_2026-11-20.pdf",
+     "type": "pdf",
+     "bytes": 8245
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-19T21:10:14+05:30",
    "date": "2026-11-19",
    "status": "ok",
@@ -348,5 +363,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-19T21:10:14+05:30"
+ "updated_at": "2026-11-20T21:15:55+05:30"
 }
