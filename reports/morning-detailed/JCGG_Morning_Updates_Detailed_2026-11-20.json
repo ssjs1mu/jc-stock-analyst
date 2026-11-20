@@ -1,0 +1,279 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "20 Nov 2026",
+ "report_time": "08:15 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bear",
+  "label": "Gap-down opening likely",
+  "sub": "Indicative Nifty opening zone 25,313 - 25,389"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-down opening likely: Wall Street weak, Asia negative, crude easing. Expected Nifty opening zone: 25,313 - 25,389 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,350.5 (-164 pts, -0.64% vs Nifty's last close).",
+      "US: S&P 500 -2.02%, Nasdaq -2.25%, Dow -2.19%.",
+      "Asia this morning: Nikkei -4.49%, Hang Seng -1.92%, Kospi -4.46%.",
+      "Currency, crude and volatility: Brent 90.01 (-2.14%); USD/INR 93.280 (-0.20%); India VIX 15.57 (+0.32%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's +1.14% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty MONTHLY expiry: Mon 23 Nov 2026; next Sensex MONTHLY expiry: Thu 26 Nov 2026.",
+      "Results today (2 companies): GVPTECH, VALECHAENG."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "COALINDIA",
+       "In the news",
+       "Stocks to watch today: Coal India, Hexaware Tech, Paytm and more in focus"
+      ],
+      [
+       "MARUTI",
+       "In the news",
+       "Maruti Suzuki leads sharp market recovery as Sensex jumps 990 points, Nifty tops 25,500"
+      ],
+      [
+       "NAVINFLUOR",
+       "Setup: BUY (A+)",
+       "Entry 10,304.6, stop 10,164.9, target 10,563.7"
+      ],
+      [
+       "POONAWALLA",
+       "Setup: BUY (A+)",
+       "Entry 503.5, stop 496.5, target 522.8"
+      ],
+      [
+       "URBANCO",
+       "Setup: BUY (A+)",
+       "Entry 174.1, stop 170.0, target 180.4"
+      ],
+      [
+       "CHOLAFIN",
+       "Setup: BUY (A+)",
+       "Entry 1,876.5, stop 1,856.2, target 1,928.3"
+      ],
+      [
+       "HEROMOTOCO",
+       "Volume surge (last session)",
+       "2.4x average volume, +5.77%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Arvind Fashions, Aptus, Wockhardt among Geojit's 3 stock picks",
+      "AI sell-off hits Indian smallcaps; Sterlite, HFCL down up to 29% in a month",
+      "Newly-listed companies add \u20b932-trillion to BSE market-cap in 2026",
+      "Stocks to watch today: Coal India, Hexaware Tech, Paytm and more in focus"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "49,097.06",
+        "-2.19%"
+       ],
+       [
+        "S&P 500",
+        "7,175.83",
+        "-2.02%"
+       ],
+       [
+        "Nasdaq Composite",
+        "23,879.20",
+        "-2.25%"
+       ],
+       [
+        "FTSE 100",
+        "10,452.70",
+        "-0.93%"
+       ],
+       [
+        "DAX",
+        "25,463.81",
+        "-1.06%"
+       ],
+       [
+        "Nikkei 225",
+        "56,775.04",
+        "-4.49%"
+       ],
+       [
+        "Hang Seng",
+        "22,402.85",
+        "-1.92%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,515.42",
+        "-1.74%"
+       ],
+       [
+        "Kospi",
+        "4,908.85",
+        "-4.46%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "90.01",
+        "-2.14%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "82.94",
+        "-0.32%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,533.80",
+        "-4.12%"
+       ],
+       [
+        "USD/INR",
+        "93.28",
+        "-0.20%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.87",
+        "-0.03%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "5.05",
+        "-0.28%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "25,241",
+       "25,651"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "24,968",
+       "25,787"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
