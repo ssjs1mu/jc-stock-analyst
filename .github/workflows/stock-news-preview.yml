@@ -1,0 +1,30 @@
+name: Stocks in the news (preview)
+# Manual check of the morning "Stocks in the news" pages: fetches the feeds, ranks, renders, pushes JSON + PNGs to sn-preview.
+on:
+  workflow_dispatch:
+    inputs:
+      now: { description: 'YYYY-MM-DDTHH:MM IST (empty = now)', default: '' }
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.12' }
+      - run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - run: |
+          N="${{ github.event.inputs.now }}"; A=""; [ -n "$N" ] && A="--now $N"
+          mkdir -p /tmp/sn
+          python pipeline/stock_news.py --out /tmp/sn/news.json --raw /tmp/sn/raw $A 2>&1 | tee /tmp/sn/log.txt
+          python pipeline/stock_news_preview.py /tmp/sn/news.json /tmp/sn/page 2>&1 | tee -a /tmp/sn/log.txt
+      - if: always()
+        run: |
+          [ -d /tmp/sn ] || exit 0
+          cd /tmp/sn && git init -q && git checkout -q -b sn-preview && git add -A && \
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm preview || exit 0
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" sn-preview

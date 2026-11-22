@@ -942,6 +942,15 @@ def build(sid, qs, heads, now):
                 "bench": bench, "cmd": cmd_t, "vix": {"level": f2(vv), "pct": pct(vix["pct"]) if vix else "n/a", "gauge": gfrac, "text": vtxt},
                 "events": evs, "watch": wl, "headlines": [cut(x, 130) for x in headl[:8]], "calls": calls_t, "gift": gtxt,
                 "gainers": stock_rows(gain), "losers": stock_rows(lose), "shock": stock_rows(shock, True), "pivots": pivrows, "est": ov["est"]}
+        if not os.environ.get("AUTO_MOCK"):
+            try:   # company-specific news since the last close, ranked by expected impact (own pages in the booklet)
+                import stock_news as SN
+                sn_ = SN.collect(now.astimezone(SN.IST) if now.tzinfo else now.replace(tzinfo=SN.IST))
+                sn_["since_txt"] = dt.datetime.fromisoformat(sn_["since"]).strftime("%a %d %b, %H:%M")
+                book["stock_news"] = {k_: sn_[k_] for k_ in ("items", "since_txt", "matched")}
+                print("stock news: %d stocks" % len(sn_["items"]))
+            except Exception as ex:
+                print("stock news:", ex)
         return {"book": book, "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (%s)" % now.strftime("%d %b %Y"),
                 "headline": head, "bias_text": bias_open, "open_text": open_text, "proj": proj, "proj_label": "Today (est.)", "mood": mood, "mood_score": ov["score"], "mood_pic": pic_key_morning(ov["est"]),
                 "spark": spark_vals, "spark_label": "Nifty 50 daily closes, last %d sessions" % len(spark_vals) if spark_vals else "",

@@ -659,6 +659,40 @@ def pm(b, p, total):
     return shell(p, inner, 2, total, "Diwali Muhurat session")
 
 
+def stock_news_pages(b):
+    """'Stocks in the news' pages (morning): one row per stock, ranked by expected price impact; 8 rows a page, at most 3 pages."""
+    items = (b.get("stock_news") or {}).get("items") or []
+    if not items:
+        return []
+    per = 8
+    chunks = [items[i:i + per] for i in range(0, min(len(items), per * 3), per)]
+    since = (b.get("stock_news") or {}).get("since_txt", "")
+
+    def mk(ch, k):
+        def f(b, p, total):
+            rows = ""
+            for j, x in enumerate(ch, k * per + 1):
+                col = "#1C820D" if x.get("tone") == "up" else "#D00000" if x.get("tone") == "dn" else "#7a7650"
+                arrow = "&#9650;" if x.get("tone") == "up" else "&#9660;" if x.get("tone") == "dn" else "&#9679;"
+                src = e(x["source"]) + " &middot; " + e(x["time"])
+                if x.get("also"):
+                    src += " &middot; also " + e(", ".join(x["also"]))
+                rows += ('<tr><td style="width:44px;font-size:22px;font-weight:800;color:#8a8660;vertical-align:top;padding-top:14px">%d</td>'
+                         '<td style="width:230px;vertical-align:top;padding-top:12px"><div style="font-size:27px;font-weight:900;line-height:1.1;word-break:break-word">%s</div>'
+                         '<div style="margin-top:6px;display:inline-block;font-size:16px;font-weight:800;letter-spacing:.6px;color:#fff;background:%s;border-radius:12px;padding:3px 10px">%s %s</div></td>'
+                         '<td style="vertical-align:top;padding:12px 0 12px 8px"><div style="font-size:25px;font-weight:800;line-height:1.25">%s</div>'
+                         '%s<div style="font-size:18px;margin-top:6px;color:#676300;font-weight:700">&mdash; %s</div></td></tr>'
+                         % (j, e(x["sym"]), col, arrow, e(x["tag"]), e(x["headline"]),
+                            ('<div style="font-size:21px;line-height:1.32;margin-top:5px;color:#4a4830">%s</div>' % e(x["brief"])) if x.get("brief") else "", src))
+            head = ('<h2 class="s">Stocks in the news%s</h2>' % (" &middot; %d of %d" % (k + 1, len(chunks)) if len(chunks) > 1 else ""))
+            note = ('<div class="small" style="opacity:.8;font-size:19px;margin-top:6px">News since %s, ranked by expected price impact (results, orders, deals, regulator action first; '
+                    'larger companies ahead). &#9650; / &#9660; = tone of the news, not a call. Summaries are the publisher&#39;s own; verify before acting.</div>' % e(since)) if k == 0 else ""
+            inner = head + '<div class="card" style="padding:4px 16px"><table>%s</table></div>' % rows + note
+            return shell(p, inner, 5, total, "Stocks in the news &middot; " + e(b["date_txt"]))
+        return f
+    return [mk(ch, k) for k, ch in enumerate(chunks)]
+
+
 PAGES = [p2, p3, p4, p5, p6]
 
 
@@ -668,6 +702,13 @@ def render(cfg, png_base, langs=("en",)):
     p = PAL.get((b.get("mood") or {}).get("key", "neutral"), PAL["neutral"])
     evening = b.get("edition") == "evening"
     pagelist = [e2, e3, e4, e_news, e_open, p5, p6] if evening else PAGES
+    if not evening:
+        try:
+            sn = stock_news_pages(b)
+            if sn:
+                pagelist = [p2, p3, p4] + sn + [p5, p6]
+        except Exception as ex:
+            print("stock news pages skipped:", ex)
     mh = None
     try:
         import festivals as _f0
