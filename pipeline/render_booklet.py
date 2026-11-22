@@ -20,9 +20,9 @@ W, H = 1080, 1800
 e = lambda s: html.escape(str(s if s is not None else ""))
 
 PAL = {  # smoky mood palettes: base, three smoke hues, accent (chips/lines), up, down
-    "bull": dict(base="#03160f", s1="#12b86a", s2="#0a8fb0", s3="#d99a0a", acc="#2ee59d", up="#34d399", dn="#fb7185", word="BULLISH TONE"),
-    "bear": dict(base="#1a0509", s1="#d01c45", s2="#6d1fa8", s3="#e8691a", acc="#ff5c7a", up="#34d399", dn="#fb7185", word="CAUTIOUS TONE"),
-    "neutral": dict(base="#070b24", s1="#3555d6", s2="#7c3aed", s3="#0ea5c4", acc="#7aa2ff", up="#34d399", dn="#fb7185", word="BALANCED TONE"),
+    "bull": dict(base="#03160f", s1="#12b86a", s2="#0a8fb0", s3="#d99a0a", acc="#2ee59d", up="#1C820D", dn="#D00000", word="BULLISH TONE"),
+    "bear": dict(base="#1a0509", s1="#d01c45", s2="#6d1fa8", s3="#e8691a", acc="#ff5c7a", up="#1C820D", dn="#D00000", word="CAUTIOUS TONE"),
+    "neutral": dict(base="#070b24", s1="#3555d6", s2="#7c3aed", s3="#0ea5c4", acc="#7aa2ff", up="#1C820D", dn="#D00000", word="BALANCED TONE"),
 }
 GOLD = "#E2B84A"
 
@@ -30,28 +30,28 @@ GOLD = "#E2B84A"
 def css(p):
     return brand.font_css() + """
 *{box-sizing:border-box;margin:0}
-body{width:%(W)dpx;height:%(H)dpx;overflow:hidden;font-family:Inter,'Segoe UI',Arial,sans-serif;color:#f5f1e6;background:%(base)s;position:relative}
+body{width:%(W)dpx;height:%(H)dpx;overflow:hidden;font-family:Inter,'Segoe UI',Arial,sans-serif;color:#33321F;background:%(base)s;position:relative}
 .smoke{position:absolute;inset:0;overflow:hidden}
 .smoke i{position:absolute;border-radius:50%%;filter:blur(110px);opacity:.75}
 .smoke i:nth-child(1){width:900px;height:760px;left:-260px;top:-180px;background:%(s1)s}
 .smoke i:nth-child(2){width:820px;height:700px;right:-300px;top:380px;background:%(s2)s}
 .smoke i:nth-child(3){width:760px;height:560px;left:-120px;bottom:-240px;background:%(s3)s;opacity:.55}
 .grain{position:absolute;inset:0;background:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px) 0 0/22px 22px;opacity:.55}
-.pg{position:relative;z-index:2;height:100%%;display:flex;flex-direction:column;padding:0 46px 0}
-.hd{display:flex;align-items:center;gap:18px;height:112px;flex:none;border-bottom:2px solid %(gold)s55}
+.pg{position:absolute;z-index:2;inset:22px;display:flex;flex-direction:column;padding:0 38px 0;background:#FBF9EF;border-radius:28px;overflow:hidden;box-shadow:0 0 0 3px rgba(255,255,255,.35),0 18px 50px rgba(0,0,0,.45)}
+.hd{display:flex;align-items:center;gap:18px;height:112px;flex:none;margin:0 -38px;padding:0 38px;background:linear-gradient(180deg,#676300,#5a5600);border-bottom:6px solid #A7A15D}
 .hd img{height:78px;border-radius:12px;border:1.5px solid %(gold)s}
 .brand{font-family:%(script)s;font-weight:700;font-size:54px;color:%(gold)s;line-height:1;text-shadow:0 0 1px #F6DC8A}
-.hd .sub{font-size:22px;color:#e8e2d0;opacity:.85;margin-top:3px;font-weight:600}
+.hd .sub{font-size:22px;color:#F1EED6;opacity:.95;margin-top:3px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .hd .n{margin-left:auto;font-size:26px;font-weight:800;border:2px solid %(gold)s;border-radius:24px;padding:4px 16px;color:%(gold)s}
 .bd{flex:1;min-height:0;padding-top:20px;display:flex;flex-direction:column;gap:16px}
-.ft{flex:none;height:46px;display:flex;align-items:center;justify-content:center;font-size:19px;opacity:.8;border-top:1px solid #ffffff22}
-h2.s{font-size:27px;letter-spacing:1.3px;text-transform:uppercase;color:%(gold)s;font-weight:800;padding-bottom:7px;border-bottom:2px solid %(acc)s66}
+.ft{flex:none;height:46px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#6B696B;margin:0 -38px;background:#F1EED6;border-top:2px solid #DDD7AE}
+h2.s{font-size:27px;letter-spacing:1.3px;text-transform:uppercase;color:#676300;font-weight:800;padding-bottom:7px;border-bottom:3px solid %(acc)s}
 .chip{display:inline-block;background:%(acc)s;color:#04120c;font-weight:900;font-size:25px;padding:7px 22px;border-radius:26px;letter-spacing:.8px}
-.card{background:linear-gradient(135deg,#ffffff1c,#ffffff0a);border:1.5px solid #ffffff2e;border-radius:22px;padding:16px 20px;backdrop-filter:blur(2px)}
+.card{background:#fff;border:2px solid #DDD7AE;border-radius:22px;padding:16px 20px;box-shadow:0 4px 14px rgba(103,99,0,.07)}
 .up{color:%(up)s}.dn{color:%(dn)s}
 table{width:100%%;border-collapse:collapse}
-td,th{padding:10px 10px;text-align:left;font-size:25px}th{font-size:19px;letter-spacing:1px;text-transform:uppercase;color:#d9d2bd;font-weight:700;border-bottom:1.5px solid #ffffff33}
-tr+tr td{border-top:1px solid #ffffff1c}td.r,th.r{text-align:right;white-space:nowrap}td b{font-weight:800}
+td,th{padding:10px 10px;text-align:left;font-size:25px}th{font-size:19px;letter-spacing:1px;text-transform:uppercase;color:#6B696B;font-weight:800;border-bottom:2px solid #DDD7AE}
+tr+tr td{border-top:1px solid #E9E4C6}td.r,th.r{text-align:right;white-space:nowrap}td b{font-weight:800}
 .small{font-size:20px;opacity:.85}
 """ % dict(W=W, H=H, gold=GOLD, script=brand.SCRIPT_STACK, **p)
 
@@ -154,9 +154,9 @@ def fest_extras(cover):
     hol = ""
     if cover and strip:
         a, b2 = strip
-        hol = ('<div style="position:absolute;left:46px;right:46px;bottom:96px;z-index:7;text-align:center;font-size:23px;font-weight:700;color:#efe9d6;background:#0000004d;border:1.5px solid #ffffff2e;border-radius:16px;padding:9px 14px;line-height:1.35">'
+        hol = ('<div style="position:absolute;left:46px;right:46px;bottom:120px;z-index:7;text-align:center;font-size:23px;font-weight:700;color:#4A4A4A;background:#F1EED6;border:2px solid #DDD7AE;border-radius:16px;padding:9px 14px;line-height:1.35">'
                '<span style="color:%s;letter-spacing:1px;font-weight:900">TRADING HOLIDAYS</span> &nbsp;This week: <b>%s</b> &nbsp;&middot;&nbsp; Next week: <b>%s</b></div>'
-               % (GOLD, e("; ".join(a) if a else "none"), e("; ".join(b2) if b2 else "none")))
+               % ("#676300", e("; ".join(a) if a else "none"), e("; ".join(b2) if b2 else "none")))
     return svg, chip, hol, css_x
 
 
@@ -196,7 +196,7 @@ def bar(x, p, scale=3.0):
     w = abs(v) / scale * 50
     col = p["up"] if v >= 0 else p["dn"]
     pos = "left:50%%;width:%.1f%%" % w if v >= 0 else "left:%.1f%%;width:%.1f%%" % (50 - w, w)
-    return '<div style="position:relative;height:14px;border-radius:7px;background:#ffffff1c;width:200px"><div style="position:absolute;top:0;bottom:0;%s;background:%s;border-radius:7px"></div><div style="position:absolute;left:50%%;top:-3px;bottom:-3px;width:2px;background:#fff9"></div></div>' % (pos, col)
+    return '<div style="position:relative;height:14px;border-radius:7px;background:#E9E4C6;width:200px"><div style="position:absolute;top:0;bottom:0;%s;background:%s;border-radius:7px"></div><div style="position:absolute;left:50%%;top:-3px;bottom:-3px;width:2px;background:#8a8566"></div></div>' % (pos, col)
 
 
 def chart(vals, proj, p, w=948, h=250):
@@ -222,11 +222,11 @@ def chart(vals, proj, p, w=948, h=250):
         c = p["up"] if proj >= vals[-1] else p["dn"]
         ex = ('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="4" stroke-dasharray="9 7" stroke-linecap="round"/>'
               '<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="4" fill="%s" fill-opacity=".25" stroke="%s" stroke-width="3" stroke-dasharray="7 5"/>'
-              '<text x="%.1f" y="%.1f" text-anchor="end" font-size="26" font-weight="800" fill="#fff">Today (est.)</text>'
+              '<text x="%.1f" y="%.1f" text-anchor="end" font-size="26" font-weight="800" fill="#33321F">Today (est.)</text>'
               % (ax, ay, px, py, GOLD, px - bw / 2, py, bw, h - bot - py, c, c, px + bw / 2, max(26, py - 12)))
     ax, ay = pts[len(vals) - 1]
     return ('<svg style="flex:none;display:block" viewBox="0 0 %d %d" width="100%%" height="%d">%s<polyline points="%s" fill="none" stroke="%s" stroke-width="5" stroke-linejoin="round"/>'
-            '<circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="#fff" stroke-width="3"/>%s</svg>' % (w, h, h, bars, line, GOLD, ax, ay, GOLD, ex))
+            '<circle cx="%.1f" cy="%.1f" r="9" fill="%s" stroke="#fff" stroke-width="3"/>%s</svg>' % (w, h, h, bars, line, "#8a6d12", ax, ay, "#8a6d12", ex))
 
 
 def gauge(frac, size=250):
@@ -238,7 +238,7 @@ def gauge(frac, size=250):
         a0, a1 = math.pi * (1 - a), math.pi * (1 - b)
         paths += '<path d="M%.1f %.1f A%d %d 0 0 1 %.1f %.1f" stroke="%s" stroke-width="22" fill="none"/>' % (cx + r * math.cos(a0), cy - r * math.sin(a0), r, r, cx + r * math.cos(a1), cy - r * math.sin(a1), c)
     ang = math.pi * (1 - frac)
-    return ('<svg viewBox="0 0 200 118" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="#fff"/></svg>'
+    return ('<svg viewBox="0 0 200 118" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="#33321F" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="#33321F"/></svg>'
             % (size, size * .59, paths, cx + 62 * math.cos(ang), cy - 62 * math.sin(ang)))
 
 
@@ -256,7 +256,7 @@ def gift_cover(b):
     if not g:
         return e(("Nifty opening zone " + b["zone"]) if b.get("zone") else "Opening view from overnight cues")
     up = pc(g["vs"]) >= 0
-    return ('<div style="font-size:22px;letter-spacing:4px;color:#d9d2bd;font-weight:700">GIFT NIFTY</div>'
+    return ('<div style="font-size:22px;letter-spacing:4px;color:#6B696B;font-weight:700">GIFT NIFTY</div>'
             '<div style="font-size:64px;font-weight:900;line-height:1">%s <span class="%s" style="font-size:36px">%s %s</span></div>'
             '<div style="font-size:26px;font-weight:600;margin-top:4px">Expected Nifty opening zone %s</div>'
             % (e(g["last"]), "up" if up else "dn", e(g["vs"]), "&#9650;" if up else "&#9660;", e(b["zone"])))
@@ -267,7 +267,7 @@ def eve_cover(b):
     if not r:
         return e(b.get("headline", ""))
     up = pc(r.get("pct", "0")) >= 0
-    return ('<div style="font-size:22px;letter-spacing:4px;color:#d9d2bd;font-weight:700">NIFTY 50 CLOSE</div>'
+    return ('<div style="font-size:22px;letter-spacing:4px;color:#6B696B;font-weight:700">NIFTY 50 CLOSE</div>'
             '<div style="font-size:64px;font-weight:900;line-height:1">%s <span class="%s" style="font-size:36px">%s %s</span></div>'
             '<div style="font-size:26px;font-weight:600;margin-top:4px">%s</div>'
             % (e(r["level"]), "up" if up else "dn", e(r["pct"]), "&#9650;" if up else "&#9660;", e(b.get("headline", ""))))
@@ -288,21 +288,22 @@ def _gen_now():
 
 def p1(b, p, total, ph):
     # hero picture fills the top band at full width (16:9, nothing cropped), fading into the page colour
-    hero = ('<div style="position:absolute;left:0;top:0;width:1080px;height:640px;background:url(%s) center/cover"></div>'
-            '<div style="position:absolute;left:0;top:0;width:1080px;height:640px;background:linear-gradient(180deg,%s55 0%%,%s00 22%%,%s00 55%%,%s 100%%)"></div>' % (ph, p["base"], p["base"], p["base"], p["base"])) if ph else ""
+    hero = ('<div style="position:absolute;left:-38px;top:-20px;width:1036px;height:600px;background:url(%s) center/cover"></div>'
+            '<div style="position:absolute;left:-38px;top:-20px;width:1036px;height:600px;background:linear-gradient(180deg,#FBF9EF00 0%%,#FBF9EF00 62%%,#FBF9EF 100%%)"></div>' % ph) if ph else ""
     spark = chart(b.get("spark", []), b.get("proj"), p, 1080, 200).replace('height="200"', 'height="200" style="position:absolute;left:0;bottom:14px;opacity:.2"').replace('Today (est.)', '') if (b.get("spark") and not ph) else ""
-    top = 560 if ph else 120
+    top = 520 if ph else 120
     inner = ('<div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:18px;text-align:center;padding-top:%dpx">%s%s'
-             '<img src="%s" style="width:230px;border-radius:22px;border:3px solid %s;box-shadow:0 20px 60px #000c;position:relative">'
-             '<div class="brand" style="font-size:104px;position:relative;line-height:1.05">%s</div>'
-             '<div style="position:relative;text-align:center">%s</div>'
-             '<div style="width:420px;height:2px;background:%s;opacity:.6;position:relative"></div>'
-             '<div style="font-size:84px;font-weight:900;line-height:1.04;white-space:nowrap;position:relative;text-shadow:0 4px 24px #000a;width:1040px;text-align:center">%s</div>'
-             '<div style="font-size:36px;font-weight:700;color:#efe9d6;position:relative;text-align:center;width:100%%">for %s</div>'
-             '<div style="font-size:26px;font-weight:600;color:#d9d2bd;position:relative">Report generated %s IST</div>'
+             '<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;background:linear-gradient(180deg,#676300,#4f4b00);border:3px solid #A7A15D;border-radius:30px;padding:18px 46px 16px;box-shadow:0 14px 34px rgba(60,58,0,.35)">'
+             '<img src="%s" style="width:190px;border-radius:20px;border:3px solid %s;margin-top:-80px;box-shadow:0 12px 30px #0008">'
+             '<div class="brand" style="font-size:96px;line-height:1.05">%s</div>'
+             '<div style="text-align:center">%s</div></div>'
+             '<div style="width:420px;height:3px;background:%s;position:relative"></div>'
+             '<div style="font-size:84px;font-weight:900;line-height:1.04;white-space:nowrap;position:relative;color:#676300;width:1000px;text-align:center">%s</div>'
+             '<div style="font-size:36px;font-weight:700;color:#4A4A4A;position:relative;text-align:center;width:100%%">for %s</div>'
+             '<div style="font-size:26px;font-weight:600;color:#6B696B;position:relative">Report generated %s IST</div>'
              '<div style="position:relative"><span class="chip">%s</span></div>'
              '<div style="font-size:34px;font-weight:800;position:relative;max-width:920px">%s</div>'
-             '<div style="font-size:24px;opacity:.75;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
+             '<div style="font-size:24px;color:#6B696B;position:relative;margin-top:auto;padding-bottom:6px">Tap the page to turn &rarr;</div></div>'
              % (top, hero, spark, brand.logo_original(), GOLD, e(brand.BRAND), brand.tagline_html(23, 5), GOLD, "Evening Breeze" if b.get("edition") == "evening" else "Morning Sunrise",
                 e(_long_date(b)), e(b.get("gen") or _gen_now()), e(b["label"].upper()), eve_cover(b) if b.get("edition") == "evening" else gift_cover(b)))
     return shell(p, inner, 1, total, "", cover=True)
@@ -382,7 +383,7 @@ def dial(frac, p, size=210):
         a0, a1 = math.pi * (1 - a), math.pi * (1 - b_)
         paths += '<path d="M%.1f %.1f A%d %d 0 0 1 %.1f %.1f" stroke="%s" stroke-opacity="%.2f" stroke-width="22" fill="none"/>' % (cx + rr * math.cos(a0), cy - rr * math.sin(a0), rr, rr, cx + rr * math.cos(a1), cy - rr * math.sin(a1), col, op)
     ang = math.pi * (1 - frac)
-    return ('<svg viewBox="0 0 200 112" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="#fff"/></svg>'
+    return ('<svg viewBox="0 0 200 112" width="%d" height="%d">%s<line x1="100" y1="100" x2="%.1f" y2="%.1f" stroke="#33321F" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="100" r="11" fill="#33321F"/></svg>'
             % (size, size * .56, paths, cx + 62 * math.cos(ang), cy - 62 * math.sin(ang)))
 
 
@@ -403,8 +404,8 @@ def p3(b, p, total):
     for r in b["bench"]:
         v = pc(r["pct"])
         col = p["up"] if v >= 0 else p["dn"]
-        bench += ('<div style="display:flex;align-items:center;gap:14px;height:56px;border-radius:30px;padding:0 20px 0 8px;background:linear-gradient(90deg,%s55,%s15);border:1.5px solid #ffffff2a">'
-                  '<span style="width:42px;height:42px;border-radius:50%%;background:#fff;color:#111;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center">%s</span>'
+        bench += ('<div style="display:flex;align-items:center;gap:14px;height:56px;border-radius:30px;padding:0 20px 0 8px;background:linear-gradient(90deg,%s55,%s15);border:1.5px solid #DDD7AE">'
+                  '<span style="width:42px;height:42px;border-radius:50%%;background:#676300;color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center">%s</span>'
                   '<span style="font-size:27px;font-weight:800;flex:1;white-space:nowrap">%s</span><span style="font-size:21px;opacity:.85;white-space:nowrap">%s IST</span><span style="font-size:27px;font-weight:700;width:150px;text-align:right">%s</span><span style="width:185px;text-align:right;font-size:27px">%s</span></div>'
                   % (col, col, code.get(r["name"], ""), e(r["name"]), sess_ist(r["name"], b.get("date_iso") or ""), e(r["level"]), chg(r["pct"])))
     tiles = cmd_tiles(b, p)
@@ -470,7 +471,7 @@ def p5(b, p, total):
              '<div style="display:flex;gap:12px"><div class="card" style="flex:1;padding:12px 16px"><div class="small">ENTRY AGE</div><div style="font-size:30px;font-weight:800">%s</div></div>'
              '<div class="card" style="flex:1;padding:12px 16px"><div class="small">TERM</div><div style="font-size:30px;font-weight:800">%s</div></div>'
              '<div class="card" style="flex:1;padding:12px 16px"><div class="small">TYPE</div><div style="font-size:24px;font-weight:800">%s</div></div></div>'
-             '<div class="card" style="border-color:#F7FF0088"><div class="small" style="letter-spacing:1.4px">BEST FOR AGE GROUP</div><div style="font-size:40px;font-weight:900;color:#F7FF00">%s years</div></div>'
+             '<div class="card" style="border-color:#A7A15D;background:#F6F3DC"><div class="small" style="letter-spacing:1.4px">BEST FOR AGE GROUP</div><div style="font-size:40px;font-weight:900;color:#676300">%s years</div></div>'
              '<h2 class="s" style="color:#43e08a">Advantages</h2><div>%s</div>'
              '<h2 class="s" style="color:#ffb454">Drawbacks</h2><div>%s</div>'
              '<div class="card" style="border:2.5px solid #ff6b6b;background:#ff6b6b22"><div style="font-size:32px;font-weight:900;color:#ff8f8f;letter-spacing:1.2px">WARNINGS</div>%s</div>'
