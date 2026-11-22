@@ -25,7 +25,7 @@
       "session": "morning",
       "kind": "png",
       "file_pattern": "JCGG_Morning_Pulse_Mobile_<date>_<page>.png",
-      "summary": "Morning phone booklet (English / हिन्दी / বাংলা): GIFT Nifty, global cues, levels for the day, events, mood — built by GitHub around 08:15 and posted to the Morning Sunrise page and client Telegram.",
+      "summary": "Morning phone booklet (English / हिन्दी / বাংলা): GIFT Nifty, global cues, levels for the day, events, mood — built by GitHub around 08:15 and posted to the Morning Sunrise page and client Telegram. Includes \"Stocks in the news\": company news since the last close (publishers and NSE filings), one line per stock with headline, short summary and source, ranked by expected price impact.",
       "telegram": false
     },
     {

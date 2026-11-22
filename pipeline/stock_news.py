@@ -4,7 +4,7 @@
 Company-specific news published since the previous session's close (15:30 IST of the last trading day), from
 free public sources only:
   * publisher RSS feeds (Economic Times, Moneycontrol, Business Standard, Mint, BusinessLine, Financial Express, NDTV Profit)
-  * BSE corporate announcements (the companies' own exchange filings)
+  * NSE corporate announcements RSS (the companies' own exchange filings)
 Each item is matched to a listed company of the tracked universe (data/weights.json, ~300 large and mid caps) by
 company name, then ranked by expected price impact:
   impact class of the news (results, orders, deals, regulator action ... > brokerage calls, launches ... > other)
@@ -360,12 +360,13 @@ def collect(now=None, raw=None, limit=20, log=print):
         items += n_
     except Exception as ex_:
         status["nse"] = str(ex_)[:80]
-    try:
-        b = bse(since, now, raw)
-        status["bse"] = len(b)
-        items += b
-    except Exception as ex_:
-        status["bse"] = str(ex_)[:80]
+    if os.environ.get("SN_BSE"):          # BSE's API refuses GitHub's servers (403); kept for runs from elsewhere
+        try:
+            b = bse(since, now, raw)
+            status["bse"] = len(b)
+            items += b
+        except Exception as ex_:
+            status["bse"] = str(ex_)[:80]
     log("feeds:", json.dumps(status))
     lc = {s: re.sub(r"\W+", "", names.get(s, "").lower()) for s in w}
     per = {}
