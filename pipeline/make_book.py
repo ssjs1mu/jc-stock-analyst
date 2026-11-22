@@ -228,7 +228,7 @@ def _holidays():
         return "[]"
 
 
-def build(date, pages, headline="", mood="neutral", caption="", kind="morning", lang_pages=None):
+def build(date, pages, headline="", mood="neutral", caption="", kind="morning", lang_pages=None, clip=None):
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%A, %d %B %Y")
@@ -256,8 +256,12 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
         folder = os.path.join(ROOT, kind, sub)
         os.makedirs(folder, exist_ok=True)
         up = "../" * (1 + (1 if sub else 0))
-        leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s><div class="back"></div><div class="shade"></div></div>'
-                         % (up, p, i + 1, 'loading="eager"') for i, p in enumerate(pages))
+        # cover: the living-photo mood clip plays over the cover picture box (same place and size; the still stays underneath)
+        vid = ('<video src="%s%s" autoplay muted loop playsinline preload="auto" style="position:absolute;left:2.04%%;top:1.22%%;width:95.93%%;height:33.33%%;object-fit:cover;'
+               'border-radius:2.7%% 2.7%% 0 0/4.7%% 4.7%% 0 0;-webkit-mask-image:linear-gradient(180deg,#000 60%%,transparent 100%%);mask-image:linear-gradient(180deg,#000 60%%,transparent 100%%);'
+               'backface-visibility:hidden;pointer-events:none"></video>' % (up, clip)) if clip else ""
+        leaves = "".join('<div class="leaf"><img src="%s%s" alt="Page %d" %s>%s<div class="back"></div><div class="shade"></div></div>'
+                         % (up, p, i + 1, 'loading="eager"', vid if i == 0 else "") for i, p in enumerate(pages))
         lp = {"en": [up + p for p in pages]}
         for _l, _pp in (lang_pages or {}).items():
             if len(_pp) == len(pages):

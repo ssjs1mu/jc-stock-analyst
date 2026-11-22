@@ -690,7 +690,18 @@ def render(cfg, png_base, langs=("en",)):
     except Exception as ex:
         print("festival decoration skipped:", ex)
         FEST[0] = None
-    pages = [p1(b, p, total, photo(cfg, sc))]
+    ph = photo(cfg, sc)
+    pages = [p1(b, p, total, ph)]
+    try:   # living-photo mood clip over the cover picture (flip-book + Telegram); never blocks the booklet
+        import mood_clip
+        mk = (b.get("mood") or {}).get("key", "neutral")
+        if b.get("edition") == "evening":
+            r0 = (b.get("snapshot") or [{}])[0]; hl = ("Nifty %s %s" % (r0.get("level", ""), r0.get("pct", ""))).strip() if r0 else b.get("headline", "")
+        else:
+            g = b.get("gift") or {}; hl = ("GIFT Nifty %s %s" % (g.get("last", ""), g.get("vs", ""))).strip() if g else b.get("label", "")
+        mood_clip.make(ph, mk if mk in ("bull", "bear") else "neutral", p["word"], hl, png_base.replace("_Mobile_", "_Clip_")[:-4] + ".mp4")
+    except Exception as ex:
+        print("mood clip skipped:", ex)
     for k, f in enumerate(pagelist):
         CUR[0] = k + 2
         pages.append(f(b, p, total))

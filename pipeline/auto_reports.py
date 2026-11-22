@@ -1054,9 +1054,13 @@ def main():
     shutil.copyfile(cj, js)
     if a.sid == "evening-breeze":
         files = [x for f in _book_pages(mpng) for x in ("--file", f)] + ["--file", js]
+        clip = mpng.replace("_Mobile_", "_Clip_")[:-4] + ".mp4"
+        if os.path.exists(clip): files += ["--file", clip]
         subprocess.check_call(pub + files + ["--caption", "Evening Breeze %s" % now.strftime("%d %b")])
         return
     files = ["--file", pdf] + (["--file", png] + [x for f in _book_pages(mpng) for x in ("--file", f)] if a.sid == "morning-pulse" else []) + ["--file", js]
+    clip = mpng.replace("_Mobile_", "_Clip_")[:-4] + ".mp4"
+    if a.sid == "morning-pulse" and os.path.exists(clip): files += ["--file", clip]
     subprocess.check_call(pub + files + ["--caption", "%s %s" % (a.sid.replace("-", " ").title(), now.strftime("%d %b"))])
 
 

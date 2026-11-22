@@ -94,7 +94,8 @@ def main():
                         cj = json.load(open(src))
                         head = cj.get("headline", "")
                         mood = (cj.get("mood") or {}).get("key", "neutral")
-                make_book.build(entry["date"], pages, head, mood, kind=kind, lang_pages=lang_pages)
+                clip = next((x["path"] for x in files if x["type"] == "mp4"), None)
+                make_book.build(entry["date"], pages, head, mood, kind=kind, lang_pages=lang_pages, clip=clip)
                 book_added = True
                 try:   # one combined message: Morning Sunrise + Evening Breeze thumbnails, links and update times
                     import make_updates
