@@ -29,6 +29,19 @@
       "telegram": false
     },
     {
+      "id": "sector-digest",
+      "task_id": "",
+      "name": "Sector Digest (booklet)",
+      "icon": "🧭",
+      "time": "20:15",
+      "days": "weekdays",
+      "session": "evening",
+      "kind": "png",
+      "file_pattern": "Sector_Digest_Mobile_<date>_<page>.png",
+      "summary": "Where money flowed in and out by sector, the stocks that show it (volume, delivery, RSI-14, PCR and option OI range, F&O build-up), RSI reversal attempts, index option positioning, and the full Circuit Watch (band hitters, 52-week highs / lows on heavy volume). Built by GitHub from NSE's end-of-day files.",
+      "telegram": false
+    },
+    {
       "id": "circuit-watch",
       "task_id": "trig_01PpoVVn7E1VMZghRW5UumWF",
       "name": "Circuit Watch Scanner",

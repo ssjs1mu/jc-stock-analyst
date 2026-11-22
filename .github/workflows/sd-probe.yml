@@ -1,8 +1,0 @@
-name: Sector Digest probe (temporary)
-on: { workflow_dispatch: { inputs: { d: { default: '20112026' } } } }
-jobs:
-  p:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: python3 pipeline/sd_probe.py "${{ github.event.inputs.d }}"

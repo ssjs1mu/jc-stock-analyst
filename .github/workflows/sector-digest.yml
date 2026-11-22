@@ -1,0 +1,61 @@
+name: Sector Digest (evening booklet)
+
+# Builds the Sector Digest from the exchange's own end-of-day files (free, no Claude / paid API).
+# Started by the ticker every 15 min from 19:00 IST until it is published; the first step is a cheap check, so a run before
+# NSE posts its evening files ends in seconds. Manual run: choose a date, "dry" = build previews only (artifact), no publish.
+on:
+  workflow_dispatch:
+    inputs:
+      date: { description: 'YYYY-MM-DD (empty = today IST)', default: '' }
+      dry: { description: 'true = previews only (artifact), nothing published', default: 'false' }
+      force: { description: 'true = rebuild even if already published', default: 'false' }
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sector-digest
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.12' }
+      - name: Due and files out?
+        id: chk
+        run: |
+          D="${{ github.event.inputs.date }}"; A=""; [ -n "$D" ] && A="--date $D"
+          [ "${{ github.event.inputs.force }}" = "true" ] && A="$A --force"
+          if [ "${{ github.event.inputs.dry }}" = "true" ]; then echo "go=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+          set +e; python pipeline/sector_digest.py --check $A; rc=$?; set -e
+          if [ $rc -eq 0 ]; then echo "go=yes" >> "$GITHUB_OUTPUT"; else echo "go=no" >> "$GITHUB_OUTPUT"; fi
+      - name: Install renderer
+        if: steps.chk.outputs.go == 'yes'
+        run: |
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Build
+        if: steps.chk.outputs.go == 'yes'
+        run: |
+          D="${{ github.event.inputs.date }}"; A=""; [ -n "$D" ] && A="--date $D"
+          [ "${{ github.event.inputs.force }}" = "true" ] && A="$A --force"
+          if [ "${{ github.event.inputs.dry }}" = "true" ]; then
+            python pipeline/sector_digest.py $A --dry --out /tmp/sd --raw /tmp/sd/raw
+          else
+            git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            python pipeline/sector_digest.py $A --out /tmp/sd
+            git add reports/sector-digest
+            git diff --cached --quiet && exit 0
+            git commit -m "report: Sector Digest $(TZ=Asia/Kolkata date +%F)"
+            for i in 1 2 3 4 5; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done; exit 1
+          fi
+      - name: Previews
+        if: github.event.inputs.dry == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: sector-digest-preview
+          path: /tmp/sd

@@ -43,6 +43,10 @@ jobs:
                 gh workflow run infographic.yml --ref main || true
               fi
             fi
+            # Sector Digest: every 15 min 19:00-22:45 IST on weekdays until published (the job's first step checks, so early runs end in seconds)
+            if [ "$dow" -le 5 ] && [ "$hm" -ge 1900 ] && [ "$hm" -le 2245 ] && [ $(( 10#${ist:3:2} % 15 )) -lt 5 ]; then
+              gh workflow run sector-digest.yml --ref main || true
+            fi
             sleep 300
           done
           # hand over to the next ticker (queued behind this one by the concurrency group)
