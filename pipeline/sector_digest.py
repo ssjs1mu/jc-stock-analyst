@@ -567,7 +567,7 @@ DISCLAIMER = ("This report is prepared by Joshi's Corner for general information
 
 
 def p_notes(R, total, n):
-    base = ["All prices, volumes, delivery %, index levels, band hits, 52-week marks, open interest and participant positions are the exchange's own end-of-day files for %s (nsearchives.nseindia.com)." % DATE_TXT[0],
+    base = ["All prices, volumes, delivery %%, index levels, band hits, 52-week marks, open interest and participant positions are the exchange's own end-of-day files for %s (nsearchives.nseindia.com)." % DATE_TXT[0],
             "Net money flow is a calculation, not a reported figure: turnover &times; ((close &minus; low) &minus; (high &minus; close)) &divide; (high &minus; low), summed over each sector index's members (constituent lists from niftyindices.com).",
             "Volume multiple and RSI-14 (Wilder) use the stored NSE daily history (%d sessions available); averages need at least 10 sessions or are shown as '-'." % R.get("nh", 0),
             "PCR and OI walls use the nearest expiry with open interest; the OI range is the highest put-OI strike at / below the underlying and the highest call-OI strike at / above it.",

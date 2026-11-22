@@ -53,9 +53,10 @@ jobs:
             git commit -m "report: Sector Digest $(TZ=Asia/Kolkata date +%F)"
             for i in 1 2 3 4 5; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done; exit 1
           fi
-      - name: Previews
+      - name: Previews to the sd-preview branch
         if: always() && github.event.inputs.dry == 'true'
-        uses: actions/upload-artifact@v5
-        with:
-          name: sector-digest-preview
-          path: /tmp/sd
+        run: |
+          [ -d /tmp/sd ] || exit 0
+          cd /tmp/sd && git init -q && git checkout -q -b sd-preview && git add -A && \
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm preview || exit 0
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" sd-preview
