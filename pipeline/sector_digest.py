@@ -717,6 +717,7 @@ def main():
     ins = ", ".join(x["lab"] for x in R["s_in"]) or "no clear inflow"; ots = ", ".join(x["lab"] for x in R["s_out"]) or "no clear outflow"
     cap = "Sector Digest %s: money in %s; out of %s; circuits %d up / %d down" % (d.strftime("%d %b"), ins, ots, len(R["circ"]["up"]), len(R["circ"]["dn"]))
     print(cap); print("\n".join(outs + [pdf]))
+    save_stats(R, a.out if a.dry else os.path.join(ROOT, "data"))
     if a.dry: return
     nf = next((v for n, v in R["snap"]["idx"] if n == "Nifty 50"), None)
     mood = "bull" if nf and nf["pct"] >= 0.3 else "bear" if nf and nf["pct"] <= -0.3 else "neutral"
@@ -724,6 +725,40 @@ def main():
     json.dump({"headline": "Money in: %s · out: %s" % (ins, ots), "mood": {"key": mood}}, open(meta, "w"))
     cmd = [sys.executable, os.path.join(HERE, "publish.py"), SID, "--date", d.isoformat(), "--caption", cap, "--file", pdf, "--file", meta] + sum([["--file", f] for f in outs], [])
     subprocess.run(cmd, check=True)
+
+
+def save_stats(R, folder):
+    """Per-stock evening facts for the next morning's 'Stocks in the news' trend read (RSI, volume, delivery, OI build-up, PCR, sector flow)."""
+    try:
+        secflow = {}
+        for x in R["sectors"]:
+            for m in x["mem"]:
+                secflow.setdefault(m["sym"], (x["lab"], x["flow"]))
+        r2 = lambda v, n=2: None if v is None else round(v, n)
+        st = {}
+        for s, m in R["S"].items():
+            if m.get("series") != "EQ":
+                continue
+            st[s] = {"c": m["c"], "pct": r2(m["pct"]), "rsi": r2(m["rsi"], 1), "rsip": r2(m["rsip"], 1), "vm": r2(m["vm"]), "dp": r2(m.get("dp"), 1),
+                     "bu": m.get("bu"), "oip": r2(m.get("oip"), 1), "pcr": m.get("pcr"), "cwall": m.get("cwall"), "pwall": m.get("pwall"),
+                     "sec": secflow.get(s, (None, None))[0], "flow": secflow.get(s, (None, None))[1]}
+        nf = next((v for n, v in R["snap"]["idx"] if n == "Nifty 50"), None)
+        mk = {"nifty_pct": r2(nf["pct"]) if nf else None, "nifty_pcr": (R["idxfo"].get("NIFTY") or {}).get("pcr"),
+              "adv": R["snap"].get("adv"), "dec": R["snap"].get("dec")}
+        json.dump({"date": R["date"].isoformat(), "market": mk, "stocks": st}, open(os.path.join(folder, "stock_stats.json"), "w"), separators=(",", ":"))
+        # daily archive (build-up, PCR, sector flow) so their edge can be measured once enough sessions exist
+        hp = os.path.join(folder, "stock_stats_hist.json")
+        try:
+            hist = json.load(open(hp))
+        except Exception:
+            hist = {"note": "per session: symbol -> [futures build-up, stock PCR, sector flow]", "d": {}}
+        hist["d"][R["date"].isoformat()] = {s: [v["bu"], v["pcr"], v["flow"]] for s, v in st.items() if v["bu"] or v["pcr"] is not None or v["flow"]}
+        for k in sorted(hist["d"])[:-260]:
+            del hist["d"][k]
+        json.dump(hist, open(hp, "w"), separators=(",", ":"))
+        print("stock stats saved:", len(st))
+    except Exception as ex:
+        print("stock stats not saved:", ex)
 
 
 if __name__ == "__main__":

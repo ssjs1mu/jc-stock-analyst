@@ -947,7 +947,12 @@ def build(sid, qs, heads, now):
                 import stock_news as SN
                 sn_ = SN.collect(now.astimezone(SN.IST) if now.tzinfo else now.replace(tzinfo=SN.IST))
                 sn_["since_txt"] = dt.datetime.fromisoformat(sn_["since"]).strftime("%a %d %b, %H:%M")
-                book["stock_news"] = {k_: sn_[k_] for k_ in ("items", "since_txt", "matched")}
+                try:   # trend read per stock: tested odds from price / RSI / volume history + OI, PCR, sector flow, news, mood
+                    import stock_trend as ST
+                    sn_["model"] = ST.enrich(sn_["items"], (mood or {}).get("key"))
+                except Exception as ex2:
+                    print("stock trend:", ex2)
+                book["stock_news"] = {k_: sn_.get(k_) for k_ in ("items", "since_txt", "matched", "model")}
                 print("stock news: %d stocks" % len(sn_["items"]))
             except Exception as ex:
                 print("stock news:", ex)

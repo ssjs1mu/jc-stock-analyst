@@ -668,6 +668,41 @@ def stock_news_pages(b):
     chunks = [items[i:i + per] for i in range(0, min(len(items), per * 3), per)]
     since = (b.get("stock_news") or {}).get("since_txt", "")
 
+    import datetime as _dt
+    model = (b.get("stock_news") or {}).get("model") or {}
+    G, R_, N_ = "#1C820D", "#D00000", "#7a7650"
+
+    def tcell(t):
+        """trend read under the symbol: view, strength bars, tested odds, and the inputs coloured by their lean"""
+        if not t:
+            return '<div style="font-size:16px;color:%s;margin-top:8px">No price history for a trend read</div>' % N_
+        col = G if t["dir"] == "up" else R_ if t["dir"] == "dn" else N_
+        word = {"up": "&#9650; BULLISH", "dn": "&#9660; BEARISH", "flat": "&#9670; RANGE"}[t["dir"]]
+        bars = "".join('<i style="display:inline-block;width:18px;height:8px;border-radius:2px;margin-right:3px;background:%s"></i>' % (col if j < t["bars"] else "#ddd8b8") for j in range(4))
+        def it(txt, lean):
+            c_ = G if lean > 0 else R_ if lean < 0 else N_
+            return '<span style="color:%s;font-weight:700;white-space:nowrap">%s</span>' % (c_, txt)
+        rs = t["rsi"]
+        parts = [it("RSI %d%s" % (rs, "&#8593;" if t["rsi_up"] else "&#8595;"), (1 if rs < 30 else -1 if rs >= 70 else 0)),
+                 it("Vol %.1f&times;" % t["vm"], (1 if t["pct"] > 0 else -1) if t["vm"] and t["vm"] >= 1.5 else 0) if t.get("vm") else "",
+                 it("Del %d%%" % t["dp"], (1 if t["pct"] > 0 else -1) if t["dp"] and t["dp"] >= 55 else 0) if t.get("dp") is not None else "",
+                 it("%s 20DMA" % ("&gt;" if t["above20"] else "&lt;"), 0)]
+        bu = t.get("bu")
+        if bu:
+            parts.append(it({"Long build-up": "Long build-up", "Short build-up": "Short build-up", "Short covering": "Short covering", "Long unwinding": "Long unwinding"}[bu],
+                            1 if bu in ("Long build-up", "Short covering") else -1))
+        if t.get("pcr") is not None:
+            parts.append(it("PCR %.2f" % t["pcr"], 1 if t["pcr"] >= 1.2 else -1 if t["pcr"] <= 0.6 else 0))
+        if t.get("flow"):
+            parts.append(it("Sector %s" % t["flow"], 1 if t["flow"] == "IN" else -1 if t["flow"] == "OUT" else 0))
+        odds = ('Tested 3-day &#9650;%d%% &#9660;%d%%' % (t["t_up"], t["t_dn"])) if t.get("t_up") is not None else 'Odds: too few cases'
+        return ('<div style="margin-top:9px;border-top:1px dashed #d9d3ad;padding-top:7px">'
+                '<div style="font-size:19px;font-weight:900;color:%s;letter-spacing:.4px">%s</div>'
+                '<div style="margin:4px 0 3px">%s<span style="font-size:15px;font-weight:800;color:%s;margin-left:4px">%s</span></div>'
+                '<div style="font-size:16px;font-weight:800;color:#33321F">%s</div>'
+                '<div style="font-size:15.5px;line-height:1.35;margin-top:3px">%s</div></div>'
+                % (col, word, bars, col, t["strength"], odds, " &middot; ".join(x for x in parts if x)))
+
     def mk(ch, k):
         def f(b, p, total):
             rows = ""
@@ -678,14 +713,21 @@ def stock_news_pages(b):
                 if x.get("also"):
                     src += " &middot; also " + e(", ".join(x["also"]))
                 rows += ('<tr><td style="width:44px;font-size:22px;font-weight:800;color:#8a8660;vertical-align:top;padding-top:14px">%d</td>'
-                         '<td style="width:230px;vertical-align:top;padding-top:12px"><div style="font-size:27px;font-weight:900;line-height:1.1;word-break:break-word">%s</div>'
-                         '<div style="margin-top:6px;display:inline-block;font-size:16px;font-weight:800;letter-spacing:.6px;color:#fff;background:%s;border-radius:12px;padding:3px 10px">%s %s</div></td>'
+                         '<td style="width:285px;vertical-align:top;padding-top:12px;padding-right:10px"><div style="font-size:27px;font-weight:900;line-height:1.1;word-break:break-word">%s</div>'
+                         '<div style="margin-top:6px;display:inline-block;font-size:16px;font-weight:800;letter-spacing:.6px;color:#fff;background:%s;border-radius:12px;padding:3px 10px">%s %s</div>%s</td>'
                          '<td style="vertical-align:top;padding:12px 0 12px 8px"><div style="font-size:25px;font-weight:800;line-height:1.25">%s</div>'
                          '%s<div style="font-size:18px;margin-top:6px;color:#676300;font-weight:700">&mdash; %s</div></td></tr>'
-                         % (j, e(x["sym"]), col, arrow, e(x["tag"]), e(x["headline"]),
+                         % (j, e(x["sym"]), col, arrow, e(x["tag"]), tcell(x.get("trend")), e(x["headline"]),
                             ('<div style="font-size:21px;line-height:1.32;margin-top:5px;color:#4a4830">%s</div>' % e(x["brief"])) if x.get("brief") else "", src))
             head = ('<h2 class="s">Stocks in the news%s</h2>' % (" &middot; %d of %d" % (k + 1, len(chunks)) if len(chunks) > 1 else ""))
-            note = ('<div class="small" style="opacity:.85;font-size:19px;margin:-4px 0 4px">Since %s &middot; ranked by expected price impact &middot; &#9650;&#9660; = tone of the news, not a call &middot; summaries are the publisher&#39;s own</div>' % e(since)) if k == 0 else ""
+            mtxt = ""
+            if model.get("test_from"):
+                mtxt = ('<br><b>Trend read:</b> tested odds = how often the same price / RSI / volume setup closed higher (&#9650;) or lower (&#9660;) 3 sessions later on '
+                        'unseen data (since %s; all stocks &#9650;%s%%, %s cases). OI build-up, PCR, sector flow, news and market mood move the view but are not yet tested. '
+                        'Colours: green leans up, red leans down. Not a buy / sell call.' % (e(_dt.datetime.strptime(model["test_from"], "%Y-%m-%d").strftime("%d %b %Y")), model.get("test_base_up"), "{:,}".format(model.get("test_n") or 0)))
+                if not model.get("ctx"):
+                    mtxt += " Last evening&#39;s OI / PCR / sector data was not available today."
+            note = ('<div class="small" style="opacity:.85;font-size:18px;margin:-4px 0 4px;line-height:1.35">Since %s &middot; ranked by expected price impact &middot; &#9650;&#9660; on the tag = tone of the news &middot; summaries are the publisher&#39;s own%s</div>' % (e(since), mtxt)) if k == 0 else ""
             inner = head + note + '<div class="card" style="padding:4px 16px"><table>%s</table></div>' % rows
             return shell(p, inner, 5, total, "Stocks in the news &middot; " + e(b["date_txt"]))
         return f

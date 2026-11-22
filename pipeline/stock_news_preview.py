@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import render_booklet as R
 from playwright.sync_api import sync_playwright
 j = json.load(open(sys.argv[1])); out = sys.argv[2]
+j.setdefault("model", None)
 j["since_txt"] = dt.datetime.fromisoformat(j["since"]).strftime("%a %d %b, %H:%M")
 b = {"stock_news": j, "date_txt": dt.datetime.fromisoformat(j["asof"]).strftime("%d %b %Y")}
 p = R.PAL["neutral"]
