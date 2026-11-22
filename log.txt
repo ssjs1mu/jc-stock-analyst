@@ -1,0 +1,23 @@
+feeds: {"https://economictimes.indiatimes.com/markets/stocks/news/rssfeeds/2146842.cms": 50, "https://economictimes.indiatimes.com/markets/stocks/earnings/rssfeeds/2143429.cms": 49, "https://economictimes.indiatimes.com/industry/rssfeeds/13352306.cms": 50, "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms": 50, "https://www.moneycontrol.com/rss/buzzingstocks.xml": 15, "https://www.moneycontrol.com/rss/results.xml": 15, "https://www.moneycontrol.com/rss/business.xml": 15, "https://www.moneycontrol.com/rss/marketreports.xml": 4, "https://www.moneycontrol.com/rss/latestnews.xml": 15, "https://www.business-standard.com/rss/markets-106.rss": 35, "https://www.business-standard.com/rss/companies-101.rss": 35, "https://www.livemint.com/rss/companies": 35, "https://www.livemint.com/rss/markets": 35, "https://www.thehindubusinessline.com/markets/stock-markets/feeder/default.rss": 60, "https://www.thehindubusinessline.com/companies/feeder/default.rss": 60, "https://feeds.feedburner.com/ndtvprofit-latest": 20, "nse": 77, "bse": "HTTP Error 403: Forbidden"}
+matched 20 stocks; top:
+  154.8 TATASTEEL   DEAL        Tata Steel to sell tubes, pipes business and Tata Steel Colors to APL Apollo for Rs 28,000 | Economic Times
+  152.5 APLAPOLLO   DEAL        APL Apollo Tubes: Acquisition (including agreement to acquire) | NSE filing
+  133.4 ASHOKLEY    ORDER       Ashok Leyland expands EV push with order of 200 trucks for cement transport, eyes wider LC | BusinessLine
+  129.7 ADANIENSOL  ORDER       Adani Energy Solutions bags 2,500 MW renewable power supply contract from West Bengal disc | BusinessLine
+  126.5 PNB         RESULTS     PNB needs Rs 5,000 crore extra provisions under ECL, CEO sees limited impact | Economic Times
+  126.5 INDUSINDBK  MANAGEMENT  IndusInd Bank ends ex-CEO Kathpalia's employment, seeks to recover pay | Economic Times
+  125.5 LODHA       MANAGEMENT  Lodha Developers Chairman Mukund Chitale Steps Down; Akhil Gupta To Replace | NDTV Profit
+  119.4 HEROMOTOCO  REGULATOR   Hero MotoCorp gets tribunal relief on Rs 27 crore income tax demand | Economic Times
+  116.5 AUROPHARMA  REGULATOR   US drug regulator classifies Aurobindo Pharma arm's Andhra facility as 'voluntary action i | Economic Times
+  112.4 VOLTAS      DEAL        Voltas signs joint venture agreement with Atomberg Innovation, to hold 50% stake in entity | Mint
+  106.6 PATANJALI   REGULATOR   Patanjali Foods faces fresh cow ghee safety action as Madhya Pradesh bans sale of one batc | Mint
+   98.0 RAILTEL     ORDER       Railtel Corporation Of India: Bagging/Receiving of orders/contracts | NSE filing
+   85.2 TITAN       EXPANSION   Titan to expand premium watch business, target 500 Helios stores in three years | Economic Times
+   62.4 ABREL       BUSINESS    Aditya Birla Real Estate aims Rs 15,000 crore annual pre-sales in three years | Economic Times
+   54.5 MARUTI      NEWS        Maruti Suzuki hikes select model prices amid cost pressures | BusinessLine
+   41.9 ITC         NEWS        ITC extends Braille-enabled packaging to Fiama, takes total to 16 SKUs | Business Standard
+   40.2 RVNL        NEWS        Rail Vikas Nigam: Updates | NSE filing
+   37.8 IOC         NEWS        Reliance, Indian Oil, other Indian refiners race to secure oil tankers as freight costs ri | Economic Times
+   37.2 VEDL        NEWS        Vedanta to pay 10% salary to 1 lakh employees under Chairman Grant | BusinessLine
+   37.0 RADICO      NEWS        Johnnie Walker-owner overtakes Pernod Ricard as India's largest alco-bev firm; Radico Khai | Economic Times
+3 pages
