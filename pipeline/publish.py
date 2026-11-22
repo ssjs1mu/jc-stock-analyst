@@ -79,8 +79,8 @@ def main():
         json.dump(idx, f, indent=1)
 
     book_added = False
-    if a.schedule_id in ("morning-pulse", "evening-breeze") and a.status == "ok":
-        kind = "evening" if a.schedule_id == "evening-breeze" else "morning"
+    if a.schedule_id in ("morning-pulse", "evening-breeze", "sector-digest") and a.status == "ok":
+        kind = {"evening-breeze": "evening", "sector-digest": "digest"}.get(a.schedule_id, "morning")
         pages = sorted(x["path"] for x in files if "_Mobile_" in x["name"] and x["type"] == "png" and not re.search(r"_Mobile_(HI|BN)_", x["name"]))
         lang_pages = {L.lower(): sorted(x["path"] for x in files if x["type"] == "png" and ("_Mobile_%s_" % L) in x["name"]) for L in ("HI", "BN")}
         lang_pages = {k: v for k, v in lang_pages.items() if v}
@@ -98,7 +98,7 @@ def main():
                 book_added = True
                 try:   # one combined message: Morning Sunrise + Evening Breeze thumbnails, links and update times
                     import make_updates
-                    make_updates.build()
+                    if kind != "digest": make_updates.build()
                 except Exception as ex2:
                     print("updates card not built:", ex2)
             except Exception as ex:
@@ -109,7 +109,7 @@ def main():
     if os.path.exists(os.path.join(ROOT, "data", "i18n_cache.json")):
         git("add", "data/i18n_cache.json", check=False)   # translation memory (Hindi / Bengali), so each phrase is translated once
     if book_added:
-        git("add", "evening" if a.schedule_id == "evening-breeze" else "morning", "updates")
+        git("add", kind, "updates")
     msg = f"report: {a.schedule_id} {entry['date']} ({a.status})"
     git("commit", "-m", msg)
     branch = git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()

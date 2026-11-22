@@ -718,7 +718,11 @@ def main():
     cap = "Sector Digest %s: money in %s; out of %s; circuits %d up / %d down" % (d.strftime("%d %b"), ins, ots, len(R["circ"]["up"]), len(R["circ"]["dn"]))
     print(cap); print("\n".join(outs + [pdf]))
     if a.dry: return
-    cmd = [sys.executable, os.path.join(HERE, "publish.py"), SID, "--date", d.isoformat(), "--caption", cap, "--file", pdf] + sum([["--file", f] for f in outs], [])
+    nf = next((v for n, v in R["snap"]["idx"] if n == "Nifty 50"), None)
+    mood = "bull" if nf and nf["pct"] >= 0.3 else "bear" if nf and nf["pct"] <= -0.3 else "neutral"
+    meta = os.path.join(a.out, "Sector_Digest_%s.json" % d.isoformat())
+    json.dump({"headline": "Money in: %s · out: %s" % (ins, ots), "mood": {"key": mood}}, open(meta, "w"))
+    cmd = [sys.executable, os.path.join(HERE, "publish.py"), SID, "--date", d.isoformat(), "--caption", cap, "--file", pdf, "--file", meta] + sum([["--file", f] for f in outs], [])
     subprocess.run(cmd, check=True)
 
 

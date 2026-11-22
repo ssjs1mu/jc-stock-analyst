@@ -793,9 +793,9 @@ var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
 var TG_MORNING = { 'premarket-news': 480, 'morning-brief': 510, 'morning-detailed': 510, 'morning-pulse': 525 }; // fixed post times (minutes after midnight IST) on trading days: 08:00, 08:30, 08:30, 08:45 - never earlier
 // SUSPENDED 2026-11-05 (not in the booklets): premarket-news, morning-brief, evening-market-wrap, evening-news-wrap
 var TG_IDS = ['morning-detailed', 'morning-pulse', 'evening-breeze', 'circuit-watch', 'sector-digest'];
-var TG_ALBUM = { 'sector-digest': '\uD83E\uDDED Sector Digest' }; // posted as one photo album (all pages) + the PDF; latest edition, once, as soon as it is published
+var TG_ALBUM = {}; // posted as one photo album (all pages) + the PDF; latest edition, once, as soon as it is published
 // Booklet reports are NOT posted page by page: one thumbnail (og.jpg) + the link to the flip-book booklet. id -> site folder.
-var TG_BOOKLET = { 'morning-pulse': ['morning', '\uD83C\uDF05 Morning Sunrise'], 'evening-breeze': ['evening', '\uD83C\uDF07 Evening Breeze'] };
+var TG_BOOKLET = { 'morning-pulse': ['morning', '\uD83C\uDF05 Morning Sunrise'], 'evening-breeze': ['evening', '\uD83C\uDF07 Evening Breeze'], 'sector-digest': ['digest', '\uD83E\uDDED Sector Digest'] };
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
 function installTelegramTrigger() {

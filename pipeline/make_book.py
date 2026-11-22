@@ -80,14 +80,14 @@ var sx=null;document.addEventListener('touchstart',function(e){sx=e.touches[0].c
 document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(dx<0?1:-1);sx=null},{passive:true});
 document.getElementById('share').onclick=function(){var d={title:%(jtitle)s,text:%(jtitle)s,url:location.href};if(navigator.share){navigator.share(d).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(location.href);this.textContent='Link copied'}};
 (function(){var RD='%(rdate)s',KIND='%(kind)s',ADM='%(admin)s',GEN='%(gen)s';
- var n=new Date(Date.now()+19800000),mm=n.getUTCHours()*60+n.getUTCMinutes(),dow=n.getUTCDay(),due=KIND==='evening'?16*60+40:8*60+55;
+ var n=new Date(Date.now()+19800000),mm=n.getUTCHours()*60+n.getUTCMinutes(),dow=n.getUTCDay(),due=KIND==='evening'?16*60+40:KIND==='digest'?21*60:8*60+55;
  function iso(d){return d.toISOString().slice(0,10)}
  var HOL=%(hol)s;function td(d){var w=d.getUTCDay();return w>=1&&w<=5&&HOL.indexOf(iso(d))<0}   /* trading day: weekday and not an NSE holiday */
  var e=new Date(n.getTime());if(!(td(n)&&mm>=due)){do{e=new Date(e.getTime()-86400000)}while(!td(e))}
  var exp=iso(e);
  var o=document.getElementById('old');
  if(RD<exp){var msg='This report was last updated <b>'+GEN+'</b> and is older than the latest one. Please inform the admin.';
-  if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
+  if(ADM){msg+=' <a href="https://wa.me/'+ADM+'?text='+encodeURIComponent('Hi, the '+(KIND==='evening'?'Evening Breeze':KIND==='digest'?'Sector Digest':'Morning Sunrise')+' report link still shows the report generated '+GEN+'. Please update it.')+'" target="_blank" rel="noopener">Message admin</a>'}
   msg+=' <span style="opacity:.8">(No report is issued on market holidays.)</span>';o.innerHTML=msg;o.style.display='block'}})();
 z();setTimeout(function(){document.getElementById('hint').style.opacity=0},6000)})();
 </script>%(fx)s<script src="https://ssjs1mu.github.io/jc-stock-analyst/analytics.js?v=2" defer></script></body></html>"""
@@ -232,8 +232,10 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
     """pages: list of repo-relative PNG paths, e.g. reports/morning-pulse/JCGG_..._1.png"""
     from datetime import datetime
     dtxt = datetime.strptime(date, "%Y-%m-%d").strftime("%A, %d %B %Y")
-    name = {"evening": "Evening Breeze", "muhurat": "Muhurat Trading 2026"}.get(kind, "Morning Sunrise")
+    name = {"evening": "Evening Breeze", "muhurat": "Muhurat Trading 2026", "digest": "Sector Digest"}.get(kind, "Morning Sunrise")
     title = "Joshi's Corner - %s for %s" % (name, dtxt)
+    if kind == "digest" and not caption:
+        caption = (headline + " | " if headline else "") + "Where money flowed in and out, stocks in focus, F&O positioning, RSI reversals and circuit watch."
     desc = caption or (headline + " | What to expect at the open, key levels, an insurance plan of the day and a restaurant offer." if headline else "What to expect at the open, key levels, an insurance plan of the day and a restaurant offer.")
     from datetime import timezone, timedelta
     _now = datetime.now(timezone(timedelta(hours=5, minutes=30)))
@@ -265,7 +267,7 @@ def build(date, pages, headline="", mood="neutral", caption="", kind="morning", 
         langjs = LANG_JS.replace("__LP__", json.dumps(lp)) if len(lp) > 1 else ""
         url = BASE + kind + "/" + sub
         og_path = os.path.join(folder, "og.jpg")
-        _og(og_path, dtxt, headline or "What to expect at the open", mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
+        _og(og_path, dtxt, headline or ("Where money flowed today" if kind == "digest" else "What to expect at the open"), mood, _thumb(os.path.join(ROOT, pages[0])), name, _now.strftime("%I:%M %p IST"))
         doc = PAGE % dict(title=html.escape(title), desc=html.escape(desc), url=url, og=url + "og.jpg", font=brand.font_css(),
                           script=brand.SCRIPT_STACK.replace('"', "'"), leaves=leaves, jtitle=json.dumps(title), gen=gen, rdate=("9999-12-31" if kind == "muhurat" else date), kind=kind, admin=admin, hol=_holidays(), chips=chips, langjs=langjs, fx=FX_JS.replace('__THEME__', theme) if theme else '')
         with open(os.path.join(folder, "index.html"), "w") as f:
