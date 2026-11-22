@@ -664,7 +664,7 @@ def stock_news_pages(b):
     items = (b.get("stock_news") or {}).get("items") or []
     if not items:
         return []
-    per = 7
+    per = 6
     chunks = [items[i:i + per] for i in range(0, min(len(items), per * 3), per)]
     since = (b.get("stock_news") or {}).get("since_txt", "")
 

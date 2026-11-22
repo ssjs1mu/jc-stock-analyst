@@ -118,7 +118,7 @@ def http(url, data=None, headers=None, t=25):
 
 
 def clean(s):
-    s = html.unescape(re.sub(r"<[^>]+>", " ", s or ""))
+    s = html.unescape(html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).replace("\xa0", " ")
     return re.sub(r"\s+", " ", s).strip()
 
 
@@ -134,13 +134,13 @@ def brief_of(desc, title):
     for s_ in sents:
         if k(s_)[:50] == k(title)[:50]:
             continue
-        if len(out) + len(s_) > 260 and out:
+        if len(out) + len(s_) > 210 and out:
             break
         out = (out + " " + s_).strip()
         if len(out) > 140:
             break
-    if len(out) > 300:
-        out = out[:297].rsplit(" ", 1)[0] + "..."
+    if len(out) > 230:
+        out = out[:227].rsplit(" ", 1)[0] + "..."
     return out
 
 
@@ -170,7 +170,7 @@ def rss(pub, url, raw=None):
     root = ET.fromstring(body)
     out = []
     for it in root.iter("item"):
-        t = clean(it.findtext("title"))
+        t = re.sub(r"\s*[-\u2014|:.]+\s*(all you need to know|all we know|details inside|details here|check details|full details|know more|explained|read more)\W*$", "", clean(it.findtext("title")), flags=re.I)
         if not t:
             continue
         d = it.findtext("description") or ""
@@ -402,7 +402,7 @@ def collect(now=None, raw=None, limit=20, log=print):
         best = e["items"][0]
         top = best
         # a publisher's story reads better than the bare filing subject: prefer it when it is about as important
-        pick = [x for x in e["items"] if not x.get("official") and x["brief"] and x["score"] >= best["score"] - 15] or \
+        pick = [x for x in e["items"] if not x.get("official") and x["brief"] and x["score"] >= best["score"] - 25] or \
                [x for x in e["items"] if x["brief"] and x["score"] >= best["score"] - 8]
         if pick:
             top = pick[0]
