@@ -57,9 +57,9 @@ FEEDS = [
 A = [  # moves prices on the day
     ("RESULTS", r"\b(provisions?|q[1-4]|quarter(ly)?|results?|earnings|net profit|profit (jumps|rises|falls|drops|surges|slumps|declines|grows)|pat\b|ebitda|revenue (jumps|rises|falls|drops|grows|declines)|margin)"),
     ("ORDER", r"\b(orders?|contracts?|bags|wins|letter of (award|intent)|loa\b|l1 bidder|tender)"),
-    ("DEAL", r"\b(acquir\w*|acquisition|merger|merge|demerg\w*|amalgamat\w*|takeover|open offer|stake (buy|sale|in)|buys .*stake|sells .*stake|to sell|sells? (its |the )?\w+ (business|unit|division|arm)|sale of|joint venture|jv\b|divest\w*|slump sale)"),
+    ("REGULATOR", r"\b(sebi|rbi|drug regulator|regulator|voluntary action indicated|usfda|fda|warning letter|import alert|observations?|form 483|penalty|fine[ds]?\b|ban(s|ned)?\b|raid|probe|investigation|ed\b|cbi\b|show[- ]cause|tax demand|gst (notice|demand)|nclt|insolven\w*|court|tribunal|cci\b)"),
+    ("DEAL", r"\b(acquir\w*|acquisition|merger|merge|demerg\w*|amalgamat\w*|takeover|open offer|stake (buy|sale|in)|buys .*stake|sells .*stake|to sell|sells? (its |the )?\w+ (business|unit|division|arm)|sale of|joint venture|jv\b|divest\w*|slump sale|disposal)"),
     ("FUNDS", r"\b(block deal|bulk deal|ofs\b|offer for sale|qip\b|rights issue|fund ?rais\w*|raises? rs|ncd\b|preferential|ipo\b|listing)"),
-    ("REGULATOR", r"\b(sebi|rbi|usfda|fda|warning letter|import alert|observations?|form 483|penalty|fine[ds]?\b|ban(s|ned)?\b|raid|probe|investigation|ed\b|cbi\b|show[- ]cause|tax demand|gst (notice|demand)|nclt|insolven\w*|court|tribunal|cci\b)"),
     ("CORP ACTION", r"\b(buyback|bonus|stock split|split|dividend|record date)"),
     ("MANAGEMENT", r"\b(resign\w*|steps down|step down|quits|ends .*employment|sack\w*|appoint\w* .*(ceo|md|cfo|chairman|director)|(ceo|md|cfo|chairman)\b.*\b(exit|quit|resign\w*|replace\w*)|promoter (sells|buys|pledge\w*)|pledge)"),
     ("RATING", r"\b(moody'?s|fitch|s&p|crisil|icra|care ratings|india ratings)\b.*\b(upgrade|downgrade|rating|outlook)|\b(upgrades?|downgrades?)\b.*\brating"),
@@ -106,7 +106,7 @@ SHORT = {  # well-known short names used in headlines (only for stocks in the un
     "HAL": ["Hindustan Aeronautics", "HAL"], "BHEL": ["BHEL", "Bharat Heavy Electricals"], "ONGC": ["ONGC"], "NTPC": ["NTPC"], "IOC": ["Indian Oil", "IOC"],
     "BPCL": ["BPCL", "Bharat Petroleum"], "HINDPETRO": ["HPCL", "Hindustan Petroleum"], "GAIL": ["GAIL"], "ITC": ["ITC"], "IRFC": ["IRFC"], "RVNL": ["RVNL", "Rail Vikas"],
     "IRCTC": ["IRCTC"], "SUZLON": ["Suzlon"], "WAAREEENER": ["Waaree Energies"], "TMPV": ["Tata Motors Passenger", "TMPV"], "TMCV": ["Tata Motors CV", "TMCV"],
-    "HINDALCO": ["Hindalco"], "GRASIM": ["Grasim"], "CIPLA": ["Cipla"], "DIVISLAB": ["Divi's Lab", "Divis Lab"], "BRITANNIA": ["Britannia"], "DABUR": ["Dabur"],
+    "HINDALCO": ["Hindalco"], "GRASIM": ["Grasim"], "CIPLA": ["Cipla"], "DIVISLAB": ["Divi's Lab", "Divis Lab"], "BRITANNIA": ["Britannia"], "DABUR": ["Dabur"], "APLAPOLLO": ["APL Apollo"], "FORTIS": ["Fortis Healthcare"], "ASTERDM": ["Aster DM"],
 }
 
 
@@ -153,7 +153,7 @@ def parse_date(s):
         return d if d.tzinfo else d.replace(tzinfo=IST)
     except Exception:
         pass
-    for f in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%d %b %Y %H:%M:%S"):
+    for f in ("%d-%b-%Y %H:%M:%S", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%d %b %Y %H:%M:%S"):
         try:
             d = dt.datetime.strptime(s[:26], f)
             return d if d.tzinfo else d.replace(tzinfo=IST)
@@ -200,10 +200,14 @@ def nse(raw=None):
             d = clean(it.findtext("description"))
             if not comp or not d:
                 continue
-            m = re.match(r"^(.*?)\s*(?:\|\s*)?subject\s*:\s*(.*)$", d, flags=re.I | re.S)
-            subj = (m.group(2) if m else d).strip()
-            t = subj.split(". ")[0][:160]
-            out.append(dict(title=t, brief=brief_of(subj, t), source="NSE filing", when=parse_date(it.findtext("pubDate")),
+            parts = re.split(r"\|\s*SUBJECT\s*:\s*", d, flags=re.I)
+            body, subj = (parts[0].strip(), parts[1].strip()) if len(parts) > 1 else (d, cat or "Announcement")
+            body = re.sub(r"^(in accordance with|pursuant to|in terms of|in compliance with|with reference to).{0,220}?2015\)?\s*(\([^)]*\))?\s*,?\s*(read with[^,]*,\s*)?(as amended,?\s*)?", "", body, flags=re.I)
+            body = re.sub(r"^(we (wish to |would like to |hereby )?inform (you )?that|please find (attached|enclosed)( herewith)?|this is to inform (you )?that|we are pleased to inform (you )?that)\s*", "", body, flags=re.I).strip()
+            body = body[:1].upper() + body[1:]
+            t = re.sub(r"\s*-\s*XBRL$", "", subj, flags=re.I)[:120]
+            subj = body
+            out.append(dict(title=t, brief=brief_of(subj, t) or subj[:260], source="NSE filing", when=parse_date(it.findtext("pubDate")),
                             link=(it.findtext("link") or "").strip(), official=True, company=comp, cat=cat))
     return out
 
@@ -273,7 +277,7 @@ def aliases(w, names):
         for c in cand:
             al.setdefault(c, s)
         fw = base.split(" ")[0] if base else ""
-        if len(fw) >= 5 and fw.lower() not in STOP and fw.isalpha() and s.startswith(fw.upper()[:5]):
+        if len(fw) >= 6 and fw.lower() not in STOP and fw.isalpha() and s.startswith(fw.upper()[:5]):
             first.setdefault(fw, set()).add(s)
     for fw, ss in first.items():
         if len(ss) == 1:
@@ -374,7 +378,7 @@ def collect(now=None, raw=None, limit=20, log=print):
             sy = [s for s in w if lc.get(s) and (lc[s].replace("limited", "").replace("ltd", "") == c)]
             if not sy:
                 continue
-            if re.search(r"(trading window|newspaper|duplicate share|loss of share|certificate under reg|reg\.? ?74|74\(5\)|compliance certificate|investor (meet|conference)|analyst|earnings call|transcript|audio recording|closure of trading|esop|esos|allotment of (equity|shares) under|intimation of record date for interest|change in (address|rta)|press release$|shareholding pattern)", (it["title"] + " " + it.get("cat", "")).lower()):
+            if re.search(r"(trading window|newspaper|duplicate share|loss of share|certificate under reg|reg\.? ?74|74\(5\)|compliance certificate|investor (meet|conference)|institutional investor|analyst|con\.? call|earnings call|transcript|audio recording|closure of trading|esop|esos|allotment of (equity|shares) under|intimation of record date for interest|change in (address|rta)|press release$|shareholding pattern)", (it["title"] + " " + it.get("cat", "")).lower()):
                 continue
         else:
             if re.search(ROUNDUP, it["title"].lower()):
@@ -384,24 +388,27 @@ def collect(now=None, raw=None, limit=20, log=print):
                 continue
         if it.get("official") and names.get(sy[0]) and not re.search(re.escape(names[sy[0]].split(" ")[0]), it["title"], re.I):
             it = dict(it, title=re.sub(r"\s+(limited|ltd\.?)$", "", names[sy[0]], flags=re.I) + ": " + it["title"])
-        tag, base = classify(it["title"] + " " + (it.get("cat") or ""))
-        for s in sy[:1]:
+        tag, base = classify(it["title"] + " " + (it.get("cat") or "") + ((" " + it["brief"]) if it.get("official") else ""))
+        for k_, s in enumerate(sy[:2] if tag in ("DEAL", "ORDER") else sy[:1]):   # a deal concerns both sides
             mc = w.get(s) or 1e10
             size = 1 + 0.18 * max(-2, min(3, math.log10(mc / 1e11)))
-            sc = base * size + (6 if it.get("official") else 0) + (4 if it["brief"] else 0)
+            sc = (base * size + (6 if it.get("official") else 0) + (4 if it["brief"] else 0)) * (0.9 if k_ else 1)
             e = per.setdefault(s, {"sym": s, "name": names.get(s, s), "items": [], "pubs": set()})
             e["items"].append(dict(it, tag=tag, score=sc, tone=tone(it["title"] + " " + it["brief"])))
             e["pubs"].add(it["source"])
     out = []
     for s, e in per.items():
         e["items"].sort(key=lambda x: (-x["score"], -(x["when"].timestamp())))
-        top = e["items"][0]
-        # prefer the best item that has a summary when its score is close
-        for x in e["items"]:
-            if x["brief"] and x["score"] >= top["score"] - 8:
-                top = x
-                break
-        sc = top["score"] + 8 * (len(e["pubs"]) - 1)
+        best = e["items"][0]
+        top = best
+        # a publisher's story reads better than the bare filing subject: prefer it when it is about as important
+        pick = [x for x in e["items"] if not x.get("official") and x["brief"] and x["score"] >= best["score"] - 15] or \
+               [x for x in e["items"] if x["brief"] and x["score"] >= best["score"] - 8]
+        if pick:
+            top = pick[0]
+            if top["tag"] == "NEWS" and best["tag"] != "NEWS":
+                top = dict(top, tag=best["tag"])
+        sc = best["score"] + 8 * (len(e["pubs"]) - 1)
         others = sorted({x["source"] for x in e["items"]} - {top["source"]})
         out.append({"sym": s, "name": e["name"], "headline": top["title"], "brief": top["brief"], "source": top["source"],
                     "time": top["when"].astimezone(IST).strftime("%d %b %H:%M"), "tag": top["tag"], "tone": top["tone"], "score": round(sc, 1),
