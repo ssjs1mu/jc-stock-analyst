@@ -39,7 +39,7 @@
   function todayStatus(s) {
     const now = istNow(); const today = istDate(now); const dow = now.getUTCDay();
     const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes(); const slot = minsOf(s.time);
-    if (s.suspended) return { cls: 'mute', text: 'Suspended since 5 Nov 2026' };
+    if (s.suspended) return { cls: 'mute', text: typeof s.suspended === 'string' ? s.suspended : 'Suspended since 5 Nov 2026' };
     if (s.kind === 'artifact') return { cls: 'info', text: 'Dashboard refresh · no PDF' };
     if (s.days === 'once') { const r1 = ((S.idx[s.id] && S.idx[s.id].runs) || [])[0]; return r1 ? { cls: 'ok', text: 'Special edition published', run: r1 } : { cls: 'info', text: 'One-off special edition' }; }
     if (!runsOnDay(s, dow)) return { cls: 'mute', text: 'No run today (weekend)' };

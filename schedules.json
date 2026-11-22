@@ -43,7 +43,8 @@
     },
     {
       "id": "circuit-watch",
-      "task_id": "trig_01PpoVVn7E1VMZghRW5UumWF",
+      "task_id": "trig_01TDfJMwtQUXfamf74rgtCq3",
+      "suspended": "Paused from 23 Nov · Sector Digest trial (covers circuits)",
       "name": "Circuit Watch Scanner",
       "icon": "⚡",
       "time": "21:00",
