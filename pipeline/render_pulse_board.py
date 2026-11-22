@@ -415,6 +415,9 @@ SCENES = {
 }
 
 
+FRESH = {"any_bull_roar_2", "any_bull_over_bear_2", "any_bear_roar_2", "any_bear_calm_2", "any_bear_calm_3"}
+
+
 def _img_file(d, nm):
     for ext in (".jpg", ".jpeg", ".png", ".webp"):
         f = os.path.join(d, nm + ext)
@@ -436,6 +439,11 @@ def mood_photo(sc):
     day = _dt.date.today().toordinal()
     ed = "close" if EDN[0] == "evening" else "open"
     pool = [("raw", f) for f in (_img_file(d, n) for n in SCENES.get((ed, key), [])) if f]
+    # user's new Canva pictures (22 Nov 2026) are featured first until 6 Dec 2026, then they join the normal rotation
+    if _dt.date.today() <= _dt.date(2026, 12, 6):
+        fresh = [x for x in pool if os.path.basename(x[1]).split(".")[0] in FRESH]
+        if fresh:
+            pool = fresh
     pool += [("scene", f) for f in (_img_file(d, n) for n in (key, key + "_2")) if f]
     if not pool:
         return None
