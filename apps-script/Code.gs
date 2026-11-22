@@ -853,7 +853,10 @@ function tgPostReports() {
       if (TG_BOOKLET[id]) { // booklet: one thumbnail + link, never the individual pages
         var bk = TG_BOOKLET[id], url = TG_SITE + bk[0] + '/' + run.date + '/', tcap = (bk[1] + ' - ' + run.date + (run.caption ? '\n' + run.caption : '') + '\n\nOpen the booklet: ' + url).slice(0, 1000);
         var th = UrlFetchApp.fetch(url + 'og.jpg?t=' + Date.now(), { muteHttpExceptions: true }), bres;
-        if (th.getResponseCode() === 200) bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendPhoto', { method: 'post', payload: { chat_id: s.c, caption: tcap, photo: th.getBlob().setName('booklet.jpg') }, muteHttpExceptions: true });
+        var clip = run.files.filter(function (x) { return x.type === 'mp4'; })[0];   // living-photo mood clip: posted as a looping animation with the caption + link
+        if (clip) { bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendAnimation', { method: 'post', payload: { chat_id: s.c, caption: tcap, animation: TG_SITE + clip.path }, muteHttpExceptions: true }); if (bres.getResponseCode() !== 200) { Logger.log(id + ' clip ' + bres.getContentText()); bres = null; } }
+        if (bres) { }
+        else if (th.getResponseCode() === 200) bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendPhoto', { method: 'post', payload: { chat_id: s.c, caption: tcap, photo: th.getBlob().setName('booklet.jpg') }, muteHttpExceptions: true });
         else bres = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: tcap }, muteHttpExceptions: true });
         if (bres.getResponseCode() === 200) { sent[id] = run.generated_at; dayP.ids[id] = 1; n++; } else Logger.log(id + ' ' + bres.getContentText());
         return;
