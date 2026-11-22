@@ -8,3 +8,5 @@ The Morning Pulse picks one by the day's mood; a missing file falls back to the 
 Scenes: pipeline/mood_scene.py paints sunrise / dawn fog (opening reports) or sunset / moon / storm / snow (closing reports) over these photos automatically - no extra files needed.
 
 Scene pictures (used by edition + mood): open_bull_roar, open_bull_calm, open_bear_calm, open_flat (dawn standoff), close_bull_roar, close_bull_calm, close_bear_over_bull, any_bull_over_bear, any_bear_roar. Mapping table: SCENES in render_pulse_board.py.
+
+Added 22 Nov 2026 (Canva, realistic): any_bull_roar_2 (bull charging, bear running away), any_bull_over_bear_2 (bull charging at a roaring bear), any_bear_roar_2 (bear charging at the bull), any_bear_calm_2 / any_bear_calm_3 (bear walking calmly). Used by both editions; each day's picture also becomes the cover's living-photo clip (pipeline/mood_clip.py).

@@ -408,10 +408,10 @@ PIC = [None]   # explicit picture key chosen by the report builder (overrides th
 # hand-picked scene pictures per (edition, mood): opening = sunrise / dawn light, closing = sunset / night / storm.
 # file names live in branding/mood/. Older dark photos (key.jpg, key_2.jpg) join the pool, painted with a matching scene by mood_scene.py.
 SCENES = {
-    ("open", "bull_roar"): ["open_bull_roar"], ("open", "bull_calm"): ["open_bull_calm"], ("open", "bull_over_bear"): ["open_flat", "any_bull_over_bear"],
-    ("open", "bear_over_bull"): ["open_flat"], ("open", "bear_calm"): ["open_bear_calm"], ("open", "bear_roar"): ["any_bear_roar"],
-    ("close", "bull_roar"): ["close_bull_roar"], ("close", "bull_calm"): ["close_bull_calm"], ("close", "bull_over_bear"): ["any_bull_over_bear"],
-    ("close", "bear_over_bull"): ["close_bear_over_bull"], ("close", "bear_calm"): [], ("close", "bear_roar"): ["any_bear_roar"],
+    ("open", "bull_roar"): ["open_bull_roar", "any_bull_roar_2"], ("open", "bull_calm"): ["open_bull_calm"], ("open", "bull_over_bear"): ["open_flat", "any_bull_over_bear", "any_bull_over_bear_2"],
+    ("open", "bear_over_bull"): ["open_flat"], ("open", "bear_calm"): ["open_bear_calm", "any_bear_calm_2", "any_bear_calm_3"], ("open", "bear_roar"): ["any_bear_roar", "any_bear_roar_2"],
+    ("close", "bull_roar"): ["close_bull_roar", "any_bull_roar_2"], ("close", "bull_calm"): ["close_bull_calm"], ("close", "bull_over_bear"): ["any_bull_over_bear", "any_bull_over_bear_2"],
+    ("close", "bear_over_bull"): ["close_bear_over_bull"], ("close", "bear_calm"): ["any_bear_calm_2", "any_bear_calm_3"], ("close", "bear_roar"): ["any_bear_roar", "any_bear_roar_2"],
 }
 
 
