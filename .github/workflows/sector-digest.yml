@@ -54,7 +54,7 @@ jobs:
             for i in 1 2 3 4 5; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin HEAD:"${GITHUB_REF_NAME}" && exit 0; sleep $((i*5)); done; exit 1
           fi
       - name: Previews
-        if: github.event.inputs.dry == 'true'
+        if: always() && github.event.inputs.dry == 'true'
         uses: actions/upload-artifact@v5
         with:
           name: sector-digest-preview

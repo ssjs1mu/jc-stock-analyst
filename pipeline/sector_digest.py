@@ -170,6 +170,12 @@ def history(d):
 def fo_stats(rows, today):
     """per underlying: PCR (nearest expiry, OI), call / put OI walls, top OI-change strikes; futures OI build-up"""
     opt, fut = {}, {}
+    if rows:                                   # column names vary slightly between file versions: map by prefix
+        ks = list(rows[0].keys())
+        pick = lambda pre: next((k for k in ks if k and k.strip().lower().startswith(pre.lower())), pre)
+        K = {"ChngInOpnInt": pick("ChngInOpnInt"), "OpnIntrst": pick("OpnIntrst")}
+        if K["ChngInOpnInt"] != "ChngInOpnInt" or K["OpnIntrst"] != "OpnIntrst":
+            rows = [dict(r, ChngInOpnInt=r.get(K["ChngInOpnInt"]), OpnIntrst=r.get(K["OpnIntrst"])) for r in rows]
     for r in rows:
         tp, s = r.get("FinInstrmTp"), r.get("TckrSymb")
         if tp in ("IDO", "STO"):
