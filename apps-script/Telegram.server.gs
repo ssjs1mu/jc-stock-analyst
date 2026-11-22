@@ -9,7 +9,8 @@
 var TG_SITE = 'https://ssjs1mu.github.io/jc-stock-analyst/';
 var TG_MORNING = { 'premarket-news': 480, 'morning-brief': 510, 'morning-detailed': 510, 'morning-pulse': 525 }; // fixed post times (minutes after midnight IST) on trading days: 08:00, 08:30, 08:30, 08:45 - never earlier
 // SUSPENDED 2026-11-05 (not in the booklets): premarket-news, morning-brief, evening-market-wrap, evening-news-wrap
-var TG_IDS = ['morning-detailed', 'morning-pulse', 'evening-breeze', 'circuit-watch'];
+var TG_IDS = ['morning-detailed', 'morning-pulse', 'evening-breeze', 'circuit-watch', 'sector-digest'];
+var TG_ALBUM = { 'sector-digest': '\uD83E\uDDED Sector Digest' }; // posted as one photo album (all pages) + the PDF; latest edition, once, as soon as it is published
 // Booklet reports are NOT posted page by page: one thumbnail (og.jpg) + the link to the flip-book booklet. id -> site folder.
 var TG_BOOKLET = { 'morning-pulse': ['morning', '\uD83C\uDF05 Morning Sunrise'], 'evening-breeze': ['evening', '\uD83C\uDF07 Evening Breeze'] };
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
@@ -57,6 +58,7 @@ function tgPostReports() {
   var lookReports = tradingDay && min0 >= 450;
   TG_IDS.forEach(function (id) {
     try {
+      if (TG_ALBUM[id]) { if (min0 >= 450) tgAlbum_(s, id, sent); return; }
       if (!lookReports) return; if (dayP.ids[id]) return; if (TG_MORNING[id] && tradingDay && min0 < TG_MORNING[id]) return; // fixed post time
       var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + id + '/index.json?t=' + Date.now(), { muteHttpExceptions: true });
       if (r.getResponseCode() !== 200) return;
@@ -86,6 +88,27 @@ function tgPostReports() {
   try { tgAutoLink_(s); } catch (e) { Logger.log('autolink ' + e); }
   try { tgLive_(s); } catch (e) { Logger.log('live ' + e); }
   return n;
+}
+
+/* album reports (Sector Digest): the newest published edition (session date within the last 4 days), posted once - pages as one album, then the PDF */
+function tgAlbum_(s, id, sent) {
+  var r = UrlFetchApp.fetch(TG_SITE + 'reports/' + id + '/index.json?t=' + Date.now(), { muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) return;
+  var runs = (JSON.parse(r.getContentText()).runs || []).filter(function (x) { return x.status === 'ok' && x.files && x.files.length; });
+  if (!runs.length) return;
+  runs.sort(function (a, b) { return a.generated_at < b.generated_at ? 1 : -1; });
+  var run = runs[0];
+  if (sent[id] && sent[id] >= run.generated_at) return;
+  if ((Date.now() - new Date(run.date + 'T00:00:00+05:30').getTime()) > 4 * 86400000) return;      // never post a stale edition
+  var pg = function (n) { var m = /_(\d+)\.png$/.exec(n); return m ? +m[1] : 0; };
+  var pages = run.files.filter(function (x) { return x.type === 'png' && /_Mobile_/.test(x.name); }).sort(function (a, b) { return pg(a.name) - pg(b.name); }).slice(0, 10);
+  var pdf = run.files.filter(function (x) { return x.type === 'pdf'; })[0];
+  var cap = (TG_ALBUM[id] + ' - ' + run.date + (run.caption ? '\n' + run.caption : '') + '\n\nAll reports: ' + TG_SITE).slice(0, 1000);
+  var media = pages.map(function (f, i) { var o = { type: 'photo', media: TG_SITE + f.path + '?v=' + encodeURIComponent(run.generated_at) }; if (i === 0) o.caption = cap; return o; });
+  var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMediaGroup', { method: 'post', payload: { chat_id: s.c, media: JSON.stringify(media) }, muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) { Logger.log(id + ' album ' + res.getContentText()); return; }
+  if (pdf) UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendDocument', { method: 'post', payload: { chat_id: s.c, document: TG_SITE + pdf.path, caption: TG_ALBUM[id] + ' - ' + run.date + ' (PDF)' }, muteHttpExceptions: true });
+  sent[id] = run.generated_at;
 }
 
 /* ---------- live news + live stock signals (same 5-minute trigger) ---------- */
