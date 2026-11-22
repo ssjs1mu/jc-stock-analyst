@@ -664,7 +664,7 @@ def stock_news_pages(b):
     items = (b.get("stock_news") or {}).get("items") or []
     if not items:
         return []
-    per = 8
+    per = 7
     chunks = [items[i:i + per] for i in range(0, min(len(items), per * 3), per)]
     since = (b.get("stock_news") or {}).get("since_txt", "")
 
@@ -685,9 +685,8 @@ def stock_news_pages(b):
                          % (j, e(x["sym"]), col, arrow, e(x["tag"]), e(x["headline"]),
                             ('<div style="font-size:21px;line-height:1.32;margin-top:5px;color:#4a4830">%s</div>' % e(x["brief"])) if x.get("brief") else "", src))
             head = ('<h2 class="s">Stocks in the news%s</h2>' % (" &middot; %d of %d" % (k + 1, len(chunks)) if len(chunks) > 1 else ""))
-            note = ('<div class="small" style="opacity:.8;font-size:19px;margin-top:6px">News since %s, ranked by expected price impact (results, orders, deals, regulator action first; '
-                    'larger companies ahead). &#9650; / &#9660; = tone of the news, not a call. Summaries are the publisher&#39;s own; verify before acting.</div>' % e(since)) if k == 0 else ""
-            inner = head + '<div class="card" style="padding:4px 16px"><table>%s</table></div>' % rows + note
+            note = ('<div class="small" style="opacity:.85;font-size:19px;margin:-4px 0 4px">Since %s &middot; ranked by expected price impact &middot; &#9650;&#9660; = tone of the news, not a call &middot; summaries are the publisher&#39;s own</div>' % e(since)) if k == 0 else ""
+            inner = head + note + '<div class="card" style="padding:4px 16px"><table>%s</table></div>' % rows
             return shell(p, inner, 5, total, "Stocks in the news &middot; " + e(b["date_txt"]))
         return f
     return [mk(ch, k) for k, ch in enumerate(chunks)]

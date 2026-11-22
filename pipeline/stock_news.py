@@ -50,45 +50,44 @@ FEEDS = [
     ("Mint", "https://www.livemint.com/rss/markets"),
     ("BusinessLine", "https://www.thehindubusinessline.com/markets/stock-markets/feeder/default.rss"),
     ("BusinessLine", "https://www.thehindubusinessline.com/companies/feeder/default.rss"),
-    ("Financial Express", "https://www.financialexpress.com/market/feed/"),
     ("NDTV Profit", "https://feeds.feedburner.com/ndtvprofit-latest"),
 ]
 
 # ---------------------------------------------------------------- impact classes (first match wins inside a class)
 A = [  # moves prices on the day
-    ("RESULTS", r"\b(q[1-4]|quarter(ly)?|results?|earnings|net profit|profit (jumps|rises|falls|drops|surges|slumps|declines|grows)|pat\b|ebitda|revenue (jumps|rises|falls|drops|grows|declines)|margin)"),
+    ("RESULTS", r"\b(provisions?|q[1-4]|quarter(ly)?|results?|earnings|net profit|profit (jumps|rises|falls|drops|surges|slumps|declines|grows)|pat\b|ebitda|revenue (jumps|rises|falls|drops|grows|declines)|margin)"),
     ("ORDER", r"\b(orders?|contracts?|bags|wins|letter of (award|intent)|loa\b|l1 bidder|tender)"),
-    ("DEAL", r"\b(acquir\w*|acquisition|merger|merge|demerg\w*|amalgamat\w*|takeover|open offer|stake (buy|sale|in)|buys .*stake|sells .*stake|joint venture|jv\b|divest\w*)"),
+    ("DEAL", r"\b(acquir\w*|acquisition|merger|merge|demerg\w*|amalgamat\w*|takeover|open offer|stake (buy|sale|in)|buys .*stake|sells .*stake|to sell|sells? (its |the )?\w+ (business|unit|division|arm)|sale of|joint venture|jv\b|divest\w*|slump sale)"),
     ("FUNDS", r"\b(block deal|bulk deal|ofs\b|offer for sale|qip\b|rights issue|fund ?rais\w*|raises? rs|ncd\b|preferential|ipo\b|listing)"),
     ("REGULATOR", r"\b(sebi|rbi|usfda|fda|warning letter|import alert|observations?|form 483|penalty|fine[ds]?\b|ban(s|ned)?\b|raid|probe|investigation|ed\b|cbi\b|show[- ]cause|tax demand|gst (notice|demand)|nclt|insolven\w*|court|tribunal|cci\b)"),
     ("CORP ACTION", r"\b(buyback|bonus|stock split|split|dividend|record date)"),
-    ("MANAGEMENT", r"\b(resign\w*|steps down|appoint\w*|ceo|managing director|\bmd\b|cfo|chairman|promoter (sells|buys|pledge\w*)|pledge)"),
+    ("MANAGEMENT", r"\b(resign\w*|steps down|step down|quits|ends .*employment|sack\w*|appoint\w* .*(ceo|md|cfo|chairman|director)|(ceo|md|cfo|chairman)\b.*\b(exit|quit|resign\w*|replace\w*)|promoter (sells|buys|pledge\w*)|pledge)"),
     ("RATING", r"\b(moody'?s|fitch|s&p|crisil|icra|care ratings|india ratings)\b.*\b(upgrade|downgrade|rating|outlook)|\b(upgrades?|downgrades?)\b.*\brating"),
     ("OPERATIONS", r"\b(fire|explosion|blast|shutdown|shut down|strike|plant (closure|halt)|outage|accident|recall)"),
     ("APPROVAL", r"\b(approval|approves|nod|licen[cs]e|patent|clearance)"),
     ("GUIDANCE", r"\b(guidance|outlook (raised|cut)|forecast)"),
 ]
 B = [  # can move prices
-    ("BROKERAGE", r"\b(target price|price target|\btarget\b|overweight|underweight|outperform|underperform|neutral|initiates? coverage|jefferies|morgan stanley|clsa|goldman|nomura|macquarie|jp ?morgan|citi\b|bernstein|ubs\b|hsbc|motilal|kotak institutional|nuvama|emkay)"),
+    ("BROKERAGE", r"\b(target price|price target|target of rs|target to rs|tp of|overweight|underweight|outperform|underperform|neutral|initiates? coverage|jefferies|morgan stanley|clsa|goldman|nomura|macquarie|jp ?morgan|citi\b|bernstein|ubs\b|hsbc|motilal|kotak institutional|nuvama|emkay)"),
     ("BUSINESS", r"\b(sales|volumes?|business update|deliveries|dispatches|market share|subscribers)\b"),
-    ("EXPANSION", r"\b(expansion|capacity|capex|new plant|commission\w*|launch\w*|unveil\w*|partnership|partners|tie[- ]up|mou\b|collaborat\w*|agreement|deal)\b"),
+    ("EXPANSION", r"\b(expan\w*|capacity|capex|new plant|commission\w*|launch\w*|unveil\w*|partnership|partners|tie[- ]up|mou\b|collaborat\w*|agreement|deal)\b"),
     ("SHARES", r"\b(shares? (jump|surge|rally|soar|rise|gain|fall|drop|slump|tank|plunge|crash|decline)\w*|hits? (52|record|upper|lower)|upper circuit|lower circuit|52-week)"),
 ]
-POS = r"\b(jump|surge|rall|soar|rise|rises|gain|wins|bags|beat|record high|upgrade|approval|approves|nod|buy\b|overweight|outperform|bonus|buyback|dividend|profit (jumps|rises|surges|grows)|order|expan|raises target)"
-NEG = r"\b(fall|falls|drop|slump|tank|plunge|crash|declin|miss|downgrade|penalty|fine[ds]?\b|ban|raid|probe|warning letter|import alert|resign|steps down|sell\b|underweight|underperform|loss|cuts target|fire|shutdown|strike|default|pledge|insolven|show[- ]cause|tax demand)"
-ROUNDUP = r"(stocks? to (watch|buy|sell)|buzzing stocks|top (gainers|losers|picks)|stocks in (news|focus)|market (live|wrap|close|update)|sensex|nifty \d|nifty (today|ends|closes|opens)|trade setup|stock picks|stocks that|shares to buy|f&o ban)"
+POS = r"\b(relief|quash\w*|wins case|jump|surge|rall|soar|rise|rises|gain|wins|bags|beat|record high|upgrade|approval|approves|nod|buy\b|overweight|outperform|bonus|buyback|dividend|profit (jumps|rises|surges|grows)|order|expan|raises target)"
+NEG = r"\b(fall|falls|drop|slump|tank|plunge|crash|declin|miss|downgrade|penalty|fine[ds]?\b|ban|raid|probe|warning letter|import alert|resign|steps down|sell (rating|call)|rates? sell|underweight|underperform|loss|cuts target|fire|shutdown|strike|default|pledge|insolven|show[- ]cause|tax demand)"
+ROUNDUP = r"(\bvs\.?\b|versus|penny stock|multibagger|which .* stock|should you|in your portfolio|stocks? under|tech query|stock query|ask the expert|\bstocks\b|shares to watch|stocks? to (watch|buy|sell)|buzzing stocks|top (gainers|losers|picks)|stocks in (news|focus)|market (live|wrap|close|update)|sensex|nifty \d|nifty (today|ends|closes|opens)|trade setup|stock picks|stocks that|shares to buy|f&o ban)"
 STOP = {"india", "indian", "national", "bharat", "hindustan", "general", "united", "central", "global", "power", "bank", "asian", "oriental", "eastern",
         "western", "southern", "northern", "premier", "super", "grand", "great", "royal", "golden", "silver", "diamond", "crystal", "prime", "first",
         "supreme", "standard", "universal", "international", "capital", "finance", "steel", "metal", "energy", "shree", "shri", "sri", "star", "gold",
         "sun", "life", "home", "data", "tech", "info", "city", "trust", "union", "state", "new", "best", "focus", "sigma", "globe", "crown", "alpha",
         "delta", "ideal", "vision", "future", "smart", "modern", "classic", "cement", "motors", "auto", "paints", "chemicals", "pharma", "health",
         "foods", "textiles", "industries", "housing", "ports", "green", "solar", "wind", "cable", "cables", "infra", "projects", "systems", "network",
-        "computer", "aditya", "birla", "tata", "adani", "bajaj", "mahindra", "godrej", "reliance", "jindal", "jsw", "hdfc", "icici", "kotak",
+        "computer", "krishna", "rama", "laxmi", "lakshmi", "ganesh", "shiva", "durga", "aditya", "birla", "tata", "adani", "bajaj", "mahindra", "godrej", "reliance", "jindal", "jsw", "hdfc", "icici", "kotak",
         "torrent", "sundaram", "kirloskar", "murugappa", "shriram", "muthoot", "piramal", "hero", "max", "apollo", "fortis", "indus", "punjab",
         "kalyan", "jubilant", "ambuja", "ultra", "titan", "voltas", "havells", "dixon", "trent", "eicher", "cipla", "lupin", "astral", "page",
         "aster", "metro", "phoenix", "prestige", "brigade", "sobha", "oberoi", "lodha", "zydus", "glenmark", "alkem", "natco", "granules"}
 SHORT = {  # well-known short names used in headlines (only for stocks in the universe)
-    "RELIANCE": ["Reliance Industries", "Reliance", "RIL"], "SBIN": ["State Bank of India", "SBI"], "LT": ["Larsen & Toubro", "L&T"],
+    "RELIANCE": ["Reliance Industries", "RIL"], "SBIN": ["State Bank of India", "SBI"], "LT": ["Larsen & Toubro", "L&T"],
     "M&M": ["Mahindra & Mahindra", "M&M"], "HINDUNILVR": ["Hindustan Unilever", "HUL"], "BHARTIARTL": ["Bharti Airtel", "Airtel"],
     "MARUTI": ["Maruti Suzuki", "Maruti"], "ETERNAL": ["Eternal", "Zomato"], "PAYTM": ["Paytm", "One 97"], "NYKAA": ["Nykaa"],
     "KOTAKBANK": ["Kotak Mahindra Bank", "Kotak Bank"], "BAJFINANCE": ["Bajaj Finance"], "BAJAJFINSV": ["Bajaj Finserv"], "BAJAJ-AUTO": ["Bajaj Auto"],
@@ -183,6 +182,32 @@ def rss(pub, url, raw=None):
     return out
 
 
+NSE_RSS = [("https://nsearchives.nseindia.com/content/RSS/Online_announcements.xml", ""),
+           ("https://nsearchives.nseindia.com/content/RSS/Financial_Results.xml", "Financial Results"),
+           ("https://nsearchives.nseindia.com/content/RSS/Corporate_action.xml", "Corporate Action")]
+
+
+def nse(raw=None):
+    """NSE corporate announcements RSS: title = company name, description = the filing's subject."""
+    out = []
+    for url, cat in NSE_RSS:
+        body = http(url, headers={"Referer": "https://www.nseindia.com/"})
+        if raw:
+            os.makedirs(raw, exist_ok=True)
+            open(os.path.join(raw, url.rsplit("/", 1)[1]), "wb").write(body)
+        for it in ET.fromstring(body).iter("item"):
+            comp = clean(it.findtext("title"))
+            d = clean(it.findtext("description"))
+            if not comp or not d:
+                continue
+            m = re.match(r"^(.*?)\s*(?:\|\s*)?subject\s*:\s*(.*)$", d, flags=re.I | re.S)
+            subj = (m.group(2) if m else d).strip()
+            t = subj.split(". ")[0][:160]
+            out.append(dict(title=t, brief=brief_of(subj, t), source="NSE filing", when=parse_date(it.findtext("pubDate")),
+                            link=(it.findtext("link") or "").strip(), official=True, company=comp, cat=cat))
+    return out
+
+
 def bse(since, now, raw=None):
     """BSE corporate announcements (company filings) between two dates."""
     a, z = since.strftime("%Y%m%d"), now.strftime("%Y%m%d")
@@ -248,7 +273,7 @@ def aliases(w, names):
         for c in cand:
             al.setdefault(c, s)
         fw = base.split(" ")[0] if base else ""
-        if len(fw) >= 6 and fw.lower() not in STOP and fw.isalpha():
+        if len(fw) >= 5 and fw.lower() not in STOP and fw.isalpha() and s.startswith(fw.upper()[:5]):
             first.setdefault(fw, set()).add(s)
     for fw, ss in first.items():
         if len(ss) == 1:
@@ -285,6 +310,8 @@ def classify(t):
 def tone(t):
     lo = t.lower()
     p, n = len(re.findall(POS, lo)), len(re.findall(NEG, lo))
+    if re.search(r"\b(relief|quash\w*|wins case|set aside)", lo):
+        p += 2
     return "up" if p > n else "dn" if n > p else ""
 
 
@@ -324,6 +351,12 @@ def collect(now=None, raw=None, limit=20, log=print):
             status[f[1]] = err or len(r)
             items += r
     try:
+        n_ = nse(raw)
+        status["nse"] = len(n_)
+        items += n_
+    except Exception as ex_:
+        status["nse"] = str(ex_)[:80]
+    try:
         b = bse(since, now, raw)
         status["bse"] = len(b)
         items += b
@@ -349,6 +382,8 @@ def collect(now=None, raw=None, limit=20, log=print):
             sy = match(it["title"], al, rx)
             if not sy or len(sy) > 2:          # roundups that name many stocks say little about each
                 continue
+        if it.get("official") and names.get(sy[0]) and not re.search(re.escape(names[sy[0]].split(" ")[0]), it["title"], re.I):
+            it = dict(it, title=re.sub(r"\s+(limited|ltd\.?)$", "", names[sy[0]], flags=re.I) + ": " + it["title"])
         tag, base = classify(it["title"] + " " + (it.get("cat") or ""))
         for s in sy[:1]:
             mc = w.get(s) or 1e10
