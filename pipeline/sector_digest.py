@@ -234,7 +234,7 @@ def build(d, raw):
         q = [x for x in qt.get(s, [])[-20:] if x]
         avgq = sum(q) / len(q) if len(q) >= 10 else None
         S[s] = dict(v, sym=s, pct=(c / v["prev"] - 1) * 100, tcr=tcr, mf=mfm * tcr, vm=(v["qty"] / avgq) if avgq else None,
-                    avgto=(avgq * c / 1e7) if avgq else None, rsi=r_now, rsip=r_prev, **{k: fo.get(s, {}).get(k) for k in ("pcr", "cwall", "pwall", "cmax", "pmax", "bu", "oip", "exp")})
+                    avgto=(avgq * c / 1e7) if avgq else None, rsi=r_now, rsip=r_prev, **{k: fo.get(s, {}).get(k) for k in ("pcr", "cwall", "pwall", "cmax", "pmax", "bu", "oip", "exp", "fpch")})
     if gaps: NOTES.append("RSI-14 not shown for %d stock(s) whose previous close differs from the stored history by more than 25%% (likely a split / bonus / stale history): %s." % (len(gaps), ", ".join(sorted(gaps)[:12]) + (" ..." if len(gaps) > 12 else "")))
     # ---- sectors
     idx = data["idx"]
@@ -255,10 +255,12 @@ def build(d, raw):
         sectors.append(dict(key=key, lab=lab, iname=iname, pct=pct, close=iv["c"] if iv else None, mf=mf, to=to, tor=(to / ato) if ato else None,
                             adv=adv, dec=dec, n=len(mem), dp=sum(dps) / len(dps) if dps else None, mem=mem))
     for x in sectors:
-        x["flow"] = "IN" if x["mf"] > 0 and x["pct"] > 0 else "OUT" if x["mf"] < 0 and x["pct"] < 0 else "MIXED"
-    sectors.sort(key=lambda x: -x["mf"])
+        x["fi"] = x["mf"] / x["to"] * 100 if x["to"] else 0          # flow intensity: net flow as % of the sector's turnover
+        x["flow"] = "IN" if x["fi"] >= 5 and x["pct"] > 0 else "OUT" if x["fi"] <= -5 and x["pct"] < 0 else "WEAK" if x["pct"] < 0 or x["fi"] < 0 else "MIXED"
+    sectors.sort(key=lambda x: -x["fi"])
     head = [x for x in sectors if x["key"] not in NOT_HEADLINE]
-    s_in = [x for x in head if x["flow"] == "IN"][:3]; s_out = [x for x in reversed(head) if x["flow"] == "OUT"][:3]
+    s_in = [x for x in head if x["flow"] == "IN"][:3]
+    s_out = ([x for x in reversed(head) if x["flow"] == "OUT"] + sorted([x for x in head if x["flow"] == "WEAK"], key=lambda x: x["pct"]))[:3]
     for grp, sign in ((s_in, 1), (s_out, -1)):
         for x in grp:
             x["focus"] = sorted([m for m in x["mem"] if (m["mf"] > 0 if sign > 0 else m["mf"] < 0) and (m["pct"] > 0 if sign > 0 else m["pct"] < 0)],
@@ -274,26 +276,43 @@ def build(d, raw):
     fos = [S[s] for s in fo if s in S and S[s].get("bu")]
     bu = {k: sorted([m for m in fos if m["bu"] == k], key=lambda m: -abs(m["oip"] or 0))[:6] for k in ("Long build-up", "Short build-up", "Short covering", "Long unwinding")}
     # ---- circuits
-    circ = {"up": [], "dn": [], "sme_up": 0, "sme_dn": 0, "ok": data["bh"] is not None}
+    circ = {"up": [], "dn": [], "sme_up": 0, "sme_dn": 0, "ok": data["bh"] is not None, "noband": 0, "unconf": []}
+    today_s = d.strftime("%d-%b-%Y").upper()
     for r in data["bh"] or []:
         if r["series"] in ("SM", "ST"):
             circ["sme_up" if r["hl"] == "H" else "sme_dn"] += 1; continue
         if r["series"] not in ("EQ", "BE", "BZ"): continue
-        v = S.get(r["sym"]) or {}
+        v = sec_all(data, r["sym"], r["series"])
         band = data["band"].get((r["sym"], r["series"])) or "-"
+        try: bp = float(band) / 100
+        except ValueError: bp = None
+        if bp is None:                       # F&O stocks have no fixed band: NSE's file still lists them (dynamic-band events) - not a circuit
+            circ["noband"] += 1; continue
+        if not v or not v.get("prev"): circ["unconf"].append(r["sym"]); continue
+        p0 = v["prev"]; ub = math.floor(p0 * (1 + bp) * 100 + 1e-6) / 100; lb = math.ceil(p0 * (1 - bp) * 100 - 1e-6) / 100
+        tick = 0.011
+        if r["hl"] == "H" and not (v["h"] >= ub - tick): circ["unconf"].append(r["sym"]); continue
+        if r["hl"] == "L" and not (v["l"] <= lb + tick): circ["unconf"].append(r["sym"]); continue
+        locked = (v["c"] >= ub - tick) if r["hl"] == "H" else (v["c"] <= lb + tick)
+        off = (v["c"] / (ub if r["hl"] == "H" else lb) - 1) * 100
+        v = dict(S.get(r["sym"]) or {}, **v)
+        if "pct" not in v: v["pct"] = (v["c"] / p0 - 1) * 100
         w = data["w52"].get(r["sym"])
-        today_s = d.strftime("%d-%b-%Y")
-        tag52 = "52-week high" if w and w[1] == today_s else "52-week low" if w and w[3] == today_s else ""
+        tag52 = "52-week high" if w and w[0] and v["h"] > w[0] else "52-week low" if w and w[2] and v["l"] < w[2] else ""
         ann = data["ann"].get(r["sym"], [])
-        row = dict(sym=r["sym"], name=r["name"], series=r["series"], band=band, c=v.get("c"), pct=v.get("pct"), vm=v.get("vm"), dp=v.get("dp"), tcr=v.get("tcr") or 0,
-                   tag52=tag52, ann=ann[0] if ann else None, hl=r["hl"])
+        row = dict(sym=r["sym"], name=r["name"], series=r["series"], band=band, c=v.get("c"), pct=v.get("pct"), vm=v.get("vm"), dp=v.get("dp"), tcr=v.get("tcr") or (v.get("tlac") or 0) / 100,
+                   tag52=tag52, ann=ann[0] if ann else None, hl=r["hl"], locked=locked, off=off)
         row["rec"], row["why"] = advise(row)
         circ["up" if r["hl"] == "H" else "dn"].append(row)
-    for k in ("up", "dn"): circ[k].sort(key=lambda r: -r["tcr"])
+    for k in ("up", "dn"): circ[k].sort(key=lambda r: (not r["locked"], -r["tcr"]))
+    if circ["noband"]: NOTES.append("NSE's band-hitter file also listed %d F&O stock(s); F&O stocks have no fixed price band (dynamic bands), so they are not counted as circuits here." % circ["noband"])
+    if circ["unconf"]: NOTES.append("Listed as band hitters but the day's high / low did not confirm the band (left out): %s." % ", ".join(circ["unconf"][:15]))
     # ---- 52-week highs / lows on heavy volume
     today_s = d.strftime("%d-%b-%Y")
-    hi52 = sorted([S[s] for s, w in data["w52"].items() if s in S and w[1] == today_s and (S[s]["vm"] or 0) >= 1.5], key=lambda m: -(m["tcr"]))[:10]
-    lo52 = sorted([S[s] for s, w in data["w52"].items() if s in S and w[3] == today_s and (S[s]["vm"] or 0) >= 1.5], key=lambda m: -(m["tcr"]))[:10]
+    # the 52-week file is published for the start of the session (highs / lows up to the previous day): a new extreme = today's high / low beyond it
+    hi52a = [S[s] for s, w in data["w52"].items() if s in S and w[0] and S[s]["h"] > w[0]]; lo52a = [S[s] for s, w in data["w52"].items() if s in S and w[2] and S[s]["l"] < w[2]]
+    hi52 = sorted([m for m in hi52a if (m["vm"] or 0) >= 1.5], key=lambda m: -(m["tcr"]))[:8]
+    lo52 = sorted([m for m in lo52a if (m["vm"] or 0) >= 1.5], key=lambda m: -(m["tcr"]))[:8]
     # ---- market snapshot
     eq = [m for m in S.values() if m["series"] == "EQ"]
     snap = dict(adv=sum(1 for m in eq if m["pct"] > 0), dec=sum(1 for m in eq if m["pct"] < 0), unch=sum(1 for m in eq if m["pct"] == 0))
@@ -319,27 +338,44 @@ def build(d, raw):
     except Exception:
         snap["fiidii"] = None
     nifty_fo = {k: fo.get(k) for k in ("NIFTY", "BANKNIFTY") if fo.get(k) and fo[k].get("pcr") is not None}
+    # still stretched (no turn yet) and the biggest single-stock outflows
+    os_ = sorted([m for m in pool.values() if m["rsi"] is not None and m["rsi"] < 30 and m not in up], key=lambda m: m["rsi"])[:6]
+    ob_ = sorted([m for m in pool.values() if m["rsi"] is not None and m["rsi"] > 75 and m not in dn], key=lambda m: -m["rsi"])[:6]
+    outs = sorted([m for m in pool.values() if m["mf"] < 0 and m["pct"] < 0], key=lambda m: m["mf"])[:8]
+    ins = sorted([m for m in pool.values() if m["mf"] > 0 and m["pct"] > 0], key=lambda m: -m["mf"])[:8]
     return dict(date=d, S=S, sectors=sectors, s_in=s_in, s_out=s_out, up=up[:8], dn=dn[:8], bu=bu, circ=circ, hi52=hi52, lo52=lo52, snap=snap,
+                os=os_, ob=ob_, outs=outs, ins=ins, n52=(len(hi52a), len(lo52a)),
                 idxfo=nifty_fo, poi=poi, nfo=len([s for s in fo if fo[s].get("pcr") is not None]))
+
+
+def sec_all(data, sym, series):
+    v = data["sec"].get(sym)
+    return dict(v) if v else None
 
 
 def advise(r):
     """hedged recommendation + reason for a circuit row, from exchange facts only (Circuit Watch rules)"""
     bits = []
-    if r["band"] not in ("-", "No Band", ""): bits.append("%s%% band" % r["band"])
+    if r["band"] not in ("-", "No Band", ""):
+        bits.append("%s%% band" % r["band"])
+        try:
+            if r.get("pct") is not None and abs(r["pct"]) > float(r["band"]) + 0.6: bits.append("move larger than the band - base price adjusted by the exchange (corporate action), check before acting")
+        except ValueError: pass
     if r["vm"]: bits.append("volume %.1fx 20-day avg" % r["vm"])
     else: bits.append("average volume not available")
     if r["dp"] is not None: bits.append("delivery %.0f%%" % r["dp"])
+    bits.insert(0, "locked at the band at close" if r.get("locked") else "touched the band, closed %s from it" % pc(r.get("off"), 1))
     if r["tag52"]: bits.append("fresh %s" % r["tag52"])
     if r["series"] == "BE": bits.append("trade-for-trade (BE) segment")
     if r["ann"]: bits.append("exchange filing today: %s" % r["ann"][0])
     else: bits.append("no exchange filing today - catalyst unverified")
     if r["hl"] == "H":
-        if r["vm"] and r["vm"] >= 3 and (r["dp"] or 0) >= 50: rec = "Avoid chasing; watch for follow-through"
+        if not r.get("locked"): rec = "Avoid chasing; supply at the band"
+        elif r["vm"] and r["vm"] >= 3 and (r["dp"] or 0) >= 50: rec = "Avoid chasing; watch for follow-through"
         elif r["series"] == "BE": rec = "Avoid chasing (thin, T2T)"
         else: rec = "Avoid chasing"
     else:
-        rec = "Wait for stabilization" if not r["ann"] else "Wait for stabilization; read the filing"
+        rec = ("Wait for stabilization" if r.get("locked") else "Wait for stabilization; buyers at the band") if not r["ann"] else "Wait for stabilization; read the filing"
     return rec, "; ".join(bits) + "."
 
 
@@ -390,6 +426,9 @@ td.r,th.r{text-align:right}td b{font-weight:800}.up{color:%(up)s}.dn{color:%(dn)
 .sx{font:600 18px Inter;color:%(mu)s}
 ul.v{padding-left:28px;font:500 21px Inter;line-height:1.45}ul.v li{margin-bottom:6px}
 .disc{font:500 17.5px Inter;line-height:1.45;color:#4A4A4A;text-align:justify}
+.tag.WEAK{background:#FBEFE3;color:#9a4a0e;border:1px solid #efcfae}.tag.LOCK{background:#33321F;color:#F1EED6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:7px 12px;border-radius:10px;font:800 18px Inter;border:1px solid %(line)s}
+td.nw{white-space:nowrap}
 """ % dict(W=W, H=H, **C)
 
 
@@ -425,27 +464,53 @@ def p_cover(R, total):
     fd = sn.get("fiidii")
     fii = ('<div class="two"><div class="tile"><small>FII cash (provisional)</small><b class="%s">%s cr</b></div><div class="tile"><small>DII cash (provisional)</small><b class="%s">%s cr</b></div></div>'
            % (cls(fd["fii_net"]), fx(fd["fii_net"], 0), cls(fd["dii_net"]), fx(fd["dii_net"], 0))) if fd else ""
-    li = lambda L: "".join('<li><b>%s</b> <span class="%s">%s</span> &middot; net flow <b class="%s">Rs %s cr</b></li>' % (e(x["lab"]), cls(x["pct"]), pc(x["pct"]), cls(x["mf"]), fx(x["mf"], 0)) for x in L) or "<li>None clear today</li>"
+    li = lambda L: "".join('<li><b>%s</b> <span class="%s">%s</span> <span class="tag %s">%s</span><div class="sx">net flow Rs %s cr (%s of turnover)</div></li>' % (e(x["lab"]), cls(x["pct"]), pc(x["pct"]), x["flow"], x["flow"], fx(x["mf"], 0), pc(x["fi"], 0)) for x in L) or "<li>None clear today</li>"
     inner = ("<h2>SECTOR DIGEST<small>Where money flowed in and out &middot; stocks that show it &middot; F&amp;O positioning &middot; RSI reversals &middot; Circuit watch</small></h2>"
              "<div class='card' style='background:%s'><b style='font:900 30px Inter;color:%s'>%s</b><div class='note' style='margin-top:4px'>NSE session close &middot; built from the exchange's end-of-day files</div></div>"
              "<h3>Session snapshot</h3><div class='tiles'>%s</div>"
              "<div class='card'><div style='display:flex;justify-content:space-between;font:800 22px Inter'><span class='up'>Advances %d</span><span class='mu'>Unchanged %d</span><span class='dn'>Declines %d</span></div>"
              "<div class='bar' style='margin-top:10px'><i style='left:0;width:%.1f%%;background:%s'></i><i style='left:%.1f%%;right:0;background:%s'></i></div></div>%s"
              "<div class='two'><div class='card'><h3 style='color:%s'>Money flowing in</h3><ul class='v'>%s</ul></div><div class='card'><h3 style='color:%s'>Money exiting</h3><ul class='v'>%s</ul></div></div>"
-             % (C["soft"], C["band"], e(DATE_TXT[0]), tiles, sn["adv"], sn["unch"], sn["dec"], br, "#7fbf6a", br, "#ef8f86", fii, C["up"], li(R["s_in"]), C["dn"], li(R["s_out"])))
+             "<h3>At a glance</h3><div class='tiles'>%s</div><h3>Sectors today</h3><div class='chips'>%s</div>"
+             % (C["soft"], C["band"], e(DATE_TXT[0]), tiles, sn["adv"], sn["unch"], sn["dec"], br, "#7fbf6a", br, "#ef8f86", fii, C["up"], li(R["s_in"]), C["dn"], li(R["s_out"]),
+                glance(R), chips(R)))
     return shell(inner, 1, total, "Sector Digest &middot; Session close")
 
 
+def glance(R):
+    t = []
+    for k, lab in (("NIFTY", "Nifty"), ("BANKNIFTY", "Bank Nifty")):
+        v = R["idxfo"].get(k)
+        if v: t.append((lab + " PCR &middot; OI range", "%.2f" % v["pcr"], "%s &ndash; %s" % (fx(v["pwall"], 0), fx(v["cwall"], 0)), ""))
+    a = (R["poi"].get("now") or {}).get("FII") or {}
+    if a.get("Future Index Long") and a.get("Future Index Short"):
+        lp = a["Future Index Long"] / (a["Future Index Long"] + a["Future Index Short"]) * 100
+        t.append(("FII index futures long", "%.0f%%" % lp, "of their long + short", "up" if lp >= 50 else "dn"))
+    c = R["circ"]
+    t.append(("Circuits (main board)", '<span class="up">%d</span> / <span class="dn">%d</span>' % (len(c["up"]), len(c["dn"])), "upper / lower", ""))
+    t.append(("New 52-week highs / lows", '<span class="up">%d</span> / <span class="dn">%d</span>' % R["n52"], "exchange 52-week file", ""))
+    t.append(("RSI turn attempts", '<span class="up">%d</span> / <span class="dn">%d</span>' % (len(R["up"]), len(R["dn"])), "up from oversold / down from overbought", ""))
+    return "".join('<div class="tile"><small>%s</small><b class="%s">%s</b><em class="mu">%s</em></div>' % (a_, c_, b_, d_) for a_, b_, d_, c_ in t)
+
+
+def chips(R):
+    def col(p):
+        if p is None: return "#fff", C["mu"]
+        k = max(-1, min(1, p / 2.5))
+        return ("rgba(28,130,13,%.2f)" % (0.12 + 0.5 * k), "#0f4f06") if k > 0 else ("rgba(208,0,0,%.2f)" % (0.10 + 0.45 * -k), "#7a0000") if k < 0 else ("#F4F1DE", C["mu"])
+    return "".join('<span class="chip" style="background:%s;color:%s">%s %s</span>' % (col(x["pct"])[0], col(x["pct"])[1], e(x["lab"]), pc(x["pct"])) for x in sorted(R["sectors"], key=lambda x: -x["pct"]))
+
+
 def p_sectors(R, total):
-    mx = max([abs(x["mf"]) for x in R["sectors"]] + [1])
-    rows = "".join('<tr><td><b>%s</b></td><td class="r %s"><b>%s</b></td><td><div class="bar"><i style="%s:50%%;width:%.1f%%;background:%s"></i><i style="left:50%%;width:2px;background:%s"></i></div>'
-                   '<div class="sx r" style="text-align:right">Rs %s cr</div></td><td class="r">%s</td><td class="r">%d / %d</td><td class="r">%s</td><td><span class="tag %s">%s</span></td></tr>'
-                   % (e(x["lab"]), cls(x["pct"]), pc(x["pct"]), "left" if x["mf"] >= 0 else "right", abs(x["mf"]) / mx * 50, "#7fbf6a" if x["mf"] >= 0 else "#ef8f86", C["mu"],
-                      fx(x["mf"], 0), ("%.1fx" % x["tor"]) if x["tor"] else "-", x["adv"], x["dec"], ("%.0f%%" % x["dp"]) if x["dp"] is not None else "-", x["flow"], x["flow"])
+    mx = max([abs(x["fi"]) for x in R["sectors"]] + [1])
+    rows = "".join('<tr><td><b>%s</b></td><td class="r nw %s"><b>%s</b></td><td><div class="bar"><i style="%s:50%%;width:%.1f%%;background:%s"></i><i style="left:50%%;width:2px;background:%s"></i></div>'
+                   '<div class="sx" style="display:flex;justify-content:space-between"><b class="%s">%s</b><span>Rs %s cr</span></div></td><td class="r nw">%s</td><td class="r nw">%d / %d</td><td class="r nw">%s</td><td><span class="tag %s">%s</span></td></tr>'
+                   % (e(x["lab"]), cls(x["pct"]), pc(x["pct"]), "left" if x["fi"] >= 0 else "right", abs(x["fi"]) / mx * 50, "#7fbf6a" if x["fi"] >= 0 else "#ef8f86", C["mu"],
+                      cls(x["fi"]), pc(x["fi"], 0) + " of turnover", fx(x["mf"], 0), ("%.1fx" % x["tor"]) if x["tor"] else "-", x["adv"], x["dec"], ("%.0f%%" % x["dp"]) if x["dp"] is not None else "-", x["flow"], x["flow"])
                    for x in R["sectors"])
     inner = ("<h2>Sector money flow<small>Net flow = turnover &times; where each stock closed in its day's range (close near the high = buying, near the low = selling), summed over the sector's index members</small></h2>"
-             "<div class='card' style='padding:10px 12px'><table><tr><th>Sector</th><th class='r'>Index</th><th style='width:300px'>Net money flow</th><th class='r'>Turnover vs avg</th><th class='r'>Adv / Dec</th><th class='r'>Delivery</th><th>Flow</th></tr>%s</table></div>"
-             "<div class='note'><b>IN</b> = net buying and the index rose &middot; <b>OUT</b> = net selling and the index fell &middot; <b>MIXED</b> = flow and price disagree. Turnover vs avg = today's sector turnover against its 20-day average.</div>" % rows)
+             "<div class='card' style='padding:10px 12px'><table><tr><th>Sector</th><th class='r'>Index</th><th style='width:330px'>Net flow (share of turnover)</th><th class='r'>Turnover vs avg</th><th class='r'>Adv / Dec</th><th class='r'>Delivery</th><th>Flow</th></tr>%s</table></div>"
+             "<div class='note'><b>IN</b> = net buying of 5%% or more of turnover and the index rose &middot; <b>OUT</b> = net selling of 5%% or more and the index fell &middot; <b>WEAK</b> = index fell or selling outweighed buying, but below the OUT mark &middot; <b>MIXED</b> = rose on thin buying. Sorted by flow share; Rs cr = absolute net flow. Turnover vs avg = today against the 20-day average.</div>" % rows)
     return shell(inner, 2, total, "Sector money flow")
 
 
@@ -470,8 +535,10 @@ def p_focus(R, total, n, which):
         body = "<div class='card note'>No core sector showed %s today (flow and price did not agree). See the sector table on page 2.</div>" % ("clear net buying with a rising index" if which == "in" else "clear net selling with a falling index")
     else:
         body = "".join("<div class='card'><h3>%s <span class='tag %s'>%s &middot; Rs %s cr</span></h3><div class='sx' style='margin:6px 0 8px'>Index %s &middot; turnover %s of average &middot; %d up / %d down</div>%s</div>"
-                       % (e(x["lab"]), "IN" if which == "in" else "OUT", pc(x["pct"]), fx(x["mf"], 0), fx(x["close"]), ("%.1fx" % x["tor"]) if x["tor"] else "-", x["adv"], x["dec"],
+                       % (e(x["lab"]), x["flow"], pc(x["pct"]), fx(x["mf"], 0), fx(x["close"]), ("%.1fx" % x["tor"]) if x["tor"] else "-", x["adv"], x["dec"],
                           focus_table(x.get("focus") or []) if x.get("focus") else "<div class='note'>No single stock led the move.</div>") for x in L)
+    if which == "out":
+        body += "<div class='card'><h3 style='color:%s'>Biggest single-stock outflows (all sectors)</h3><div class='sx' style='margin:4px 0 8px'>Liquid names that fell with the heaviest net selling</div>%s</div>" % (C["dn"], focus_table(R["outs"][:6]))
     inner = ("<h2>%s<small>Stocks in focus that justify the flow &middot; Vol &times; = today's volume against the 20-day average &middot; Deliv = delivery %% &middot; RSI 14 with today's direction</small></h2>%s"
              "<div class='note'>Options: PCR = put OI &divide; call OI (nearest expiry); OI range = highest put-OI strike below the price (support) and highest call-OI strike above it (resistance).</div>" % (title, body))
     return shell(inner, n, total, title.split(" ", 2)[-1] if False else ("Money in" if which == "in" else "Money out"))
@@ -497,14 +564,14 @@ def p_fno(R, total, n):
             L, S_ = a.get("Future Index Long"), a.get("Future Index Short")
             if not L or not S_: return ""
             lp = L / (L + S_) * 100; dl = (L - (b.get("Future Index Long") or L)); ds = (S_ - (b.get("Future Index Short") or S_))
-            return '<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td><td class="r"><b class="%s">%.0f%%</b></td><td class="r"><span class="%s">%+d</span> / <span class="%s">%+d</span></td></tr>' % (
-                who, fx(L, 0), fx(S_, 0), "up" if lp >= 50 else "dn", lp, cls(dl), dl, cls(-ds), ds)
+            return '<tr><td><b>%s</b></td><td class="r">%s</td><td class="r">%s</td><td class="r"><b class="%s">%.0f%%</b></td><td class="r"><span class="%s">%s</span> / <span class="%s">%s</span></td></tr>' % (
+                who, fx(L, 0), fx(S_, 0), "up" if lp >= 50 else "dn", lp, cls(dl), ("+" if dl > 0 else "") + fx(dl, 0), cls(-ds), ("+" if ds > 0 else "") + fx(ds, 0))
         pt = ("<div class='card'><h3>Who holds index futures</h3><table style='margin-top:8px'><tr><th>Participant</th><th class='r'>Long</th><th class='r'>Short</th><th class='r'>Long %%</th><th class='r'>Change L / S</th></tr>%s</table>"
               "<div class='sx' style='margin-top:6px'>Contracts, from the exchange's participant-wise open interest.</div></div>" % "".join(row(w) for w in ("FII", "DII", "Pro", "Client")))
     bu = R["bu"]
-    blk = lambda k, good: ("<div class='card'><h3 style='color:%s'>%s</h3><table style='margin-top:6px'><tr><th>Stock</th><th class='r'>Price</th><th class='r'>Fut OI</th><th>PCR &middot; range</th></tr>%s</table></div>"
+    blk = lambda k, good: ("<div class='card'><h3 style='color:%s'>%s</h3><table style='margin-top:6px'><tr><th>Stock</th><th class='r'>Fut price</th><th class='r'>Fut OI</th><th>PCR &middot; range</th></tr>%s</table></div>"
                            % (C["up"] if good else C["dn"], k, "".join('<tr><td><b>%s</b></td><td class="r %s">%s</td><td class="r">%s</td><td class="sx">%s</td></tr>'
-                                                                       % (e(m["sym"]), cls(m["pct"]), pc(m["pct"]), pc(m["oip"], 1), ("%.2f &middot; %s&ndash;%s" % (m["pcr"], fx(m["pwall"], 0), fx(m["cwall"], 0))) if m.get("pcr") is not None else "-")
+                                                                       % (e(m["sym"]), cls(m.get("fpch")), pc(m.get("fpch")), pc(m["oip"], 1), ("%.2f &middot; %s&ndash;%s" % (m["pcr"], fx(m["pwall"], 0), fx(m["cwall"], 0))) if m.get("pcr") is not None else "-")
                                                                        for m in bu[k]) or "<tr><td colspan='4' class='mu'>None today</td></tr>"))
     inner = ("<h2>F&amp;O positioning<small>Open interest from the exchange's F&amp;O bhavcopy &middot; %d stocks with options read today</small></h2>%s%s"
              "<div class='two'>%s%s</div><div class='two'>%s%s</div>"
@@ -521,9 +588,18 @@ def p_rsi(R, total, n):
     inner = ("<h2>RSI-14 reversal watch<small>Attempts to turn &middot; sector-index members and F&amp;O stocks only (liquid names)</small></h2>"
              "<div class='card'><h3 style='color:%s'>Oversold, trying to turn up</h3><div class='sx' style='margin:4px 0 8px'>RSI was below 32 yesterday, rose today, and the stock closed higher</div>%s</div>"
              "<div class='card'><h3 style='color:%s'>Overbought, trying to turn down</h3><div class='sx' style='margin:4px 0 8px'>RSI was above 68 yesterday, fell today, and the stock closed lower</div>%s</div>"
+             "<div class='two'><div class='card'><h3 style='color:%s'>Still oversold (RSI &lt; 30)</h3><div class='sx'>No turn yet &middot; watch for the first up-close</div>%s</div>"
+             "<div class='card'><h3 style='color:%s'>Still overbought (RSI &gt; 75)</h3><div class='sx'>Stretched &middot; trail stops, avoid fresh chasing</div>%s</div></div>"
              "<div class='note'>An attempt is not a confirmed reversal: watch for a second day in the same direction, ideally on volume above average and with the option range (put / call OI walls) agreeing.</div>"
-             % (C["up"], t(R["up"], True), C["dn"], t(R["dn"], False)))
+             % (C["up"], t(R["up"], True), C["dn"], t(R["dn"], False), C["up"], mini(R["os"]), C["dn"], mini(R["ob"])))
     return shell(inner, n, total, "RSI reversal watch")
+
+
+def mini(L):
+    return ("<table style='margin-top:6px'><tr><th>Stock</th><th class='r'>RSI</th><th class='r'>Close</th><th>Range</th></tr>%s</table>"
+            % ("".join('<tr><td><b>%s</b></td><td class="r"><b>%.0f</b></td><td class="r nw %s">%s</td><td class="sx">%s</td></tr>'
+                       % (e(m["sym"]), m["rsi"], cls(m["pct"]), pc(m["pct"]), ("%s&ndash;%s" % (fx(m["pwall"], 0), fx(m["cwall"], 0))) if m.get("pcr") is not None else "-") for m in L)
+               or "<tr><td colspan='4' class='mu'>None</td></tr>"))
 
 
 def p_circuit(R, total, n):
@@ -531,12 +607,13 @@ def p_circuit(R, total, n):
     def t(L, up):
         if not c["ok"]: return "<div class='note'>Exchange band-hitter file not available - not estimated.</div>"
         if not L: return "<div class='note'>No confirmed %s-circuit hits on the main board today.</div>" % ("upper" if up else "lower")
-        rows = "".join('<tr><td><b>%s</b>%s</td><td class="r">%s<br><b class="%s">%s</b></td><td><b>%s</b></td><td class="sx" style="font-size:17px">%s</td></tr>'
-                       % (e(r["sym"]), ' <span class="tag MIXED" style="font-size:13px">BE</span>' if r["series"] == "BE" else "", fx(r["c"]), cls(r["pct"]), pc(r["pct"]), e(r["rec"]), e(r["why"])) for r in L[:9])
-        more = len(L) - 9
+        rows = "".join('<tr><td><b>%s</b><br>%s%s</td><td class="r nw">%s<br><b class="%s">%s</b></td><td><b>%s</b></td><td class="sx" style="font-size:17px">%s</td></tr>'
+                       % (e(r["sym"]), '<span class="tag LOCK" style="font-size:13px">LOCKED</span> ' if r["locked"] else '<span class="tag MIXED" style="font-size:13px">OFF BAND</span> ',
+                          '<span class="tag WEAK" style="font-size:13px">%s</span>' % e(r["series"]) if r["series"] != "EQ" else "", fx(r["c"]), cls(r["pct"]), pc(r["pct"]), e(r["rec"]), e(r["why"])) for r in L[:8])
+        more = len(L) - 8
         return ("<table><tr><th>Stock</th><th class='r'>Move</th><th>Recommendation</th><th>Reason</th></tr>%s</table>%s"
-                % (rows, "<div class='sx' style='margin-top:6px'>+ %d more (sorted by turnover) - full list on the next page</div>" % more if more > 0 else ""))
-    inner = ("<h2>Circuit watch<small>Price-band hitters from the exchange's own list &middot; main board %d upper / %d lower &middot; SME %d upper / %d lower</small></h2>"
+                % (rows, "<div class='sx' style='margin-top:6px'>+ %d more (locked first, then by turnover) - full list on the next page</div>" % more if more > 0 else ""))
+    inner = ("<h2>Circuit watch<small>Fixed-band stocks that hit their price band (exchange list, confirmed by the day's high / low) &middot; main board %d upper / %d lower &middot; SME %d upper / %d lower &middot; locked names first</small></h2>"
              "<div class='card'><h3 style='color:%s'>Upper circuit</h3>%s</div><div class='card'><h3 style='color:%s'>Lower circuit</h3>%s</div>"
              "<div class='note'>Circuit-locked stocks carry execution risk (no sellers / buyers at the band); the move alone is not a reason to enter.</div>"
              % (len(c["up"]), len(c["dn"]), c["sme_up"], c["sme_dn"], C["up"], t(c["up"], True), C["dn"], t(c["dn"], False)))
@@ -545,15 +622,15 @@ def p_circuit(R, total, n):
 
 def p_circuit_all(R, total, n):
     c = R["circ"]
-    lst = lambda L: ", ".join("<b>%s</b> %s" % (e(r["sym"]), pc(r["pct"], 1)) for r in L) or "none"
+    lst = lambda L: ", ".join("<b>%s</b> %s%s" % (e(r["sym"]), pc(r["pct"], 1), "" if r["locked"] else "*") for r in L) or "none"
     w = lambda L, hi: ("<table><tr><th>Stock</th><th class='r'>Close</th><th class='r'>Vol &times;</th><th class='r'>Deliv</th><th class='r'>RSI 14</th><th>Options</th></tr>%s</table>"
                        % ("".join('<tr><td><b>%s</b></td><td class="r">%s<br><b class="%s">%s</b></td><td class="r">%.1fx</td><td class="r">%s</td><td class="r">%s</td><td>%s</td></tr>'
                                   % (e(m["sym"]), fx(m["c"]), cls(m["pct"]), pc(m["pct"]), m["vm"], ("%.0f%%" % m["dp"]) if m.get("dp") is not None else "-", rsi_txt(m), oi_txt(m)) for m in L)
                           or "<tr><td colspan='6' class='mu'>None on heavy volume today</td></tr>"))
-    inner = ("<h2>52-week extremes &amp; full circuit list<small>Fresh 52-week highs / lows on at least 1.5&times; average volume (exchange 52-week file)</small></h2>"
+    inner = ("<h2>52-week extremes &amp; full circuit list<small>Fresh 52-week highs / lows on at least 1.5&times; average volume &middot; %d highs / %d lows in all today (exchange 52-week file)</small></h2>"
              "<div class='card'><h3 style='color:%s'>New 52-week highs</h3>%s</div><div class='card'><h3 style='color:%s'>New 52-week lows</h3>%s</div>"
-             "<div class='card'><h3>All main-board band hitters</h3><div class='note' style='margin-top:6px'><b class='up'>Upper (%d):</b> %s</div><div class='note' style='margin-top:8px'><b class='dn'>Lower (%d):</b> %s</div></div>"
-             % (C["up"], w(R["hi52"], True), C["dn"], w(R["lo52"], False), len(c["up"]), lst(c["up"]), len(c["dn"]), lst(c["dn"])))
+             "<div class='card'><h3>All main-board band hitters</h3><div class='note' style='margin-top:6px'><b class='up'>Upper (%d):</b> %s</div><div class='note' style='margin-top:8px'><b class='dn'>Lower (%d):</b> %s</div><div class='sx' style='margin-top:8px'>* touched the band but closed off it</div></div>"
+             % (R["n52"][0], R["n52"][1], C["up"], w(R["hi52"], True), C["dn"], w(R["lo52"], False), len(c["up"]), lst(c["up"]), len(c["dn"]), lst(c["dn"])))
     return shell(inner, n, total, "52-week &amp; circuits")
 
 
@@ -641,7 +718,7 @@ def main():
     cap = "Sector Digest %s: money in %s; out of %s; circuits %d up / %d down" % (d.strftime("%d %b"), ins, ots, len(R["circ"]["up"]), len(R["circ"]["dn"]))
     print(cap); print("\n".join(outs + [pdf]))
     if a.dry: return
-    cmd = [sys.executable, os.path.join(HERE, "publish.py"), SID, "--caption", cap, "--file", pdf] + sum([["--file", f] for f in outs], [])
+    cmd = [sys.executable, os.path.join(HERE, "publish.py"), SID, "--date", d.isoformat(), "--caption", cap, "--file", pdf] + sum([["--file", f] for f in outs], [])
     subprocess.run(cmd, check=True)
 
 

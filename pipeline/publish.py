@@ -36,6 +36,7 @@ def main():
     ap.add_argument("--caption", default="")
     ap.add_argument("--status", default="ok", choices=["ok", "holiday", "failed", "skipped"])
     ap.add_argument("--note", default="")
+    ap.add_argument("--date", default="", help="session date YYYY-MM-DD the report belongs to (default: today IST)")
     a = ap.parse_args()
 
     with open(os.path.join(ROOT, "schedules.json")) as f:
@@ -60,7 +61,7 @@ def main():
                       "type": os.path.splitext(name)[1].lstrip(".").lower(),
                       "bytes": os.path.getsize(src)})
 
-    entry = {"generated_at": now.isoformat(timespec="seconds"), "date": now.strftime("%Y-%m-%d"),
+    entry = {"generated_at": now.isoformat(timespec="seconds"), "date": a.date or now.strftime("%Y-%m-%d"),
              "status": a.status, "caption": a.caption, "note": a.note, "files": files}
 
     idx_path = os.path.join(folder, "index.json")
