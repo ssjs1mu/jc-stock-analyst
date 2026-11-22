@@ -475,7 +475,7 @@ def p5(b, p, total):
              '<h2 class="s" style="color:#43e08a">Advantages</h2><div>%s</div>'
              '<h2 class="s" style="color:#ffb454">Drawbacks</h2><div>%s</div>'
              '<div class="card" style="border:2.5px solid #ff6b6b;background:#ff6b6b22"><div style="font-size:32px;font-weight:900;color:#ff8f8f;letter-spacing:1.2px">WARNINGS</div>%s</div>'
-             '<div style="font-size:30px;line-height:1.35;opacity:.95"><b style="color:#4DEBFF">Outlook:</b> %s</div>'
+             '<div style="font-size:30px;line-height:1.35;opacity:.95"><b style="color:#2a6f97">Outlook:</b> %s</div>'
              '<div class="small" style="opacity:.7;font-size:23px">Check the latest brochure with LIC or your agent before buying. General information, not advice.</div>'
              % (e(pl["cat"].upper()), e(pl["name"]), e(pl["line"]), e(pl["entry"]), e(pl["term"]), e(pl["kind"]), e(pl["ages"]),
                 _ul(pl["benefits"], "#43e08a", 34), _ul(pl["drawbacks"], "#ffb454", 33), _ul(pl["warnings"], "#ff8f8f", 32), e(pl["outlook"])))
