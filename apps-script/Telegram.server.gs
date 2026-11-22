@@ -16,7 +16,8 @@ var TG_BOOKLET = { 'morning-pulse': ['morning', '\uD83C\uDF05 Morning Sunrise'],
 function tgProps_() { var p = PropertiesService.getScriptProperties(); var t = p.getProperty('TG_TOKEN'), c = p.getProperty('TG_CHAT'); if (!t || !c) throw new Error('Set TG_TOKEN and TG_CHAT in Script properties first'); return { p: p, t: t, c: c }; }
 function tgTest() { var s = tgProps_(); var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + s.t + '/sendMessage', { method: 'post', payload: { chat_id: s.c, text: "Joshi's Corner report feed connected." }, muteHttpExceptions: true }); Logger.log(r.getContentText()); return r.getContentText(); }
 function installTelegramTrigger() {
-  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'tgPostReports') ScriptApp.deleteTrigger(t); });
+  // also removes any trigger that calls THIS function: one was set by mistake and kept deleting the 5-minute poster before it could run
+  ScriptApp.getProjectTriggers().forEach(function (t) { var h = t.getHandlerFunction(); if (h === 'tgPostReports' || h === 'installTelegramTrigger') ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('tgPostReports').timeBased().everyMinutes(5).create();
 }
 /* NSE equity trading holidays 2026 (exchange circular; cross-checked on two sources). A holiday is treated exactly like a non-trading day: no 5-minute signals, no morning sequence, no client daily post - news only, every 30 minutes. KEEP IN SYNC with NSE_HOLIDAYS in pipeline/auto_reports.py. ADD NEXT YEAR'S LIST EACH DECEMBER. Weekend entries (15-Feb, 21-Mar, 15-Aug) need no entry: weekends are already non-trading. Muhurat session (Sun 08-Nov-2026, timings TBA) is NOT treated as trading. */
