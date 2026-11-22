@@ -440,11 +440,11 @@ def mood_photo(sc):
     ed = "close" if EDN[0] == "evening" else "open"
     pool = [("raw", f) for f in (_img_file(d, n) for n in SCENES.get((ed, key), [])) if f]
     # user's new Canva pictures (22 Nov 2026) are featured first until 6 Dec 2026, then they join the normal rotation
-    if _dt.date.today() <= _dt.date(2026, 12, 6):
-        fresh = [x for x in pool if os.path.basename(x[1]).split(".")[0] in FRESH]
-        if fresh:
-            pool = fresh
-    pool += [("scene", f) for f in (_img_file(d, n) for n in (key, key + "_2")) if f]
+    fresh = [x for x in pool if os.path.basename(x[1]).split(".")[0] in FRESH] if _dt.date.today() <= _dt.date(2026, 12, 6) else []
+    if fresh:
+        pool = fresh
+    else:
+        pool += [("scene", f) for f in (_img_file(d, n) for n in (key, key + "_2")) if f]
     if not pool:
         return None
     kind, f = pool[day % len(pool)]            # rotate through the whole pool day by day, new scene pictures first
