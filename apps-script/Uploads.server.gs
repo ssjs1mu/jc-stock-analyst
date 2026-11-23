@@ -2,6 +2,8 @@
    POST {action:'pf_save', key:<admin passcode>, type:'trade'|'ledger'|'dp', name:<original file name>, files:[{client:<code>, csv:<text>}]}
    Saves one CSV per client code (codes only - the pages never send client names) under
      Joshi's Corner - Client Uploads / Trade files | Ledger | DP holdings / <CLIENT CODE> / <CODE> <type> <yyyy-mm-dd HHmm> (<original name>).csv
+   POST {action:'pf_load', key} -> the newest CSV of every client code in each type folder, so an upload made on one device
+   (phone app, laptop) loads on every other device: {ok, files:[{type:'trade'|'ledger'|'dp', client, t:<created ms>, name, csv}]}
    Needs the admin passcode (same as the client watchlists). */
 var PF_ROOT_NAME = "Joshi's Corner - Client Uploads";
 var PF_TYPES = { trade: 'Trade files', ledger: 'Ledger', dp: 'DP holdings' };
@@ -31,3 +33,16 @@ function pfSave_(b) {
   });
 }
 function pfLock_(fn) { var lk = LockService.getScriptLock(); lk.waitLock(20000); try { return fn(); } finally { lk.releaseLock(); } }
+function pfLoad_() {
+  var root = pfRoot_(), out = [];
+  Object.keys(PF_TYPES).forEach(function (k) {
+    var it = root.getFoldersByName(PF_TYPES[k]); if (!it.hasNext()) return;
+    var cf = it.next().getFolders();
+    while (cf.hasNext()) {
+      var f = cf.next(), fs = f.getFiles(), best = null;
+      while (fs.hasNext()) { var x = fs.next(); if (x.isTrashed() || !/\.csv$/i.test(x.getName())) continue; if (!best || x.getDateCreated() > best.getDateCreated()) best = x; }
+      if (best) out.push({ type: k, client: f.getName(), t: best.getDateCreated().getTime(), name: best.getName(), csv: best.getBlob().getDataAsString() });
+    }
+  });
+  return JSON.stringify({ ok: true, files: out });
+}
