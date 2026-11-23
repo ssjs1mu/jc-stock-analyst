@@ -2,6 +2,81 @@
  "schedule_id": "sector-digest",
  "runs": [
   {
+   "generated_at": "2026-11-23T19:17:25+05:30",
+   "date": "2026-11-23",
+   "status": "ok",
+   "caption": "Sector Digest 23 Nov: money in Realty; out of Private Bank, PSU Bank, Oil & Gas; circuits 62 up / 85 down",
+   "note": "",
+   "files": [
+    {
+     "name": "Sector_Digest_2026-11-23.pdf",
+     "path": "reports/sector-digest/Sector_Digest_2026-11-23.pdf",
+     "type": "pdf",
+     "bytes": 2296993
+    },
+    {
+     "name": "Sector_Digest_2026-11-23.json",
+     "path": "reports/sector-digest/Sector_Digest_2026-11-23.json",
+     "type": "json",
+     "bytes": 103
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_1.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_1.png",
+     "type": "png",
+     "bytes": 264885
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_2.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_2.png",
+     "type": "png",
+     "bytes": 328204
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_3.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_3.png",
+     "type": "png",
+     "bytes": 173705
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_4.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_4.png",
+     "type": "png",
+     "bytes": 368211
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_5.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_5.png",
+     "type": "png",
+     "bytes": 268401
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_6.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_6.png",
+     "type": "png",
+     "bytes": 303627
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_7.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_7.png",
+     "type": "png",
+     "bytes": 418740
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_8.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_8.png",
+     "type": "png",
+     "bytes": 357532
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-23_9.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-23_9.png",
+     "type": "png",
+     "bytes": 254117
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-22T19:16:43+05:30",
    "date": "2026-11-20",
    "status": "ok",
@@ -71,5 +146,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-22T19:16:43+05:30"
+ "updated_at": "2026-11-23T19:17:25+05:30"
 }
