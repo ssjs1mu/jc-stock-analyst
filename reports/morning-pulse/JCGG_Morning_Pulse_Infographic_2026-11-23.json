@@ -1,0 +1,1516 @@
+{
+ "book": {
+  "flows": {
+   "date": "19 Nov",
+   "fii": 7411.41,
+   "dii": -1356.57
+  },
+  "pcr": {
+   "pcr": 1.6863191031447755,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "23 Nov 2026",
+  "date_iso": "2026-11-23",
+  "mood": {
+   "key": "bull",
+   "label": "Positive start likely",
+   "sub": "Indicative Nifty opening zone 25,873 - 25,950"
+  },
+  "label": "Positive start likely",
+  "zone": "25,873 - 25,950",
+  "headline": "Positive start likely - Nifty zone 25,873 - 25,950",
+  "open_text": "Wall Street weak, Asia negative, crude easing. Carry-over: Nifty's +1.12% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+  "yday": "Nifty's +1.12% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour.",
+  "spark": [
+   22749.75,
+   22698.849609375,
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125,
+   25291.099609375,
+   25387.400390625,
+   25227.94921875,
+   25514.30078125,
+   25800.599609375
+  ],
+  "proj": 25911.5,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "25,800.60",
+    "pct": "+1.12%",
+    "pts": "+286.30"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "83,919.71",
+    "pct": "+1.08%",
+    "pts": "+897.96"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "64,635.20",
+    "pct": "+2.49%",
+    "pts": "+1572.20"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "24,088.80",
+    "pct": "+0.80%",
+    "pts": "+191.65"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,188 - 25,494",
+    "r": "25,958 - 26,115",
+    "note": "A sustained move above 25,958 opens up 26,115; a slide below 25,494 would expose 25,188.",
+    "flag": ""
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "61,889 - 63,262",
+    "r": "65,344 - 66,054",
+    "note": "A sustained move above 65,344 opens up 66,054; a slide below 63,262 would expose 61,889.",
+    "flag": ""
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "48,147.33",
+    "pct": "-1.93%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "6,910.39",
+    "pct": "-3.70%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "22,617.73",
+    "pct": "-5.28%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,346.30",
+    "pct": "-1.02%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "24,802.78",
+    "pct": "-2.60%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "56,436.65",
+    "pct": "-5.06%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "22,103.84",
+    "pct": "-1.37%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,485.99",
+    "pct": "-1.35%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "4,641.55",
+    "pct": "-4.69%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "89.49",
+    "pct": "-3.33%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "83.03",
+    "pct": "-1.13%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,582.40",
+    "pct": "+1.91%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "92.660",
+    "pct": "-0.68%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.71",
+    "pct": "-0.09%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.91",
+    "pct": "-2.77%"
+   }
+  ],
+  "vix": {
+   "level": "17.32",
+   "pct": "+7.51%",
+   "gauge": 0.634000015258789,
+   "text": "India VIX 17.32 (+7.51%); USD/INR 92.66 (-0.68%); US 10-yr yield 4.91 (-2.77%). India VIX rose 7.5% - hedging demand up."
+  },
+  "events": [
+   "Nifty MONTHLY expiry today (Mon 23 Nov 2026) (moved from Tuesday's holiday).",
+   "Results today (2 companies): BCSSL, SFCTECH."
+  ],
+  "watch": [
+   [
+    "KOTAKBANK",
+    "In the news",
+    "Gold Rate Today in India, 23 Nov 2026 - Live 18K, 22K & 24K Gold Prices"
+   ],
+   [
+    "ADANIENT",
+    "In the news",
+    "Adani Enterprises, BSE and 5 Other Stocks That Delivered Returns of Up to 44% in 2026 Amid"
+   ],
+   [
+    "FEDERALBNK",
+    "Setup: BUY (A+)",
+    "Entry 374.6, stop 370.6, target 381.1"
+   ],
+   [
+    "IDFCFIRSTB",
+    "Setup: BUY (A+)",
+    "Entry 87.7, stop 86.7, target 89.3"
+   ],
+   [
+    "ULTRACEMCO",
+    "Setup: BUY (A+)",
+    "Entry 12,947.0, stop 12,840.8, target 13,139.2"
+   ],
+   [
+    "EICHERMOT",
+    "Setup: BUY (A+)",
+    "Entry 8,155.4, stop 8,070.6, target 8,339.7"
+   ],
+   [
+    "INDUSINDBK",
+    "Volume surge (last session)",
+    "6.0x average volume, +8.59%"
+   ],
+   [
+    "AXISBANK",
+    "Volume surge (last session)",
+    "3.2x average volume, +4.72%"
+   ]
+  ],
+  "headlines": [
+   "26,000 next milestone for Nifty; Fortis among 3 stock ideas: Osho Krishan",
+   "OCBC: AI rout becomes a growth shock as EM currencies take the dollar's strength",
+   "GIFT Nifty Jumps 170 Points, Signals Positive Opening For Indian Markets Despite Asian Market Rout",
+   "Tech stock sell-off deepens in Asia",
+   "NDTV Profit Live TV: Watch Live Business News, Stock Market Live TV, Free Live News Streaming",
+   "Sensex, Nifty Today: GIFT Nifty signals strong open despite Black Monday fears",
+   "China Lowers Margin Requirement to 80% to Boost Stock Liquidity",
+   "US stock futures jump over 2% in relief bounce, gold rallies, but Kospi slides nearly 4%"
+  ],
+  "calls": {
+   "buy": [
+    {
+     "sym": "FEDERALBNK",
+     "side": "BUY",
+     "entry": "374.57",
+     "sl": "370.57",
+     "t1": "381.06",
+     "t2": "386.50",
+     "rr": "1.6",
+     "risk": "4.00",
+     "riskpct": "1.07%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 12.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 29: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "IDFCFIRSTB",
+     "side": "BUY",
+     "entry": "87.67",
+     "sl": "86.69",
+     "t1": "89.31",
+     "t2": "91.03",
+     "rr": "1.7",
+     "risk": "0.98",
+     "riskpct": "1.12%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 12.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 32: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "ULTRACEMCO",
+     "side": "BUY",
+     "entry": "12,946.96",
+     "sl": "12,840.84",
+     "t1": "13,139.20",
+     "t2": "13,298.38",
+     "rr": "1.8",
+     "risk": "106.12",
+     "riskpct": "0.82%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 46: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "EICHERMOT",
+     "side": "BUY",
+     "entry": "8,155.36",
+     "sl": "8,070.56",
+     "t1": "8,339.67",
+     "t2": "8,466.87",
+     "rr": "2.2",
+     "risk": "84.80",
+     "riskpct": "1.04%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 35: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "CEMPRO",
+     "side": "BUY",
+     "entry": "1,424.65",
+     "sl": "1,400.53",
+     "t1": "1,467.97",
+     "t2": "1,513.03",
+     "rr": "1.8",
+     "risk": "24.12",
+     "riskpct": "1.69%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 28: strong trend, +DI leads"
+     ]
+    }
+   ],
+   "sell": [],
+   "watch_buy": [
+    {
+     "sym": "APOLLOHOSP",
+     "conv": 49,
+     "S": 12.5,
+     "why": "first target too close for the risk (R:R 1.07 < 1.5)"
+    },
+    {
+     "sym": "POONAWALLA",
+     "conv": 49,
+     "S": 12.5,
+     "why": "first target too close for the risk (R:R 1.36 < 1.5)"
+    },
+    {
+     "sym": "PHOENIXLTD",
+     "conv": 49,
+     "S": 12,
+     "why": "first target too close for the risk (R:R 1.42 < 1.5)"
+    },
+    {
+     "sym": "AXISBANK",
+     "conv": 49,
+     "S": 11.5,
+     "why": "RSI stretched"
+    }
+   ]
+  },
+  "gift": {
+   "last": "25,912.0",
+   "pct": "+0.22%",
+   "premium": "+111 pts",
+   "vs": "+0.43%",
+   "asof": "23 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "INDUSINDBK",
+    "1,003.00",
+    "+8.59%"
+   ],
+   [
+    "APOLLOHOSP",
+    "9,200.00",
+    "+5.29%"
+   ],
+   [
+    "AXISBANK",
+    "1,446.00",
+    "+4.72%"
+   ],
+   [
+    "MARUTI",
+    "14,011.00",
+    "+3.11%"
+   ],
+   [
+    "ULTRACEMCO",
+    "12,939.00",
+    "+3.02%"
+   ]
+  ],
+  "losers": [
+   [
+    "TITAN",
+    "4,620.00",
+    "-1.70%"
+   ],
+   [
+    "TATASTEEL",
+    "178.00",
+    "-1.60%"
+   ],
+   [
+    "NTPC",
+    "321.50",
+    "-1.08%"
+   ],
+   [
+    "HINDUNILVR",
+    "2,052.50",
+    "-1.05%"
+   ],
+   [
+    "SUNPHARMA",
+    "1,884.90",
+    "-0.79%"
+   ]
+  ],
+  "shock": [
+   [
+    "INDUSINDBK",
+    "1,003.00",
+    "6.0x avg vol",
+    "+8.59%"
+   ],
+   [
+    "AXISBANK",
+    "1,446.00",
+    "3.2x avg vol",
+    "+4.72%"
+   ],
+   [
+    "APOLLOHOSP",
+    "9,200.00",
+    "2.7x avg vol",
+    "+5.29%"
+   ],
+   [
+    "MARUTI",
+    "14,011.00",
+    "2.6x avg vol",
+    "+3.11%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "25,188",
+     "25,494",
+     "25,652",
+     "25,958",
+     "26,115"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "61,889",
+     "63,262",
+     "63,972",
+     "65,344",
+     "66,054"
+    ]
+   }
+  ],
+  "est": 0.43,
+  "stock_news": {
+   "items": [
+    {
+     "sym": "TATASTEEL",
+     "name": "Tata Steel Limited",
+     "headline": "Tata Steel\u2019s \u20b928,000 crore deal with APL Apollo is part of a two-stage takeover transaction",
+     "brief": "Tata Steel has agreed to transfer its tubes business for up to \u20b911,700 crore and its 100% stake in Tata Steel Colors for \u20b916,300 crore to APL Apollo.",
+     "source": "Mint",
+     "time": "22 Nov 22:35",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 162.8,
+     "also": [
+      "Business Standard",
+      "BusinessLine",
+      "Economic Times"
+     ],
+     "n": 11,
+     "link": "https://www.livemint.com/companies/news/tata-steel-s-28-000-crore-deal-with-apl-apollo-is-part-of-a-two-stage-transaction-11795360468769.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.8,
+      "ctx": -0.5,
+      "p_up": 55,
+      "p_dn": 45,
+      "avg": 0.54,
+      "n": 227,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 50,
+      "t_n": 10657,
+      "t_avg": 0.22,
+      "edge": 2.7,
+      "rsi": 47,
+      "rsi_up": false,
+      "vm": 2.0156004714465388,
+      "dp": 44.28200768088569,
+      "pct": -1.5976560340538377,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.7,
+      "flow": "WEAK",
+      "sec": "Metal",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "ASHOKLEY",
+     "name": "Ashok Leyland Limited",
+     "headline": "Ashok Leyland expands EV push with order of 200 trucks for cement transport, eyes wider LCV market",
+     "brief": "The order marks Ashok Leyland subsidiary OHM Mobility\u2019s expansion beyond electric buses into freight transportation, a segment seen as the next growth frontier for commercial vehicle electrification",
+     "source": "BusinessLine",
+     "time": "22 Nov 11:02",
+     "tag": "ORDER",
+     "tone": "up",
+     "score": 133.4,
+     "also": [
+      "Business Standard",
+      "Economic Times"
+     ],
+     "n": 4,
+     "link": "https://www.thehindubusinessline.com/companies/ashok-leyland-expands-ev-push-with-order-of-200-trucks-for-cement-transport-eyes-wider-lcv-market/article71729219.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.1,
+      "ctx": 2.0,
+      "p_up": 53,
+      "p_dn": 46,
+      "avg": 0.54,
+      "n": 2248,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 53,
+      "rsi_up": false,
+      "vm": 0.5974647981033268,
+      "dp": 36.86265022454515,
+      "pct": -1.6852241950045206,
+      "above20": true,
+      "bu": null,
+      "pcr": 0.83,
+      "flow": "IN",
+      "sec": "Infrastructure",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "APLAPOLLO",
+     "name": "APL Apollo Tubes Limited",
+     "headline": "Tata Steel\u2019s \u20b928,000 crore deal with APL Apollo is part of a two-stage takeover transaction",
+     "brief": "Tata Steel has agreed to transfer its tubes business for up to \u20b911,700 crore and its 100% stake in Tata Steel Colors for \u20b916,300 crore to APL Apollo.",
+     "source": "Mint",
+     "time": "22 Nov 22:35",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 127.0,
+     "also": [
+      "BusinessLine",
+      "Economic Times",
+      "NSE filing"
+     ],
+     "n": 6,
+     "link": "https://www.livemint.com/companies/news/tata-steel-s-28-000-crore-deal-with-apl-apollo-is-part-of-a-two-stage-transaction-11795360468769.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.3,
+      "ctx": -1.0,
+      "p_up": 57,
+      "p_dn": 43,
+      "avg": 1.01,
+      "n": 155,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 50,
+      "t_n": 10657,
+      "t_avg": 0.22,
+      "edge": 2.7,
+      "rsi": 43,
+      "rsi_up": false,
+      "vm": 3.551554780900748,
+      "dp": 45.0182348702177,
+      "pct": -1.2244517901205914,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.55,
+      "flow": "WEAK",
+      "sec": "Metal",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "PNB",
+     "name": "Punjab National Bank",
+     "headline": "PNB needs Rs 5,000 crore extra provisions under ECL, CEO sees limited impact",
+     "brief": "Punjab National Bank expects an additional provision of approximately Rs 5,000 crore due to ECL migration. They initially estimated higher but reduced the expected requirement based on digital assessments.",
+     "source": "Economic Times",
+     "time": "22 Nov 13:02",
+     "tag": "RESULTS",
+     "tone": "dn",
+     "score": 126.5,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/banking/finance/banking/pnb-needs-rs-5000-crore-extra-provisions-under-ecl-ceo-sees-limited-impact/articleshow/136069636.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -1.4,
+      "ctx": -0.5,
+      "p_up": 55,
+      "p_dn": 45,
+      "avg": 0.59,
+      "n": 988,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 86,
+      "rsi_up": true,
+      "vm": 1.1204074197796239,
+      "dp": 32.937237322855886,
+      "pct": 0.3099773974814454,
+      "above20": true,
+      "bu": "Long unwinding",
+      "pcr": 1.12,
+      "flow": "IN",
+      "sec": "Bank",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "INDUSINDBK",
+     "name": "IndusInd Bank Limited",
+     "headline": "IndusInd Bank ends ex-CEO Kathpalia's employment, seeks to recover pay",
+     "brief": "IndusInd Bank has ended the employment of Sumant Kathpalia following a disciplinary investigation into misconduct.",
+     "source": "Economic Times",
+     "time": "21 Nov 06:24",
+     "tag": "MANAGEMENT",
+     "tone": "dn",
+     "score": 126.5,
+     "also": [
+      "Business Standard"
+     ],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/industry/banking/finance/banking/indusind-bank-ends-ex-ceo-kathpalias-employment-seeks-to-recover-pay/articleshow/136042443.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.3,
+      "ctx": 0.5,
+      "p_up": 48,
+      "p_dn": 52,
+      "avg": 0.15,
+      "n": 511,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 10443,
+      "t_avg": -0.1,
+      "edge": -1.6,
+      "rsi": 70,
+      "rsi_up": true,
+      "vm": 6.129832732349329,
+      "dp": 38.15407299280604,
+      "pct": 8.590916472689875,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 1.02,
+      "flow": "IN",
+      "sec": "Private Bank",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "AUROPHARMA",
+     "name": "Aurobindo Pharma Limited",
+     "headline": "US drug regulator classifies Aurobindo Pharma arm's Andhra facility as 'voluntary action indicated'",
+     "brief": "Aurobindo Pharma Limited has announced that its subsidiary, Apitoria Pharma Pvt Ltd, received a VAI classification for its facility.",
+     "source": "Economic Times",
+     "time": "21 Nov 13:49",
+     "tag": "REGULATOR",
+     "tone": "",
+     "score": 124.5,
+     "also": [
+      "NDTV Profit"
+     ],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/industry/healthcare/biotech/pharmaceuticals/us-drug-regulator-classifies-aurobindo-pharma-arms-andhra-facility-as-voluntary-action-indicated/articleshow/136048904.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.1,
+      "ctx": 1.0,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3447,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 60,
+      "rsi_up": false,
+      "vm": 0.6339499608649227,
+      "dp": 61.598502059175566,
+      "pct": -0.3710472392977818,
+      "above20": true,
+      "bu": null,
+      "pcr": 0.65,
+      "flow": "IN",
+      "sec": "Healthcare",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "HEROMOTOCO",
+     "name": "Hero MotoCorp Limited",
+     "headline": "Hero MotoCorp gets tribunal relief on Rs 27 crore income tax demand",
+     "brief": "The Income Tax Appellate Tribunal has provided significant relief to Hero MotoCorp regarding an income tax demand.",
+     "source": "Economic Times",
+     "time": "21 Nov 20:04",
+     "tag": "REGULATOR",
+     "tone": "up",
+     "score": 119.4,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/auto/auto-news/hero-motocorp-gets-tribunal-relief-on-rs-27-crore-income-tax-demand/articleshow/136056677.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.6,
+      "ctx": 1.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3447,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 61,
+      "rsi_up": false,
+      "vm": 1.119137101572919,
+      "dp": 48.52789753841707,
+      "pct": -0.3599712023038157,
+      "above20": true,
+      "bu": "Long unwinding",
+      "pcr": 1.08,
+      "flow": "IN",
+      "sec": "Auto",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "MARICO",
+     "name": "Marico Limited",
+     "headline": "Marico fines independent director Bhaskar Bhat Rs 3 lakh over spouse's share purchase",
+     "brief": "Marico has imposed a \u20b93 lakh penalty on independent director Bhaskar Bhat for a trading violation. His spouse, Vrunda Bhaskar, purchased 200 shares during a restricted trading period.",
+     "source": "Economic Times",
+     "time": "23 Nov 00:39",
+     "tag": "REGULATOR",
+     "tone": "dn",
+     "score": 116.7,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/cons-products/fmcg/marico-fines-independent-director-bhaskar-bhat-rs-3-lakh-over-spouses-share-purchase/articleshow/136082626.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -1.4,
+      "ctx": -0.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3447,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 67,
+      "rsi_up": false,
+      "vm": 0.5560074525214752,
+      "dp": 59.727207881089626,
+      "pct": -0.19590770570308605,
+      "above20": true,
+      "bu": null,
+      "pcr": 1.03,
+      "flow": "WEAK",
+      "sec": "FMCG",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "ADANIENSOL",
+     "name": "Adani Energy Solutions Limited",
+     "headline": "Adani Energy Solutions bags 2,500 MW renewable power supply contract from West Bengal discom",
+     "brief": "The latest win comes as AESL expands its presence in India\u2019s power transmission segment, having secured a major transmission project in Bihar",
+     "source": "BusinessLine",
+     "time": "21 Nov 17:31",
+     "tag": "ORDER",
+     "tone": "up",
+     "score": 115.7,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/adani-energy-solutions-bags-2500-mw-renewable-power-supply-contract-from-west-bengal-discom/article71727585.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.2,
+      "ctx": 2.0,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.26,
+      "n": 2113,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 10443,
+      "t_avg": -0.1,
+      "edge": -1.6,
+      "rsi": 63,
+      "rsi_up": true,
+      "vm": 1.1086823071542795,
+      "dp": 48.86036186295785,
+      "pct": 1.2488122709379574,
+      "above20": true,
+      "bu": null,
+      "pcr": 0.8,
+      "flow": "IN",
+      "sec": "Commodities",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "PATANJALI",
+     "name": "Patanjali Foods Limited",
+     "headline": "Patanjali Foods faces fresh cow ghee safety action as Madhya Pradesh bans sale of one batch",
+     "brief": "Patanjali Foods has said it will seek retesting and may appeal after Madhya Pradesh authorities banned the sale of a cow ghee batch declared unsafe.",
+     "source": "Mint",
+     "time": "21 Nov 19:33",
+     "tag": "REGULATOR",
+     "tone": "dn",
+     "score": 106.6,
+     "also": [],
+     "n": 1,
+     "link": "https://www.livemint.com/companies/news/patanjali-foods-faces-fresh-cow-ghee-safety-action-as-madhya-pradesh-bans-sale-of-one-batch-details-inside-11795268582196.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.9,
+      "ctx": 0.0,
+      "p_up": 51,
+      "p_dn": 48,
+      "avg": 0.46,
+      "n": 5271,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 57,
+      "rsi_up": true,
+      "vm": 0.2964711012345586,
+      "dp": 27.219955735446323,
+      "pct": 0.547263681592037,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 1.09,
+      "flow": "WEAK",
+      "sec": "FMCG",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "TITAN",
+     "name": "Titan Company Limited",
+     "headline": "Titan to expand premium watch business, target 500 Helios stores in three years",
+     "brief": "Titan, which currently operates around 316 stores under its Helios and Helios Luxe formats, plans to add 40-50 stores annually, including premium Helios Luxe outlets, said Rahul Shukla, Vice President and Chief Sales and...",
+     "source": "Economic Times",
+     "time": "20 Nov 21:09",
+     "tag": "EXPANSION",
+     "tone": "up",
+     "score": 85.2,
+     "also": [
+      "BusinessLine"
+     ],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/industry/cons-products/electronics/titan-to-expand-premium-watch-business-target-500-helios-stores-in-three-years/articleshow/136032267.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.9,
+      "ctx": 0.0,
+      "p_up": 53,
+      "p_dn": 47,
+      "avg": 0.56,
+      "n": 1182,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 45,
+      "rsi_up": false,
+      "vm": 1.450204484965826,
+      "dp": 36.71238619421276,
+      "pct": -1.702127659574468,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.63,
+      "flow": "WEAK",
+      "sec": "Consumer Durables",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "ABREL",
+     "name": "Aditya Birla Real Estate Limited",
+     "headline": "Aditya Birla Real Estate aims Rs 15,000 crore annual pre-sales in three years",
+     "brief": "Aditya Birla Real Estate Ltd has set an ambitious target of achieving Rs 15,000 crore in annual pre-sales. The company recorded sales bookings of over Rs 8,000 crore during the past two financial years.",
+     "source": "Economic Times",
+     "time": "22 Nov 14:32",
+     "tag": "BUSINESS",
+     "tone": "",
+     "score": 62.4,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/services/property-/-cstruction/aditya-birla-real-estate-aims-rs-15000-crore-annual-pre-sales-in-three-years/articleshow/136070818.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.1,
+      "ctx": 1.0,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3447,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 61,
+      "rsi_up": false,
+      "vm": 0.2490321735503287,
+      "dp": 52.32455600672655,
+      "pct": -0.8321096426823337,
+      "above20": true,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Realty",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "PERSISTENT",
+     "name": "Persistent Systems Limited",
+     "headline": "Persistent Systems: Updates",
+     "brief": "Persistent Systems Limited has informed the Exchange regarding 'Company Statement'.",
+     "source": "NSE filing",
+     "time": "23 Nov 07:43",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 44.4,
+     "also": [],
+     "n": 1,
+     "link": "https://nsearchives.nseindia.com/corporate/PERSISTENTUSER1_23112026074246_CompanyStatementforexchangesreleaseNov232026Signed.pdf",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.1,
+      "ctx": 1.0,
+      "p_up": 54,
+      "p_dn": 46,
+      "avg": 0.61,
+      "n": 714,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 62,
+      "rsi_up": true,
+      "vm": 3.471545940362961,
+      "dp": 40.32509433540983,
+      "pct": 4.149659863945578,
+      "above20": true,
+      "bu": null,
+      "pcr": 0.64,
+      "flow": "IN",
+      "sec": "Digital",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "ITC",
+     "name": "ITC Limited",
+     "headline": "ITC extends Braille-enabled packaging to Fiama, takes total to 16 SKUs",
+     "brief": "Alongside an industry-wide shift toward AI-enabled personalisation and algorithmic optimisation, diversified conglomerate ITC Ltd is pursuing an analogue, inclusive approach to product innovation by incorporating raised...",
+     "source": "Business Standard",
+     "time": "22 Nov 14:23",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 41.9,
+     "also": [],
+     "n": 1,
+     "link": "https://www.business-standard.com/companies/news/itc-extends-braille-enabled-packaging-to-fiama-takes-total-to-16-skus-126112200306_1.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -1.4,
+      "ctx": -0.5,
+      "p_up": 55,
+      "p_dn": 45,
+      "avg": 0.59,
+      "n": 988,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 72,
+      "rsi_up": false,
+      "vm": 1.3380848820391604,
+      "dp": 45.40140377489585,
+      "pct": -0.631229235880391,
+      "above20": true,
+      "bu": "Short build-up",
+      "pcr": 0.67,
+      "flow": "WEAK",
+      "sec": "FMCG",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "MARUTI",
+     "name": "Maruti Suzuki India Limited",
+     "headline": "Maruti Suzuki hikes select model prices amid cost pressures",
+     "brief": "The latest price hike follows three rounds of price increases in the first half of financial year 2027, totalling a little over 1 per cent.",
+     "source": "BusinessLine",
+     "time": "22 Nov 12:35",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 40.5,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/maruti-suzuki-hikes-select-model-prices-amid-cost-pressures/article71730823.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.2,
+      "ctx": 2.0,
+      "p_up": 48,
+      "p_dn": 52,
+      "avg": 0.15,
+      "n": 511,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 10443,
+      "t_avg": -0.1,
+      "edge": -1.6,
+      "rsi": 76,
+      "rsi_up": true,
+      "vm": 2.7214089436390183,
+      "dp": 52.278356132467565,
+      "pct": 3.1054529398778423,
+      "above20": true,
+      "bu": "Long build-up",
+      "pcr": 1.12,
+      "flow": "IN",
+      "sec": "Auto",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "IOC",
+     "name": "Indian Oil Corporation Limited",
+     "headline": "Reliance, Indian Oil, other Indian refiners race to secure oil tankers as freight costs rise",
+     "brief": "Indian refiners are increasingly looking for long-term tanker contracts to secure crude supplies effectively.",
+     "source": "Economic Times",
+     "time": "20 Nov 17:42",
+     "tag": "NEWS",
+     "tone": "dn",
+     "score": 37.8,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/energy/oil-gas/reliance-indian-oil-other-indian-refiners-race-to-secure-oil-tankers-as-freight-costs-rise/articleshow/136026329.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.2,
+      "ctx": 2.0,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.26,
+      "n": 2113,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 10443,
+      "t_avg": -0.1,
+      "edge": -1.6,
+      "rsi": 70,
+      "rsi_up": true,
+      "vm": 1.1576955511663394,
+      "dp": 52.481853473822405,
+      "pct": 1.8267929634641327,
+      "above20": true,
+      "bu": "Long build-up",
+      "pcr": 1.22,
+      "flow": "IN",
+      "sec": "Commodities",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "VEDL",
+     "name": "Vedanta Limited",
+     "headline": "Vedanta to pay 10% salary to 1 lakh employees under Chairman Grant",
+     "brief": "The grant, which covers employees from entry-level positions to mid and senior management, is aimed at providing additional financial support to employees and their families amid rising living costs.",
+     "source": "BusinessLine",
+     "time": "20 Nov 19:49",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 37.2,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/vedanta-to-pay-10-salary-to-1-lakh-employees-under-chairman-grant/article71724500.ece",
+     "trend": {
+      "dir": "up",
+      "strength": "Mild",
+      "bars": 1,
+      "view": 1.8,
+      "ctx": 0.5,
+      "p_up": 57,
+      "p_dn": 43,
+      "avg": 1.01,
+      "n": 155,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 50,
+      "t_n": 10657,
+      "t_avg": 0.22,
+      "edge": 2.7,
+      "rsi": 38,
+      "rsi_up": false,
+      "vm": 1.8079369736653035,
+      "dp": 31.2616664259655,
+      "pct": -2.32252769798933,
+      "above20": false,
+      "bu": null,
+      "pcr": 0.69,
+      "flow": "WEAK",
+      "sec": "Metal",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "RADICO",
+     "name": "Radico Khaitan Limited",
+     "headline": "Johnnie Walker-owner overtakes Pernod Ricard as India's largest alco-bev firm; Radico Khaitan in 3rd place",
+     "brief": "Pernod Ricard India reported a significant revenue decline of 13.6% in FY26, primarily due to the sale of Imperial Blue.",
+     "source": "Economic Times",
+     "time": "22 Nov 14:12",
+     "tag": "NEWS",
+     "tone": "dn",
+     "score": 37.0,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/cons-products/liquor/johnnie-walker-maker-overtakes-pernod-ricard-to-become-indias-largest-alco-bev-firm-radico-khaitan-in-3rd-place/articleshow/136070542.cms",
+     "trend": {
+      "dir": "dn",
+      "strength": "Moderate",
+      "bars": 2,
+      "view": -2.4,
+      "ctx": -1.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3447,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 21254,
+      "t_avg": -0.15,
+      "edge": -1.8,
+      "rsi": 60,
+      "rsi_up": true,
+      "vm": 0.41410344522155945,
+      "dp": 57.57016867308272,
+      "pct": 0.1072961373390558,
+      "above20": true,
+      "bu": "Short build-up",
+      "pcr": 0.6,
+      "flow": "WEAK",
+      "sec": "FMCG",
+      "asof": "2026-11-20"
+     }
+    },
+    {
+     "sym": "CHENNPETRO",
+     "name": "Chennai Petroleum Corporation Limited",
+     "headline": "Gold And Silver Rates Today: Check 24K, 22K Gold Prices In Mumbai, Delhi, Chennai, Kolkata, Bengaluru On November 23",
+     "brief": "Gold and silver prices in India rose on November 23 after a sharp weekly decline, as traders reduced expectations of imminent Federal Reserve rate hikes.",
+     "source": "NDTV Profit",
+     "time": "23 Nov 07:23",
+     "tag": "NEWS",
+     "tone": "dn",
+     "score": 32.9,
+     "also": [],
+     "n": 1,
+     "link": "https://www.ndtvprofit.com/markets/gold-and-silver-rates-today-check-24k-22k-gold-prices-in-mumbai-delhi-chennai-kolkata-bengaluru-on-november-23-12363833#publisher=newsstand",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.3,
+      "ctx": 0.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": 0.01,
+      "n": 1763,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 10443,
+      "t_avg": -0.1,
+      "edge": -1.6,
+      "rsi": 46,
+      "rsi_up": true,
+      "vm": 0.4509743646495486,
+      "dp": 39.98081773752572,
+      "pct": 0.09826630167753658,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Oil & Gas",
+      "asof": "2026-11-20"
+     }
+    }
+   ],
+   "since_txt": "Fri 20 Nov, 15:30",
+   "matched": 19,
+   "model": {
+    "test_from": "2026-06-12",
+    "test_base_up": 47,
+    "test_n": 53992,
+    "asof": "2026-11-20",
+    "from": "2025-12-26",
+    "sessions": 223,
+    "cases": 85112,
+    "base_up": 49,
+    "horizon": 3,
+    "ctx": true,
+    "breadth": 67.98418972332016
+   }
+  }
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (23 Nov 2026)",
+ "headline": "Positive start likely - Nifty zone 25,873 - 25,950",
+ "bias_text": "GIFT Nifty 25,912.0 (+111 pts, +0.43% vs Nifty's last close). US: S&P 500 -3.70%, Nasdaq -5.28%, Dow -1.93%. Carry-over: Nifty's +1.12% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street weak, Asia negative, crude easing. Carry-over: Nifty's +1.12% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "proj": 25911.5,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 25,873 - 25,950"
+ },
+ "mood_score": 0.43,
+ "mood_pic": "bull_calm",
+ "spark": [
+  22749.75,
+  22698.849609375,
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375,
+  25030.349609375,
+  25044.650390625,
+  25255.05078125,
+  25299.349609375,
+  25144.30078125,
+  25291.099609375,
+  25387.400390625,
+  25227.94921875,
+  25514.30078125,
+  25800.599609375
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.634000015258789,
+  "headline": "India VIX 17.32 (+7.51%)",
+  "text": "India VIX 17.32 (+7.51%); USD/INR 92.66 (-0.68%); US 10-yr yield 4.91 (-2.77%). India VIX rose 7.5% - hedging demand up."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "25,800.60",
+   "pct": "+1.12%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "89.49",
+   "pct": "-3.33%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "3,582.40",
+   "pct": "+1.91%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "17.32",
+   "pct": "+7.51%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "92.660",
+   "pct": "-0.68%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "4.91",
+   "pct": "-2.77%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "48,147.33",
+   "pct": "-1.93%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "6,910.39",
+   "pct": "-3.70%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "22,617.73",
+   "pct": "-5.28%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,346.30",
+   "pct": "-1.02%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "24,802.78",
+   "pct": "-2.60%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "56,436.65",
+   "pct": "-5.06%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "22,103.84",
+   "pct": "-1.37%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,485.99",
+   "pct": "-1.35%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "4,641.55",
+   "pct": "-4.69%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 56,436.65 (-5.06%), Hang Seng 22,103.84 (-1.37%), Shanghai 3,485.99 (-1.35%), Kospi 4,641.55 (-4.69%). Wall Street: Dow 48,147.33 (-1.93%), S&P 500 6,910.39 (-3.70%), Nasdaq 22,617.73 (-5.28%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "25,188 - 25,494",
+   "r": "25,958 - 26,115",
+   "note": "A sustained move above 25,958 opens up 26,115; a slide below 25,494 would expose 25,188.",
+   "flag": ""
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "61,889 - 63,262",
+   "r": "65,344 - 66,054",
+   "note": "A sustained move above 65,344 opens up 66,054; a slide below 63,262 would expose 61,889.",
+   "flag": ""
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Nifty MONTHLY expiry today (Mon 23 Nov 2026) (moved from Tuesday's holiday). Results today (2 companies): BCSSL, SFCTECH."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "KOTAKBANK (In the news); ADANIENT (In the news); FEDERALBNK (Setup: BUY (A+)); IDFCFIRSTB (Setup: BUY (A+)); ULTRACEMCO (Setup: BUY (A+)); EICHERMOT (Setup: BUY (A+))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "26,000 next milestone for Nifty; Fortis among 3 stock ideas: Osho Krishan | OCBC: AI rout becomes a growth shock as EM currencies take the dollar's strength"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "INDUSINDBK",
+    "pct": "+8.59%"
+   },
+   {
+    "sym": "APOLLOHOSP",
+    "pct": "+5.29%"
+   },
+   {
+    "sym": "AXISBANK",
+    "pct": "+4.72%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "TITAN",
+    "pct": "-1.70%"
+   },
+   {
+    "sym": "TATASTEEL",
+    "pct": "-1.60%"
+   },
+   {
+    "sym": "NTPC",
+    "pct": "-1.08%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
