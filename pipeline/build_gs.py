@@ -3,6 +3,7 @@
    apps-script/Code.base.gs   web-app endpoints (ping, dash, nse, wl_*, calls_* routes …)
    calls_engine.js            the pure-JS calls engine (JCE) — identical file the terminal loads
    apps-script/Radar.server.gs  radar screening data (qstat, qfund)
+   apps-script/Params.server.gs logic parameters from the master Google Sheet (action=params)
    apps-script/Calls.server.gs  call book (08:10 build, 16:05 reconcile, Drive JC_Calls.json, triggers)
 Run from the repo root:  python3 pipeline/build_gs.py"""
 import pathlib
@@ -15,6 +16,7 @@ cl = (r / 'apps-script/Clients.server.gs').read_text()
 rd = (r / 'apps-script/Radar.server.gs').read_text()
 vs = (r / 'apps-script/Visitors.server.gs').read_text()
 up = (r / 'apps-script/Uploads.server.gs').read_text()
-out = base.rstrip() + '\n\n/* ===================== calls_engine.js (JCE) — generated, do not edit here ===================== */\n' + eng.rstrip() + '\n\n' + srv.lstrip() + '\n\n' + tg.lstrip() + '\n\n' + cl.lstrip() + '\n\n' + rd.lstrip() + '\n\n' + vs.lstrip() + '\n\n' + up.lstrip()
+pm = (r / 'apps-script/Params.server.gs').read_text()
+out = base.rstrip() + '\n\n/* ===================== calls_engine.js (JCE) — generated, do not edit here ===================== */\n' + eng.rstrip() + '\n\n' + srv.lstrip() + '\n\n' + tg.lstrip() + '\n\n' + cl.lstrip() + '\n\n' + rd.lstrip() + '\n\n' + vs.lstrip() + '\n\n' + up.lstrip() + '\n\n' + pm.lstrip()
 (r / 'apps-script/Code.gs').write_text(out)
 print('Code.gs', len(out.encode()), 'bytes')

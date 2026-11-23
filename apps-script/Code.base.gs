@@ -45,6 +45,7 @@ function doGet(e) {
     else if (p.action === 'qfund') out = qFund_(p.symbols);
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
+    else if (p.action === 'params') out = paramsGet_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
     else out = JSON.stringify({ error: 'unknown action' });
   } catch (err) { out = JSON.stringify({ error: String(err) }); }
