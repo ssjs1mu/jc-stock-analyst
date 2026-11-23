@@ -6,6 +6,7 @@ Backend = Apps Script, built from `apps-script/*.server.gs` + `Code.base.gs` by 
 
 | Date (IST) | Backend ver | Change | Files | Why |
 |---|---|---|---|---|
+| 2026-11-23 | **[Claude]** Backend: `pf_state_save` / `pf_state_load` - the Portfolio pages keep their complete data as one JSON in Drive ('Joshi\'s Corner - Client Uploads / App state', newest + 40 earlier copies); `pf_clear` moves every client upload and backup to Drive trash (recoverable 30 days) and saves an empty state so all devices clear. All need the admin passcode. |
 | 2026-11-23 | **[Claude]** Backend `pf_load`: returns every trade file and ledger CSV of each client (oldest first, with file id) instead of only the newest, so a later upload of an older period (last year's file) no longer hides the current year on other devices; DP holdings still newest only. |
 | 2026-11-23 | **[Claude]** Fix: Client dashboards → setting / entering the admin passcode said "Use at least 8 characters" for any passcode - the panel redrew ("Working…") before reading the box, which emptied it. The typed passcode is now kept while typing (and restored after a redraw) and cleared after use. Admin passcode was reset on request (ADM_H / ADM_S removed by a one-off editor function, script restored). |
 | 2026-11-23 | **[Claude]** Backend: POST `pf_load` (admin passcode) returns the newest CSV of every client code in each upload folder (Trade files / Ledger / DP holdings) so jcgg-dashboard uploads made on one device load on every other device. |

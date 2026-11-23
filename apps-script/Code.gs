@@ -1108,10 +1108,10 @@ function postRoute_(b) {
     if (admLocked_() && !admOk_(b.key)) return JSON.stringify({ error: 'locked', locked: true });
     return a === 'wl_load' ? wlLoad_() : wlSave_(b.data);
   }
-  if (a === 'pf_save' || a === 'pf_load') {   // client trade books / ledgers / DP holdings <-> Drive (Uploads.server.gs)
+  if (a === 'pf_save' || a === 'pf_load' || a === 'pf_state_save' || a === 'pf_state_load' || a === 'pf_clear') {   // Portfolio <-> Drive (Uploads.server.gs)
     if (!admLocked_()) return JSON.stringify({ error: 'set an admin passcode first' });
     if (!admOk_(b.key)) return JSON.stringify({ error: 'bad passcode' });
-    return a === 'pf_save' ? pfSave_(b) : pfLoad_();
+    return a === 'pf_save' ? pfSave_(b) : a === 'pf_load' ? pfLoad_() : a === 'pf_state_save' ? pfStateSave_(b) : a === 'pf_state_load' ? pfStateLoad_() : pfClear_();
   }
   if (/^(cl_|tg_)/.test(a)) {
     if (!admLocked_()) return JSON.stringify({ error: 'set an admin passcode first' });
@@ -1405,4 +1405,37 @@ function pfLoad_() {
     }
   });
   return JSON.stringify({ ok: true, files: out });
+}
+/* ---------- whole-app backup: the Portfolio pages save their complete data as one JSON after every change ----------
+   POST pf_state_save {key, state:<json text>} -> "App state" folder, newest kept + last 40 copies (older go to Drive trash)
+   POST pf_state_load {key}                     -> {ok, t, state} newest copy, or {ok, none:true}
+   POST pf_clear {key}                          -> every upload and backup moved to Drive trash (recoverable 30 days), an empty state
+                                                   saved so every device clears too */
+function pfStateFolder_() { return pfFolder_(pfRoot_(), 'App state'); }
+function pfStateSave_(b) {
+  var s = String(b.state || ''); if (!s || s.length > 25000000) throw new Error('state missing or too large');
+  return pfLock_(function () {
+    var fo = pfStateFolder_(), stamp = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HHmmss');
+    var f = fo.createFile('portfolio state ' + stamp + '.json', s, MimeType.PLAIN_TEXT), all = [], it = fo.getFiles();
+    while (it.hasNext()) { var x = it.next(); if (!x.isTrashed()) all.push(x); }
+    all.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });
+    for (var i = 41; i < all.length; i++) all[i].setTrashed(true);
+    return JSON.stringify({ ok: true, t: f.getDateCreated().getTime(), id: f.getId() });
+  });
+}
+function pfStateLoad_() {
+  var it = pfStateFolder_().getFiles(), best = null;
+  while (it.hasNext()) { var x = it.next(); if (!x.isTrashed() && (!best || x.getDateCreated() > best.getDateCreated())) best = x; }
+  if (!best) return JSON.stringify({ ok: true, none: true });
+  return JSON.stringify({ ok: true, t: best.getDateCreated().getTime(), state: best.getBlob().getDataAsString() });
+}
+function pfClear_() {
+  return pfLock_(function () {
+    var root = pfRoot_(), n = 0;
+    (function walk(fo) { var fs = fo.getFiles(); while (fs.hasNext()) { var x = fs.next(); if (!x.isTrashed()) { x.setTrashed(true); n++; } }
+      var ds = fo.getFolders(); while (ds.hasNext()) walk(ds.next()); })(root);
+    var e = JSON.stringify({ v: 1, t: Date.now(), cleared: true, data: {} });
+    var f = pfStateFolder_().createFile('portfolio state ' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd HHmmss') + ' (cleared).json', e, MimeType.PLAIN_TEXT);
+    return JSON.stringify({ ok: true, trashed: n, t: f.getDateCreated().getTime() });
+  });
 }
