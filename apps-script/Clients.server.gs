@@ -93,6 +93,11 @@ function postRoute_(b) {
     if (admLocked_() && !admOk_(b.key)) return JSON.stringify({ error: 'locked', locked: true });
     return a === 'wl_load' ? wlLoad_() : wlSave_(b.data);
   }
+  if (a === 'pf_save') {   // client trade books / ledgers / DP holdings -> Drive (Uploads.server.gs)
+    if (!admLocked_()) return JSON.stringify({ error: 'set an admin passcode first' });
+    if (!admOk_(b.key)) return JSON.stringify({ error: 'bad passcode' });
+    return pfSave_(b);
+  }
   if (/^(cl_|tg_)/.test(a)) {
     if (!admLocked_()) return JSON.stringify({ error: 'set an admin passcode first' });
     if (!admOk_(b.key)) return JSON.stringify({ error: 'bad passcode' });
