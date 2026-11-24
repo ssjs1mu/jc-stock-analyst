@@ -2,6 +2,14 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-24T08:13:43+05:30",
+   "date": "2026-11-24",
+   "status": "holiday",
+   "caption": "",
+   "note": "NSE closed today: Guru Nanak Jayanti.",
+   "files": []
+  },
+  {
    "generated_at": "2026-11-23T08:13:45+05:30",
    "date": "2026-11-23",
    "status": "ok",
@@ -2922,5 +2930,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-23T08:13:45+05:30"
+ "updated_at": "2026-11-24T08:13:43+05:30"
 }
