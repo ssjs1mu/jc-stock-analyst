@@ -133,6 +133,11 @@ async function moodNow(idx) {
   uni.forEach((s, i) => { const b = bars[yf[i]]; if (b && b.length) stocks.push({ sym: s.replace(/\.BO$/, ''), ex: /\.BO$/.test(s) ? 'BO' : 'NS', daily: b }); else missing.push(s); });
   let mood = null; try { mood = await moodNow(idx); } catch (e) { /* no mood — calls fall back to the regime rules only */ }
   console.log('Pre-open market mood: ' + (mood ? mood.score + ' ' + mood.label + ' (' + mood.parts.join(', ') + ')' : 'unavailable'));
+  /* your own conditions: Live rows of the Rules tab in the master sheet (backend, else the last copy saved in data/rules.json) */
+  let rules = null, rsrc = 'none';
+  try { const j = await getJSON(BACKEND + '?action=rules', 25000); if (j && Array.isArray(j.rules)) { rules = j.rules; rsrc = 'sheet'; } } catch (e) { }
+  if (!rules) { try { rules = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'rules.json'), 'utf8')).rules || []; rsrc = 'data/rules.json'; } catch (e) { rules = []; } }
+  const rs = JCE.setRules(rules); console.log('Your rules (' + rsrc + '): ' + rs.live + ' live' + (rs.bad.length ? ', ' + rs.bad.length + ' rows need fixing: ' + rs.bad.map((b) => b.id + ' ' + b.bad).join(' | ') : ''));
   const book = JCE.buildBook({ dateIso: today, stocks, nifty: idx['^NSEI'], vix: idx['^INDIAVIX'] || [], maxDay: 10, maxInv: 5, mood });
   const now = new Date().toISOString(), symKey = (c) => (c.ex === 'BO' ? c.sym + '.BO' : c.sym), recs = [];
   book.day.forEach((c) => { c.id = 'D-' + today + '-' + symKey(c); c.status = 'WAIT'; c.createdAt = now; c.lockedAt = now; c.src = 'github'; recs.push(c); });

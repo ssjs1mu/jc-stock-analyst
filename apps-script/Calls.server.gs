@@ -70,6 +70,7 @@ function callsBuild_(force) {
     var uni = universe_(), yf = uni.map(yfOf_), data = fetchBarsMany_(yf.concat(['^NSEI', '^INDIAVIX']), '2y', '1d');
     var stocks = [], missing = [];
     uni.forEach(function (s, i) { var d = data[yf[i]]; if (d && d.length) stocks.push({ sym: s.replace(/\.BO$/, ''), ex: /\.BO$/.test(s) ? 'BO' : 'NS', daily: d }); else missing.push(s); });
+    JCE.setRules(rulesLive_());   /* your Live rows of the Rules tab */
     var book = JCE.buildBook({ dateIso: today, stocks: stocks, nifty: data['^NSEI'] || [], vix: data['^INDIAVIX'] || [], maxDay: 10, maxInv: 5 });
     var now = new Date().toISOString(), open = {};
     cur.calls.forEach(function (c) { if (c.type === 'INV' && !FINAL_[c.status]) open[c.sym + '.' + (c.ex || 'NS')] = 1; });
@@ -92,7 +93,7 @@ function callsReconcile_() {
     var b5 = fetchBarsMany_(Object.keys(syms5), '5d', '5m'), bd = fetchBarsMany_(Object.keys(symsD), '1y', '1d'), n1 = 0, n2 = 0, now = new Date().toISOString();
     dayOpen.forEach(function (c) {
       var bars = (b5[(c.ex === 'BO' ? c.sym + '.BO' : c.sym + '.NS')] || []).filter(function (b) { return JCE.istDate(b.t) === today; }); if (bars.length < 20) return;
-      var sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2 }, ev = JCE.evalDay(sd, bars, c.atr, true);
+      var sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2, er: c.er }, ev = JCE.evalDay(sd, bars, c.atr, true);
       c.status = ev.state; c.fill = ev.fill; c.exitPx = ev.exitPx; c.R = ev.R; c.retPct = ev.retPct; c.daysHeld = 0; c.exitDate = today; c.settledAt = now; c.settledBy = 'server'; n1++;
     });
     inv.forEach(function (c) {

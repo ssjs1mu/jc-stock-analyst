@@ -115,7 +115,7 @@
       bySym[y].forEach((c) => {
         const day = bars.filter((b) => JCE.istDate(b.t) === c.date); if (!day.length) return;
         const past = c.date < today, final = past || (isWeekday() && min >= 930) || !isWeekday(); if (day.length < 12 && !final) return;
-        const sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2 }, ev = JCE.evalDay(sd, day, c.atr, final);
+        const sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2, er: c.er }, ev = JCE.evalDay(sd, day, c.atr, final);
         applyEv(c, ev, final ? { exitDate: c.date, settledAt: new Date().toISOString(), settledBy: 'terminal', daysHeld: 0 } : null);
       });
     });

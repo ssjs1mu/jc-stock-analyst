@@ -46,6 +46,7 @@ function doGet(e) {
     else if (p.action === 'dailyb') out = dailyBatch_(p.symbols, p.range);
     else if (p.action === 'preopen') out = preOpen_();
     else if (p.action === 'params') out = paramsGet_();
+    else if (p.action === 'rules') out = rulesGet_();
     else if (p.action === 'upcoming') out = upcomingResults_(Math.min(Math.max(parseInt(p.days, 10) || 7, 1), 14));
     else out = JSON.stringify({ error: 'unknown action' });
   } catch (err) { out = JSON.stringify({ error: String(err) }); }
@@ -487,12 +488,114 @@ var JCE = (function () {
     return { S: S, pts: pts, narrowCpr: x.piv.cprPct < 0.4 };
   }
 
+  /* ---------- YOUR RULES: rows of the "Rules" tab in the master sheet "JC Logic & Formula Reference" ----------
+     Only rows with Status = Live and Use = Intraday are used here. Stage "Setup" is tested on the previous session's daily candle
+     (before the open): Effect "Must" = no call unless true, "Points" = adds (Long) / subtracts (Short) points to the confluence score.
+     Stage "Entry" is tested on the 5-minute candle that closes beyond the trigger: it must be true too, otherwise the call waits for a
+     later candle. Side "Both" mirrors a Long rule for shorts (> becomes <, High becomes Low, RSI 60 becomes 40, MACD +x becomes −x).
+     5-minute indicators use today's candles only (warm up from 09:15). Every call keeps the entry rules it was built with. */
+  var RULES = [], RULES_BAD = [];
+  var OPND = {
+    Setup: ['Close', 'Open', 'High', 'Low', 'Prev Close', 'Volume', 'DMA (SMA)', 'EMA', 'RSI', 'ATR', 'ADX', 'MACD Hist', 'Avg Volume', 'N-Day High', 'N-Day Low', 'Number'],
+    Entry: ['Price (5m Close)', '5m Open', '5m High', '5m Low', 'VWAP', 'Day Open', 'Day High', 'Day Low', 'Prev Day High', 'Prev Day Low', 'Prev Day Close', '5m EMA', '5m DMA (SMA)', '5m RSI', '5m Volume', '5m Avg Volume', 'Minutes Since Open', 'Daily DMA (SMA)', 'Daily EMA', 'Number']
+  };
+  var DEFN = { 'DMA (SMA)': 20, 'EMA': 20, 'RSI': 14, 'ATR': 14, 'ADX': 14, 'Avg Volume': 20, 'N-Day High': 20, 'N-Day Low': 20, '5m EMA': 20, '5m DMA (SMA)': 20, '5m RSI': 14, '5m Avg Volume': 10, 'Daily DMA (SMA)': 20, 'Daily EMA': 20 };
+  var PRICE = { 'Close': 1, 'Open': 1, 'High': 1, 'Low': 1, 'Prev Close': 1, 'DMA (SMA)': 1, 'EMA': 1, 'N-Day High': 1, 'N-Day Low': 1, 'Price (5m Close)': 1, '5m Open': 1, '5m High': 1, '5m Low': 1, 'VWAP': 1, 'Day Open': 1, 'Day High': 1, 'Day Low': 1, 'Prev Day High': 1, 'Prev Day Low': 1, 'Prev Day Close': 1, '5m EMA': 1, '5m DMA (SMA)': 1, 'Daily DMA (SMA)': 1, 'Daily EMA': 1 };
+  var SWAP = { 'High': 'Low', 'Low': 'High', 'N-Day High': 'N-Day Low', 'N-Day Low': 'N-Day High', '5m High': '5m Low', '5m Low': '5m High', 'Day High': 'Day Low', 'Day Low': 'Day High', 'Prev Day High': 'Prev Day Low', 'Prev Day Low': 'Prev Day High' };
+  var OPS = { '>': 1, '<': 1, '>=': 1, '<=': 1, 'Crosses Above': 1, 'Crosses Below': 1 }, FLIP = { '>': '<', '<': '>', '>=': '<=', '<=': '>=', 'Crosses Above': 'Crosses Below', 'Crosses Below': 'Crosses Above' };
+  function g(r, k) { var v = r[k]; return v == null ? '' : String(v).trim(); }
+  function normRule(r) {
+    var o = { id: g(r, 'Rule ID'), use: g(r, 'Use'), stage: g(r, 'Stage'), side: g(r, 'Side') || 'Both', L: g(r, 'Left'), Ln: parseInt(g(r, 'L Period'), 10) || null, op: g(r, 'Test'), R: g(r, 'Right'), Rn: parseInt(g(r, 'R Period'), 10) || null,
+      val: g(r, 'Value / ×') === '' ? null : parseFloat(g(r, 'Value / ×').replace(/[,×x\s]/g, '')), eff: g(r, 'Effect') || 'Must', pts: parseFloat(g(r, 'Points')) || 1, status: g(r, 'Status') || 'Proposed' };
+    var why = !o.id ? 'no Rule ID' : !OPND[o.stage] ? 'Stage must be Setup or Entry' : !/^(Long|Short|Both)$/.test(o.side) ? 'Side must be Long, Short or Both' : OPND[o.stage].indexOf(o.L) < 0 || o.L === 'Number' ? 'Left "' + o.L + '" is not a valid ' + o.stage + ' item' : !OPS[o.op] ? 'Test must be >, <, >=, <=, Crosses Above or Crosses Below' : OPND[o.stage].indexOf(o.R) < 0 ? 'Right "' + o.R + '" is not a valid ' + o.stage + ' item' : o.R === 'Number' && !isNum(o.val) ? 'Right is Number but Value is empty' : o.stage === 'Entry' && o.eff !== 'Must' ? 'Entry rules can only be Must' : !/^(Must|Points)$/.test(o.eff) ? 'Effect must be Must or Points' : '';
+    if (why) return { bad: why, id: o.id || '?' };
+    if (!o.Ln) o.Ln = DEFN[o.L] || null; if (!o.Rn) o.Rn = DEFN[o.R] || null; if (o.R !== 'Number' && !isNum(o.val)) o.val = 1;
+    return o;
+  }
+  function mirror(o) {
+    var m = Object.assign({}, o), lp = PRICE[o.L], rp = PRICE[o.R], osc = { 'RSI': 100, '5m RSI': 100, 'MACD Hist': 0 };
+    if ((lp && o.R !== 'Number') || (rp && !lp)) { m.op = FLIP[o.op]; m.L = SWAP[o.L] || o.L; m.R = SWAP[o.R] || o.R; }
+    else if (osc[o.L] != null && o.R === 'Number') { m.op = FLIP[o.op]; m.val = osc[o.L] ? 100 - o.val : -o.val; }
+    else if (osc[o.L] != null && osc[o.R] != null) m.op = FLIP[o.op];
+    return m;
+  }
+  function versions(o, dir) { if (o.side === 'Both') return [dir > 0 ? o : mirror(o)]; return (o.side === 'Long') === (dir > 0) ? [o] : []; }
+  function setRules(rows, opts) {
+    var all = (rows || []).map(normRule), ok = [], bad = [], st = (opts && opts.status) || 'Live';
+    all.forEach(function (o) { if (o.bad) bad.push(o); else if (o.status === st && /^Intraday/i.test(o.use || 'Intraday')) ok.push(o); });
+    RULES = ok; RULES_BAD = bad; return { live: ok.length, bad: bad };
+  }
+  function cmp(op, a, b, a1, b1) {
+    if (!isNum(a) || !isNum(b)) return false;
+    if (op === '>') return a > b; if (op === '<') return a < b; if (op === '>=') return a >= b; if (op === '<=') return a <= b;
+    if (!isNum(a1) || !isNum(b1)) return false; return op === 'Crosses Above' ? a > b && a1 <= b1 : a < b && a1 >= b1;
+  }
+  function dser(dd, key, n) {
+    var ck = key + '|' + n; dd._rc = dd._rc || {}; if (dd._rc[ck]) return dd._rc[ck];
+    var c = dd.map(function (b) { return b.c; }), s;
+    if (key === 'DMA (SMA)' || key === 'Daily DMA (SMA)') s = c.map(function (_, i) { return sma(c, n, i); });
+    else if (key === 'EMA' || key === 'Daily EMA') s = ema(c, n); else if (key === 'RSI') s = rsi(c, n); else if (key === 'ATR') s = atr(dd, n); else if (key === 'ADX') s = adx(dd, n).adx; else if (key === 'MACD Hist') s = macdHist(c);
+    else if (key === 'Avg Volume') s = dd.map(function (_, i) { if (i < n) return null; var t = 0; for (var j = i - n; j < i; j++) t += dd[j].v; return t / n; });
+    else if (key === 'N-Day High' || key === 'N-Day Low') s = dd.map(function (_, i) { if (i + 1 < n) return null; var x = key === 'N-Day High' ? -Infinity : Infinity; for (var j = i - n + 1; j <= i; j++) x = key === 'N-Day High' ? Math.max(x, dd[j].h) : Math.min(x, dd[j].l); return x; });
+    dd._rc[ck] = s; return s;
+  }
+  function dval(dd, key, n, j, val) {
+    if (j < 0 || !dd[j]) return null; var b = dd[j];
+    if (key === 'Number') return val; if (key === 'Close') return b.c; if (key === 'Open') return b.o; if (key === 'High') return b.h; if (key === 'Low') return b.l; if (key === 'Volume') return b.v; if (key === 'Prev Close') return dd[j - 1] ? dd[j - 1].c : null;
+    var s = dser(dd, key, n); return s ? s[j] : null;
+  }
+  function setupTrue(dd, k, o) {
+    var rv = function (j) { var v = dval(dd, o.R, o.Rn, j, o.val); return o.R === 'Number' ? v : isNum(v) ? v * o.val : null; };
+    return cmp(o.op, dval(dd, o.L, o.Ln, k, null), rv(k), dval(dd, o.L, o.Ln, k - 1, null), rv(k - 1));
+  }
+  function resolveEntry(dd, k, o) {   /* daily items become fixed numbers so the call can be settled later from 5-min candles alone */
+    var r = { id: o.id, op: o.op, L: o.L, Ln: o.Ln, R: o.R, Rn: o.Rn, val: o.val }, b = dd[k];
+    var fix = function (key, n) { return key === 'Prev Day High' ? b.h : key === 'Prev Day Low' ? b.l : key === 'Prev Day Close' ? b.c : key === 'Daily DMA (SMA)' || key === 'Daily EMA' ? dval(dd, key, n, k, null) : undefined; };
+    var lf = fix(o.L, o.Ln), rf = fix(o.R, o.Rn); if (lf !== undefined) { r.L = 'Fixed'; r.lv = lf; } if (rf !== undefined) { r.R = 'Fixed'; r.rv = rf; }
+    return r;
+  }
+  function mser(B, key, n, cache) {
+    var ck = key + '|' + n; if (cache[ck]) return cache[ck]; var c = B.map(function (b) { return b.c; }), s;
+    if (key === '5m EMA') s = ema(c, n); else if (key === '5m DMA (SMA)') s = c.map(function (_, i) { return sma(c, n, i); }); else if (key === '5m RSI') s = rsi(c, n);
+    else if (key === 'VWAP') { var pv = 0, vv = 0; s = B.map(function (b) { var tp = (b.h + b.l + b.c) / 3; pv += tp * (b.v || 0); vv += b.v || 0; return vv ? pv / vv : tp; }); }
+    else if (key === 'Day High' || key === 'Day Low') { var x = null; s = B.map(function (b) { x = x == null ? (key === 'Day High' ? b.h : b.l) : key === 'Day High' ? Math.max(x, b.h) : Math.min(x, b.l); return x; }); }
+    else if (key === '5m Avg Volume') s = B.map(function (_, i) { if (i < n) return null; var t = 0; for (var j = i - n; j < i; j++) t += B[j].v || 0; return t / n; });
+    cache[ck] = s; return s;
+  }
+  function mval(B, key, n, i, val, fixed, cache) {
+    if (i < 0 || !B[i]) return null; var b = B[i];
+    if (key === 'Fixed') return fixed; if (key === 'Number') return val; if (key === 'Price (5m Close)') return b.c; if (key === '5m Open') return b.o; if (key === '5m High') return b.h; if (key === '5m Low') return b.l;
+    if (key === '5m Volume') return b.v; if (key === 'Day Open') return B[0].o; if (key === 'Minutes Since Open') return istMin(b.t) - 555;
+    var s = mser(B, key, n, cache); return s ? s[i] : null;
+  }
+  function entryOk(er, B, i, cache) {
+    for (var q = 0; q < er.length; q++) {
+      var o = er[q], rv = function (j) { var v = mval(B, o.R, o.Rn, j, o.val, o.rv, cache); return o.R === 'Number' || o.R === 'Fixed' ? v : isNum(v) ? v * o.val : null; };
+      if (!cmp(o.op, mval(B, o.L, o.Ln, i, null, o.lv, cache), rv(i), mval(B, o.L, o.Ln, i - 1, null, o.lv, cache), rv(i - 1))) return false;
+    }
+    return true;
+  }
+  function applyRules(dd, k, sc) {   /* Points rules move the score; returns the Must rules that failed for each direction */
+    var fail = { '1': [], '-1': [] };
+    RULES.forEach(function (o) {
+      if (o.stage !== 'Setup') return;
+      [1, -1].forEach(function (dir) {
+        versions(o, dir).forEach(function (v) {
+          var t = setupTrue(dd, k, v);
+          if (o.eff === 'Points') { if (t) { var p = dir * o.pts; sc.S += p; sc.pts.push({ label: 'Rule ' + o.id, v: p, txt: 'your rule: ' + v.L + ' ' + v.op + ' ' + (v.R === 'Number' ? v.val : v.R) }); } }
+          else if (!t) fail[String(dir)].push(o.id);
+        });
+      });
+    });
+    return fail;
+  }
+
   /* ---------- plan for one session from the previous session's data ---------- */
   function dayPlanFor(dd, k, mkt) {
     var x = ctxAt(dd, k), m = (mkt && mkt[x.date]) || null, a = x.atr;
     var out = { date: x.date, ref: { h: x.h, l: x.l, c: x.c }, atr: a, ctx: x, mkt: m, sides: [], bias: 'No trade', score: 0, grade: '', pts: [], reasons: [] };
     if (!isNum(a) || !isNum(x.e50)) { out.reasons.push('not enough history'); return out; }
-    var sc = scoreDay(x, m); out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
+    var sc = scoreDay(x, m), rf = RULES.length ? applyRules(dd, k, sc) : null; out.pts = sc.pts; out.score = sc.S; out.narrowCpr = sc.narrowCpr;
     var abs = Math.abs(sc.S), dir = sc.S > 0 ? 1 : -1, atrPct = a / x.c * 100, why = out.reasons;
     var need = CFG.minScore; if (m && m.vixHigh) need += 1.5; if (m && m.vixRising) need += 0.5; if (m && ((dir > 0 && m.reg <= -2) || (dir < 0 && m.reg >= 2))) need += 2; if (sc.narrowCpr) need -= 0.5;
     /* today's pre-open MOOD (global cues, crude, rupee, VIX, Nifty's last move): a call that fights it is held back; one that agrees needs a little less confluence */
@@ -505,6 +608,7 @@ var JCE = (function () {
     if (atrPct < CFG.minAtrPct) why.push('range too small (ATR ' + atrPct.toFixed(1) + '%)'); if (atrPct > CFG.maxAtrPct) why.push('too volatile (ATR ' + atrPct.toFixed(1) + '%)');
     if (x.turnover < CFG.minTurnover) why.push('thin liquidity'); if (x.c < CFG.minPrice) why.push('price below ₹' + CFG.minPrice);
     if (dir > 0 && x.rsi > 78) why.push('RSI stretched'); if (dir < 0 && x.rsi < 22) why.push('RSI washed-out');
+    if (rf && rf[String(dir)].length) why.push('your rule ' + rf[String(dir)].join(', ') + ' not met');
     if (why.length) { out.bias = 'No trade'; return out; }
     var lv = [], addL = function (v, l) { if (isNum(v)) lv.push({ v: v, label: l }); }, rp = x.piv;
     ['R3', 'R2', 'R1', 'P', 'S1', 'S2', 'S3'].forEach(function (q) { addL(rp[q], 'Pivot ' + q); }); addL(rp.cprTop, 'CPR top'); addL(rp.cprBot, 'CPR bottom'); addL(rp.H3, 'Camarilla H3'); addL(rp.H4, 'Camarilla H4'); addL(rp.L3, 'Camarilla L3'); addL(rp.L4, 'Camarilla L4'); addL(x.h, 'Prev high'); addL(x.l, 'Prev low'); addL(x.hi20, '20-day high'); addL(x.lo20, '20-day low');
@@ -515,6 +619,7 @@ var JCE = (function () {
     var t1 = ups[0] ? ups[0].v : entry + dir * Math.max(0.75 * a, 1.3 * risk);
     var t2 = ups[1] ? ups[1].v : t1 + dir * Math.max(0.6 * a, 1.0 * risk); if (dir * (t2 - t1) < CFG.t2MinGap * a) t2 = t1 + dir * 0.6 * a;
     var sd = { dir: dir, side: dir > 0 ? 'BUY' : 'SELL', entry: entry, sl: entry - dir * risk, t1: t1, t2: t2, risk: risk, rr1: Math.abs(t1 - entry) / risk, rr2: Math.abs(t2 - entry) / risk, t1Why: ups[0] ? ups[0].label : 'ATR projection', t2Why: ups[1] ? ups[1].label : 'ATR projection' };
+    var er = []; RULES.forEach(function (o) { if (o.stage === 'Entry') versions(o, dir).forEach(function (v) { er.push(resolveEntry(dd, k, v)); }); }); if (er.length) sd.er = er;
     if (sd.rr1 < CFG.minRR1) { why.push('first target too close for the risk (R:R ' + sd.rr1.toFixed(2) + ' < ' + CFG.minRR1 + ')'); return out; }
     out.sides = [sd]; out.bias = dir > 0 ? 'Bullish' : 'Bearish'; out.grade = abs >= CFG.gradeAA ? 'A+' : abs >= CFG.gradeA ? 'A' : 'B';
     return out;
@@ -524,13 +629,14 @@ var JCE = (function () {
      Entry = a 5-min candle CLOSING beyond the trigger (wicks don't count), not before 09:20, not after 14:30, not if the day gaps/chases past it.
      Stop moves to cost after T1; half booked at T1, half at T2 / stop-at-cost / 15:15 square-off. Stop & target in one bar → stop first. */
   function evalDay(sd, bars, atrv, final) {
-    var d = sd.dir, fill = null, fi = -1, cfg = CFG, i, b;
+    var d = sd.dir, fill = null, fi = -1, cfg = CFG, i, b; var er = sd.er && sd.er.length ? sd.er : null, ec = {};
     for (i = 0; i < bars.length; i++) {
       b = bars[i]; var mn = istMin(b.t);
       if (i === 0) { var gapBy = d > 0 ? b.o - sd.entry : sd.entry - b.o; if (gapBy > cfg.gapSkip * atrv) return { state: 'SKIP', fill: null, R: 0, fi: 0 }; }
       if (i < cfg.firstEntryBar) continue;
       if (mn >= cfg.noEntryAfter) break;
       var beyond = d > 0 ? b.c >= sd.entry : b.c <= sd.entry;
+      if (beyond && er && !entryOk(er, bars, i, ec)) continue;
       if (beyond) { var over = d > 0 ? b.c - sd.entry : sd.entry - b.c; if (over > cfg.chaseMax * atrv) return { state: 'SKIP', fill: null, R: 0, fi: i }; fill = b.c; fi = i; break; }
     }
     var lastB = last(bars);
@@ -652,7 +758,7 @@ var JCE = (function () {
       if (plan.sides.length) {
         var sd = plan.sides[0], m = plan.mkt;
         day.push({ type: 'DAY', sym: s.sym, ex: s.ex || 'NS', date: today, side: sd.side, entry: sd.entry, sl: sd.sl, t1: sd.t1, t2: sd.t2, rr1: sd.rr1, rr2: sd.rr2, t1Why: sd.t1Why, t2Why: sd.t2Why, risk: sd.risk, atr: plan.atr, score: Math.abs(plan.score), grade: plan.grade,
-          why: plan.pts.filter(function (p) { return Math.sign(p.v) === sd.dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 6).map(function (p) { return p.label + ': ' + p.txt; }), cmp0: plan.ref.c, regime: m ? m.bias : null });
+          why: plan.pts.filter(function (p) { return Math.sign(p.v) === sd.dir; }).sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); }).slice(0, 6).map(function (p) { return p.label + ': ' + p.txt; }), cmp0: plan.ref.c, regime: m ? m.bias : null, er: sd.er || undefined });
       } else { skipped.push({ sym: s.sym, why: plan.reasons.join('; ') || 'no edge' }); if (plan.moodBlock && held.length < 40) held.push({ sym: s.sym, side: plan.score > 0 ? 'BUY' : 'SELL', score: Math.round(Math.abs(plan.score) * 10) / 10 }); }
       var iv = investFor(dd, k, inputs.nifty, mkt);
       if (iv) inv.push(Object.assign(iv, { sym: s.sym, ex: s.ex || 'NS', date: today }));
@@ -662,7 +768,7 @@ var JCE = (function () {
     return { held: held, board: board, day: day.slice(0, inputs.maxDay || 12), inv: inv.slice(0, inputs.maxInv || 5), skipped: skipped, ctx: m0 ? { regime: m0.bias, reg: m0.reg, vix: m0.vix, vixHigh: m0.vixHigh, niftyRsi: m0.rsi, niftyChg: m0.chg, mood: inputs.mood ? inputs.mood.score : null, moodLabel: inputs.mood ? inputs.mood.label : null } : null };
   }
 
-  return { CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };
+  return { setRules: setRules, rules: function () { return { live: RULES, bad: RULES_BAD }; }, normRule: normRule, OPND: OPND, CFG: CFG, isNum: isNum, istDate: istDate, istMin: istMin, ema: ema, rsi: rsi, atr: atr, adx: adx, macdHist: macdHist, pivots: pivots, ctxAt: ctxAt, scoreDay: scoreDay, mktSeries: mktSeries, dayPlanFor: dayPlanFor, evalDay: evalDay, sessionsOf: sessionsOf, replay: replay, summarize: summarize, investFor: investFor, evalInvest: evalInvest, buildBook: buildBook };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = JCE;
 
@@ -737,6 +843,7 @@ function callsBuild_(force) {
     var uni = universe_(), yf = uni.map(yfOf_), data = fetchBarsMany_(yf.concat(['^NSEI', '^INDIAVIX']), '2y', '1d');
     var stocks = [], missing = [];
     uni.forEach(function (s, i) { var d = data[yf[i]]; if (d && d.length) stocks.push({ sym: s.replace(/\.BO$/, ''), ex: /\.BO$/.test(s) ? 'BO' : 'NS', daily: d }); else missing.push(s); });
+    JCE.setRules(rulesLive_());   /* your Live rows of the Rules tab */
     var book = JCE.buildBook({ dateIso: today, stocks: stocks, nifty: data['^NSEI'] || [], vix: data['^INDIAVIX'] || [], maxDay: 10, maxInv: 5 });
     var now = new Date().toISOString(), open = {};
     cur.calls.forEach(function (c) { if (c.type === 'INV' && !FINAL_[c.status]) open[c.sym + '.' + (c.ex || 'NS')] = 1; });
@@ -759,7 +866,7 @@ function callsReconcile_() {
     var b5 = fetchBarsMany_(Object.keys(syms5), '5d', '5m'), bd = fetchBarsMany_(Object.keys(symsD), '1y', '1d'), n1 = 0, n2 = 0, now = new Date().toISOString();
     dayOpen.forEach(function (c) {
       var bars = (b5[(c.ex === 'BO' ? c.sym + '.BO' : c.sym + '.NS')] || []).filter(function (b) { return JCE.istDate(b.t) === today; }); if (bars.length < 20) return;
-      var sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2 }, ev = JCE.evalDay(sd, bars, c.atr, true);
+      var sd = { dir: c.side === 'BUY' ? 1 : -1, entry: c.entry, sl: c.sl, t1: c.t1, t2: c.t2, er: c.er }, ev = JCE.evalDay(sd, bars, c.atr, true);
       c.status = ev.state; c.fill = ev.fill; c.exitPx = ev.exitPx; c.R = ev.R; c.retPct = ev.retPct; c.daysHeld = 0; c.exitDate = today; c.settledAt = now; c.settledBy = 'server'; n1++;
     });
     inv.forEach(function (c) {
