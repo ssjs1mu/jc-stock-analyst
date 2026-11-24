@@ -2,6 +2,14 @@
  "schedule_id": "evening-breeze",
  "runs": [
   {
+   "generated_at": "2026-11-24T16:06:59+05:30",
+   "date": "2026-11-24",
+   "status": "holiday",
+   "caption": "",
+   "note": "NSE closed today: Guru Nanak Jayanti.",
+   "files": []
+  },
+  {
    "generated_at": "2026-11-23T16:12:13+05:30",
    "date": "2026-11-23",
    "status": "ok",
@@ -2716,5 +2724,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-23T16:12:13+05:30"
+ "updated_at": "2026-11-24T16:06:59+05:30"
 }
