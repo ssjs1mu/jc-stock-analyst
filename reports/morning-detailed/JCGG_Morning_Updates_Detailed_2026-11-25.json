@@ -1,0 +1,284 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "25 Nov 2026",
+ "report_time": "08:10 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 25,702 - 25,778"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-up opening likely: Wall Street weak, Asia negative, crude easing. Expected Nifty opening zone: 25,702 - 25,778 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,741.0 (+391 pts, +1.54% vs Nifty's last close).",
+      "US: S&P 500 -0.50%, Nasdaq -1.48%, Dow +0.85%.",
+      "Asia this morning: Nikkei -3.57%, Hang Seng +1.12%, Kospi -5.65%.",
+      "Currency, crude and volatility: Brent 87.69 (-4.06%); USD/INR 92.900 (-0.02%); India VIX 17.70 (+2.19%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's -1.75% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 01 Dec 2026; next Sensex MONTHLY expiry: Thu 26 Nov 2026.",
+      "Results today (2 companies): ENRIN, SIMBHALS."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "ADANIENT",
+       "In the news",
+       "Top stocks to watch today: Tata Steel, Lenskart, Adani Enterprises, PhysicsWallah, Hindalc"
+      ],
+      [
+       "SBIN",
+       "In the news",
+       "RBI MPC: SBI economists think Repo Rate may rise by 25 bps, not 50 bps; what\u2019s the reason"
+      ],
+      [
+       "ITC",
+       "In the news",
+       "Sensex Today Ends 417 Points Lower | Nifty Below 23,900 | ITC & Trent Losers"
+      ],
+      [
+       "COALINDIA",
+       "Setup: SELL (A)",
+       "Entry 381.2, stop 384.7, target 376.0"
+      ],
+      [
+       "HINDALCO",
+       "Setup: SELL (A)",
+       "Entry 896.9, stop 907.8, target 869.9"
+      ],
+      [
+       "INOXWIND",
+       "Setup: SELL (A)",
+       "Entry 53.5, stop 54.6, target 51.4"
+      ],
+      [
+       "KEC",
+       "Setup: SELL (A)",
+       "Entry 293.7, stop 298.8, target 283.3"
+      ],
+      [
+       "TATASTEEL",
+       "Volume surge (last session)",
+       "6.9x average volume, -8.43%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty Jumps 246 Points, Signals Strong Opening For Sensex, Nifty; Asian Markets Crash",
+      "Stocks to watch: Tata Motors PV, Hyundai Motor, Lenskart, Gland Pharma",
+      "Daily Voice: Nifty 50 at 30,000 in 2027? Strong fundamentals and domestic liquidity support outlook, says...",
+      "Top stocks to watch today: Tata Steel, Lenskart, Adani Enterprises, PhysicsWallah, Hindalco, ABB, and 9 others in focus"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "50,018.70",
+        "+0.85%"
+       ],
+       [
+        "S&P 500",
+        "7,201.09",
+        "-0.50%"
+       ],
+       [
+        "Nasdaq Composite",
+        "23,733.54",
+        "-1.48%"
+       ],
+       [
+        "FTSE 100",
+        "10,467.10",
+        "-0.13%"
+       ],
+       [
+        "DAX",
+        "25,017.81",
+        "-1.26%"
+       ],
+       [
+        "Nikkei 225",
+        "56,552.49",
+        "-3.57%"
+       ],
+       [
+        "Hang Seng",
+        "22,468.80",
+        "+1.12%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,514.35",
+        "-0.96%"
+       ],
+       [
+        "Kospi",
+        "4,723.34",
+        "-5.65%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "87.69",
+        "-4.06%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "80.87",
+        "-1.44%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,570.20",
+        "+0.23%"
+       ],
+       [
+        "USD/INR",
+        "92.90",
+        "-0.02%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.83",
+        "+0.02%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.90",
+        "-0.28%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50",
+       "25,131",
+       "25,780"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "24,913",
+       "26,211"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation."
+    }
+   ]
+  }
+ ]
+}
