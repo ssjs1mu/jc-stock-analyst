@@ -1,0 +1,284 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "26 Nov 2026",
+ "report_time": "08:12 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 26,034 - 26,111"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Gap-up opening likely: Wall Street steady, Asia positive, crude easing. Expected Nifty opening zone: 26,034 - 26,111 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 26,073.0 (+254 pts, +0.98% vs Nifty's last close).",
+      "US: S&P 500 -0.25%, Nasdaq -0.62%, Dow +0.33%.",
+      "Asia this morning: Nikkei +1.38%, Hang Seng +1.86%, Kospi +1.35%.",
+      "Currency, crude and volatility: Brent 90.80 (-4.03%); USD/INR 92.807 (-0.12%); India VIX 17.67 (-0.17%)."
+     ]
+    },
+    {
+     "type": "paragraph",
+     "text": "Carry-over from yesterday: Nifty's +1.85% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour."
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Sensex MONTHLY expiry today (Thu 26 Nov 2026).",
+      "No major quarterly results flagged for today."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "EICHERMOT",
+       "In the news",
+       "Eicher, 2 other stocks flashing bullish signals on tech charts: Ajit Mishra"
+      ],
+      [
+       "KOTAKBANK",
+       "In the news",
+       "How should investors play the current Indian stock market moves? Kotak's Sanjeev Prasad ad"
+      ],
+      [
+       "COALINDIA",
+       "Setup: SELL (A)",
+       "Entry 381.2, stop 384.7, target 376.0"
+      ],
+      [
+       "HINDALCO",
+       "Setup: SELL (A)",
+       "Entry 896.9, stop 907.8, target 869.9"
+      ],
+      [
+       "INOXWIND",
+       "Setup: SELL (A)",
+       "Entry 53.5, stop 54.6, target 51.4"
+      ],
+      [
+       "KEC",
+       "Setup: SELL (A)",
+       "Entry 293.7, stop 298.8, target 283.3"
+      ],
+      [
+       "BAJAJFINSV",
+       "Volume surge (last session)",
+       "4.6x average volume, +2.39%"
+      ],
+      [
+       "TATASTEEL",
+       "Volume surge (last session)",
+       "4.3x average volume, -2.27%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Asian stocks enjoy another bounce as tech holds court",
+      "Eicher, 2 other stocks flashing bullish signals on tech charts: Ajit Mishra",
+      "GIFT Nifty breaches 26,000: Can Dalal Street overpower Trump's 25% tariff threat?",
+      "KLCI: Silver Lining In December?"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "50,182.95",
+        "+0.33%"
+       ],
+       [
+        "S&P 500",
+        "7,182.78",
+        "-0.25%"
+       ],
+       [
+        "Nasdaq Composite",
+        "23,585.80",
+        "-0.62%"
+       ],
+       [
+        "FTSE 100",
+        "10,426.90",
+        "-0.38%"
+       ],
+       [
+        "DAX",
+        "24,702.13",
+        "-1.26%"
+       ],
+       [
+        "Nikkei 225",
+        "57,798.00",
+        "+1.38%"
+       ],
+       [
+        "Hang Seng",
+        "22,375.41",
+        "+1.86%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,487.05",
+        "+0.30%"
+       ],
+       [
+        "Kospi",
+        "4,761.10",
+        "+1.35%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "90.80",
+        "-4.03%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "84.05",
+        "+0.44%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,612.70",
+        "+2.17%"
+       ],
+       [
+        "USD/INR",
+        "92.81",
+        "-0.12%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.74",
+        "+0.07%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.85",
+        "-1.14%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "25,974",
+       "26,129"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,797",
+       "26,307"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (26,034 - 26,111) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
