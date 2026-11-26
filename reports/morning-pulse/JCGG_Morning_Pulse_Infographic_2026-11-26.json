@@ -1,0 +1,1425 @@
+{
+ "book": {
+  "flows": {
+   "date": "25 Nov",
+   "fii": 4479.08,
+   "dii": 4018.72
+  },
+  "pcr": {
+   "pcr": 0.9359010222268398,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "26 Nov 2026",
+  "date_iso": "2026-11-26",
+  "mood": {
+   "key": "bull",
+   "label": "Gap-up opening likely",
+   "sub": "Indicative Nifty opening zone 26,034 - 26,111"
+  },
+  "label": "Gap-up opening likely",
+  "zone": "26,034 - 26,111",
+  "headline": "Gap-up opening likely - Nifty zone 26,034 - 26,111",
+  "open_text": "Wall Street steady, Asia positive, crude easing. Carry-over: Nifty's +1.85% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+  "yday": "Nifty's +1.85% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour.",
+  "spark": [
+   22936.75,
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125,
+   25291.099609375,
+   25387.400390625,
+   25227.94921875,
+   25514.30078125,
+   25800.599609375,
+   25349.650390625,
+   25819.25
+  ],
+  "proj": 26072.3,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "25,819.25",
+    "pct": "+1.85%",
+    "pts": "+469.60"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "83,938.28",
+    "pct": "+1.82%",
+    "pts": "+1502.29"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "63,703.25",
+    "pct": "+1.79%",
+    "pts": "+1117.90"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "24,025.40",
+    "pct": "+1.17%",
+    "pts": "+277.25"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,797 - 25,974",
+    "r": "26,129 - 26,307",
+    "note": "Gap up expected: yesterday's resistance levels now act as support. Support R1 25,974 / P 25,797; a hold above 26,129 targets 26,307.",
+    "flag": "Re-anchored to GIFT open zone"
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "63,695 - 64,142",
+    "r": "64,581 - 65,028",
+    "note": "Gap up expected: yesterday's resistance levels now act as support. Support R1 64,142 / P 63,695; a hold above 64,581 targets 65,028. Estimated from the Nifty gap.",
+    "flag": "Re-anchored to GIFT open zone"
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "50,182.95",
+    "pct": "+0.33%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,182.78",
+    "pct": "-0.25%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "23,585.80",
+    "pct": "-0.62%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,426.90",
+    "pct": "-0.38%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "24,702.13",
+    "pct": "-1.26%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "57,795.11",
+    "pct": "+1.37%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "22,377.96",
+    "pct": "+1.88%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,487.05",
+    "pct": "+0.30%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "4,761.10",
+    "pct": "+1.35%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "90.80",
+    "pct": "-4.03%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "84.05",
+    "pct": "+0.44%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,612.10",
+    "pct": "+2.16%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "92.807",
+    "pct": "-0.12%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.75",
+    "pct": "+0.07%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.85",
+    "pct": "-1.14%"
+   }
+  ],
+  "vix": {
+   "level": "17.67",
+   "pct": "-0.17%",
+   "gauge": 0.6164999961853027,
+   "text": "India VIX 17.67 (-0.17%); USD/INR 92.81 (-0.12%); US 10-yr yield 4.85 (-1.14%). India VIX eased 0.2% - volatility expectations cooling."
+  },
+  "events": [
+   "Sensex MONTHLY expiry today (Thu 26 Nov 2026).",
+   "No major quarterly results flagged for today."
+  ],
+  "watch": [
+   [
+    "EICHERMOT",
+    "In the news",
+    "Eicher, 2 other stocks flashing bullish signals on tech charts: Ajit Mishra"
+   ],
+   [
+    "KOTAKBANK",
+    "In the news",
+    "How should investors play the current Indian stock market moves? Kotak's Sanjeev Prasad ad"
+   ],
+   [
+    "COALINDIA",
+    "Setup: SELL (A)",
+    "Entry 381.2, stop 384.7, target 376.0"
+   ],
+   [
+    "HINDALCO",
+    "Setup: SELL (A)",
+    "Entry 896.9, stop 907.8, target 869.9"
+   ],
+   [
+    "INOXWIND",
+    "Setup: SELL (A)",
+    "Entry 53.5, stop 54.6, target 51.4"
+   ],
+   [
+    "KEC",
+    "Setup: SELL (A)",
+    "Entry 293.7, stop 298.8, target 283.3"
+   ],
+   [
+    "BAJAJFINSV",
+    "Volume surge (last session)",
+    "4.6x average volume, +2.39%"
+   ],
+   [
+    "TATASTEEL",
+    "Volume surge (last session)",
+    "4.3x average volume, -2.27%"
+   ]
+  ],
+  "headlines": [
+   "Asian stocks enjoy another bounce as tech holds court",
+   "Eicher, 2 other stocks flashing bullish signals on tech charts: Ajit Mishra",
+   "GIFT Nifty breaches 26,000: Can Dalal Street overpower Trump's 25% tariff threat?",
+   "KLCI: Silver Lining In December?",
+   "Sensex Today: Sensex Surges 1,502 Points, Nifty Crosses 25,800 as Investors Gain Over \u20b93 Lakh Crore",
+   "Asian Stocks Rise as Dip Buyers Stabilize AI Trade: Markets Wrap",
+   "Nasdaq tumbles, Nvidia slides as Trump opens new tariff battle with 14 trading partners",
+   "Asian markets rise as Wall Street rebound lifts investor sentiment"
+  ],
+  "calls": {
+   "buy": [],
+   "sell": [
+    {
+     "sym": "COALINDIA",
+     "side": "SELL",
+     "entry": "381.24",
+     "sl": "384.66",
+     "t1": "376.03",
+     "t2": "370.91",
+     "rr": "1.5",
+     "risk": "3.42",
+     "riskpct": "0.90%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 27: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "HINDALCO",
+     "side": "SELL",
+     "entry": "896.94",
+     "sl": "907.79",
+     "t1": "869.88",
+     "t2": "851.10",
+     "rr": "2.5",
+     "risk": "10.85",
+     "riskpct": "1.21%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 25: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "INOXWIND",
+     "side": "SELL",
+     "entry": "53.45",
+     "sl": "54.63",
+     "t1": "51.35",
+     "t2": "49.17",
+     "rr": "1.8",
+     "risk": "1.18",
+     "riskpct": "2.21%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 29: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "KEC",
+     "side": "SELL",
+     "entry": "293.72",
+     "sl": "298.81",
+     "t1": "283.27",
+     "t2": "275.63",
+     "rr": "2.0",
+     "risk": "5.09",
+     "riskpct": "1.73%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 29: strong trend, \u2212DI leads"
+     ]
+    },
+    {
+     "sym": "OIL",
+     "side": "SELL",
+     "entry": "421.08",
+     "sl": "425.39",
+     "t1": "409.40",
+     "t2": "402.93",
+     "rr": "2.7",
+     "risk": "4.31",
+     "riskpct": "1.02%",
+     "conv": 94,
+     "convl": "Very high",
+     "grade": "A",
+     "S": 8.5,
+     "why": [
+      "Trend: price < 20 < 50 < 200 DMA",
+      "ADX 26: strong trend, \u2212DI leads"
+     ]
+    }
+   ],
+   "watch_buy": [
+    {
+     "sym": "ASTERDM",
+     "conv": 49,
+     "S": 11.5,
+     "why": "against today's market mood (BEARISH 36/100)"
+    },
+    {
+     "sym": "HONASA",
+     "conv": 49,
+     "S": 11.5,
+     "why": "against today's market mood (BEARISH 36/100)"
+    },
+    {
+     "sym": "OBEROIRLTY",
+     "conv": 49,
+     "S": 11.5,
+     "why": "against today's market mood (BEARISH 36/100)"
+    },
+    {
+     "sym": "KPRMILL",
+     "conv": 49,
+     "S": 11,
+     "why": "against today's market mood (BEARISH 36/100)"
+    }
+   ]
+  },
+  "gift": {
+   "last": "26,073.0",
+   "pct": "+0.03%",
+   "premium": "+254 pts",
+   "vs": "+0.98%",
+   "asof": "26 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "HINDUNILVR",
+    "2,141.80",
+    "+6.08%"
+   ],
+   [
+    "BRITANNIA",
+    "5,076.20",
+    "+5.08%"
+   ],
+   [
+    "TATACONSUM",
+    "1,185.80",
+    "+4.66%"
+   ],
+   [
+    "DIVISLAB",
+    "11,716.50",
+    "+4.58%"
+   ],
+   [
+    "HDFCLIFE",
+    "601.30",
+    "+4.58%"
+   ]
+  ],
+  "losers": [
+   [
+    "INDUSINDBK",
+    "963.00",
+    "-3.99%"
+   ],
+   [
+    "BPCL",
+    "305.35",
+    "-2.79%"
+   ],
+   [
+    "TATASTEEL",
+    "159.30",
+    "-2.27%"
+   ],
+   [
+    "POWERGRID",
+    "264.85",
+    "-1.54%"
+   ],
+   [
+    "BHARTIARTL",
+    "2,128.50",
+    "-1.54%"
+   ]
+  ],
+  "shock": [
+   [
+    "BAJAJFINSV",
+    "1,925.00",
+    "4.6x avg vol",
+    "+2.39%"
+   ],
+   [
+    "TATASTEEL",
+    "159.30",
+    "4.3x avg vol",
+    "-2.27%"
+   ],
+   [
+    "HINDUNILVR",
+    "2,141.80",
+    "3.1x avg vol",
+    "+6.08%"
+   ],
+   [
+    "HDFCLIFE",
+    "601.30",
+    "2.9x avg vol",
+    "+4.58%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "25,464",
+     "25,642",
+     "25,797",
+     "25,974",
+     "26,129"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "62,809",
+     "63,256",
+     "63,695",
+     "64,142",
+     "64,581"
+    ]
+   }
+  ],
+  "est": 0.98,
+  "stock_news": {
+   "items": [
+    {
+     "sym": "LT",
+     "name": "Larsen & Toubro Limited",
+     "headline": "L&T wins order worth up to \u20b92,500 cr for battery storage project in Gujarat",
+     "brief": "The 300 MW/900 MWh battery energy storage project at Khavda will help maximise renewable energy utilisation, strengthen grid stability and enhance the reliability of power supply",
+     "source": "Business Standard",
+     "time": "25 Nov 16:37",
+     "tag": "ORDER",
+     "tone": "up",
+     "score": 134.2,
+     "also": [],
+     "n": 1,
+     "link": "https://www.business-standard.com/companies/news/l-t-wins-order-worth-up-to-2-500-cr-for-battery-storage-project-in-gujarat-126112500803_1.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.5,
+      "ctx": 2.5,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.26,
+      "n": 2164,
+      "fine": true,
+      "t_up": 44,
+      "t_dn": 55,
+      "t_n": 12817,
+      "t_avg": -0.16,
+      "edge": -2.0,
+      "rsi": 63,
+      "rsi_up": true,
+      "vm": 0.5804240801151705,
+      "dp": 53.7369174191475,
+      "pct": 1.3683260567331001,
+      "above20": true,
+      "bu": "Long build-up",
+      "pcr": 0.85,
+      "flow": "WEAK",
+      "sec": "Infrastructure",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "PNB",
+     "name": "Punjab National Bank",
+     "headline": "Deutsche Bank, PNB join hands to finance corporate acquisitions in India",
+     "brief": "Deutsche Bank and Punjab National Bank have signed a preliminary agreement to structure and finance corporate acquisitions in India, following RBI reforms allowing domestic lenders to fund up to 75% of acquisition deal values.",
+     "source": "Economic Times",
+     "time": "25 Nov 18:11",
+     "tag": "DEAL",
+     "tone": "dn",
+     "score": 126.2,
+     "also": [],
+     "n": 3,
+     "link": "https://economictimes.indiatimes.com/industry/banking/finance/banking/deutsche-bank-pnb-join-hands-to-finance-corporate-acquisitions-in-india/articleshow/136161935.cms",
+     "trend": {
+      "dir": "dn",
+      "strength": "Mild",
+      "bars": 1,
+      "view": -1.6,
+      "ctx": -1.0,
+      "p_up": 54,
+      "p_dn": 45,
+      "avg": 0.56,
+      "n": 1024,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 70,
+      "rsi_up": false,
+      "vm": 0.8598959162505514,
+      "dp": 38.17054750073724,
+      "pct": -0.7612687813021611,
+      "above20": true,
+      "bu": "Short build-up",
+      "pcr": 0.71,
+      "flow": "IN",
+      "sec": "Bank",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "WIPRO",
+     "name": "Wipro Limited",
+     "headline": "Wipro secures over $500 million contract from energy major BP",
+     "brief": "The deal spanning around seven years will bring an average of about $75 million in annual business for Wipro and see 3,000 BP employees move to the IT services company, offering a boost to CEO Srini Pallia\u2019s growth efforts.",
+     "source": "Mint",
+     "time": "25 Nov 20:29",
+     "tag": "ORDER",
+     "tone": "",
+     "score": 125.3,
+     "also": [
+      "Business Standard"
+     ],
+     "n": 2,
+     "link": "https://www.livemint.com/companies/news/wipro-bags-500-million-contract-from-bp-11795614860412.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.5,
+      "ctx": 0.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": 0.0,
+      "n": 1791,
+      "fine": true,
+      "t_up": 44,
+      "t_dn": 55,
+      "t_n": 12817,
+      "t_avg": -0.16,
+      "edge": -2.0,
+      "rsi": 52,
+      "rsi_up": true,
+      "vm": 0.6000289426321308,
+      "dp": 46.334400510265816,
+      "pct": 0.939719152117048,
+      "above20": false,
+      "bu": null,
+      "pcr": 0.66,
+      "flow": "WEAK",
+      "sec": "IT",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "LGEINDIA",
+     "name": "LG Electronics India Limited",
+     "headline": "LG Electronics shares to be in focus as promoter to sell 2% stake to meet public float norms; check details",
+     "brief": "LG Electronics Inc. plans to sell up to 2% of LG Electronics India through a block deal at a floor price of \u20b91,709.30 per share, raising about \u20b92,320.5 crore to meet minimum public shareholding rules.",
+     "source": "Mint",
+     "time": "25 Nov 19:31",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 116.8,
+     "also": [
+      "Business Standard"
+     ],
+     "n": 3,
+     "link": "https://www.livemint.com/market/lg-electronics-shares-to-be-in-focus-as-promoter-to-sell-2-stake-to-meet-public-float-norms-check-details-11795612944008.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.1,
+      "ctx": 0.5,
+      "p_up": 52,
+      "p_dn": 48,
+      "avg": 0.35,
+      "n": 458,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 63,
+      "rsi_up": true,
+      "vm": 2.389378567569896,
+      "dp": 61.955004118298504,
+      "pct": 2.300984528832635,
+      "above20": true,
+      "bu": null,
+      "pcr": null,
+      "flow": "WEAK",
+      "sec": "Consumer Durables",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "PPLPHARMA",
+     "name": "Piramal Pharma Limited",
+     "headline": "Carlyle pares 7.4% stake in Piramal Pharma for over Rs 2,211 crore",
+     "brief": "The Carlyle Group has divested 7.4 percent of its stake in Piramal Pharma through an open market deal, selling approximately 9.86 crore shares at an average rate of Rs 224.17 each.",
+     "source": "Economic Times",
+     "time": "25 Nov 20:32",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 107.2,
+     "also": [],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/markets/stocks/news/carlyle-pares-7-4-stake-in-piramal-pharma-for-over-rs-2211-crore/articleshow/136165837.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.4,
+      "ctx": 1.0,
+      "p_up": 55,
+      "p_dn": 45,
+      "avg": 0.56,
+      "n": 230,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 52,
+      "rsi_up": false,
+      "vm": 2.2192109876288098,
+      "dp": 42.974254076100635,
+      "pct": -1.8362953269449933,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Pharma",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "SCHAEFFLER",
+     "name": "Schaeffler India Limited",
+     "headline": "Schaeffler India block deal: Schaeffler AG likely to sell 6% stake at \u20b93,400 apiece; deal size \u20b93,188 crore: Report",
+     "brief": "Schaeffler AG is reportedly planning to sell a 6% stake in Schaeffler India through a block deal worth about \u20b93,188 crore, at a 5.6% discount to the previous close.",
+     "source": "Mint",
+     "time": "25 Nov 18:46",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 106.9,
+     "also": [],
+     "n": 1,
+     "link": "https://www.livemint.com/market/stock-market-news/schaeffler-india-block-deal-schaeffler-ag-to-offload-6-stake-at-rs-3-400-apiece-deal-size-rs-3-188-crore-report-11795612021351.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.1,
+      "ctx": 0.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.45,
+      "n": 5432,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 48,
+      "rsi_up": false,
+      "vm": 1.2611513938413819,
+      "dp": 72.58476230517434,
+      "pct": -0.1912469857812049,
+      "above20": true,
+      "bu": null,
+      "pcr": null,
+      "flow": null,
+      "sec": null,
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "TATASTEEL",
+     "name": "Tata Steel Limited",
+     "headline": "Tata Steel open to revisiting APL Apollo deal structure after investor backlash",
+     "brief": "Tata Steel's management is discussing possible changes with APL Apollo after shareholders raised concerns over debt, valuations and the financial implications of the proposed transactions.",
+     "source": "Mint",
+     "time": "25 Nov 20:37",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 84.0,
+     "also": [
+      "BusinessLine"
+     ],
+     "n": 2,
+     "link": "https://www.livemint.com/companies/news/tata-steel-open-to-revisiting-apl-apollo-deal-structure-after-investor-backlash-11795616029618.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.3,
+      "ctx": -1.0,
+      "p_up": 57,
+      "p_dn": 43,
+      "avg": 0.99,
+      "n": 159,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 51,
+      "t_n": 10698,
+      "t_avg": 0.19,
+      "edge": 2.7,
+      "rsi": 30,
+      "rsi_up": false,
+      "vm": 4.340755715325996,
+      "dp": 37.39106006362697,
+      "pct": -2.2699386503067416,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.48,
+      "flow": "WEAK",
+      "sec": "Commodities",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "EICHERMOT",
+     "name": "Eicher Motors Limited",
+     "headline": "Royal Enfield signs Rs 1,000 crore MoU with Tamil Nadu government for EV expansion",
+     "brief": "Royal Enfield has signed a non-binding Memorandum of Understanding with the Tamil Nadu government. The investment of Rs 1,000 crore aims to accelerate the company's electric vehicle development over seven years.",
+     "source": "Economic Times",
+     "time": "25 Nov 15:57",
+     "tag": "EXPANSION",
+     "tone": "up",
+     "score": 75.3,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/renewables/royal-enfield-signs-rs-1000-crore-mou-with-tamil-nadu-government-for-ev-expansion/articleshow/136157570.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.0,
+      "ctx": 2.0,
+      "p_up": 46,
+      "p_dn": 54,
+      "avg": 0.33,
+      "n": 253,
+      "fine": true,
+      "t_up": 44,
+      "t_dn": 55,
+      "t_n": 12817,
+      "t_avg": -0.16,
+      "edge": -2.0,
+      "rsi": 75,
+      "rsi_up": true,
+      "vm": 1.5434371289752338,
+      "dp": 66.56013334377413,
+      "pct": 2.000611807892322,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.88,
+      "flow": "IN",
+      "sec": "Auto",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "HYUNDAI",
+     "name": "Hyundai Motor India Limited",
+     "headline": "Hyundai Bayon\u2019s \u20b91-lakh offers within a month of launch cloud market-share recovery",
+     "brief": "Priced from \u20b99.99 lakh, Bayon takes on Maruti Suzuki\u2019s Grand Vitara while competing for buyers of higher-priced Venue and Brezza variants",
+     "source": "BusinessLine",
+     "time": "25 Nov 17:20",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 68.9,
+     "also": [],
+     "n": 2,
+     "link": "https://www.thehindubusinessline.com/companies/hyundai-bayons-1-lakh-offers-within-a-month-of-launch-cloud-market-share-recovery/article71741832.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -1.1,
+      "ctx": -0.5,
+      "p_up": 53,
+      "p_dn": 47,
+      "avg": 0.52,
+      "n": 2363,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 53,
+      "rsi_up": false,
+      "vm": 1.4886087967245274,
+      "dp": 44.456897926260794,
+      "pct": -1.9953596287703015,
+      "above20": true,
+      "bu": "Short build-up",
+      "pcr": 0.47,
+      "flow": "IN",
+      "sec": "Auto",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "APLAPOLLO",
+     "name": "APL Apollo Tubes Limited",
+     "headline": "APL Apollo deal: Working on stakeholders' concerns, says Tata Steel CEO",
+     "brief": "\"We've heard all the noise from the market... and we've addressed a lot of it (shareholder concerns) yesterday,\" said T V Narendran, CEO & MD, Tata Steel",
+     "source": "Business Standard",
+     "time": "25 Nov 22:09",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 68.6,
+     "also": [],
+     "n": 1,
+     "link": "https://www.business-standard.com/companies/news/working-on-issues-raised-by-both-stakeholders-says-tata-steel-ceo-126112501216_1.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.9,
+      "ctx": -1.0,
+      "p_up": 61,
+      "p_dn": 39,
+      "avg": 1.48,
+      "n": 362,
+      "fine": true,
+      "t_up": 50,
+      "t_dn": 50,
+      "t_n": 5197,
+      "t_avg": 0.32,
+      "edge": 3.9,
+      "rsi": 15,
+      "rsi_up": false,
+      "vm": 20.921069390589594,
+      "dp": 26.39149870788602,
+      "pct": -11.616766467065869,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.58,
+      "flow": "WEAK",
+      "sec": "Commodities",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "BHARTIARTL",
+     "name": "Bharti Airtel Limited",
+     "headline": "Bharti Airtel to invest \u20b91,200 crore in three data centres in Assam",
+     "brief": "The three data centres in Guwahati, Jorhat and Silchar will have a combined capacity of 40 MW and could be operational by 2028, with land already available for all three facilities",
+     "source": "Business Standard",
+     "time": "25 Nov 22:27",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 53.5,
+     "also": [
+      "Economic Times"
+     ],
+     "n": 2,
+     "link": "https://www.business-standard.com/companies/news/bharti-airtel-to-invest-1-200-crore-in-three-data-centres-in-assam-126112501173_1.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.1,
+      "ctx": 0.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.24,
+      "n": 3534,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 62,
+      "rsi_up": false,
+      "vm": 0.8121587598923886,
+      "dp": 69.73066476418653,
+      "pct": -0.516795865633075,
+      "above20": true,
+      "bu": null,
+      "pcr": 0.66,
+      "flow": "WEAK",
+      "sec": "Infrastructure",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "CHENNPETRO",
+     "name": "Chennai Petroleum Corporation Limited",
+     "headline": "Gold Rate Today: Check 24K, 22K Gold Prices in Mumbai, Delhi, Chennai, Kolkata, Bengaluru on November 26",
+     "brief": "US inflation rose 0.3% month-on-month in October after a 0.5% increase in September, strengthening expectations of a December Fed rate hike.",
+     "source": "NDTV Profit",
+     "time": "26 Nov 07:12",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 40.8,
+     "also": [
+      "BusinessLine"
+     ],
+     "n": 2,
+     "link": "https://www.ndtvprofit.com/markets/gold-rate-today-check-24k-22k-gold-prices-in-mumbai-delhi-chennai-kolkata-bengaluru-on-november-26-12378121#publisher=newsstand",
+     "trend": {
+      "dir": "up",
+      "strength": "Mild",
+      "bars": 1,
+      "view": 1.8,
+      "ctx": 0.5,
+      "p_up": 55,
+      "p_dn": 45,
+      "avg": 0.52,
+      "n": 368,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 51,
+      "t_n": 10698,
+      "t_avg": 0.19,
+      "edge": 2.7,
+      "rsi": 39,
+      "rsi_up": false,
+      "vm": 1.0974103133348012,
+      "dp": 41.47203370830501,
+      "pct": -5.347000969663392,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "MIXED",
+      "sec": "Oil & Gas",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "POWERGRID",
+     "name": "Power Grid Corporation of India Limited",
+     "headline": "Power Grid To Mull Rs 45,000 Crore Borrowing And $600 Million Term Loan On November 30",
+     "brief": "Power Grid reported a net profit of Rs 3,866 crore in the September quarter of FY27, up 8.4% YoY from Rs 3,566 crore in the same quarter a year ago.",
+     "source": "NDTV Profit",
+     "time": "26 Nov 07:16",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 39.7,
+     "also": [],
+     "n": 1,
+     "link": "https://www.ndtvprofit.com/markets/power-grid-to-mull-rs-45-000-crore-borrowing-and-600-million-term-loan-on-november-30-12378144#publisher=newsstand",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.4,
+      "ctx": 1.0,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.45,
+      "n": 5432,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 57,
+      "rsi_up": true,
+      "vm": 0.9403640485135144,
+      "dp": 52.971970916222475,
+      "pct": 0.7173872003020492,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.58,
+      "flow": "IN",
+      "sec": "PSE (PSU stocks)",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "TECHM",
+     "name": "Tech Mahindra Limited",
+     "headline": "Tech Mahindra CEO Mohit Joshi on the company's next big goal: \u2018Become a world-beating IT company\u2019",
+     "brief": "Joshi said the first three years of the company's transformation were focused on achieving world-class standards and catching up with competitors.",
+     "source": "Mint",
+     "time": "25 Nov 17:49",
+     "tag": "NEWS",
+     "tone": "up",
+     "score": 39.3,
+     "also": [],
+     "n": 1,
+     "link": "https://www.livemint.com/companies/news/tech-mahindra-ceo-mohit-joshi-on-the-companys-next-big-goal-become-a-world-beating-it-company-11795604349549.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.9,
+      "ctx": 1.5,
+      "p_up": 53,
+      "p_dn": 47,
+      "avg": 0.55,
+      "n": 2670,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 60,
+      "rsi_up": true,
+      "vm": 0.7037230686418513,
+      "dp": 57.44467157890586,
+      "pct": 1.333333333333336,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.71,
+      "flow": "WEAK",
+      "sec": "IT",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "LICI",
+     "name": "Life Insurance Corporation Of India",
+     "headline": "LIC names third CFO this year amid senior management churn",
+     "brief": "Sonija M.S. takes charge of the insurer's finances as repeated leadership changes reshape its top management. LIC also appointed Meenakshi Malhotra as its appointed actuary.",
+     "source": "Mint",
+     "time": "25 Nov 22:10",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 38.1,
+     "also": [],
+     "n": 1,
+     "link": "https://www.livemint.com/companies/news/lic-names-third-cfo-this-year-amid-senior-management-churn-11795621717137.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -1.1,
+      "ctx": -0.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.45,
+      "n": 5432,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 19501,
+      "t_avg": -0.12,
+      "edge": -1.3,
+      "rsi": 58,
+      "rsi_up": true,
+      "vm": 1.2358719449606053,
+      "dp": 59.1124023558815,
+      "pct": 0.25779523692610146,
+      "above20": true,
+      "bu": "Long unwinding",
+      "pcr": 0.48,
+      "flow": null,
+      "sec": null,
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "SUZLON",
+     "name": "Suzlon Energy Limited",
+     "headline": "Suzlon begins construction of 1 GW AI-powered wind blade factory in Tamil Nadu",
+     "brief": "The new facility will manufacture advanced blades for India\u2019s tallest and most powerful wind turbine, while strengthening the company\u2019s manufacturing capabilities.",
+     "source": "BusinessLine",
+     "time": "25 Nov 16:31",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 37.2,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/suzlon-begins-construction-of-1-gw-ai-powered-wind-blade-factory-in-tamil-nadu/article71741982.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.5,
+      "ctx": 0.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": -0.02,
+      "n": 2167,
+      "fine": true,
+      "t_up": 44,
+      "t_dn": 55,
+      "t_n": 12817,
+      "t_avg": -0.16,
+      "edge": -2.0,
+      "rsi": 40,
+      "rsi_up": true,
+      "vm": 0.5669395236262416,
+      "dp": 37.23281508482458,
+      "pct": 0.7529280535415592,
+      "above20": false,
+      "bu": null,
+      "pcr": 0.71,
+      "flow": "WEAK",
+      "sec": "Infrastructure",
+      "asof": "2026-11-25"
+     }
+    },
+    {
+     "sym": "PINELABS",
+     "name": "Pine Labs Limited",
+     "headline": "Pine Labs bets on AI agents for merchants, starts with ads and data queries",
+     "brief": "The fintech firm has launched two AI agents to help merchants analyse sales and payments data and run Google ad campaigns, with an Agent App Store planned for December 15",
+     "source": "Business Standard",
+     "time": "25 Nov 17:17",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 34.6,
+     "also": [],
+     "n": 1,
+     "link": "https://www.business-standard.com/companies/news/pine-labs-bets-on-ai-agents-for-merchants-starts-with-ads-and-data-queries-126112500892_1.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.5,
+      "ctx": 0.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": 0.0,
+      "n": 1791,
+      "fine": true,
+      "t_up": 44,
+      "t_dn": 55,
+      "t_n": 12817,
+      "t_avg": -0.16,
+      "edge": -2.0,
+      "rsi": 46,
+      "rsi_up": true,
+      "vm": 0.3465260726478525,
+      "dp": 39.09640568212234,
+      "pct": 0.4923345382026624,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "WEAK",
+      "sec": "Digital",
+      "asof": "2026-11-25"
+     }
+    }
+   ],
+   "since_txt": "Wed 25 Nov, 15:30",
+   "matched": 17,
+   "model": {
+    "test_from": "2026-06-15",
+    "test_base_up": 47,
+    "test_n": 54502,
+    "asof": "2026-11-25",
+    "from": "2025-12-26",
+    "sessions": 225,
+    "cases": 86123,
+    "base_up": 49,
+    "horizon": 3,
+    "ctx": true,
+    "breadth": 58.498023715415016
+   }
+  }
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (26 Nov 2026)",
+ "headline": "Gap-up opening likely - Nifty zone 26,034 - 26,111",
+ "bias_text": "GIFT Nifty 26,073.0 (+254 pts, +0.98% vs Nifty's last close). US: S&P 500 -0.25%, Nasdaq -0.62%, Dow +0.33%. Carry-over: Nifty's +1.85% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street steady, Asia positive, crude easing. Carry-over: Nifty's +1.85% move in the last session is large enough to shape today's opening; expect follow-through or profit-taking near the first hour. Opening call anchored on GIFT Nifty.",
+ "proj": 26072.3,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bull",
+  "label": "Gap-up opening likely",
+  "sub": "Indicative Nifty opening zone 26,034 - 26,111"
+ },
+ "mood_score": 0.98,
+ "mood_pic": "bull_roar",
+ "spark": [
+  22936.75,
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375,
+  25030.349609375,
+  25044.650390625,
+  25255.05078125,
+  25299.349609375,
+  25144.30078125,
+  25291.099609375,
+  25387.400390625,
+  25227.94921875,
+  25514.30078125,
+  25800.599609375,
+  25349.650390625,
+  25819.25
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.6164999961853027,
+  "headline": "India VIX 17.67 (-0.17%)",
+  "text": "India VIX 17.67 (-0.17%); USD/INR 92.81 (-0.12%); US 10-yr yield 4.85 (-1.14%). India VIX eased 0.2% - volatility expectations cooling."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "25,819.25",
+   "pct": "+1.85%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "90.80",
+   "pct": "-4.03%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "3,612.10",
+   "pct": "+2.16%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "17.67",
+   "pct": "-0.17%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "92.807",
+   "pct": "-0.12%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "4.85",
+   "pct": "-1.14%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "50,182.95",
+   "pct": "+0.33%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,182.78",
+   "pct": "-0.25%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "23,585.80",
+   "pct": "-0.62%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,426.90",
+   "pct": "-0.38%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "24,702.13",
+   "pct": "-1.26%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "57,795.11",
+   "pct": "+1.37%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "22,377.96",
+   "pct": "+1.88%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,487.05",
+   "pct": "+0.30%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "4,761.10",
+   "pct": "+1.35%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 57,795.11 (+1.37%), Hang Seng 22,377.96 (+1.88%), Shanghai 3,487.05 (+0.30%), Kospi 4,761.10 (+1.35%). Wall Street: Dow 50,182.95 (+0.33%), S&P 500 7,182.78 (-0.25%), Nasdaq 23,585.80 (-0.62%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "25,797 - 25,974",
+   "r": "26,129 - 26,307",
+   "note": "Gap up expected: yesterday's resistance levels now act as support. Support R1 25,974 / P 25,797; a hold above 26,129 targets 26,307.",
+   "flag": "Re-anchored to GIFT open zone"
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "63,695 - 64,142",
+   "r": "64,581 - 65,028",
+   "note": "Gap up expected: yesterday's resistance levels now act as support. Support R1 64,142 / P 63,695; a hold above 64,581 targets 65,028. Estimated from the Nifty gap.",
+   "flag": "Re-anchored to GIFT open zone"
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Sensex MONTHLY expiry today (Thu 26 Nov 2026). No major quarterly results flagged for today."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "EICHERMOT (In the news); KOTAKBANK (In the news); COALINDIA (Setup: SELL (A)); HINDALCO (Setup: SELL (A)); INOXWIND (Setup: SELL (A)); KEC (Setup: SELL (A))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "Asian stocks enjoy another bounce as tech holds court | Eicher, 2 other stocks flashing bullish signals on tech charts: Ajit Mishra"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "HINDUNILVR",
+    "pct": "+6.08%"
+   },
+   {
+    "sym": "BRITANNIA",
+    "pct": "+5.08%"
+   },
+   {
+    "sym": "TATACONSUM",
+    "pct": "+4.66%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "INDUSINDBK",
+    "pct": "-3.99%"
+   },
+   {
+    "sym": "BPCL",
+    "pct": "-2.79%"
+   },
+   {
+    "sym": "TATASTEEL",
+    "pct": "-2.27%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}
