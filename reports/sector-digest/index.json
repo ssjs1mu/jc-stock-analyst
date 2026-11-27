@@ -2,6 +2,81 @@
  "schedule_id": "sector-digest",
  "runs": [
   {
+   "generated_at": "2026-11-27T19:18:50+05:30",
+   "date": "2026-11-27",
+   "status": "ok",
+   "caption": "Sector Digest 27 Nov: money in Defence, Media; out of Auto, Private Bank, PSU Bank; circuits 73 up / 38 down",
+   "note": "",
+   "files": [
+    {
+     "name": "Sector_Digest_2026-11-27.pdf",
+     "path": "reports/sector-digest/Sector_Digest_2026-11-27.pdf",
+     "type": "pdf",
+     "bytes": 2364560
+    },
+    {
+     "name": "Sector_Digest_2026-11-27.json",
+     "path": "reports/sector-digest/Sector_Digest_2026-11-27.json",
+     "type": "json",
+     "bytes": 106
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_1.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_1.png",
+     "type": "png",
+     "bytes": 273559
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_2.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_2.png",
+     "type": "png",
+     "bytes": 341273
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_3.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_3.png",
+     "type": "png",
+     "bytes": 240290
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_4.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_4.png",
+     "type": "png",
+     "bytes": 342196
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_5.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_5.png",
+     "type": "png",
+     "bytes": 327984
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_6.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_6.png",
+     "type": "png",
+     "bytes": 314449
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_7.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_7.png",
+     "type": "png",
+     "bytes": 420269
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_8.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_8.png",
+     "type": "png",
+     "bytes": 311657
+    },
+    {
+     "name": "Sector_Digest_Mobile_2026-11-27_9.png",
+     "path": "reports/sector-digest/Sector_Digest_Mobile_2026-11-27_9.png",
+     "type": "png",
+     "bytes": 265630
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-26T19:48:07+05:30",
    "date": "2026-11-26",
    "status": "ok",
@@ -296,5 +371,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-26T19:48:07+05:30"
+ "updated_at": "2026-11-27T19:18:50+05:30"
 }
