@@ -1,0 +1,280 @@
+{
+ "report_subtitle": "Joshi's Corner",
+ "report_date": "27 Nov 2026",
+ "report_time": "08:13 IST",
+ "generated_line": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk.",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 25,918 - 25,996"
+ },
+ "report_title": "JCGG - Morning Updates (Detailed)",
+ "sections": [
+  {
+   "heading": "Opening Outlook",
+   "blocks": [
+    {
+     "type": "paragraph",
+     "text": "Positive start likely: Wall Street steady, Asia positive, crude easing. Expected Nifty opening zone: 25,918 - 25,996 (indicative)."
+    },
+    {
+     "type": "bullets",
+     "items": [
+      "GIFT Nifty 25,958.0 (+74 pts, +0.28% vs Nifty's last close).",
+      "US: S&P 500 -0.25%, Nasdaq -0.62%, Dow +0.33%.",
+      "Asia this morning: Nikkei +1.14%, Hang Seng +0.73%, Kospi +2.20%.",
+      "Currency, crude and volatility: Brent 92.18 (-2.57%); USD/INR 92.238 (-0.61%); India VIX 16.84 (-4.70%)."
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Opening call anchored on GIFT Nifty. Indicative only; the actual opening can differ with domestic news."
+    }
+   ],
+   "style": "framed"
+  },
+  {
+   "heading": "Events Today",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Next Nifty weekly expiry: Tue 01 Dec 2026; next Sensex weekly expiry: Thu 03 Dec 2026.",
+      "Results today (1 companies): SETCO."
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Stocks to Watch",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Stock",
+      "Trigger",
+      "What to watch"
+     ],
+     "rows": [
+      [
+       "KOTAKBANK",
+       "In the news",
+       "Sensex Soars Close to 400 Pts, Nifty Nears 26,600: 3 Reasons Why the Stock Market Is Up To"
+      ],
+      [
+       "TRENT",
+       "In the news",
+       "Nifty surges over 12% in November, eyes biggest monthly gain in six years; BSE, Eternal, T"
+      ],
+      [
+       "WIPRO",
+       "In the news",
+       "Sensex Today Ends 390 Points Higher | Nifty Above 25,850 | Wipro Up 4%"
+      ],
+      [
+       "HEROMOTOCO",
+       "Setup: BUY (A+)",
+       "Entry 5,756.0, stop 5,696.5, target 5,856.8"
+      ],
+      [
+       "MANKIND",
+       "Setup: BUY (A+)",
+       "Entry 2,694.6, stop 2,667.9, target 2,736.7"
+      ],
+      [
+       "UNITDSPR",
+       "Setup: BUY (A+)",
+       "Entry 1,521.2, stop 1,505.8, target 1,544.9"
+      ],
+      [
+       "WELSPUNLIV",
+       "Setup: BUY (A+)",
+       "Entry 279.2, stop 273.9, target 287.6"
+      ],
+      [
+       "HINDUNILVR",
+       "Volume surge (last session)",
+       "3.1x average volume, +6.08%"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.16,
+      0.26,
+      0.58
+     ],
+     "align": [
+      "left",
+      "left",
+      "left"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Headlines to Track",
+   "blocks": [
+    {
+     "type": "bullets",
+     "items": [
+      "Stocks to watch: Urban Company, Leela Palaces,Waaree Renewable, KPI Green",
+      "Asian shares mostly rise ahead of Wall Street's reopening after the Thanksgiving holiday",
+      "GIFT Nifty loses steam: Can Rs 11,474 crore of institutional buying keep Dalal Street's rally alive?",
+      "Shares find footing after bruising month, dollar set for third monthly gain"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "Overnight & Asian Cues",
+   "blocks": [
+    {
+     "type": "pair",
+     "left": {
+      "type": "table",
+      "headers": [
+       "Equities",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Dow Jones",
+        "50,182.95",
+        "+0.33%"
+       ],
+       [
+        "S&P 500",
+        "7,182.78",
+        "-0.25%"
+       ],
+       [
+        "Nasdaq Composite",
+        "23,585.80",
+        "-0.62%"
+       ],
+       [
+        "FTSE 100",
+        "10,609.30",
+        "+1.75%"
+       ],
+       [
+        "DAX",
+        "25,215.52",
+        "+2.08%"
+       ],
+       [
+        "Nikkei 225",
+        "58,154.50",
+        "+1.14%"
+       ],
+       [
+        "Hang Seng",
+        "22,389.55",
+        "+0.73%"
+       ],
+       [
+        "Shanghai Composite",
+        "3,475.23",
+        "-0.05%"
+       ],
+       [
+        "Kospi",
+        "4,815.00",
+        "+2.20%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     },
+     "right": {
+      "type": "table",
+      "headers": [
+       "Crude, FX, bonds",
+       "Level",
+       "% Chg"
+      ],
+      "rows": [
+       [
+        "Brent crude (US$/bbl)",
+        "92.18",
+        "-2.57%"
+       ],
+       [
+        "WTI crude (US$/bbl)",
+        "85.63",
+        "+2.33%"
+       ],
+       [
+        "Gold (US$/oz, Comex)",
+        "3,659.40",
+        "+3.50%"
+       ],
+       [
+        "USD/INR",
+        "92.24",
+        "-0.61%"
+       ],
+       [
+        "Dollar index (DXY)",
+        "103.67",
+        "-0.00%"
+       ],
+       [
+        "US 10-yr yield (%)",
+        "4.85",
+        "-1.14%"
+       ]
+      ],
+      "trend": false,
+      "col_widths": [
+       0.46,
+       0.27,
+       0.27
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "heading": "Key Levels for Today",
+   "blocks": [
+    {
+     "type": "table",
+     "headers": [
+      "Index",
+      "Support",
+      "Resistance"
+     ],
+     "rows": [
+      [
+       "Nifty 50 (1st)",
+       "25,864",
+       "26,106"
+      ],
+      [
+       "Nifty 50 (2nd)",
+       "25,754",
+       "26,237"
+      ]
+     ],
+     "trend": false,
+     "col_widths": [
+      0.4,
+      0.3,
+      0.3
+     ]
+    },
+    {
+     "type": "note",
+     "text": "Levels are classic pivot points computed from the last session's high, low and close, not a recommendation. Because GIFT Nifty points to an open (25,918 - 25,996) outside yesterday's pivot band, support and resistance are the nearest levels below and above that zone."
+    }
+   ]
+  }
+ ]
+}
