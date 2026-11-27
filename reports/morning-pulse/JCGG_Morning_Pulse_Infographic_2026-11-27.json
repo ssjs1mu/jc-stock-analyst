@@ -1,0 +1,1209 @@
+{
+ "book": {
+  "flows": {
+   "date": "25 Nov",
+   "fii": 4479.08,
+   "dii": 4018.72
+  },
+  "pcr": {
+   "pcr": 1.0314204372272193,
+   "expiry": "nearest",
+   "ts": "",
+   "src": "Upstox"
+  },
+  "date_txt": "27 Nov 2026",
+  "date_iso": "2026-11-27",
+  "mood": {
+   "key": "bull",
+   "label": "Positive start likely",
+   "sub": "Indicative Nifty opening zone 25,918 - 25,996"
+  },
+  "label": "Positive start likely",
+  "zone": "25,918 - 25,996",
+  "headline": "Positive start likely - Nifty zone 25,918 - 25,996",
+  "open_text": "Wall Street steady, Asia positive, crude easing. Opening call anchored on GIFT Nifty.",
+  "yday": null,
+  "spark": [
+   23053.099609375,
+   23440.80078125,
+   23810.849609375,
+   23960.599609375,
+   24536.599609375,
+   25030.349609375,
+   25044.650390625,
+   25255.05078125,
+   25299.349609375,
+   25144.30078125,
+   25291.099609375,
+   25387.400390625,
+   25227.94921875,
+   25514.30078125,
+   25800.599609375,
+   25349.650390625,
+   25819.25,
+   25884.5
+  ],
+  "proj": 25957.0,
+  "snapshot": [
+   {
+    "name": "Nifty 50",
+    "sub": "prev close",
+    "level": "25,884.50",
+    "pct": "+0.25%",
+    "pts": "+65.25"
+   },
+   {
+    "name": "Sensex",
+    "sub": "prev close",
+    "level": "84,328.59",
+    "pct": "+0.46%",
+    "pts": "+390.31"
+   },
+   {
+    "name": "Bank Nifty",
+    "sub": "prev close",
+    "level": "63,535.30",
+    "pct": "-0.26%",
+    "pts": "-167.95"
+   },
+   {
+    "name": "Nifty 500",
+    "sub": "prev close",
+    "level": "24,086.50",
+    "pct": "+0.25%",
+    "pts": "+61.10"
+   }
+  ],
+  "levels": [
+   {
+    "name": "Nifty 50",
+    "s": "25,754 - 25,864",
+    "r": "26,106 - 26,237",
+    "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 26,106 / R3 26,237; a slide below 25,864 exposes 25,754. (Prev high, R1 inside the open zone.)",
+    "flag": "Re-anchored to GIFT open zone"
+   },
+   {
+    "name": "Bank Nifty",
+    "s": "62,885 - 63,210",
+    "r": "63,983 - 64,430",
+    "note": "A sustained move above 63,983 opens up 64,430; a slide below 63,210 would expose 62,885.",
+    "flag": ""
+   }
+  ],
+  "bench": [
+   {
+    "name": "Dow Jones",
+    "code": "US",
+    "level": "50,182.95",
+    "pct": "+0.33%"
+   },
+   {
+    "name": "S&P 500",
+    "code": "US",
+    "level": "7,182.78",
+    "pct": "-0.25%"
+   },
+   {
+    "name": "Nasdaq Composite",
+    "code": "US",
+    "level": "23,585.80",
+    "pct": "-0.62%"
+   },
+   {
+    "name": "FTSE 100",
+    "code": "UK",
+    "level": "10,609.30",
+    "pct": "+1.75%"
+   },
+   {
+    "name": "DAX",
+    "code": "DE",
+    "level": "25,215.52",
+    "pct": "+2.08%"
+   },
+   {
+    "name": "Nikkei 225",
+    "code": "JP",
+    "level": "58,154.50",
+    "pct": "+1.14%"
+   },
+   {
+    "name": "Hang Seng",
+    "code": "HK",
+    "level": "22,391.89",
+    "pct": "+0.74%"
+   },
+   {
+    "name": "Shanghai Composite",
+    "code": "CN",
+    "level": "3,475.45",
+    "pct": "-0.04%"
+   },
+   {
+    "name": "Kospi",
+    "code": "KR",
+    "level": "4,822.39",
+    "pct": "+2.36%"
+   }
+  ],
+  "cmd": [
+   {
+    "name": "Brent crude US$/bbl",
+    "level": "92.12",
+    "pct": "-2.63%"
+   },
+   {
+    "name": "WTI crude US$/bbl",
+    "level": "85.61",
+    "pct": "+2.31%"
+   },
+   {
+    "name": "Gold US$/oz",
+    "level": "3,659.00",
+    "pct": "+3.48%"
+   },
+   {
+    "name": "USD / INR",
+    "level": "92.238",
+    "pct": "-0.61%"
+   },
+   {
+    "name": "Dollar index",
+    "level": "103.67",
+    "pct": "-0.00%"
+   },
+   {
+    "name": "US 10-yr yield %",
+    "level": "4.85",
+    "pct": "-1.14%"
+   }
+  ],
+  "vix": {
+   "level": "16.84",
+   "pct": "-4.70%",
+   "gauge": 0.6579999923706055,
+   "text": "India VIX 16.84 (-4.70%); USD/INR 92.24 (-0.61%); US 10-yr yield 4.85 (-1.14%). India VIX eased 4.7% - volatility expectations cooling."
+  },
+  "events": [
+   "Next Nifty weekly expiry: Tue 01 Dec 2026; next Sensex weekly expiry: Thu 03 Dec 2026.",
+   "Results today (1 companies): SETCO."
+  ],
+  "watch": [
+   [
+    "KOTAKBANK",
+    "In the news",
+    "Sensex Soars Close to 400 Pts, Nifty Nears 26,600: 3 Reasons Why the Stock Market Is Up To"
+   ],
+   [
+    "TRENT",
+    "In the news",
+    "Nifty surges over 12% in November, eyes biggest monthly gain in six years; BSE, Eternal, T"
+   ],
+   [
+    "WIPRO",
+    "In the news",
+    "Sensex Today Ends 390 Points Higher | Nifty Above 25,850 | Wipro Up 4%"
+   ],
+   [
+    "HEROMOTOCO",
+    "Setup: BUY (A+)",
+    "Entry 5,756.0, stop 5,696.5, target 5,856.8"
+   ],
+   [
+    "MANKIND",
+    "Setup: BUY (A+)",
+    "Entry 2,694.6, stop 2,667.9, target 2,736.7"
+   ],
+   [
+    "UNITDSPR",
+    "Setup: BUY (A+)",
+    "Entry 1,521.2, stop 1,505.8, target 1,544.9"
+   ],
+   [
+    "WELSPUNLIV",
+    "Setup: BUY (A+)",
+    "Entry 279.2, stop 273.9, target 287.6"
+   ],
+   [
+    "HINDUNILVR",
+    "Volume surge (last session)",
+    "3.1x average volume, +6.08%"
+   ]
+  ],
+  "headlines": [
+   "Stocks to watch: Urban Company, Leela Palaces,Waaree Renewable, KPI Green",
+   "Asian shares mostly rise ahead of Wall Street's reopening after the Thanksgiving holiday",
+   "GIFT Nifty loses steam: Can Rs 11,474 crore of institutional buying keep Dalal Street's rally alive?",
+   "Shares find footing after bruising month, dollar set for third monthly gain",
+   "Top stocks to watch today: NSE, Tata Group, Texmaco Rail, Tata Motors shares in focus on Friday, 27 November",
+   "Stock Market Today: Sensex Jumps 390 Points, Nifty Closes A\u2026",
+   "Stock Market Today: All You Need To Know Going Into Trade On Nov. 27",
+   "LIVE: GIFT Nifty signals cautious start for Sensex, Nifty; Kospi steady after recent spikes"
+  ],
+  "calls": {
+   "buy": [
+    {
+     "sym": "HEROMOTOCO",
+     "side": "BUY",
+     "entry": "5,755.96",
+     "sl": "5,696.52",
+     "t1": "5,856.83",
+     "t2": "5,945.99",
+     "rr": "1.7",
+     "risk": "59.44",
+     "riskpct": "1.03%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "Market: Nifty bullish \u00b7 VIX 17.7"
+     ]
+    },
+    {
+     "sym": "MANKIND",
+     "side": "BUY",
+     "entry": "2,694.60",
+     "sl": "2,667.93",
+     "t1": "2,736.67",
+     "t2": "2,780.73",
+     "rr": "1.6",
+     "risk": "26.67",
+     "riskpct": "0.99%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 39: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "UNITDSPR",
+     "side": "BUY",
+     "entry": "1,521.23",
+     "sl": "1,505.79",
+     "t1": "1,544.90",
+     "t2": "1,569.70",
+     "rr": "1.5",
+     "risk": "15.44",
+     "riskpct": "1.01%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "Market: Nifty bullish \u00b7 VIX 17.7"
+     ]
+    },
+    {
+     "sym": "WELSPUNLIV",
+     "side": "BUY",
+     "entry": "279.24",
+     "sl": "273.93",
+     "t1": "287.62",
+     "t2": "295.59",
+     "rr": "1.6",
+     "risk": "5.31",
+     "riskpct": "1.90%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11.5,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 37: strong trend, +DI leads"
+     ]
+    },
+    {
+     "sym": "IDFCFIRSTB",
+     "side": "BUY",
+     "entry": "88.22",
+     "sl": "87.15",
+     "t1": "90.19",
+     "t2": "91.60",
+     "rr": "1.8",
+     "risk": "1.07",
+     "riskpct": "1.21%",
+     "conv": 100,
+     "convl": "Very high",
+     "grade": "A+",
+     "S": 11,
+     "why": [
+      "Trend: price > 20 > 50 > 200 DMA",
+      "ADX 35: strong trend, +DI leads"
+     ]
+    }
+   ],
+   "sell": [],
+   "watch_buy": [
+    {
+     "sym": "INDIGO",
+     "conv": 49,
+     "S": 12.5,
+     "why": "first target too close for the risk (R:R 1.17 < 1.5)"
+    },
+    {
+     "sym": "EICHERMOT",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.41 < 1.5)"
+    },
+    {
+     "sym": "AUROPHARMA",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.48 < 1.5)"
+    },
+    {
+     "sym": "GLENMARK",
+     "conv": 49,
+     "S": 11.5,
+     "why": "first target too close for the risk (R:R 1.24 < 1.5)"
+    }
+   ]
+  },
+  "gift": {
+   "last": "25,958.0",
+   "pct": "+0.14%",
+   "premium": "+74 pts",
+   "vs": "+0.28%",
+   "asof": "27 Nov 08:00"
+  },
+  "gainers": [
+   [
+    "HCLTECH",
+    "1,468.60",
+    "+6.42%"
+   ],
+   [
+    "HINDUNILVR",
+    "2,141.80",
+    "+6.08%"
+   ],
+   [
+    "BRITANNIA",
+    "5,076.20",
+    "+5.08%"
+   ],
+   [
+    "TCS",
+    "2,640.30",
+    "+4.89%"
+   ],
+   [
+    "INFY",
+    "1,183.00",
+    "+4.69%"
+   ]
+  ],
+  "losers": [
+   [
+    "ASIANPAINT",
+    "2,543.00",
+    "-2.98%"
+   ],
+   [
+    "BAJFINANCE",
+    "1,097.85",
+    "-2.96%"
+   ],
+   [
+    "SHRIRAMFIN",
+    "961.85",
+    "-2.84%"
+   ],
+   [
+    "NESTLEIND",
+    "1,320.30",
+    "-2.81%"
+   ],
+   [
+    "BAJAJFINSV",
+    "1,885.90",
+    "-2.03%"
+   ]
+  ],
+  "shock": [
+   [
+    "HINDUNILVR",
+    "2,141.80",
+    "3.1x avg vol",
+    "+6.08%"
+   ],
+   [
+    "BRITANNIA",
+    "5,076.20",
+    "2.1x avg vol",
+    "+5.08%"
+   ],
+   [
+    "WIPRO",
+    "196.54",
+    "1.8x avg vol",
+    "+3.96%"
+   ],
+   [
+    "CIPLA",
+    "1,433.20",
+    "1.8x avg vol",
+    "+2.38%"
+   ]
+  ],
+  "pivots": [
+   {
+    "name": "Nifty 50",
+    "vals": [
+     "25,623",
+     "25,754",
+     "25,864",
+     "25,995",
+     "26,106"
+    ]
+   },
+   {
+    "name": "Bank Nifty",
+    "vals": [
+     "62,885",
+     "63,210",
+     "63,657",
+     "63,983",
+     "64,430"
+    ]
+   }
+  ],
+  "est": 0.28,
+  "stock_news": {
+   "items": [
+    {
+     "sym": "CHENNPETRO",
+     "name": "Chennai Petroleum Corporation Limited",
+     "headline": "Ashiana Housing JV buys 10-acre land in Chennai for senior living project, eyes Rs 1,100 cr revenue",
+     "brief": "Ashiana Housing Ltd recently revealed its acquisition of nearly 10 acres in Chennai aimed at a senior living initiative.",
+     "source": "Economic Times",
+     "time": "26 Nov 21:21",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 108.2,
+     "also": [
+      "NDTV Profit"
+     ],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/markets/digital-real-estate/realty-news/ashiana-housing-jv-buys-10-acre-land-in-chennai-for-senior-living-project-eyes-rs-1100-cr-revenue/articleshow/136197134.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.1,
+      "ctx": 1.0,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": -0.05,
+      "n": 2223,
+      "fine": true,
+      "t_up": 46,
+      "t_dn": 53,
+      "t_n": 5714,
+      "t_avg": 0.07,
+      "edge": 0.1,
+      "rsi": 40,
+      "rsi_up": true,
+      "vm": 0.5231385058725271,
+      "dp": 23.922267899122428,
+      "pct": 0.5853944094833895,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Oil & Gas",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "SCHAEFFLER",
+     "name": "Schaeffler India Limited",
+     "headline": "Schaeffler sells 6.5% stake in Indian unit, raises over \u20ac300 million",
+     "brief": "The German group plans to use the proceeds to support its diversification into electrification, automation and robotics amid a difficult European automotive market.",
+     "source": "BusinessLine",
+     "time": "26 Nov 20:10",
+     "tag": "DEAL",
+     "tone": "",
+     "score": 107.1,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/schaeffler-sells-65-stake-in-indian-unit-raises-over-300-million/article71747215.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.3,
+      "ctx": 0.5,
+      "p_up": 51,
+      "p_dn": 49,
+      "avg": 0.62,
+      "n": 424,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 23159,
+      "t_avg": -0.17,
+      "edge": -1.6,
+      "rsi": 57,
+      "rsi_up": true,
+      "vm": 3.6999952688782507,
+      "dp": 27.105758724106664,
+      "pct": 2.796445431824488,
+      "above20": true,
+      "bu": null,
+      "pcr": null,
+      "flow": null,
+      "sec": null,
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "SBIN",
+     "name": "State Bank of India",
+     "headline": "SBI's renewable energy loan book at Rs 1.24 lakh crore; financed 60 GW capacity: MD",
+     "brief": "Battery energy storage is the single biggest challenge facing India's power sector as the growing renewable energy capacity needs to be supported by adequate storage and transmission infrastructure.",
+     "source": "Economic Times",
+     "time": "26 Nov 22:16",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 82.0,
+     "also": [],
+     "n": 1,
+     "link": "https://economictimes.indiatimes.com/industry/banking/finance/banking/sbis-renewable-energy-loan-book-at-rs-1-24-lakh-crore-financed-60-gw-capacity-md/articleshow/136198588.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.8,
+      "ctx": 0.0,
+      "p_up": 54,
+      "p_dn": 46,
+      "avg": 0.52,
+      "n": 1046,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 23159,
+      "t_avg": -0.17,
+      "edge": -1.6,
+      "rsi": 70,
+      "rsi_up": false,
+      "vm": 0.5002564019124589,
+      "dp": 39.723466624805134,
+      "pct": -0.13179282168431225,
+      "above20": true,
+      "bu": "Long unwinding",
+      "pcr": 0.77,
+      "flow": "WEAK",
+      "sec": "Financial Services",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "WIPRO",
+     "name": "Wipro Limited",
+     "headline": "Wipro takes over 3,000 BP employees in new deal: What's behind the British oil giant's big move?",
+     "brief": "BP will transfer over 3,000 finance employees in India, Hungary and Malaysia to Wipro in 2027 as the energy giant reshapes operations and cuts costs.",
+     "source": "Mint",
+     "time": "26 Nov 18:02",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 80.1,
+     "also": [
+      "Business Standard"
+     ],
+     "n": 2,
+     "link": "https://www.livemint.com/companies/wipro-lands-major-bp-deal-takes-over-3-000-employees-across-3-countries-why-is-the-british-co-transferring-staff-11795693466869.html",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.7,
+      "ctx": 1.5,
+      "p_up": 53,
+      "p_dn": 47,
+      "avg": 0.55,
+      "n": 744,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 23159,
+      "t_avg": -0.17,
+      "edge": -1.6,
+      "rsi": 61,
+      "rsi_up": true,
+      "vm": 1.9457580599103508,
+      "dp": 29.58747367368665,
+      "pct": 3.961914837344607,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.81,
+      "flow": "IN",
+      "sec": "IT",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "BSE",
+     "name": "BSE Limited",
+     "headline": "NSE, BSE shares gain as HSBC initiates coverage; prefers BSE over NSE",
+     "brief": "HSBC has set a target price of \u20b94,500 for BSE, indicating 20% upside, while assigning a target of \u20b92,300 to NSE. The brokerage sees stronger medium-term earnings growth potential in BSE.",
+     "source": "BusinessLine",
+     "time": "26 Nov 16:31",
+     "tag": "BROKERAGE",
+     "tone": "up",
+     "score": 76.9,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/markets/nse-bse-shares-gain-as-hsbc-initiates-coverage-prefers-bse-over-nse/article71745400.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 1.2,
+      "ctx": 2.0,
+      "p_up": 53,
+      "p_dn": 47,
+      "avg": 0.55,
+      "n": 744,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 23159,
+      "t_avg": -0.17,
+      "edge": -1.6,
+      "rsi": 70,
+      "rsi_up": true,
+      "vm": 1.7507537619650366,
+      "dp": 39.09121105716072,
+      "pct": 5.700360245814799,
+      "above20": true,
+      "bu": "Long build-up",
+      "pcr": 0.83,
+      "flow": "WEAK",
+      "sec": "Financial Services",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "NETWEB",
+     "name": "Netweb Technologies India Limited",
+     "headline": "Netweb Technologies India: Press Release",
+     "brief": "Netweb Technologies India Limited has informed the Exchange regarding a press release dated November 27, 2026, titled \"Regarding Product launch\".",
+     "source": "NSE filing",
+     "time": "27 Nov 07:54",
+     "tag": "EXPANSION",
+     "tone": "",
+     "score": 68.8,
+     "also": [],
+     "n": 1,
+     "link": "https://nsearchives.nseindia.com/corporate/NETWEB1234_27112026075412_Intimation_Press_Release_Product_Launch.pdf",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.2,
+      "ctx": 1.0,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.21,
+      "n": 538,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 9169,
+      "t_avg": -0.14,
+      "edge": -1.6,
+      "rsi": 43,
+      "rsi_up": true,
+      "vm": 0.47631272838565003,
+      "dp": 24.27832278886299,
+      "pct": 1.1518898972773466,
+      "above20": false,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Digital",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "HDFCBANK",
+     "name": "HDFC Bank Limited",
+     "headline": "SC asks HDFC Bank, three others to ok staff prosecution",
+     "brief": "The Supreme Court has ordered HDFC Bank, ICICI Bank, Sammaan Capital, and PNB Housing Finance to grant prosecution sanctions.",
+     "source": "Economic Times",
+     "time": "27 Nov 01:32",
+     "tag": "NEWS",
+     "tone": "dn",
+     "score": 45.5,
+     "also": [],
+     "n": 3,
+     "link": "https://economictimes.indiatimes.com/markets/stocks/news/sc-asks-hdfc-bank-three-others-to-ok-staff-prosecution/articleshow/136206787.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.3,
+      "ctx": 0.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": 0.28,
+      "n": 261,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 9169,
+      "t_avg": -0.14,
+      "edge": -1.6,
+      "rsi": 72,
+      "rsi_up": true,
+      "vm": 1.7479188562747832,
+      "dp": 63.82098560482442,
+      "pct": 1.8671708815882715,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.7,
+      "flow": "WEAK",
+      "sec": "Financial Services",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "TECHM",
+     "name": "Tech Mahindra Limited",
+     "headline": "Market Trading Guide: Tech Mahindra, Angel One among 5 stock recommendations for Friday",
+     "brief": "Market experts recommend five stocks for Friday, including Tech Mahindra, Angel One, Tata Consumer, Kansai Nerolac and Agarwal Eye, outlining entry levels, stop losses and upside targets.",
+     "source": "Economic Times",
+     "time": "26 Nov 20:20",
+     "tag": "NEWS",
+     "tone": "dn",
+     "score": 39.4,
+     "also": [],
+     "n": 2,
+     "link": "https://economictimes.indiatimes.com/markets/stocks/news/market-trading-guide-tech-mahindra-angel-one-among-5-stock-recommendations-for-friday/slideshow/136196068.cms",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.2,
+      "ctx": 1.0,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.24,
+      "n": 2209,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 9169,
+      "t_avg": -0.14,
+      "edge": -1.6,
+      "rsi": 66,
+      "rsi_up": true,
+      "vm": 1.003549756841902,
+      "dp": 49.94149493049374,
+      "pct": 2.970242060848323,
+      "above20": true,
+      "bu": "Short covering",
+      "pcr": 0.67,
+      "flow": "IN",
+      "sec": "IT",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "ADANIENT",
+     "name": "Adani Enterprises Limited",
+     "headline": "Adani Enterprises and Adani Power plan public bond sale to raise at least $220 million",
+     "brief": "Each company is expected to raise between \u20b91,000 crore and \u20b92,000 crore",
+     "source": "BusinessLine",
+     "time": "26 Nov 17:19",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 39.4,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/adani-enterprises-and-adani-power-plan-public-bond-sale-to-raise-at-least-220-million/article71745193.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": -0.8,
+      "ctx": 0.0,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": 0.01,
+      "n": 1807,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 9169,
+      "t_avg": -0.14,
+      "edge": -1.6,
+      "rsi": 46,
+      "rsi_up": false,
+      "vm": 1.3839268713149362,
+      "dp": 38.67158378433457,
+      "pct": -0.3185310099306727,
+      "above20": false,
+      "bu": "Short build-up",
+      "pcr": 0.71,
+      "flow": "IN",
+      "sec": "Metal",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "TATAPOWER",
+     "name": "Tata Power Company Limited",
+     "headline": "Tata Power: Opportunity or value trap as ambitious growth plans meet execution risks?",
+     "brief": "Tata Power's ambitious FY30 expansion roadmap and steady earnings growth offer a long-term growth opportunity, but project execution and a sizeable arbitration dispute remain key risks for investors.",
+     "source": "Mint",
+     "time": "27 Nov 08:00",
+     "tag": "NEWS",
+     "tone": "up",
+     "score": 37.9,
+     "also": [],
+     "n": 1,
+     "link": "https://www.livemint.com/market/stock-market-news/tata-power-opportunity-or-value-trap-as-ambitious-growth-plans-meet-execution-risks-11795692308967.html",
+     "trend": {
+      "dir": "up",
+      "strength": "Moderate",
+      "bars": 2,
+      "view": 2.6,
+      "ctx": 2.5,
+      "p_up": 45,
+      "p_dn": 55,
+      "avg": -0.05,
+      "n": 2223,
+      "fine": true,
+      "t_up": 46,
+      "t_dn": 53,
+      "t_n": 5714,
+      "t_avg": 0.07,
+      "edge": 0.1,
+      "rsi": 30,
+      "rsi_up": true,
+      "vm": 0.7344559032255913,
+      "dp": 53.791369312013735,
+      "pct": 0.15479876160990713,
+      "above20": false,
+      "bu": "Long build-up",
+      "pcr": 0.61,
+      "flow": "IN",
+      "sec": "Commodities",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "HINDZINC",
+     "name": "Hindustan Zinc Limited",
+     "headline": "Hindustan Zinc, IIT Madras develop zinc-air battery-powered electric three-wheeler prototype",
+     "brief": "The research collaboration has moved from laboratory development to vehicle-level testing, exploring new uses for India\u2019s abundant zinc resources",
+     "source": "BusinessLine",
+     "time": "26 Nov 17:17",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 36.2,
+     "also": [],
+     "n": 1,
+     "link": "https://www.thehindubusinessline.com/companies/hindustan-zinc-iit-madras-develop-zinc-air-battery-powered-electric-three-wheeler-prototype/article71746157.ece",
+     "trend": {
+      "dir": "flat",
+      "strength": "Weak",
+      "bars": 0,
+      "view": 0.2,
+      "ctx": 1.0,
+      "p_up": 49,
+      "p_dn": 51,
+      "avg": 0.21,
+      "n": 538,
+      "fine": true,
+      "t_up": 45,
+      "t_dn": 55,
+      "t_n": 9169,
+      "t_avg": -0.14,
+      "edge": -1.6,
+      "rsi": 44,
+      "rsi_up": true,
+      "vm": 1.1192107281399482,
+      "dp": 38.47051786918622,
+      "pct": 1.327689051375789,
+      "above20": false,
+      "bu": null,
+      "pcr": 0.69,
+      "flow": "IN",
+      "sec": "Metal",
+      "asof": "2026-11-26"
+     }
+    },
+    {
+     "sym": "URBANCO",
+     "name": "Urban Company Limited",
+     "headline": "Urban Company enters AC mkt; promises zero repair cost for 5 years",
+     "brief": "The home-services platform launches Native Ultra and Ultra Air with a five-year unconditional warranty, including gas refills, and a 10-year compressor warranty.",
+     "source": "Business Standard",
+     "time": "26 Nov 20:07",
+     "tag": "NEWS",
+     "tone": "",
+     "score": 34.7,
+     "also": [],
+     "n": 1,
+     "link": "https://www.business-standard.com/companies/news/urban-company-enters-ac-market-with-units-designed-for-indian-summers-126112601340_1.html",
+     "trend": {
+      "dir": "up",
+      "strength": "Moderate",
+      "bars": 2,
+      "view": 2.3,
+      "ctx": 1.0,
+      "p_up": 58,
+      "p_dn": 42,
+      "avg": 0.84,
+      "n": 1054,
+      "fine": true,
+      "t_up": 49,
+      "t_dn": 51,
+      "t_n": 11280,
+      "t_avg": 0.18,
+      "edge": 2.7,
+      "rsi": 57,
+      "rsi_up": true,
+      "vm": 1.3482365411707182,
+      "dp": 39.44095622217085,
+      "pct": 3.56081286017592,
+      "above20": true,
+      "bu": null,
+      "pcr": null,
+      "flow": "IN",
+      "sec": "Digital",
+      "asof": "2026-11-26"
+     }
+    }
+   ],
+   "since_txt": "Thu 26 Nov, 15:30",
+   "matched": 12,
+   "model": {
+    "test_from": "2026-06-16",
+    "test_base_up": 46,
+    "test_n": 54513,
+    "asof": "2026-11-26",
+    "from": "2025-12-26",
+    "sessions": 226,
+    "cases": 86628,
+    "base_up": 49,
+    "horizon": 3,
+    "ctx": true,
+    "breadth": 60.27667984189723
+   }
+  }
+ },
+ "title": "Morning Market Brief: Global Trends, Key Levels & Daily Alerts (27 Nov 2026)",
+ "headline": "Positive start likely - Nifty zone 25,918 - 25,996",
+ "bias_text": "GIFT Nifty 25,958.0 (+74 pts, +0.28% vs Nifty's last close). US: S&P 500 -0.25%, Nasdaq -0.62%, Dow +0.33%. Opening call anchored on GIFT Nifty.",
+ "open_text": "Wall Street steady, Asia positive, crude easing. Opening call anchored on GIFT Nifty.",
+ "proj": 25957.0,
+ "proj_label": "Today (est.)",
+ "mood": {
+  "key": "bull",
+  "label": "Positive start likely",
+  "sub": "Indicative Nifty opening zone 25,918 - 25,996"
+ },
+ "mood_score": 0.28,
+ "mood_pic": "bull_calm",
+ "spark": [
+  23053.099609375,
+  23440.80078125,
+  23810.849609375,
+  23960.599609375,
+  24536.599609375,
+  25030.349609375,
+  25044.650390625,
+  25255.05078125,
+  25299.349609375,
+  25144.30078125,
+  25291.099609375,
+  25387.400390625,
+  25227.94921875,
+  25514.30078125,
+  25800.599609375,
+  25349.650390625,
+  25819.25,
+  25884.5
+ ],
+ "spark_label": "Nifty 50 daily closes, last 18 sessions",
+ "vix": {
+  "gauge": 0.6579999923706055,
+  "headline": "India VIX 16.84 (-4.70%)",
+  "text": "India VIX 16.84 (-4.70%); USD/INR 92.24 (-0.61%); US 10-yr yield 4.85 (-1.14%). India VIX eased 4.7% - volatility expectations cooling."
+ },
+ "tiles": [
+  {
+   "name": "Nifty 50",
+   "sub": "prev close",
+   "value": "25,884.50",
+   "pct": "+0.25%"
+  },
+  {
+   "name": "Brent Crude",
+   "sub": "US$/bbl",
+   "value": "92.12",
+   "pct": "-2.63%"
+  },
+  {
+   "name": "Gold Spot",
+   "sub": "US$/oz",
+   "value": "3,659.00",
+   "pct": "+3.48%"
+  },
+  {
+   "name": "India VIX",
+   "sub": "close",
+   "value": "16.84",
+   "pct": "-4.70%"
+  },
+  {
+   "name": "USD/INR",
+   "sub": "latest",
+   "value": "92.238",
+   "pct": "-0.61%"
+  },
+  {
+   "name": "US 10-yr",
+   "sub": "yield %",
+   "value": "4.85",
+   "pct": "-1.14%"
+  }
+ ],
+ "bench": [
+  {
+   "name": "Dow Jones",
+   "code": "US",
+   "level": "50,182.95",
+   "pct": "+0.33%"
+  },
+  {
+   "name": "S&P 500",
+   "code": "US",
+   "level": "7,182.78",
+   "pct": "-0.25%"
+  },
+  {
+   "name": "Nasdaq Composite",
+   "code": "US",
+   "level": "23,585.80",
+   "pct": "-0.62%"
+  },
+  {
+   "name": "FTSE 100",
+   "code": "UK",
+   "level": "10,609.30",
+   "pct": "+1.75%"
+  },
+  {
+   "name": "DAX",
+   "code": "DE",
+   "level": "25,215.52",
+   "pct": "+2.08%"
+  },
+  {
+   "name": "Nikkei 225",
+   "code": "JP",
+   "level": "58,154.50",
+   "pct": "+1.14%"
+  },
+  {
+   "name": "Hang Seng",
+   "code": "HK",
+   "level": "22,391.89",
+   "pct": "+0.74%"
+  },
+  {
+   "name": "Shanghai Composite",
+   "code": "CN",
+   "level": "3,475.45",
+   "pct": "-0.04%"
+  },
+  {
+   "name": "Kospi",
+   "code": "KR",
+   "level": "4,822.39",
+   "pct": "+2.36%"
+  }
+ ],
+ "asia": {
+  "head": "Asia & Global Cues",
+  "text": "Latest closes: Nikkei 58,154.50 (+1.14%), Hang Seng 22,391.89 (+0.74%), Shanghai 3,475.45 (-0.04%), Kospi 4,822.39 (+2.36%). Wall Street: Dow 50,182.95 (+0.33%), S&P 500 7,182.78 (-0.25%), Nasdaq 23,585.80 (-0.62%)."
+ },
+ "levels": [
+  {
+   "name": "Nifty 50",
+   "s": "25,754 - 25,864",
+   "r": "26,106 - 26,237",
+   "note": "Gap down expected: yesterday's support levels now act as resistance. Resistance R2 26,106 / R3 26,237; a slide below 25,864 exposes 25,754. (Prev high, R1 inside the open zone.)",
+   "flag": "Re-anchored to GIFT open zone"
+  },
+  {
+   "name": "Bank Nifty",
+   "s": "62,885 - 63,210",
+   "r": "63,983 - 64,430",
+   "note": "A sustained move above 63,983 opens up 64,430; a slide below 63,210 would expose 62,885.",
+   "flag": ""
+  }
+ ],
+ "bottom": [
+  {
+   "title": "Events Today",
+   "icon": "cal",
+   "text": "Next Nifty weekly expiry: Tue 01 Dec 2026; next Sensex weekly expiry: Thu 03 Dec 2026. Results today (1 companies): SETCO."
+  },
+  {
+   "title": "Stocks to Watch",
+   "icon": "chart",
+   "text": "KOTAKBANK (In the news); TRENT (In the news); WIPRO (In the news); HEROMOTOCO (Setup: BUY (A+)); MANKIND (Setup: BUY (A+)); UNITDSPR (Setup: BUY (A+))"
+  },
+  {
+   "title": "Headlines to Track",
+   "icon": "list",
+   "text": "Stocks to watch: Urban Company, Leela Palaces,Waaree Renewable, KPI Green | Asian shares mostly rise ahead of Wall Street's reopening after the Thanksgiving"
+  }
+ ],
+ "movers": {
+  "up": [
+   {
+    "sym": "HCLTECH",
+    "pct": "+6.42%"
+   },
+   {
+    "sym": "HINDUNILVR",
+    "pct": "+6.08%"
+   },
+   {
+    "sym": "BRITANNIA",
+    "pct": "+5.08%"
+   }
+  ],
+  "dn": [
+   {
+    "sym": "ASIANPAINT",
+    "pct": "-2.98%"
+   },
+   {
+    "sym": "BAJFINANCE",
+    "pct": "-2.96%"
+   },
+   {
+    "sym": "SHRIRAMFIN",
+    "pct": "-2.84%"
+   }
+  ]
+ },
+ "footnote": "",
+ "disclaimer": "For information only. Not investment advice. Markets carry risk."
+}

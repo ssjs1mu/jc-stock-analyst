@@ -2,6 +2,183 @@
  "schedule_id": "morning-pulse",
  "runs": [
   {
+   "generated_at": "2026-11-27T08:15:31+05:30",
+   "date": "2026-11-27",
+   "status": "ok",
+   "caption": "Morning Pulse 27 Nov",
+   "note": "",
+   "files": [
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-27.pdf",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-27.pdf",
+     "type": "pdf",
+     "bytes": 821770
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-27.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-27.png",
+     "type": "png",
+     "bytes": 1361952
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_1.png",
+     "type": "png",
+     "bytes": 811160
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_2.png",
+     "type": "png",
+     "bytes": 280700
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_3.png",
+     "type": "png",
+     "bytes": 525846
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_4.png",
+     "type": "png",
+     "bytes": 328698
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_5.png",
+     "type": "png",
+     "bytes": 419411
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_6.png",
+     "type": "png",
+     "bytes": 398616
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_7.png",
+     "type": "png",
+     "bytes": 269305
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_2026-11-27_8.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_2026-11-27_8.png",
+     "type": "png",
+     "bytes": 1346401
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_1.png",
+     "type": "png",
+     "bytes": 814961
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_2.png",
+     "type": "png",
+     "bytes": 274946
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_3.png",
+     "type": "png",
+     "bytes": 519368
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_4.png",
+     "type": "png",
+     "bytes": 312256
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_5.png",
+     "type": "png",
+     "bytes": 416510
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_6.png",
+     "type": "png",
+     "bytes": 402013
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_7.png",
+     "type": "png",
+     "bytes": 275351
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_HI_2026-11-27_8.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_HI_2026-11-27_8.png",
+     "type": "png",
+     "bytes": 1346274
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_1.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_1.png",
+     "type": "png",
+     "bytes": 829272
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_2.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_2.png",
+     "type": "png",
+     "bytes": 311939
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_3.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_3.png",
+     "type": "png",
+     "bytes": 528080
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_4.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_4.png",
+     "type": "png",
+     "bytes": 354587
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_5.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_5.png",
+     "type": "png",
+     "bytes": 494522
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_6.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_6.png",
+     "type": "png",
+     "bytes": 472683
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_7.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_7.png",
+     "type": "png",
+     "bytes": 326420
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Mobile_BN_2026-11-27_8.png",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Mobile_BN_2026-11-27_8.png",
+     "type": "png",
+     "bytes": 1348507
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Infographic_2026-11-27.json",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Infographic_2026-11-27.json",
+     "type": "json",
+     "bytes": 29707
+    },
+    {
+     "name": "JCGG_Morning_Pulse_Clip_2026-11-27.mp4",
+     "path": "reports/morning-pulse/JCGG_Morning_Pulse_Clip_2026-11-27.mp4",
+     "type": "mp4",
+     "bytes": 347716
+    }
+   ]
+  },
+  {
    "generated_at": "2026-11-26T08:14:03+05:30",
    "date": "2026-11-26",
    "status": "ok",
@@ -3320,5 +3497,5 @@
    ]
   }
  ],
- "updated_at": "2026-11-26T08:14:03+05:30"
+ "updated_at": "2026-11-27T08:15:31+05:30"
 }
